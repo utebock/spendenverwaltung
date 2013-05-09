@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite failures="0" time="0.03" errors="0" skipped="0" tests="1" name="at.ac.tuwien.AppTest">
+<testsuite failures="0" time="0.098" errors="0" skipped="0" tests="1" name="at.ac.tuwien.AppTest">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Libraries"/>
@@ -22,7 +22,7 @@
     <property name="basedir" value="/Users/thomas/Documents/TU Wien/4. Semester/PR &amp; SE/Gruppenphase/qse-sepm-ss13-06"/>
     <property name="java.endorsed.dirs" value="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/lib/endorsed"/>
     <property name="os.arch" value="x86_64"/>
-    <property name="surefire.real.class.path" value="/Users/thomas/Documents/TU Wien/4. Semester/PR &amp; SE/Gruppenphase/qse-sepm-ss13-06/target/surefire/surefirebooter7013344739522340697.jar"/>
+    <property name="surefire.real.class.path" value="/Users/thomas/Documents/TU Wien/4. Semester/PR &amp; SE/Gruppenphase/qse-sepm-ss13-06/target/surefire/surefirebooter6777532034081889521.jar"/>
     <property name="java.io.tmpdir" value="/var/folders/vy/l2kjv4x12rz0d7qdg8b60nym0000gn/T/"/>
     <property name="line.separator" value="
 "/>
@@ -30,7 +30,7 @@
     <property name="os.name" value="Mac OS X"/>
     <property name="sun.jnu.encoding" value="MacRoman"/>
     <property name="java.library.path" value=".:/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java"/>
-    <property name="surefire.test.class.path" value="/Users/thomas/Documents/TU Wien/4. Semester/PR &amp; SE/Gruppenphase/qse-sepm-ss13-06/target/test-classes:/Users/thomas/Documents/TU Wien/4. Semester/PR &amp; SE/Gruppenphase/qse-sepm-ss13-06/target/classes:/Users/thomas/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar:"/>
+    <property name="surefire.test.class.path" value="/Users/thomas/Documents/TU Wien/4. Semester/PR &amp; SE/Gruppenphase/qse-sepm-ss13-06/target/test-classes:/Users/thomas/Documents/TU Wien/4. Semester/PR &amp; SE/Gruppenphase/qse-sepm-ss13-06/target/classes:/Users/thomas/.m2/repository/junit/junit/4.11/junit-4.11.jar:/Users/thomas/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/Users/thomas/.m2/repository/org/mockito/mockito-all/1.9.5/mockito-all-1.9.5.jar:/Users/thomas/.m2/repository/org/springframework/spring/2.5.6/spring-2.5.6.jar:/Users/thomas/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar:"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.class.version" value="50.0"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
@@ -42,11 +42,11 @@
     <property name="java.specification.version" value="1.6"/>
     <property name="file.encoding" value="MacRoman"/>
     <property name="user.name" value="thomas"/>
-    <property name="java.class.path" value="/Users/thomas/Documents/TU Wien/4. Semester/PR &amp; SE/Gruppenphase/qse-sepm-ss13-06/target/test-classes:/Users/thomas/Documents/TU Wien/4. Semester/PR &amp; SE/Gruppenphase/qse-sepm-ss13-06/target/classes:/Users/thomas/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar:"/>
+    <property name="java.class.path" value="/Users/thomas/Documents/TU Wien/4. Semester/PR &amp; SE/Gruppenphase/qse-sepm-ss13-06/target/test-classes:/Users/thomas/Documents/TU Wien/4. Semester/PR &amp; SE/Gruppenphase/qse-sepm-ss13-06/target/classes:/Users/thomas/.m2/repository/junit/junit/4.11/junit-4.11.jar:/Users/thomas/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/Users/thomas/.m2/repository/org/mockito/mockito-all/1.9.5/mockito-all-1.9.5.jar:/Users/thomas/.m2/repository/org/springframework/spring/2.5.6/spring-2.5.6.jar:/Users/thomas/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar:"/>
     <property name="java.vm.specification.version" value="1.0"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="java.home" value="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home"/>
-    <property name="sun.java.command" value="/Users/thomas/Documents/TU Wien/4. Semester/PR &amp; SE/Gruppenphase/qse-sepm-ss13-06/target/surefire/surefirebooter7013344739522340697.jar /Users/thomas/Documents/TU Wien/4. Semester/PR &amp; SE/Gruppenphase/qse-sepm-ss13-06/target/surefire/surefire1884270617439698442tmp /Users/thomas/Documents/TU Wien/4. Semester/PR &amp; SE/Gruppenphase/qse-sepm-ss13-06/target/surefire/surefire3023438072943389430tmp"/>
+    <property name="sun.java.command" value="/Users/thomas/Documents/TU Wien/4. Semester/PR &amp; SE/Gruppenphase/qse-sepm-ss13-06/target/surefire/surefirebooter6777532034081889521.jar /Users/thomas/Documents/TU Wien/4. Semester/PR &amp; SE/Gruppenphase/qse-sepm-ss13-06/target/surefire/surefire9198418544879488719tmp /Users/thomas/Documents/TU Wien/4. Semester/PR &amp; SE/Gruppenphase/qse-sepm-ss13-06/target/surefire/surefire6396099568281706166tmp"/>
     <property name="java.specification.vendor" value="Sun Microsystems Inc."/>
     <property name="user.language" value="de"/>
     <property name="awt.toolkit" value="apple.awt.CToolkit"/>
@@ -65,5 +65,5 @@
     <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase time="0.002" classname="at.ac.tuwien.AppTest" name="testApp"/>
+  <testcase time="0.001" classname="at.ac.tuwien.AppTest" name="testApp"/>
 </testsuite>
