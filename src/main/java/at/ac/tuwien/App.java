@@ -2,7 +2,6 @@ package at.ac.tuwien;
 
 /**
  * Hello World!
- * 
  *
  */
 public class App 
