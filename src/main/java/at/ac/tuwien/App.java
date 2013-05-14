@@ -1,7 +1,7 @@
 package at.ac.tuwien;
 
 /**
- * Hello world!
+ * Hello World!
  * 
  *
  */
