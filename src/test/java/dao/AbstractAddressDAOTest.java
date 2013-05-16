@@ -44,21 +44,15 @@ public abstract class AbstractAddressDAOTest {
 
 		try {
 			Address returnedAddress = addressDAO.create(address);
+			address.setId(returnedAddress.getId()); // for #equals
+			
 			Address savedAddress = addressDAO.getByID(returnedAddress.getId());
+			
+			// check if address was returned correctly
+			assert (returnedAddress.equals(address));
 
-			// TODO change to #equals when implemented
-			// check if returned address is correct
-			assert (returnedAddress.getStreet().equals(address.getStreet()));
-			assert (returnedAddress.getPostalCode() == address.getPostalCode());
-			assert (returnedAddress.getCity() == address.getCity());
-			assert (returnedAddress.getCountry() == address.getCountry());
-
-			// check address was saved correctly
-			assert (savedAddress.getId() == returnedAddress.getId());
-			assert (savedAddress.getStreet().equals(address.getStreet()));
-			assert (savedAddress.getPostalCode() == address.getPostalCode());
-			assert (savedAddress.getCity() == address.getCity());
-			assert (savedAddress.getCountry() == address.getCountry());
+			// check if address was saved correctly
+			assert (savedAddress.equals(returnedAddress));
 
 		} catch (PersistenceException e) {
 			fail();
@@ -115,15 +109,15 @@ public abstract class AbstractAddressDAOTest {
 			assert (returnedAddress.getId() == address.getId());
 			assert (returnedAddress.getStreet().equals(address.getStreet()));
 			assert (returnedAddress.getPostalCode() == address.getPostalCode());
-			assert (returnedAddress.getCountry() == address.getCountry());
-			assert (returnedAddress.getCity() != address.getCity()); // different city
+			assert (returnedAddress.getCountry().equals(address.getCountry()));
+			assert (!returnedAddress.getCity().equals(address.getCity())); // different city
 
 			// check if address was updated correctly
 			assert (updatedAddress.getId() == address.getId());
 			assert (updatedAddress.getStreet().equals(address.getStreet()));
 			assert (updatedAddress.getPostalCode() == address.getPostalCode());
-			assert (updatedAddress.getCountry() == address.getCountry());
-			assert (updatedAddress.getCity() != address.getCity()); // different city
+			assert (updatedAddress.getCountry().equals(address.getCountry()));
+			assert (!updatedAddress.getCity().equals(address.getCity())); // different city
 
 			assert (returnedAddress.getCity() == updatedAddress.getCity());
 

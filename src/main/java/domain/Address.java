@@ -53,4 +53,34 @@ public class Address {
 	public void setCountry(String country) {
 		this.country = country;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+
+		if (obj == null) {
+			return false;
+		}
+
+		if (this == obj) {
+			return true;
+		}
+
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+
+		Address other = (Address) obj;
+
+		if (this.getId() == other.getId()
+				&& this.getPostalCode() == other.getPostalCode()
+				&& this.getStreet().equals(other.getStreet())
+				&& this.getCity().equals(other.getCity())
+				&& this.getCountry().equals(other.getCountry())) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	//TODO override #hashCode for hash-based data structures
 }
