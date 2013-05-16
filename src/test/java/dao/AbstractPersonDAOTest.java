@@ -5,6 +5,9 @@ import org.junit.Test;
 
 public abstract class AbstractPersonDAOTest {
 	
+	//TODO you should use the interface here, 
+	// since you don't know which implementation
+	// you will be testing yet (abstract test!) -pm
 	protected PersonDAOImplemented personDAO;
 	
 	@Test
