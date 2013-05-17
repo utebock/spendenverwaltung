@@ -2,6 +2,8 @@ package dao;
 
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
 import org.junit.Test;
 
 import domain.Address;
@@ -129,13 +131,91 @@ public abstract class AbstractAddressDAOTest {
 	/*
 	 * testing delete
 	 */
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void deleteWithNullParameter_ThrowsException() {
+		try {
+			addressDAO.delete(null);
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
 
-	// TODO
+	@Test
+	public void deleteWithValidParameter_RemovesEntity() {
+		Address address = new Address();
+		address.setStreet("Teststreet 1/1");
+		address.setPostalCode(00000);
+		address.setCity("Testcity");
+		address.setCountry("Testcountry");
+		try {
+			address = addressDAO.create(address);
+			Address createdAddress = addressDAO.getByID(address.getId());
+			assert(createdAddress!=null);
+			
+			addressDAO.delete(address);
+			Address deletedAddress = addressDAO.getByID(address.getId());
+			assert(deletedAddress==null);
+			
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
 
 	/*
 	 * testing find
 	 */
 
-	// TODO
+	@Test
+	public void getAll_ReturnsAllEntities() {
+		Address address = new Address();
+		address.setStreet("Teststreet 1/1");
+		address.setPostalCode(00000);
+		address.setCity("Testcity");
+		address.setCountry("Testcountry");
+		
+		Address address2 = new Address();
+		address2.setStreet("Teststreet2 1/1");
+		address2.setPostalCode(00001);
+		address2.setCity("Testcity2");
+		address2.setCountry("Testcountry2");
+		try {
+			addressDAO.create(address);
+			addressDAO.create(address2);
+			
+			List<Address> addressList = addressDAO.getAll();
+			assert(addressList!=null && addressList.size()==2);
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+	
+	@Test
+	public void getWithInvalidId_ReturnsNull() {
+		try {
+			Address address = addressDAO.getByID(100);
+			assert(address==null);
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+	
+	@Test
+	public void getWithValidId_ReturnsEntity() {
+		Address address = new Address();
+		address.setStreet("Teststreet 1/1");
+		address.setPostalCode(00000);
+		address.setCity("Testcity");
+		address.setCountry("Testcountry");
+		
+		try {
+			Address createdAddress = addressDAO.create(address);
+			Address foundAddress = addressDAO.getByID(createdAddress.getId());
+			
+			assert(foundAddress!=null && foundAddress.getId()==createdAddress.getId());
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
 
 }
