@@ -20,6 +20,11 @@
 	<property name="username" value="ubadministrative" />
 	<property name="password" value="ubadmin" />
 </bean>
+<bean id="addressDao" class="dao.AddressDAOImplemented">
+</bean>
+<bean id="personDao" class="dao.PersonDAOImplemented">
+	<property name="addressDao" ref="addressDao" />
+</bean>
 </beans>
 
            
