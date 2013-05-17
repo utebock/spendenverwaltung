@@ -2,6 +2,7 @@ package dao;
 
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
@@ -16,13 +17,13 @@ public class DataSourceTest {
 	
 	@Test
 	public void testConnectionShouldNotThrowException() {
-		@SuppressWarnings("resource")
 		ApplicationContext context = new ClassPathXmlApplicationContext("testspring.xml");
 		
-		@SuppressWarnings("unused")
-		DataSourceTransactionManager transactionManager = context.getBean("transactionManager", DataSourceTransactionManager.class);
+			@SuppressWarnings("unused")
+			DataSourceTransactionManager transactionManager = context.getBean("transactionManager", DataSourceTransactionManager.class);
 		
-		assert(true);
+			assert(true);
+			
+			((AbstractApplicationContext) context).close();
 	}
-
 }
