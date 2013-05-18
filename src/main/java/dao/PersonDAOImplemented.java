@@ -1,11 +1,18 @@
 package dao;
 
+
 import java.util.List;
 
 import domain.Person;
 
 public class PersonDAOImplemented implements IPersonDAO{
-
+	
+	private IAddressDAO addressDao;
+	
+	public void setAddressDao(IAddressDAO addressDao) {
+		this.addressDao = addressDao;
+	}
+	
 	@Override
 	public Person create(Person p) {
 		// TODO Auto-generated method stub
