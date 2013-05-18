@@ -3,10 +3,6 @@ package domain;
 public class Person {
 
 	private int id;
-	public static enum Gender{
-		MALE, FEMALE, UNDEFINED
-	};
-	private Gender gender;
 	
 	public static enum Salutation{
 		HERR, FRAU, FA, FAM
@@ -36,11 +32,11 @@ public class Person {
 		this.id = id;
 	}
 	
-	public Gender getGender(){
-		return gender;
+	public Salutation getSalutation(){
+		return salutation;
 	}
-	public void setGender(Gender gender){
-		this.gender = gender;
+	public void setSalutation(Salutation salutation){
+		this.salutation = salutation;
 	}
 	
 	public String getGivenName(){
@@ -69,13 +65,6 @@ public class Person {
 	}
 	public void setEmail(String email){
 		
-	}
-	
-	public Salutation getSalutation(){
-		return salutation;
-	}
-	public void setSalutation(Salutation salutation){
-		this.salutation = salutation;
 	}
 	
 	public String getTitle(){

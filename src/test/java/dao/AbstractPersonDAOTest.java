@@ -8,15 +8,15 @@ import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
 import domain.Person;
+import exceptions.PersistenceException;
 
 public abstract class AbstractPersonDAOTest {
 
 	protected IPersonDAO personDAO;
 	
 	@Test
-	public void createShouldCreatePersonWithValidParameters(){
+	public void createShouldCreatePersonWithValidParameters() throws PersistenceException{
 		Person person = new Person();
-		person.setGender(Person.Gender.MALE);
 		person.setSalutation(Person.Salutation.HERR);
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
@@ -31,14 +31,13 @@ public abstract class AbstractPersonDAOTest {
 	}
 	
 	@Test (expected = IllegalArgumentException.class)
-	public void createWithInvalidParametersShouldThrowException(){
+	public void createWithInvalidParametersShouldThrowException() throws PersistenceException{
 		personDAO.create(null);
 	}
 	
 	@Test
-	public void updateShouldUpdatePerson(){
+	public void updateShouldUpdatePerson() throws PersistenceException{
 		Person person = new Person();
-		person.setGender(Person.Gender.MALE);
 		person.setSalutation(Person.Salutation.HERR);
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
@@ -55,22 +54,21 @@ public abstract class AbstractPersonDAOTest {
 	}
 	
 	@Test (expected = IllegalArgumentException.class)
-	public void updateWithInvalidParametersShouldThrowException(){
+	public void updateWithInvalidParametersShouldThrowException() throws PersistenceException{
 		Person person = null;
 		personDAO.update(person);
 	}
 	
-	@Test (expected = NullPointerException.class )
-	public void updateNonExistentPersonShouldThrowException(){
+	@Test (expected = NullPointerException.class) 
+	public void updateNonExistentPersonShouldThrowException() throws PersistenceException{
 		Person person = personDAO.getByID(1000000);
 		person.setSurname("XXX");
 		personDAO.update(person);
 	}
 	
 	@Test
-	public void getByIdShouldGetPersonByID(){
+	public void getByIdShouldGetPersonByID() throws PersistenceException{
 		Person person = new Person();
-		person.setGender(Person.Gender.MALE);
 		person.setSalutation(Person.Salutation.HERR);
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
@@ -84,16 +82,15 @@ public abstract class AbstractPersonDAOTest {
 		assertThat(p.getGivenName(), is("Heinz"));
 	}
 	
-	@Test (expected = NullPointerException.class )
-	public void getByIdOfNonExistentPersonShouldThrowException(){
+	@Test (expected = NullPointerException.class)
+	public void getByIdOfNonExistentPersonShouldThrowException() throws PersistenceException{
 		Person person = personDAO.getByID(1000000);
 		assertNull(person);
 	}
 	
 	@Test
-	public void deleteShouldDeletePerson(){
+	public void deleteShouldDeletePerson() throws PersistenceException{
 		Person person = new Person();
-		person.setGender(Person.Gender.MALE);
 		person.setSalutation(Person.Salutation.HERR);
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
@@ -107,20 +104,19 @@ public abstract class AbstractPersonDAOTest {
 	}
 	
 	@Test (expected = NullPointerException.class)
-	public void deleteNonExistentPersonShouldThrowException(){
+	public void deleteNonExistentPersonShouldThrowException() throws PersistenceException{
 		Person person = personDAO.getByID(1000000);
 		personDAO.delete(person);
 	}
 	
 	@Test (expected = IllegalArgumentException.class)
-	public void deleteNullShouldThrowException(){
+	public void deleteNullShouldThrowException() throws PersistenceException{
 		personDAO.delete(null);
 	}
 	
 	@Test
-	public void getAllShouldGetAllPersons(){
+	public void getAllShouldGetAllPersons() throws PersistenceException{
 		Person person = new Person();
-		person.setGender(Person.Gender.MALE);
 		person.setSalutation(Person.Salutation.HERR);
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
@@ -130,7 +126,6 @@ public abstract class AbstractPersonDAOTest {
 		personDAO.create(person);
 		
 		Person person2 = new Person();
-		person2.setGender(Person.Gender.MALE);
 		person2.setSalutation(Person.Salutation.HERR);
 		person2.setTitle("Prof. Dr.");
 		person2.setGivenName("Heinz");
@@ -145,9 +140,8 @@ public abstract class AbstractPersonDAOTest {
 	}
 	
 	@Test
-	public void getAllShouldReturnFalse(){
+	public void getAllShouldReturnFalse() throws PersistenceException{
 		Person person = new Person();
-		person.setGender(Person.Gender.MALE);
 		person.setSalutation(Person.Salutation.HERR);
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
