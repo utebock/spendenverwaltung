@@ -23,7 +23,6 @@
 <bean id="addressDao" class="dao.AddressDAOImplemented">
 </bean>
 <bean id="personDao" class="dao.PersonDAOImplemented">
-	<property name="addressDao" ref="addressDao" />
 </bean>
 </beans>
 
