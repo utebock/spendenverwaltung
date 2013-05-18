@@ -21,7 +21,6 @@ public abstract class AbstractPersonDAOTest {
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
 		person.setSurname("Oberhummer");
-		person.setAddress("Teststrasse 2, A-1100 Wien");
 		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
 		person.setNotificationType(Person.NotificationType.MAIL);
 		Person heinz = personDAO.create(person);
@@ -44,7 +43,6 @@ public abstract class AbstractPersonDAOTest {
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
 		person.setSurname("Oberhummer");
-		person.setAddress("Teststrasse 2, A-1100 Wien");
 		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
 		person.setNotificationType(Person.NotificationType.MAIL);
 		
@@ -77,7 +75,6 @@ public abstract class AbstractPersonDAOTest {
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
 		person.setSurname("Oberhummer");
-		person.setAddress("Teststrasse 2, A-1100 Wien");
 		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
 		person.setNotificationType(Person.NotificationType.MAIL);
 		personDAO.create(person);
@@ -101,7 +98,6 @@ public abstract class AbstractPersonDAOTest {
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
 		person.setSurname("Oberhummer");
-		person.setAddress("Teststrasse 2, A-1100 Wien");
 		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
 		person.setNotificationType(Person.NotificationType.MAIL);
 		Person p = personDAO.create(person);
@@ -129,7 +125,6 @@ public abstract class AbstractPersonDAOTest {
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
 		person.setSurname("Oberhummer");
-		person.setAddress("Teststrasse 2, A-1100 Wien");
 		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
 		person.setNotificationType(Person.NotificationType.MAIL);
 		personDAO.create(person);
@@ -140,7 +135,6 @@ public abstract class AbstractPersonDAOTest {
 		person2.setTitle("Prof. Dr.");
 		person2.setGivenName("Heinz");
 		person2.setSurname("Oberhummer");
-		person2.setAddress("Teststrasse 3, A-1100 Wien");
 		person2.setEmail("heinz-oberhummer2@diekonfessionsfreien.at");
 		person2.setNotificationType(Person.NotificationType.MAIL);
 		personDAO.create(person2);
@@ -158,7 +152,6 @@ public abstract class AbstractPersonDAOTest {
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
 		person.setSurname("Oberhummer");
-		person.setAddress("Teststrasse 2, A-1100 Wien");
 		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
 		person.setNotificationType(Person.NotificationType.MAIL);
 		personDAO.create(person);

@@ -16,7 +16,7 @@ public class Person {
 	private String company;
 	private String givenName;
 	private String surname;
-	private String address;
+	private Address address;
 	private String email;
 	private String telephone;
 	public static enum NotificationType{
@@ -57,10 +57,10 @@ public class Person {
 		this.surname = surname;
 	}
 	
-	public String getAddress(){
+	public Address getAddress(){
 		return address;
 	}
-	public void setAddress(String address){
+	public void setAddress(Address address){
 		this.address = address;
 	}
 	
