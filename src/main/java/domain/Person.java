@@ -3,15 +3,26 @@ package domain;
 public class Person {
 
 	private int id;
-	private String givenName;
-	private String surname;
-	private int addressID;
-	private String email;
-	private String salutation;
+	public static enum Gender{
+		MALE, FEMALE, UNDEFINED
+	};
+	private Gender gender;
+	
+	public static enum Salutation{
+		HERR, FRAU, FA, FAM
+	};
+	private Salutation salutation;
 	private String title;
 	private String company;
+	private String givenName;
+	private String surname;
+	private String address;
+	private String email;
 	private String telephone;
-	private String notificationType;
+	public static enum NotificationType{
+		MAIL, POST
+	};
+	private NotificationType notificationType;
 	private String note;
 	
 	public Person(){
@@ -23,6 +34,13 @@ public class Person {
 	}
 	public void setID(int id){
 		this.id = id;
+	}
+	
+	public Gender getGender(){
+		return gender;
+	}
+	public void setGender(Gender gender){
+		this.gender = gender;
 	}
 	
 	public String getGivenName(){
@@ -39,11 +57,11 @@ public class Person {
 		this.surname = surname;
 	}
 	
-	public int getAddressID(){
-		return addressID;
+	public String getAddress(){
+		return address;
 	}
-	public void setAddressID(int addressID){
-		this.addressID = addressID;
+	public void setAddress(String address){
+		this.address = address;
 	}
 	
 	public String getEmail(){
@@ -53,10 +71,10 @@ public class Person {
 		
 	}
 	
-	public String getSalutation(){
+	public Salutation getSalutation(){
 		return salutation;
 	}
-	public void setSalutation(String salutation){
+	public void setSalutation(Salutation salutation){
 		this.salutation = salutation;
 	}
 	
@@ -81,10 +99,10 @@ public class Person {
 		this.telephone = telephone;
 	}
 	
-	public String getNotificationType(){
+	public NotificationType getNotificationType(){
 		return notificationType;
 	}
-	public void setNotificationType(String notificationType){
+	public void setNotificationType(NotificationType notificationType){
 		this.notificationType = notificationType;
 	}
 	

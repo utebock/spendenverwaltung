@@ -20,7 +20,7 @@ public class DataSourceTest {
 		ApplicationContext context = new ClassPathXmlApplicationContext("testspring.xml");
 		
 			@SuppressWarnings("unused")
-			DataSourceTransactionManager transactionManager = context.getBean("transactionManager", DataSourceTransactionManager.class);
+			DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) context.getBean("transactionManager", DataSourceTransactionManager.class);
 		
 			assert(true);
 			
