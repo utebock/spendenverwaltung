@@ -11,8 +11,11 @@ import exceptions.PersistenceException;
 
 public abstract class AbstractAddressDAOTest {
 
-	protected IAddressDAO addressDAO;
+	protected static IAddressDAO addressDAO;
 
+	public static void setAddressDAO(IAddressDAO addressDAO) {
+		AbstractAddressDAOTest.addressDAO = addressDAO;
+	}
 	/*
 	 * testing create
 	 */

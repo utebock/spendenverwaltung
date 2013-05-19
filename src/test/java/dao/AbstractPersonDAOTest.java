@@ -52,7 +52,7 @@ public abstract class AbstractPersonDAOTest {
 		personDAO.create(person);
 		person.setSurname("XXX");
 		personDAO.update(person);
-		Person p = personDAO.getByID(person.getID());
+		Person p = personDAO.getByID(person.getId());
 	
 		assertThat(p.getSurname(), is("XXX"));	
 	}
@@ -81,7 +81,7 @@ public abstract class AbstractPersonDAOTest {
 		person.setNotificationType(Person.NotificationType.MAIL);
 		personDAO.create(person);
 		
-		Person p = personDAO.getByID(person.getID());
+		Person p = personDAO.getByID(person.getId());
 		
 		assertThat(p.getGivenName(), is("Heinz"));
 	}
@@ -103,7 +103,7 @@ public abstract class AbstractPersonDAOTest {
 		person.setNotificationType(Person.NotificationType.MAIL);
 		Person p = personDAO.create(person);
 		personDAO.delete(p);
-		Person p2 = personDAO.getByID(p.getID());
+		Person p2 = personDAO.getByID(p.getId());
 		assertNull(p2);
 	}
 	
