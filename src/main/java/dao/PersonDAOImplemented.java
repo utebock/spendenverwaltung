@@ -1,14 +1,21 @@
 package dao;
 
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+
+import java.sql.PreparedStatement;
 
 import service.PersonValidator;
 
@@ -39,27 +46,46 @@ public class PersonDAOImplemented implements IPersonDAO{
 		this.addressDAO = addressDAO;
 	}
 	
+	private class CreatePersonStatementCreator implements PreparedStatementCreator {
+
+		private Person person;
+		
+		CreatePersonStatementCreator(Person person) {
+			this.person = person;
+		}
+		
+		private String createPersons = "insert into persons (given_name, surname, mailing_address, email, salutation, title, " + 
+				"company, telephone, notification_type, note) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+				
+		@Override
+		public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+					PreparedStatement ps = connection.prepareStatement(createPersons, Statement.RETURN_GENERATED_KEYS);
+					ps.setString(1, person.getGivenName());
+					ps.setString(2, person.getSurname());
+					ps.setInt(3, person.getMailingAddress().getId());
+					ps.setString(4, person.getEmail());
+					ps.setString(5, person.getSalutation().toString());
+					ps.setString(6, person.getTitle());
+					ps.setString(7, person.getCompany());
+					ps.setString(8, person.getTelephone());
+					ps.setString(9, person.getNotificationType().toString());
+					ps.setString(10, person.getNote());
+					
+					return ps;
+		}
+	}
+	
+	
 	@Override
 	public Person create(Person person) {
 		
 		personValidator.validate(person);
 		
-		String createPersons = "insert into persons (given_name, surname, mailing_address, email, salutation, title, " + 
-		"company, telephone, notification_type, note) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		KeyHolder keyHolder = new GeneratedKeyHolder();
 		
-		Object[] params = new Object[] {person.getGivenName(), person.getSurname(), person.getMailing_address().getId(),
-				person.getEmail(), person.getSalutation(), person.getTitle(), person.getCompany(), person.getTelephone(), 
-				person.getNotificationType(), person.getNote()
-				};
+		jdbcTemplate.update(new CreatePersonStatementCreator(person), keyHolder);
 		
-		int[] types = new int[] {Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.VARCHAR
-				, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR 
-				};
-		
-		/**
-		 * set person id to update result
-		 */
-		person.setId(jdbcTemplate.update(createPersons, params, types));
+		person.setId(keyHolder.getKey().intValue());
 		
 		String insertLivesAt = "insert into lives_at (person_id, address_id) values (?, ?)";
 		
@@ -83,7 +109,7 @@ public class PersonDAOImplemented implements IPersonDAO{
 		String updatePersons = "update persons set given_name = ?, surname = ?, mailing_address = ?, email = ?, salutation = ?, title = ?, " + 
 		"company = ?, telephone = ?, notification_type = ?, note = ? where id = ?;";
 		
-		Object[] params = new Object[] {person.getGivenName(), person.getSurname(), person.getMailing_address().getId(),
+		Object[] params = new Object[] {person.getGivenName(), person.getSurname(), person.getMailingAddress().getId(),
 				person.getEmail(), person.getSalutation(), person.getTitle(), person.getCompany(), person.getTelephone(), 
 				person.getNotificationType(), person.getNote(), person.getId()
 				};
@@ -95,7 +121,7 @@ public class PersonDAOImplemented implements IPersonDAO{
 		/**
 		 * set person id to update result
 		 */
-		person.setId(jdbcTemplate.update(updatePersons, params, types));
+		jdbcTemplate.update(updatePersons, params, types);
 		
 		String updateLivesAt = "insert into lives_at (person_id, address_id) values (?, ?)";
 		
@@ -191,7 +217,7 @@ public class PersonDAOImplemented implements IPersonDAO{
 			Person person = new Person();
 			person.setId(rs.getInt("id"));
 			try {
-				person.setMailing_address(addressDAO.getByID(rs.getInt("mailing_address")));
+				person.setMailingAddress(addressDAO.getByID(rs.getInt("mailing_address")));
 			} catch (PersistenceException e) {
 				/**
 				 * this should NEVER happen, so we rethrow an unchecked exception

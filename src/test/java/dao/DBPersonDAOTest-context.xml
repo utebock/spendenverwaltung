@@ -21,7 +21,9 @@
 	<property name="password" value="ubadmin" />
 </bean>
 <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-	<property name="dataSource" ref="dataSource" />
+<property name="dataSource">
+<ref bean="dataSource"/>
+</property>
 </bean>
 <bean id="personValidator" class="service.PersonValidator">
 </bean>

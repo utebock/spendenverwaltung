@@ -5,7 +5,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TransactionConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
@@ -14,11 +19,15 @@ import domain.Address;
 import domain.Person;
 import exceptions.PersistenceException;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("DBPersonDAOTest-context.xml")
+@TransactionConfiguration(defaultRollback=true)
 public abstract class AbstractPersonDAOTest {
 
 	protected static IPersonDAO personDAO;
 	protected static IAddressDAO addressDAO;
 	private static final Logger log = Logger.getLogger(AbstractPersonDAOTest.class);
+	
 	public static void setAddressDao(IAddressDAO addressDAO) {
 		AbstractPersonDAOTest.addressDAO = addressDAO;
 	}
@@ -28,6 +37,7 @@ public abstract class AbstractPersonDAOTest {
 	}
 	
 	@Test
+	@Transactional
 	public void createShouldCreatePersonWithValidParameters() throws PersistenceException{
 		Person person = new Person();
 		
@@ -42,7 +52,7 @@ public abstract class AbstractPersonDAOTest {
 		addresses.add(address);
 		
 		person.setAddresses(addresses);
-		person.setMailing_address(address);
+		person.setMailingAddress(address);
 		
 		person.setSalutation(Person.Salutation.HERR);
 		person.setCompany("IBM");
@@ -55,17 +65,23 @@ public abstract class AbstractPersonDAOTest {
 		person.setNote("");
 		personDAO.create(person);
 		log.info("Created person: "+ person.getGivenName() +" "+ person.getSurname());
+		/**
+		 * TODO: dieser test testet eigentlich nur ob exceptions geworfen werden,
+		 * da die folgenden zeilen immer wahr sein werden egal was sonst passiert.
+		 */
 		assertThat(person == null, is(false));
 		assertThat(person.getGivenName(), is("Heinz"));
 	
 	}
 	
 	@Test (expected = IllegalArgumentException.class)
+	@Transactional
 	public void createWithInvalidParametersShouldThrowException() throws PersistenceException{
 		personDAO.create(null);
 	}
 	
 	@Test
+	@Transactional
 	public void updateShouldUpdatePerson() throws PersistenceException{
 		
 		Person person = new Person();
@@ -81,7 +97,7 @@ public abstract class AbstractPersonDAOTest {
 		addresses.add(address);
 		
 		person.setAddresses(addresses);
-		person.setMailing_address(address);
+		person.setMailingAddress(address);
 		
 		person.setSalutation(Person.Salutation.HERR);
 		person.setCompany("IBM");
@@ -100,12 +116,14 @@ public abstract class AbstractPersonDAOTest {
 	}
 	
 	@Test (expected = IllegalArgumentException.class)
+	@Transactional
 	public void updateWithInvalidParametersShouldThrowException() throws PersistenceException{
 		Person person = null;
 		personDAO.update(person);
 	}
 	
 	@Test (expected = EmptyResultDataAccessException.class) 
+	@Transactional
 	public void updateNonExistentPersonShouldThrowException() throws PersistenceException{
 		Person person = personDAO.getByID(1000000);
 		person.setSurname("XXX");
@@ -113,6 +131,7 @@ public abstract class AbstractPersonDAOTest {
 	}
 	
 	@Test
+	@Transactional
 	public void getByIdShouldGetPersonByID() throws PersistenceException{
 		Person person = new Person();
 		
@@ -127,7 +146,7 @@ public abstract class AbstractPersonDAOTest {
 		addresses.add(address);
 		
 		person.setAddresses(addresses);
-		person.setMailing_address(address);
+		person.setMailingAddress(address);
 		
 		person.setSalutation(Person.Salutation.HERR);
 		person.setCompany("IBM");
@@ -145,12 +164,14 @@ public abstract class AbstractPersonDAOTest {
 	}
 	
 	@Test (expected = EmptyResultDataAccessException.class)
+	@Transactional(readOnly=true)
 	public void getByIdOfNonExistentPersonShouldThrowException() throws PersistenceException{
 		@SuppressWarnings("unused")
 		Person person = personDAO.getByID(100);
 	}
 	
 	@Test
+	@Transactional
 	public void deleteShouldDeletePerson() throws PersistenceException{
 		Person person = new Person();
 		
@@ -165,7 +186,7 @@ public abstract class AbstractPersonDAOTest {
 		addresses.add(address);
 		
 		person.setAddresses(addresses);
-		person.setMailing_address(address);
+		person.setMailingAddress(address);
 		
 		person.setSalutation(Person.Salutation.HERR);
 		person.setCompany("IBM");
@@ -183,17 +204,20 @@ public abstract class AbstractPersonDAOTest {
 	}
 	
 	@Test (expected = EmptyResultDataAccessException.class)
+	@Transactional
 	public void deleteNonExistentPersonShouldThrowException() throws PersistenceException{
 		Person person = personDAO.getByID(1000000);
 		personDAO.delete(person);
 	}
 	
 	@Test (expected = IllegalArgumentException.class)
+	@Transactional
 	public void deleteNullShouldThrowException() throws PersistenceException{
 		personDAO.delete(null);
 	}
 	
 	@Test
+	@Transactional
 	public void getAllShouldGetAllPersons() throws PersistenceException{
 		
 		Person person = new Person();
@@ -209,7 +233,7 @@ public abstract class AbstractPersonDAOTest {
 		addresses.add(address);
 		
 		person.setAddresses(addresses);
-		person.setMailing_address(address);
+		person.setMailingAddress(address);
 		
 		person.setSalutation(Person.Salutation.HERR);
 		person.setCompany("IBM");
@@ -234,7 +258,7 @@ public abstract class AbstractPersonDAOTest {
 		addresses2.add(address2);
 		
 		person2.setAddresses(addresses2);
-		person2.setMailing_address(address2);
+		person2.setMailingAddress(address2);
 		
 		person2.setSalutation(Person.Salutation.HERR);
 		person2.setCompany("IBM");
@@ -255,6 +279,7 @@ public abstract class AbstractPersonDAOTest {
 	}
 	
 	@Test (expected = EmptyResultDataAccessException.class)
+	@Transactional
 	public void getAllShouldReturnFalse() throws PersistenceException{
 		Person person = new Person();
 		
@@ -269,7 +294,7 @@ public abstract class AbstractPersonDAOTest {
 		addresses.add(address);
 		
 		person.setAddresses(addresses);
-		person.setMailing_address(address);
+		person.setMailingAddress(address);
 		
 		person.setSalutation(Person.Salutation.HERR);
 		person.setCompany("IBM");

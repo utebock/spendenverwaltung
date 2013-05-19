@@ -106,11 +106,11 @@ public class Person {
 		this.note = note;
 	}
 
-	public Address getMailing_address() {
+	public Address getMailingAddress() {
 		return mailing_address;
 	}
 
-	public void setMailing_address(Address mailing_address) {
+	public void setMailingAddress(Address mailing_address) {
 		this.mailing_address = mailing_address;
 	}
 }

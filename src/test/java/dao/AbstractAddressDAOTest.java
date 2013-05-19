@@ -5,10 +5,18 @@ import static org.junit.Assert.fail;
 import java.util.List;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.transaction.TransactionConfiguration;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import domain.Address;
 import exceptions.PersistenceException;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("DBAddressDAOTest-context.xml")
+@TransactionConfiguration(defaultRollback=true)
 public abstract class AbstractAddressDAOTest {
 
 	protected static IAddressDAO addressDAO;
@@ -21,6 +29,7 @@ public abstract class AbstractAddressDAOTest {
 	 */
 
 	@Test(expected = IllegalArgumentException.class)
+	@Transactional
 	public void createWithNullParameter_ThrowsException() {
 		try {
 			addressDAO.create(null);
@@ -30,6 +39,7 @@ public abstract class AbstractAddressDAOTest {
 	}
 
 	@Test(expected = IllegalArgumentException.class)
+	@Transactional
 	public void createWithInvalidStateParameter_ThrowsException() {
 		try {
 			addressDAO.create(new Address()); // all values are null
@@ -39,6 +49,7 @@ public abstract class AbstractAddressDAOTest {
 	}
 
 	@Test
+	@Transactional
 	public void createWithValidParameter_ReturnsSavedAddress() {
 
 		Address address = new Address();
@@ -69,6 +80,7 @@ public abstract class AbstractAddressDAOTest {
 	 */
 
 	@Test(expected = IllegalArgumentException.class)
+	@Transactional
 	public void updateWithNullParameter_ThrowsException() {
 		try {
 			addressDAO.update(null);
@@ -78,6 +90,7 @@ public abstract class AbstractAddressDAOTest {
 	}
 
 	@Test(expected = IllegalArgumentException.class)
+	@Transactional
 	public void updateWithInvalidStateParameter_ThrowsException() {
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
@@ -96,6 +109,7 @@ public abstract class AbstractAddressDAOTest {
 	}
 
 	@Test
+	@Transactional
 	public void updateWithValidParameters_ReturnsUpdatedAddress() {
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
@@ -136,6 +150,7 @@ public abstract class AbstractAddressDAOTest {
 	 */
 	
 	@Test(expected = IllegalArgumentException.class)
+	@Transactional
 	public void deleteWithNullParameter_ThrowsException() {
 		try {
 			addressDAO.delete(null);
@@ -145,6 +160,7 @@ public abstract class AbstractAddressDAOTest {
 	}
 
 	@Test
+	@Transactional
 	public void deleteWithValidParameter_RemovesEntity() {
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
@@ -170,6 +186,7 @@ public abstract class AbstractAddressDAOTest {
 	 */
 
 	@Test
+	@Transactional(readOnly=true)
 	public void getAll_ReturnsAllEntities() {
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
@@ -194,6 +211,7 @@ public abstract class AbstractAddressDAOTest {
 	}
 	
 	@Test
+	@Transactional(readOnly=true)
 	public void getWithInvalidId_ReturnsNull() {
 		try {
 			Address address = addressDAO.getByID(100);
@@ -204,6 +222,7 @@ public abstract class AbstractAddressDAOTest {
 	}
 	
 	@Test
+	@Transactional(readOnly=true)
 	public void getWithValidId_ReturnsEntity() {
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
