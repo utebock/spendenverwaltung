@@ -10,6 +10,8 @@ import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
+import service.PersonValidator;
+
 import domain.Address;
 import domain.Person;
 import exceptions.IllegalDBStateException;
@@ -19,8 +21,15 @@ public class PersonDAOImplemented implements IPersonDAO{
 	
 	private IAddressDAO addressDAO;
 	private JdbcTemplate jdbcTemplate;
+	private PersonValidator personValidator;
 	
 	private static final Logger log = Logger.getLogger(PersonDAOImplemented.class);
+	
+	private String addressQuery = "select * from lives_at where person_id = ?";
+	
+	public void setPersonValidator(PersonValidator personValidator) {
+		this.personValidator = personValidator;
+	}
 	
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -33,7 +42,7 @@ public class PersonDAOImplemented implements IPersonDAO{
 	@Override
 	public Person create(Person person) {
 		
-		validate(person);
+		personValidator.validate(person);
 		
 		String createPersons = "insert into persons (given_name, surname, mailing_address, email, salutation, title, " + 
 		"company, telephone, notification_type, note) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -69,11 +78,7 @@ public class PersonDAOImplemented implements IPersonDAO{
 	@Override
 	public Person update(Person person) {
 		
-		if(person == null){
-			throw new IllegalArgumentException("Person was null");
-		}
-		
-		validate(person);
+		personValidator.validate(person);
 
 		String updatePersons = "update persons set given_name = ?, surname = ?, mailing_address = ?, email = ?, salutation = ?, title = ?, " + 
 		"company = ?, telephone = ?, notification_type = ?, note = ? where id = ?;";
@@ -108,32 +113,36 @@ public class PersonDAOImplemented implements IPersonDAO{
 
 	@Override
 	public void delete(Person person) {
+		//TODO: fix constraint violation 
 		
-		if(person == null){
-			throw new IllegalArgumentException("person was null");
-		}
-		
-		validate(person);
-		
-		/**
-		 * TODO: fix constraint-errors
-		String deletePersons = "delete from persons where id = ?;";
-		
-		Object[] params = new Object[] {person.getId()};
-		
-		int[] types = new int[] {Types.INTEGER};
-		
-		jdbcTemplate.update(deletePersons, params, types);
-		*/
+//		personValidator.validate(person);
+//		
+//		String deletePersons = "delete from persons where id = ?;";
+//		String removeLivesAt = "delete from lives_at where person_id = ?";
+//		
+//		Object[] params = new Object[] {person.getId()};
+//		
+//		int[] types = new int[] {Types.INTEGER};
+//		
+//		jdbcTemplate.update(removeLivesAt, params, types);
+//		
+//		jdbcTemplate.update(deletePersons, params, types);
 	}
 
 	@Override
 	public List<Person> getAll() {
 		
 		String select = "select * from persons";
-		List<Person> list = jdbcTemplate.query(select, new PersonMapper());
-		log.info(list.size() + " list size");
-		return list;
+		List<Person> personList = jdbcTemplate.query(select, new PersonMapper());
+		log.info(personList.size() + " list size");
+		
+		for(Person entry : personList) {
+			
+			List<Address> addresses = jdbcTemplate.query(addressQuery, new Object[] {entry.getId()}, new AddressMapper());
+			entry.setAddresses(addresses);
+		}
+		
+		return personList;
 	}
 
 	@Override
@@ -142,28 +151,32 @@ public class PersonDAOImplemented implements IPersonDAO{
 		if(id < 0){
 			throw new IllegalArgumentException("Id must not be less than 0");
 		}
-		String select = "select * from persons where id = ?;";
-		return jdbcTemplate.queryForObject(select, new Object[]{id}, new PersonMapper());
 		
+		Person person;
+		
+		String select = "select * from persons where id = ?;";
+		
+		person = jdbcTemplate.queryForObject(select, new Object[]{id}, new PersonMapper());
+	
+		List<Address> addresses = jdbcTemplate.query(addressQuery, new Object[] {person.getId()}, new AddressMapper());
+		person.setAddresses(addresses);
+		
+		return person;
 	}
 	
-	/**
-	 * TODO: validation should NOT be performed in the same class. either add a service layer
-	 * class to validate Person objects and re-use that, or add an inner class to accomplish
-	 * this for the DAO layer specifically if there are differences.
-	 */
-	public void validate(Person person){
-		
-		if(person == null){
-			throw new IllegalArgumentException("Person must not be null");
+	private class AddressMapper implements RowMapper<Address> {
+
+		@Override
+		public Address mapRow(ResultSet rs, int rowNum) throws SQLException {
+			try {
+				return addressDAO.getByID(rs.getInt("address_id"));
+			} catch (PersistenceException e) {
+				/**
+				 * this should NEVER happen, so we rethrow an unchecked exception
+				 */
+				throw new IllegalDBStateException(e);
+			}
 		}
-		if(person.getId() < 0){
-			throw new IllegalArgumentException("Id must not be less than 0");
-		}
-		/**
-		 * TODO: define all constraints
-		 *
-		 */
 	}
 	
 	private class PersonMapper implements RowMapper<Person> {

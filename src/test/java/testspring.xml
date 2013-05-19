@@ -25,12 +25,15 @@
 <ref bean="dataSource"/>
 </property>
 </bean>
+<bean id="personValidator" class="service.PersonValidator">
+</bean>
 <bean id="addressDao" class="dao.AddressDAOImplemented">
 	<property name="jdbcTemplate" ref="jdbcTemplate" />
 </bean>
 <bean id="personDao" class="dao.PersonDAOImplemented">
 	<property name="addressDao" ref="addressDao" />
 	<property name="jdbcTemplate" ref="jdbcTemplate" />
+	<property name="personValidator" ref="personValidator" />
 </bean>
 </beans>
 

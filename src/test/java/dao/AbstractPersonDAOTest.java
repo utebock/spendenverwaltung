@@ -146,6 +146,7 @@ public abstract class AbstractPersonDAOTest {
 	
 	@Test (expected = EmptyResultDataAccessException.class)
 	public void getByIdOfNonExistentPersonShouldThrowException() throws PersistenceException{
+		@SuppressWarnings("unused")
 		Person person = personDAO.getByID(100);
 	}
 	
@@ -177,8 +178,8 @@ public abstract class AbstractPersonDAOTest {
 		person.setNote("");
 		personDAO.create(person);
 		personDAO.delete(person);
-		assertNull(person);
 		
+		assertNull(personDAO.getByID(person.getId()));
 	}
 	
 	@Test (expected = EmptyResultDataAccessException.class)

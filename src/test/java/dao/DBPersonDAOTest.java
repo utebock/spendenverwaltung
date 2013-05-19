@@ -22,7 +22,7 @@ public class DBPersonDAOTest extends AbstractPersonDAOTest {
 		setAddressDao(context.getBean("addressDao", IAddressDAO.class));
 	}
 	
-	/**5
+	/**
 	 * manually close ApplicationContext and associated resources
 	 */
 	@AfterClass 
