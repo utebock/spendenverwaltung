@@ -15,15 +15,15 @@ import domain.Person;
 
 public class PersonDAOImplemented implements IPersonDAO{
 	
-	private IAddressDAO addressDao;
+	private IAddressDAO addressDAO;
 	private JdbcTemplate jdbcTemplate;
 	
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 	
-	public void setAddressDao(IAddressDAO addressDao) {
-		this.addressDao = addressDao;
+	public void setAddressDao(IAddressDAO addressDAO) {
+		this.addressDAO = addressDAO;
 	}
 	
 	@Override
@@ -33,11 +33,11 @@ public class PersonDAOImplemented implements IPersonDAO{
 		if(person == null){
 			throw new IllegalArgumentException("Person must not be null");
 		}
-		
+
 		String createPersons = "insert into persons (given_name, surname, mailing_address, email, salutation, title, " + 
 		"company, telephone, notification_type, note) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		
-		Object[] params = new Object[] {person.getGivenName(), person.getSurname(), person.getMailing_address(),
+		Object[] params = new Object[] {person.getGivenName(), person.getSurname(), person.getMailing_address().getId(),
 				person.getEmail(), person.getSalutation(), person.getTitle(), person.getCompany(), person.getTelephone(), 
 				person.getNotificationType(), person.getNote()
 				};

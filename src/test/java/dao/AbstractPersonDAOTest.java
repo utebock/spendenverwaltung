@@ -1,5 +1,6 @@
 package dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
@@ -7,12 +8,18 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
+import domain.Address;
 import domain.Person;
 import exceptions.PersistenceException;
 
 public abstract class AbstractPersonDAOTest {
 
 	protected static IPersonDAO personDAO;
+	protected static IAddressDAO addressDAO;
+	
+	public static void setAddressDao(IAddressDAO addressDAO) {
+		AbstractPersonDAOTest.addressDAO = addressDAO;
+	}
 	
 	public static void setPersonDao(IPersonDAO personDAO) {
 		AbstractPersonDAOTest.personDAO = personDAO;
@@ -21,12 +28,29 @@ public abstract class AbstractPersonDAOTest {
 	@Test
 	public void createShouldCreatePersonWithValidParameters() throws PersistenceException{
 		Person person = new Person();
+		
+		Address address = new Address();
+		address.setStreet("Teststreet 1/1");
+		address.setPostalCode(00000);
+		address.setCity("Testcity");
+		address.setCountry("Testcountry");
+
+		address = addressDAO.create(address);
+		List<Address> addresses = new ArrayList<Address>();
+		addresses.add(address);
+		
+		person.setAddresses(addresses);
+		person.setMailing_address(address);
+		
 		person.setSalutation(Person.Salutation.HERR);
+		person.setCompany("IBM");
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
 		person.setSurname("Oberhummer");
 		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
+		person.setTelephone("01234567889");
 		person.setNotificationType(Person.NotificationType.MAIL);
+		person.setNote("");
 		Person heinz = personDAO.create(person);
 		
 		assertThat(heinz == null, is(false));
@@ -41,13 +65,32 @@ public abstract class AbstractPersonDAOTest {
 	
 	@Test
 	public void updateShouldUpdatePerson() throws PersistenceException{
+		
 		Person person = new Person();
+		
+		Address address = new Address();
+		address.setStreet("Teststreet 1/1");
+		address.setPostalCode(00000);
+		address.setCity("Testcity");
+		address.setCountry("Testcountry");
+
+		address = addressDAO.create(address);
+		List<Address> addresses = new ArrayList<Address>();
+		addresses.add(address);
+		
+		person.setAddresses(addresses);
+		person.setMailing_address(address);
+		
 		person.setSalutation(Person.Salutation.HERR);
+		person.setCompany("IBM");
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
 		person.setSurname("Oberhummer");
 		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
+		person.setTelephone("01234567889");
 		person.setNotificationType(Person.NotificationType.MAIL);
+		person.setNote("");
+		Person heinz = personDAO.create(person);
 		
 		personDAO.create(person);
 		person.setSurname("XXX");

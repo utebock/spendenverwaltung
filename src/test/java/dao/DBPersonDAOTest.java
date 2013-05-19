@@ -19,9 +19,10 @@ public class DBPersonDAOTest extends AbstractPersonDAOTest {
 		context = new ClassPathXmlApplicationContext("testspring.xml");
 		
 		setPersonDao(context.getBean("personDao", IPersonDAO.class));
+		setAddressDao(context.getBean("addressDao", IAddressDAO.class));
 	}
 	
-	/**
+	/**5
 	 * manually close ApplicationContext and associated resources
 	 */
 	@AfterClass 
