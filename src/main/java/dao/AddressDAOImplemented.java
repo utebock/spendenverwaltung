@@ -1,6 +1,11 @@
 package dao;
 
+import java.sql.Types;
 import java.util.List;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import domain.Address;
 import exceptions.PersistenceException;
@@ -13,10 +18,32 @@ import exceptions.PersistenceException;
  */
 public class AddressDAOImplemented implements IAddressDAO {
 
+	private JdbcTemplate jdbcTemplate;
+	
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
+	
 	@Override
-	public Address create(Address a) throws PersistenceException {
-		// TODO Auto-generated method stub
-		return null;
+	@Transactional(isolation=Isolation.SERIALIZABLE)
+	public Address create(Address address) throws PersistenceException {
+		
+		if(address == null){
+			throw new IllegalArgumentException("Person must not be null");
+		}
+		
+		String createAddress = "insert into addresses (street_no, postal_code, city, country) values (?,?,?,?)";
+		
+		Object[] params = new Object[] {address.getStreet(), address.getPostalCode(), address.getCity(), address.getCountry()};
+		
+		int[] types = new int[] {Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR};
+		
+		/**
+		 * set address id to update result
+		 */
+		address.setId(jdbcTemplate.update(createAddress, params, types));
+		
+		return address;
 	}
 
 	@Override

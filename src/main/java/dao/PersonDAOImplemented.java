@@ -49,7 +49,7 @@ public class PersonDAOImplemented implements IPersonDAO{
 		/**
 		 * set person id to update result
 		 */
-		person.setID(jdbcTemplate.update(createPersons, params, types));
+		person.setId(jdbcTemplate.update(createPersons, params, types));
 		
 		String insertLivesAt = "insert into lives_at (person_id, address_id) values (?, ?)";
 		
@@ -59,7 +59,7 @@ public class PersonDAOImplemented implements IPersonDAO{
 		 * inserting relevant lives_at entries
 		 */
 		for(Address address : addresses) {
-			jdbcTemplate.update(insertLivesAt, new Object[] {person.getID(), address.getId()}, new int[] {Types.INTEGER, Types.INTEGER});
+			jdbcTemplate.update(insertLivesAt, new Object[] {person.getId(), address.getId()}, new int[] {Types.INTEGER, Types.INTEGER});
 		}
 		
 		return person;
