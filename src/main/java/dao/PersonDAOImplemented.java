@@ -16,6 +16,11 @@ import domain.Person;
 public class PersonDAOImplemented implements IPersonDAO{
 	
 	private IAddressDAO addressDao;
+	private JdbcTemplate jdbcTemplate;
+	
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
 	
 	public void setAddressDao(IAddressDAO addressDao) {
 		this.addressDao = addressDao;
@@ -29,10 +34,8 @@ public class PersonDAOImplemented implements IPersonDAO{
 			throw new IllegalArgumentException("Person must not be null");
 		}
 		
-		JdbcTemplate jdbcTemplate = new JdbcTemplate();
-		
-		String createPersons = "insert into persons (given_name, surname, email, salutation, title, " + 
-		"company, telephone, notification_type, note) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		String createPersons = "insert into persons (given_name, surname, mailing_address, email, salutation, title, " + 
+		"company, telephone, notification_type, note) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		
 		Object[] params = new Object[] {person.getGivenName(), person.getSurname(), person.getMailing_address(),
 				person.getEmail(), person.getSalutation(), person.getTitle(), person.getCompany(), person.getTelephone(), 
