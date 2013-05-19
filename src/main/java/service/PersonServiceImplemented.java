@@ -2,6 +2,9 @@ package service;
 
 import java.util.List;
 
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
+
 import dao.IPersonDAO;
 import domain.Person;
 import exceptions.PersistenceException;
@@ -20,6 +23,7 @@ public class PersonServiceImplemented implements IPersonService{
 	}
 	
 	@Override
+	@Transactional(isolation=Isolation.SERIALIZABLE)
 	public Person create(Person p) throws ServiceException {
 		Person person = null;
 		try{
@@ -32,6 +36,7 @@ public class PersonServiceImplemented implements IPersonService{
 	}
 
 	@Override
+	@Transactional(isolation=Isolation.SERIALIZABLE)
 	public Person update(Person p) throws ServiceException {
 		Person person = null;
 		try{
@@ -44,6 +49,7 @@ public class PersonServiceImplemented implements IPersonService{
 	}
 
 	@Override
+	@Transactional(isolation=Isolation.SERIALIZABLE)
 	public void delete(Person p) throws ServiceException {
 		try{
 			personDAO.delete(p);
@@ -55,6 +61,7 @@ public class PersonServiceImplemented implements IPersonService{
 	}
 
 	@Override
+	@Transactional(readOnly=true)
 	public List<Person> getAll() throws ServiceException {
 		List<Person> list = null;
 		try{
@@ -67,6 +74,7 @@ public class PersonServiceImplemented implements IPersonService{
 	}
 
 	@Override
+	@Transactional(readOnly=true)
 	public Person getByID(int id) throws ServiceException {
 		Person person = null;
 		try{

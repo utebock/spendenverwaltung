@@ -1,6 +1,6 @@
 package exceptions;
 
-public class ServiceException extends Exception {
+public class ServiceException extends Throwable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -12,7 +12,7 @@ public class ServiceException extends Exception {
 		super(failureNotice);
 	}
 
-	public ServiceException(Exception e){
+	public ServiceException(Throwable e){
         super(e);
 	}
 }

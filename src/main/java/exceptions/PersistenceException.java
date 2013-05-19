@@ -7,7 +7,7 @@ package exceptions;
  * @author philipp muhoray
  * 
  */
-public class PersistenceException extends Exception {
+public class PersistenceException extends Throwable {
 
 	/**
 	 * 

@@ -9,11 +9,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import domain.Address;
 import domain.Person;
+import exceptions.IllegalDBStateException;
+import exceptions.PersistenceException;
 
 public class PersonDAOImplemented implements IPersonDAO{
 	
@@ -31,7 +31,6 @@ public class PersonDAOImplemented implements IPersonDAO{
 	}
 	
 	@Override
-	@Transactional(isolation=Isolation.SERIALIZABLE)
 	public Person create(Person person) {
 		
 		validate(person);
@@ -70,6 +69,10 @@ public class PersonDAOImplemented implements IPersonDAO{
 	@Override
 	public Person update(Person person) {
 		
+		if(person == null){
+			throw new IllegalArgumentException("Person was null");
+		}
+		
 		validate(person);
 
 		String updatePersons = "update persons set given_name = ?, surname = ?, mailing_address = ?, email = ?, salutation = ?, title = ?, " + 
@@ -106,6 +109,10 @@ public class PersonDAOImplemented implements IPersonDAO{
 	@Override
 	public void delete(Person person) {
 		
+		if(person == null){
+			throw new IllegalArgumentException("person was null");
+		}
+		
 		validate(person);
 		
 		/**
@@ -114,7 +121,7 @@ public class PersonDAOImplemented implements IPersonDAO{
 		
 		Object[] params = new Object[] {person.getId()};
 		
-		int[] types = new int[] {Types.VARCHAR};
+		int[] types = new int[] {Types.INTEGER};
 		
 		jdbcTemplate.update(deletePersons, params, types);
 		*/
@@ -140,6 +147,11 @@ public class PersonDAOImplemented implements IPersonDAO{
 		
 	}
 	
+	/**
+	 * TODO: validation should NOT be performed in the same class. either add a service layer
+	 * class to validate Person objects and re-use that, or add an inner class to accomplish
+	 * this for the DAO layer specifically if there are differences.
+	 */
 	public void validate(Person person){
 		
 		if(person == null){
@@ -156,13 +168,25 @@ public class PersonDAOImplemented implements IPersonDAO{
 	
 	private class PersonMapper implements RowMapper<Person> {
 		
+		/**
+		 * TODO: Map Addresses to Person after calling this, otherwise the person objects have no
+		 * address lists. Will need another RowMapper to process a query on "lives_at" table in order
+		 * to obtain the Addresses (do this in another method that is called by findPerson & findAll 
+		 * methods).
+		 */
 		public Person mapRow(ResultSet rs, int rowNum) throws SQLException{
 			Person person = new Person();
-			Address addr = person.getMailing_address();
 			person.setId(rs.getInt("id"));
+			try {
+				person.setMailing_address(addressDAO.getByID(rs.getInt("mailing_address")));
+			} catch (PersistenceException e) {
+				/**
+				 * this should NEVER happen, so we rethrow an unchecked exception
+				 */
+				throw new IllegalDBStateException(e);
+			}
 			person.setGivenName(rs.getString("given_name"));
 			person.setSurname(rs.getString("surname"));
-			person.setMailing_address(addr);
 			person.setEmail(rs.getString("email"));
 			person.setSalutation(Person.Salutation.valueOf(rs.getString("salutation")));
 			person.setTitle(rs.getString("title"));

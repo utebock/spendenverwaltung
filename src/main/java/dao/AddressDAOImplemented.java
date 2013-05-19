@@ -4,8 +4,6 @@ import java.sql.Types;
 import java.util.List;
 
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import domain.Address;
 import exceptions.PersistenceException;
@@ -25,7 +23,6 @@ public class AddressDAOImplemented implements IAddressDAO {
 	}
 	
 	@Override
-	@Transactional(isolation=Isolation.SERIALIZABLE)
 	public Address create(Address address) throws PersistenceException {
 		
 		if(address == null){
