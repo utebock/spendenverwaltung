@@ -26,6 +26,7 @@
 </property>
 </bean>
 <bean id="addressDao" class="dao.AddressDAOImplemented">
+	<property name="jdbcTemplate" ref="jdbcTemplate" />
 </bean>
 <bean id="personDao" class="dao.PersonDAOImplemented">
 	<property name="addressDao" ref="addressDao" />
