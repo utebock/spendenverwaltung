@@ -16,6 +16,7 @@ public class Person {
 	private String givenName;
 	private String surname;
 	private List<Address> addresses = new ArrayList<Address>();
+	private Address mailing_address;
 	private String email;
 	private String telephone;
 	public static enum NotificationType{
@@ -103,5 +104,13 @@ public class Person {
 	}
 	public void setNote(String note){
 		this.note = note;
+	}
+
+	public Address getMailing_address() {
+		return mailing_address;
+	}
+
+	public void setMailing_address(Address mailing_address) {
+		this.mailing_address = mailing_address;
 	}
 }

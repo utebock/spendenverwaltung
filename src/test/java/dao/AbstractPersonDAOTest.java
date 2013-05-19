@@ -12,7 +12,11 @@ import exceptions.PersistenceException;
 
 public abstract class AbstractPersonDAOTest {
 
-	protected IPersonDAO personDAO;
+	protected static IPersonDAO personDAO;
+	
+	public static void setPersonDao(IPersonDAO personDAO) {
+		AbstractPersonDAOTest.personDAO = personDAO;
+	}
 	
 	@Test
 	public void createShouldCreatePersonWithValidParameters() throws PersistenceException{
