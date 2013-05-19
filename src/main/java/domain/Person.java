@@ -1,5 +1,8 @@
 package domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Person {
 
 	private int id;
@@ -12,7 +15,7 @@ public class Person {
 	private String company;
 	private String givenName;
 	private String surname;
-	private Address address;
+	private List<Address> addresses = new ArrayList<Address>();
 	private String email;
 	private String telephone;
 	public static enum NotificationType{
@@ -53,11 +56,11 @@ public class Person {
 		this.surname = surname;
 	}
 	
-	public Address getAddress(){
-		return address;
+	public List<Address> getAddresses(){
+		return addresses;
 	}
-	public void setAddress(Address address){
-		this.address = address;
+	public void setAddresses(List<Address> addresses){
+		this.addresses = addresses;
 	}
 	
 	public String getEmail(){
