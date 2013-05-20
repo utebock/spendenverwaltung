@@ -8,25 +8,30 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 
+import service.IAddressService;
 import service.IPersonService;
 
 public class MainFrame extends JFrame{
 
 	private static final long serialVersionUID = 1L;
 	private static IPersonService personService;
+	private static IAddressService addressService;
 	
 	public MainFrame(){
-		super();
+		super("Ute Bock Spendenverwaltungssystem");
 		this.addWindowListener(new WindowAdapter(){ 
 			public void windowClosing(WindowEvent wE) {
 				System.exit(0);
 			}});
 	}
 	
-	public void setIPersonService(IPersonService personService){
+	public void setPersonService(IPersonService personService){
 		MainFrame.personService = personService;
 	}
-
+	public void setAddressService(IAddressService addressService){
+		MainFrame.addressService = addressService;
+	}
+	
 	public static void openMainWindow(){
 		setUpGUI();
 		
@@ -51,9 +56,7 @@ public class MainFrame extends JFrame{
 		MainFrame frame = new MainFrame();
 		JPanel panel = new JPanel();
 		frame.add(new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
-		/**
-		 * FIXME: Either add buttons here or call methods for doing so
-		 */
+		frame.add(new Overview(personService, addressService));
 		frame.setSize(800, 800);
 		frame.setLocation(100,100);
 		frame.setResizable(true);
