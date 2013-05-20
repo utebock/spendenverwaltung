@@ -6,10 +6,11 @@ import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import domain.Address;
 import exceptions.PersistenceException;
@@ -168,14 +169,12 @@ public abstract class AbstractAddressDAOTest {
 		address.setPostalCode(00000);
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
+		
 		try {
 			address = addressDAO.create(address);
-			Address createdAddress = addressDAO.getByID(address.getId());
-			assert(createdAddress!=null);
-			
 			addressDAO.delete(address);
-			Address deletedAddress = addressDAO.getByID(address.getId());
-			assert(deletedAddress==null);
+			List<Address> allAddresses = addressDAO.getAll();
+			assert(!allAddresses.contains(address));
 			
 		} catch (PersistenceException e) {
 			fail();
@@ -211,12 +210,11 @@ public abstract class AbstractAddressDAOTest {
 		}
 	}
 	
-	@Test
+	@Test(expected = EmptyResultDataAccessException.class)
 	@Transactional(readOnly=true)
-	public void getWithInvalidId_ReturnsNull() {
+	public void getWithInvalidId_ThrowsException() {
 		try {
-			Address address = addressDAO.getByID(100);
-			assert(address==null);
+			addressDAO.getByID(100);
 		} catch (PersistenceException e) {
 			fail();
 		}

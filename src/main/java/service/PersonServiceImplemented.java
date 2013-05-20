@@ -15,6 +15,7 @@ public class PersonServiceImplemented implements IPersonService{
 	private IPersonDAO personDAO;
 	
 	public IPersonDAO getPersonDAO(){
+
 		return personDAO;
 	}
 	
