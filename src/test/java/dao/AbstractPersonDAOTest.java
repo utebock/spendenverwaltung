@@ -40,7 +40,6 @@ public abstract class AbstractPersonDAOTest {
 	@Transactional
 	public void createShouldCreatePersonWithValidParameters() throws PersistenceException{
 		Person person = new Person();
-		
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
 		address.setPostalCode(00000);
@@ -57,20 +56,19 @@ public abstract class AbstractPersonDAOTest {
 		person.setSalutation(Person.Salutation.HERR);
 		person.setCompany("IBM");
 		person.setTitle("Prof. Dr.");
-		person.setGivenName("Heinz");
-		person.setSurname("Oberhummer");
-		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
+		person.setGivenName("Test");
+		person.setSurname("Test");
+		person.setEmail("test@test.at");
 		person.setTelephone("01234567889");
 		person.setNotificationType(Person.NotificationType.MAIL);
 		person.setNote("");
-		personDAO.create(person);
-		log.info("Created person: "+ person.getGivenName() +" "+ person.getSurname());
-		/**
-		 * TODO: dieser test testet eigentlich nur ob exceptions geworfen werden,
-		 * da die folgenden zeilen immer wahr sein werden egal was sonst passiert.
-		 */
-		assertThat(person == null, is(false));
-		assertThat(person.getGivenName(), is("Heinz"));
+		
+		Person test = personDAO.create(person);
+		test.setId(person.getId());
+		Person other = personDAO.getById(test.getId());
+		
+		assertThat(test, is(person));
+		assert(other.equals(test));
 	
 	}
 	
@@ -83,9 +81,7 @@ public abstract class AbstractPersonDAOTest {
 	@Test
 	@Transactional
 	public void updateShouldUpdatePerson() throws PersistenceException{
-		
 		Person person = new Person();
-		
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
 		address.setPostalCode(00000);
@@ -102,17 +98,22 @@ public abstract class AbstractPersonDAOTest {
 		person.setSalutation(Person.Salutation.HERR);
 		person.setCompany("IBM");
 		person.setTitle("Prof. Dr.");
-		person.setGivenName("Heinz");
-		person.setSurname("Oberhummer");
-		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
+		person.setGivenName("Test");
+		person.setSurname("Test");
+		person.setEmail("test@test.at");
 		person.setTelephone("01234567889");
 		person.setNotificationType(Person.NotificationType.MAIL);
 		person.setNote("");
-		personDAO.create(person);
-
+		
+		person = personDAO.create(person);
 		person.setSurname("New Surname");
-		personDAO.update(person);
-		assertThat(person.getSurname(), is("New Surname"));	
+
+		Person returned = personDAO.update(person);
+		Person updated = personDAO.getById(person.getId());
+	
+		assertThat(returned.getId(), is(person.getId()));	
+		assert(!updated.getSurname().equals(person.getSurname()));
+		assert(returned.getSurname().equals(updated.getSurname()));
 	}
 	
 	@Test (expected = IllegalArgumentException.class)
@@ -125,16 +126,15 @@ public abstract class AbstractPersonDAOTest {
 	@Test (expected = EmptyResultDataAccessException.class) 
 	@Transactional
 	public void updateNonExistentPersonShouldThrowException() throws PersistenceException{
-		Person person = personDAO.getByID(1000000);
+		Person person = personDAO.getById(1000000);
 		person.setSurname("XXX");
 		personDAO.update(person);
 	}
 	
 	@Test
 	@Transactional
-	public void getByIdShouldGetPersonByID() throws PersistenceException{
+	public void getByIdShouldGetPersonById() throws PersistenceException{
 		Person person = new Person();
-		
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
 		address.setPostalCode(00000);
@@ -151,30 +151,31 @@ public abstract class AbstractPersonDAOTest {
 		person.setSalutation(Person.Salutation.HERR);
 		person.setCompany("IBM");
 		person.setTitle("Prof. Dr.");
-		person.setGivenName("Heinz");
-		person.setSurname("Oberhummer");
-		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
+		person.setGivenName("Test");
+		person.setSurname("Test");
+		person.setEmail("test@test.at");
 		person.setTelephone("01234567889");
 		person.setNotificationType(Person.NotificationType.MAIL);
 		person.setNote("");
-		personDAO.create(person);
 		
-		Person p = personDAO.getByID(person.getId());
-		assertThat(p.getGivenName(), is("Heinz"));
+		person = personDAO.create(person);
+		
+		Person p = personDAO.getById(person.getId());
+		assert(p.getGivenName().equals(person.getGivenName()));
+		assert(p.getTelephone().equals(person.getTelephone()));
 	}
 	
 	@Test (expected = EmptyResultDataAccessException.class)
 	@Transactional(readOnly=true)
 	public void getByIdOfNonExistentPersonShouldThrowException() throws PersistenceException{
 		@SuppressWarnings("unused")
-		Person person = personDAO.getByID(100);
+		Person person = personDAO.getById(100);
 	}
 	
-	@Test
+	@Test (expected = EmptyResultDataAccessException.class)
 	@Transactional
 	public void deleteShouldDeletePerson() throws PersistenceException{
 		Person person = new Person();
-		
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
 		address.setPostalCode(00000);
@@ -191,22 +192,28 @@ public abstract class AbstractPersonDAOTest {
 		person.setSalutation(Person.Salutation.HERR);
 		person.setCompany("IBM");
 		person.setTitle("Prof. Dr.");
-		person.setGivenName("Arne");
-		person.setSurname("Zank");
-		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
+		person.setGivenName("Test");
+		person.setSurname("Test");
+		person.setEmail("test@test.at");
 		person.setTelephone("01234567889");
 		person.setNotificationType(Person.NotificationType.MAIL);
 		person.setNote("");
-		personDAO.create(person);
+		
+		person = personDAO.create(person);
+		assert(person!=null);
+		
 		personDAO.delete(person);
 		
-		assertNull(personDAO.getByID(person.getId()));
+		assert(person == null);
+		Person deleted = personDAO.getById(person.getId());
+		assert(deleted == null);
+		
 	}
 	
 	@Test (expected = EmptyResultDataAccessException.class)
 	@Transactional
 	public void deleteNonExistentPersonShouldThrowException() throws PersistenceException{
-		Person person = personDAO.getByID(1000000);
+		Person person = personDAO.getById(1000000);
 		personDAO.delete(person);
 	}
 	
@@ -273,8 +280,7 @@ public abstract class AbstractPersonDAOTest {
 		
 		List<Person> list = personDAO.getAll();
 		assertThat(list.isEmpty(), is(false));
-		
-		// assertThat(list.size(), is(2)); should return 2 after rollback
+		assertThat(list.size(), is(2)); //should return 2 after rollback
 		
 	}
 	
@@ -307,7 +313,7 @@ public abstract class AbstractPersonDAOTest {
 		person.setNote("");
 		personDAO.create(person);
 		
-		Person person2 = personDAO.getByID(100000);
+		Person person2 = personDAO.getById(100000);
 		List<Person> list = personDAO.getAll();
 		assertThat(list.contains(person2), is(false));
 	}
