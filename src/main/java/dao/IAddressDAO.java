@@ -51,7 +51,7 @@ public interface IAddressDAO {
 	 * 
 	 * @param id
 	 *            unique address identification number
-	 * @return Address based on given id or NULL if id non existent
+	 * @return Address based on given id
 	 */
 	public Address getByID(int id) throws PersistenceException;
 }

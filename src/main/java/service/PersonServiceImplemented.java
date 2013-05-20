@@ -14,9 +14,9 @@ public class PersonServiceImplemented implements IPersonService{
 
 	private IPersonDAO personDAO;
 	
-	//FIXME accessors should be named after the property name, 
+	//FIXME accessors should be named after the property, 
 	// not the property type (IPersonDAO -> PersonDAO)
-	// (will make problems at bean creation)
+	// (will make problems at bean creation) - pm
 	public IPersonDAO getIPersonDAO(){
 		return personDAO;
 	}

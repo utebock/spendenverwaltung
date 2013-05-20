@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
@@ -171,14 +172,12 @@ public abstract class AbstractAddressServiceTest {
 		address.setPostalCode(00000);
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
+		
 		try {
 			address = addressService.create(address);
-			Address createdAddress = addressService.getByID(address.getId());
-			assert (createdAddress != null);
-
 			addressService.delete(address);
-			Address deletedAddress = addressService.getByID(address.getId());
-			assert (deletedAddress == null);
+			List<Address> allAddresses = addressService.getAll();
+			assert(!allAddresses.contains(address));
 
 		} catch (ServiceException e) {
 			fail();
@@ -214,12 +213,11 @@ public abstract class AbstractAddressServiceTest {
 		}
 	}
 
-	@Test
+	@Test(expected = EmptyResultDataAccessException.class)
 	@Transactional(readOnly=true)
-	public void getWithInvalidId_ReturnsNull() {
+	public void getWithInvalidId_ThrowsException() {
 		try {
-			Address address = addressService.getByID(100);
-			assert (address == null);
+			addressService.getByID(100);
 		} catch (ServiceException e) {
 			fail();
 		}
