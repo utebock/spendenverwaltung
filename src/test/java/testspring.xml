@@ -47,4 +47,8 @@
 	<bean id="personValidator" class="service.PersonValidator">
 	</bean>
 	
+	<bean id="personService" class="service.PersonServiceImplemented">
+		<property name="personDAO" ref="personDao" />
+	</bean>
+	
 </beans>
