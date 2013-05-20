@@ -20,7 +20,7 @@ import domain.Person;
 import exceptions.PersistenceException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("DBPersonDAOTest-context.xml")
+@ContextConfiguration("../testspring.xml")
 @TransactionConfiguration(defaultRollback=true)
 public abstract class AbstractPersonDAOTest {
 

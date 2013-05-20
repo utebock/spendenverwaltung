@@ -15,7 +15,7 @@ import domain.Address;
 import exceptions.PersistenceException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("DBAddressDAOTest-context.xml")
+@ContextConfiguration("../testspring.xml")
 @TransactionConfiguration(defaultRollback=true)
 public abstract class AbstractAddressDAOTest {
 
