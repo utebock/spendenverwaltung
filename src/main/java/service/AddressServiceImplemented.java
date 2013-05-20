@@ -20,11 +20,11 @@ public class AddressServiceImplemented implements IAddressService {
 
 	private IAddressDAO addressDAO;
 
-	public IAddressDAO getIAddressDAO() {
+	public IAddressDAO getAddressDAO() {
 		return addressDAO;
 	}
 
-	public void setIAddressDAO(IAddressDAO addressDAO) {
+	public void setAddressDAO(IAddressDAO addressDAO) {
 		this.addressDAO = addressDAO;
 	}
 

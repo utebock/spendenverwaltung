@@ -15,7 +15,7 @@ import domain.Address;
 import exceptions.ServiceException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("DBAddressServiceTest-context.xml")
+@ContextConfiguration("../testspring.xml")
 @TransactionConfiguration(defaultRollback=true)
 public abstract class AbstractAddressServiceTest {
 
