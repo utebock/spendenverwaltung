@@ -38,5 +38,5 @@ public interface IPersonDAO {
 	 * @param id unique person identification number
 	 * @return Person based on retrieved id
 	 */
-	public Person getByID(int id) throws PersistenceException;
+	public Person getById(int id) throws PersistenceException;
 }

@@ -113,4 +113,44 @@ public class Person {
 	public void setMailingAddress(Address mailing_address) {
 		this.mailing_address = mailing_address;
 	}
+	
+	@Override
+	public String toString(){
+		return "Id: "+ id +"; Given Name: "+givenName+"; Surname: "+surname;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+
+		if (obj == null) {
+			return false;
+		}
+
+		if (this == obj) {
+			return true;
+		}
+
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+
+		Person other = (Person) obj;
+
+		if (this.getId() == other.getId()
+				&& this.getGivenName().equals(other.getGivenName())
+				&& this.getSurname().equals(other.getSurname())
+				&& this.getAddresses().equals(other.getAddresses())
+				&& this.getSalutation().equals(other.getSalutation())
+				&& this.getCompany().equals(other.getCompany())
+				&& this.getMailingAddress().equals(other.getMailingAddress())
+				&& this.getNote().equals(other.getNote())
+				&& this.getTitle().equals(other.getTitle())
+				&& this.getTelephone().equals(other.getTelephone())
+				&& this.getNotificationType().equals(other.getNotificationType())
+				&& this.getEmail().equals(other.getEmail())){
+			return true;
+		}
+		
+		return false;
+	}
 }

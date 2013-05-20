@@ -139,20 +139,19 @@ public class PersonDAOImplemented implements IPersonDAO{
 
 	@Override
 	public void delete(Person person) {
-		//TODO: fix constraint violation 
 		
-//		personValidator.validate(person);
-//		
-//		String deletePersons = "delete from persons where id = ?;";
-//		String removeLivesAt = "delete from lives_at where person_id = ?";
-//		
-//		Object[] params = new Object[] {person.getId()};
-//		
-//		int[] types = new int[] {Types.INTEGER};
-//		
-//		jdbcTemplate.update(removeLivesAt, params, types);
-//		
-//		jdbcTemplate.update(deletePersons, params, types);
+		personValidator.validate(person);
+	
+		String deletePersons = "delete from persons where id = ?;";
+		String removeLivesAt = "delete from lives_at where person_id = ?";
+		
+		Object[] params = new Object[] {person.getId()};
+	
+		int[] types = new int[] {Types.INTEGER};
+		
+		jdbcTemplate.update(removeLivesAt, params, types);
+	
+		jdbcTemplate.update(deletePersons, params, types);
 	}
 
 	@Override
@@ -172,7 +171,7 @@ public class PersonDAOImplemented implements IPersonDAO{
 	}
 
 	@Override
-	public Person getByID(int id) {
+	public Person getById(int id) {
 		
 		if(id < 0){
 			throw new IllegalArgumentException("Id must not be less than 0");

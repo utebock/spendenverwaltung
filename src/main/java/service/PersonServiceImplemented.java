@@ -78,10 +78,10 @@ public class PersonServiceImplemented implements IPersonService{
 
 	@Override
 	@Transactional(readOnly=true)
-	public Person getByID(int id) throws ServiceException {
+	public Person getById(int id) throws ServiceException {
 		Person person = null;
 		try{
-			person = personDAO.getByID(id);
+			person = personDAO.getById(id);
 		}
 		catch(PersistenceException e){
 			throw new ServiceException(e);
