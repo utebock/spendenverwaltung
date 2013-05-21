@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -24,6 +25,9 @@ import exceptions.PersistenceException;
  * 
  */
 public class AddressDAOImplemented implements IAddressDAO {
+
+	private static final Logger log = Logger
+			.getLogger(AddressDAOImplemented.class);
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -83,29 +87,34 @@ public class AddressDAOImplemented implements IAddressDAO {
 
 	@Override
 	public Address create(final Address a) throws PersistenceException {
+		log.info("Creating Address: " + a.toString());
+
 		AddressValidator.validate(a);
 
 		KeyHolder keyHolder = new GeneratedKeyHolder();
-
 		jdbcTemplate.update(new CreateAddressStatementCreator(a), keyHolder);
 
-		/**
-		 * set address id to update result
-		 */
+		// set address id to update result
 		a.setId(keyHolder.getKey().intValue());
 
+		log.info("Address entity with id='" + a.getId()
+				+ "' successfully created.");
 		return a;
 	}
 
 	@Override
 	public Address update(final Address a) throws PersistenceException {
+		log.info("Updating Address: " + a.toString());
 		AddressValidator.validate(a);
 		jdbcTemplate.update(new UpdateAddressStatementCreator(a));
+		log.info("Address entity with id='" + a.getId()
+				+ "' successfully updated.");
 		return a;
 	}
 
 	@Override
 	public void delete(final Address a) throws PersistenceException {
+		log.info("Deleting Address: " + a.toString());
 		AddressValidator.validate(a);
 		jdbcTemplate.update(new PreparedStatementCreator() {
 
@@ -121,23 +130,27 @@ public class AddressDAOImplemented implements IAddressDAO {
 
 		});
 
+		log.info("Address entity with id='" + a.getId()
+				+ "' successfully deleted.");
 	}
 
 	@Override
 	public List<Address> getAll() throws PersistenceException {
-		String select = "select * from addresses";
-		return jdbcTemplate.query(select, new AddressMapper());
+		log.info("Reading all Addresses.");
+		return jdbcTemplate.query("select * from addresses",
+				new AddressMapper());
 	}
 
 	@Override
 	public Address getByID(int id) throws PersistenceException {
-
+		log.info("Reading Address with id='" + id + "'");
 		if (id < 0) {
+			log.info("Error reading Address with id='" + id + "': Id was less than 0");
 			throw new IllegalArgumentException("Id must not be less than 0");
 		}
-		String select = "select * from addresses where id = ?;";
 
-		return jdbcTemplate.queryForObject(select, new Object[] { id },
+		return jdbcTemplate.queryForObject(
+				"select * from addresses where id = ?;", new Object[] { id },
 				new AddressMapper());
 	}
 

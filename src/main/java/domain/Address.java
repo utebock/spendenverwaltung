@@ -83,4 +83,11 @@ public class Address {
 	}
 	
 	//TODO override #hashCode for hash-based data structures
+	
+	@Override
+	public String toString() {
+		return "id='" + this.getId() + "', street='" + this.getStreet() + "', city='"
+				+ this.getCity() + "', country='" + this.getCountry()
+				+ "', postal code='" + this.getPostalCode() + "'";
+	}
 }

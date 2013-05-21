@@ -18,7 +18,7 @@ public class Overview extends JPanel{
 	private static final long serialVersionUID = 1L;
 	private IPersonService personService;
 	private IAddressService addressService;
-	private ComponentBuilder builder = new ComponentBuilder();
+	private ComponentBuilder builder;
 	private ButtonListener buttonListener;
 	private JButton person;
 	private JLabel general;
@@ -34,7 +34,8 @@ public class Overview extends JPanel{
 		super(new MigLayout());
 		this.personService = personService;
 		this.addressService = addressService;
-		
+		buttonListener = new ButtonListener(this);
+		builder = new ComponentBuilder();
 		setUpPersons();
 	}
 
@@ -47,11 +48,10 @@ public class Overview extends JPanel{
 		empty = builder.createLabel(" ");		
 		personsPanel.add(general, "wrap");
 		personsPanel.add(empty, "wrap");
-		person = builder.createImageButton("images/template.jpg", buttonListener);
-		person.setActionCommand("person_overview");
+		person = builder.createImageButton("images/template.jpg", buttonListener, "person_overview");
 		personsPanel.add(person);
 		
-		filter = builder.createImageButton("images/template.jpg", buttonListener);
+		filter = builder.createImageButton("images/template.jpg", buttonListener, "filter_overview");
 		personsPanel.add(filter, "wrap, gap 25");
 		//button labels
 		persons = builder.createLabel("Personen");
@@ -65,6 +65,14 @@ public class Overview extends JPanel{
 		//personsPanel.add(separatorLabel);
 		*/
 		
+	}
+	
+	public void goToPersons(){
+		PersonOverview po = new PersonOverview(personService, addressService, this);
+		this.removeAll();
+		this.repaint();
+		this.add(po);
+
 	}
 	
 

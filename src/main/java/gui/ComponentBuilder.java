@@ -9,10 +9,11 @@ import javax.swing.JPanel;
 
 public class ComponentBuilder {
 
-	public JButton createImageButton(String path, ActionListener listener){
+	public JButton createImageButton(String path, ActionListener listener, String actionCommand){
 		java.net.URL url = getClass().getResource(path);
 		JButton button = new JButton(new ImageIcon(url));
 		button.addActionListener(listener);
+		button.setActionCommand(actionCommand);
 		return button;
 	}
 	

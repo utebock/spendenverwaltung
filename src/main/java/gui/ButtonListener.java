@@ -23,7 +23,7 @@ public class ButtonListener implements ActionListener{
 		String cmd = e.getActionCommand();
 		
 		if(cmd.equals("person_overview")){
-			//personOverview;
+			overview.goToPersons();
 		}
 		
 	}
