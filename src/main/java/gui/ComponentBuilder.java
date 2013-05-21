@@ -62,4 +62,11 @@ public class ComponentBuilder {
 	public JTextArea createTextArea(int row, int col){
 		return new JTextArea(row, col);
 	}
+	
+	public JButton createButton(String text, ActionListener listener, String actionCommand){
+		JButton button = new JButton(text);
+		button.addActionListener(listener);
+		button.setActionCommand(actionCommand);
+		return button;
+	}
 }

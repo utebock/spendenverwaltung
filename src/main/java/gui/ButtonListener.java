@@ -41,6 +41,14 @@ public class ButtonListener implements ActionListener{
 			personOverview.goToCreate();
 		}
 		
+		if(cmd.equals("create_person_in_db")){
+			createPerson.createPersonInDb();
+		}
+		
+		if(cmd.equals("cancel_person")){
+			createPerson.returnTo();
+		}
+		
 	}
 
 }

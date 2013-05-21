@@ -37,6 +37,10 @@ public class PersonOverview extends JPanel{
 		this.personService = personService;
 		this.addressService = addressService;
 		this.overview = overview;
+		setUp();
+	}
+	
+	public void setUp(){
 		System.out.println("Hello");
 		
 		buttonListener = new ButtonListener(this);
@@ -47,7 +51,6 @@ public class PersonOverview extends JPanel{
 		panel.setPreferredSize(new Dimension(800, 800));
 		
 		this.add(panel);
-		
 		create = builder.createImageButton("images/template.jpg", buttonListener, "create_person");
 		panel.add(create);
 		

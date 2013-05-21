@@ -4,12 +4,18 @@ import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+
+import domain.Address;
+import domain.Person;
+import exceptions.ServiceException;
 
 import net.miginfocom.swing.MigLayout;
 import service.IAddressService;
@@ -26,7 +32,7 @@ public class CreatePerson extends JPanel{
 	private ActionHandler actionHandler;
 	private JPanel panel;
 	
-	
+	private JLabel addDonation;
 	private JLabel addPerson;
 	@SuppressWarnings("rawtypes")
 	private JComboBox salutation;
@@ -71,7 +77,15 @@ public class CreatePerson extends JPanel{
 	private JLabel note;
 	private JTextArea noteArea; 
 	
+	private JLabel donation;
+	@SuppressWarnings("rawtypes")
+	private JComboBox donationCombo;
+	private JTextField amount;
+	private JButton ok;
+	private JButton cancel;
 	
+	private Person p = new Person();
+	private Address addr = new Address();
 	
 	public CreatePerson(IPersonService personService, IAddressService addressService, PersonOverview personOverview){
 		super(new MigLayout());
@@ -93,21 +107,18 @@ public class CreatePerson extends JPanel{
 		setUpDonation();
 	}
 
-
-
 	private void setUpDonation() {
 		// TODO Auto-generated method stub
 		
 	}
 
-
-
 	private void setUpCreate() {
 		
-		addPerson = builder.createLabel("Person anlegen");
+		addPerson = builder.createLabel("Personendaten eintragen");
 		panel.add(addPerson, "wrap");
 		JLabel empty = builder.createLabel("		");
 		panel.add(empty, "wrap");
+		
 		String[] salutCombo = new String[]{"Herr", "Frau", "Fam.", "FA."};
 		salutation = builder.createComboBox(salutCombo, actionHandler, "salutCombo");
 		salutLabel = builder.createLabel("Anrede: ");
@@ -173,14 +184,112 @@ public class CreatePerson extends JPanel{
 		buttonGroupNotify.add(notifyPost);
 		panel.add(notifyType);
 		panel.add(notifyMail);
-		panel.add(notifyPost, "split 2");
+		panel.add(notifyPost, "split 3");
 		
 		note = builder.createLabel("Notiz: ");
 		noteArea = builder.createTextArea(5, 20);
 		panel.add(note, "gap 90");
 		panel.add(noteArea, "wrap");
 		
+		/**
+		 * Next section
+		 */
+		panel.add(empty,"wrap");
 		
+		addDonation = builder.createLabel("Neue Spende anlegen");
+		panel.add(addDonation, "wrap");
+		
+		String[] donationString = new String[]{"Ueberweisung", "Veranstaltung", "Online-Shop"};
+		donationCombo = builder.createComboBox(donationString, actionHandler, "donationCombo");
+		donation = builder.createLabel("Spende durch: ");
+		panel.add(donation);
+		panel.add(donationCombo);
+		amount = builder.createTextField(10);
+		panel.add(amount, "wrap");
+		
+		panel.add(empty, "wrap");
+		
+		ok = builder.createButton("Anlegen", buttonListener, "create_person_in_db");
+		panel.add(ok);
+		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_person");
+		panel.add(cancel, "split 2, wrap");
 	}
-
+	
+	public void createPersonInDb(){
+		String salut = "Herr";
+		if(salutation.getSelectedItem().equals("Frau")){
+			salut = "Frau";
+		}
+		if(salutation.getSelectedItem().equals("Fam.")){
+			salut = "Fam.";
+		}
+		if(salutation.getSelectedItem().equals("FA.")){
+			salut = "FA.";
+		}
+		p.setSalutation(Person.Salutation.valueOf(salut));
+		
+		String title = "Ing.";
+		if(titleBox.getSelectedItem().equals("DI")){
+			title = "DI";
+		}
+		p.setTitle(title);
+		
+		String company = companyField.getText();
+		p.setCompany(company);
+		
+		String givenName = givenField.getText();
+		p.setGivenName(givenName);
+		
+		String surname = surnameField.getText();
+		p.setSurname(surname);
+		
+		String tel = telephoneField.getText();
+		p.setTelephone(tel);
+		
+		String mail = mailField.getText();
+		p.setEmail(mail);
+		
+		String street = streetField.getText();
+		addr.setStreet(street);
+		
+		int postal = Integer.parseInt(postalField.getText());
+		addr.setPostalCode(postal);
+		
+		String city = cityField.getText();
+		addr.setCity(city);
+		
+		String country = countryField.getText();
+		addr.setCountry(country);
+		
+		if(notifyMail.isSelected()){
+			p.setNotificationType(Person.NotificationType.MAIL);
+		}
+		else{
+			p.setNotificationType(Person.NotificationType.POST);
+		}
+		
+		String note = noteArea.getText();
+		p.setNote(note);
+		
+		try{
+			addressService.create(addr);
+			personService.create(p);
+		}
+		catch(ServiceException e){
+			 JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+	            e.printStackTrace();
+	    		return;
+		}
+		returnTo();
+	}
+	
+	public void returnTo(){
+		this.removeAll();
+		this.revalidate();
+		this.repaint();
+		personOverview.removeAll();
+		personOverview.revalidate();
+		personOverview.repaint();
+		personOverview.setUp();
+	}
 }
