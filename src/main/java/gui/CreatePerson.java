@@ -13,13 +13,12 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import domain.Address;
-import domain.Person;
-import exceptions.ServiceException;
-
 import net.miginfocom.swing.MigLayout;
 import service.IAddressService;
 import service.IPersonService;
+import domain.Address;
+import domain.Person;
+import exceptions.ServiceException;
 
 public class CreatePerson extends JPanel{
 	
@@ -274,7 +273,7 @@ public class CreatePerson extends JPanel{
 		p.setNote(note);
 		
 		try{
-			addressService.create(addr);
+//			addressService.create(addr); // will now be created when person is created - pm
 			personService.create(p);
 		}
 		catch(ServiceException e){
