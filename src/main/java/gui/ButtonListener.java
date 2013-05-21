@@ -49,6 +49,10 @@ public class ButtonListener implements ActionListener{
 			createPerson.returnTo();
 		}
 		
+		if(cmd.equals("delete_person")){
+			personOverview.goToDelete();
+		}
+		
 	}
 
 }

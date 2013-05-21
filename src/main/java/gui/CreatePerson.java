@@ -216,12 +216,12 @@ public class CreatePerson extends JPanel{
 	}
 	
 	public void createPersonInDb(){
-		String salut = "Herr";
+		String salut = "HERR";
 		if(salutation.getSelectedItem().equals("Frau")){
-			salut = "Frau";
+			salut = "FRAU";
 		}
 		if(salutation.getSelectedItem().equals("Fam.")){
-			salut = "Fam.";
+			salut = "FAM.";
 		}
 		if(salutation.getSelectedItem().equals("FA.")){
 			salut = "FA.";
