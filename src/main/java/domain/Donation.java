@@ -11,11 +11,11 @@ import java.util.Date;
 public class Donation {
 	private int id;
 	private Person person;
-	private double amount;
+	private int amount;
 	private Date date;
 	private String dedication;
 	public static enum DonationType{
-		
+		SMS, SHOP, BANKING
 	};
 	private DonationType type;
 	private String note;
@@ -35,7 +35,7 @@ public class Donation {
 	public double getAmount() {
 		return amount;
 	}
-	public void setAmount(double amount) {
+	public void setAmount(int amount) {
 		this.amount = amount;
 	}
 	public Date getDate() {
@@ -61,5 +61,35 @@ public class Donation {
 	}
 	public void setNote(String note) {
 		this.note = note;
+	}	
+	
+	@Override
+	public boolean equals(Object obj) {
+
+		if (obj == null) {
+			return false;
+		}
+
+		if (this == obj) {
+			return true;
+		}
+
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+
+		Donation donation = (Donation) obj;
+
+		if (this.getId() == donation.getId()
+				&& this.getAmount() == donation.getAmount()
+				&& this.getDate().equals(donation.getDate())
+				&& this.getDedication() == donation.getDedication()
+				&& this.getPerson().getId() == donation.getPerson().getId()
+				&& this.getType() == donation.getType()
+				&& this.getNote().equals(donation.getNote())) {
+			return true;
+		}
+		
+		return false;
 	}
 }
