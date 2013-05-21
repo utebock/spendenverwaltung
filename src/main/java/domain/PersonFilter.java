@@ -28,6 +28,18 @@ public class PersonFilter {
 	}
 
 	/**
+	 * @return whether all criteria are set to <code>null</code>, so that the
+	 *         new filter matches all persons.
+	 */
+	public boolean isEmpty() {
+		return givenNamePart == null && surnamePart == null
+				&& titlePart == null && addressSet == null && emailSet == null
+				&& telephoneSet == null && telephonePart == null
+				&& notePart == null && wantsEmailNotification == null
+				&& wantsPostalNotification == null && salutation == null;
+	}
+
+	/**
 	 * @return a sting a matching person's given name must contain, or
 	 *         <code>null</code> if the given name is irrelevant for this filter
 	 */
@@ -86,7 +98,7 @@ public class PersonFilter {
 	 *         false if they must not, or <code>null</code> if holding an
 	 *         address is irrelevant for this filter
 	 */
-	public Boolean getHasAddress() {
+	public Boolean getAddressSet() {
 		return addressSet;
 	}
 
@@ -96,8 +108,8 @@ public class PersonFilter {
 	 *            address specified, or <code>null</code> if holding an address
 	 *            shall be irrelevant to this filter
 	 */
-	public void setHasAddress(Boolean hasAddress) {
-		this.addressSet = hasAddress;
+	public void setAddressSet(Boolean addressSet) {
+		this.addressSet = addressSet;
 	}
 
 	/**
@@ -105,7 +117,7 @@ public class PersonFilter {
 	 *         false if they must not, or <code>null</code> if holding an email
 	 *         address is irrelevant for this filter
 	 */
-	public Boolean getHasEmail() {
+	public Boolean getEmailSet() {
 		return emailSet;
 	}
 
@@ -115,8 +127,8 @@ public class PersonFilter {
 	 *            address specified, or <code>null</code> if holding an email
 	 *            address shall be irrelevant to this filter
 	 */
-	public void setHasEmail(Boolean hasEmail) {
-		this.emailSet = hasEmail;
+	public void setEmailSet(Boolean emailSet) {
+		this.emailSet = emailSet;
 	}
 
 	/**
@@ -124,7 +136,7 @@ public class PersonFilter {
 	 *         false if they must not, or <code>null</code> if holding a
 	 *         telephone number is irrelevant for this filter
 	 */
-	public Boolean getHasTelephone() {
+	public Boolean getTelephoneSet() {
 		return telephoneSet;
 	}
 
@@ -134,8 +146,8 @@ public class PersonFilter {
 	 *            number specified, or <code>null</code> if holding a telephone
 	 *            number shall be irrelevant to this filter
 	 */
-	public void setHasTelephone(Boolean hasTelephone) {
-		this.telephoneSet = hasTelephone;
+	public void setTelephoneSet(Boolean telephoneSet) {
+		this.telephoneSet = telephoneSet;
 	}
 
 	/**
