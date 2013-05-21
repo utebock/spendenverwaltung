@@ -14,11 +14,12 @@ public class PersonServiceImplemented implements IPersonService{
 
 	private IPersonDAO personDAO;
 	
-	public IPersonDAO getIPersonDAO(){
+	public IPersonDAO getPersonDAO(){
+
 		return personDAO;
 	}
 	
-	public void setIPersonDAO(IPersonDAO personDAO){
+	public void setPersonDAO(IPersonDAO personDAO){
 		this.personDAO = personDAO;
 	}
 	
@@ -75,10 +76,10 @@ public class PersonServiceImplemented implements IPersonService{
 
 	@Override
 	@Transactional(readOnly=true)
-	public Person getByID(int id) throws ServiceException {
+	public Person getById(int id) throws ServiceException {
 		Person person = null;
 		try{
-			person = personDAO.getByID(id);
+			person = personDAO.getById(id);
 		}
 		catch(PersistenceException e){
 			throw new ServiceException(e);

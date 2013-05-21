@@ -1,17 +1,17 @@
-package dao;
+package service;
 
 import java.util.List;
 
 import domain.Address;
-import exceptions.PersistenceException;
+import exceptions.ServiceException;
 
 /**
- * interface to the data source for {@link Address} entities.
+ * service providing functionality for {@link Address}
  * 
  * @author philipp muhoray
- * 
+ *
  */
-public interface IAddressDAO {
+public interface IAddressService {
 
 	/**
 	 * Creates a new address
@@ -20,7 +20,7 @@ public interface IAddressDAO {
 	 *            Address to be created
 	 * @return Fully defined address
 	 */
-	public Address create(Address a) throws PersistenceException;
+	public Address create(Address a) throws ServiceException;
 
 	/**
 	 * Updates an existing address
@@ -29,7 +29,7 @@ public interface IAddressDAO {
 	 *            Address to be updated
 	 * @return Updated address
 	 */
-	public Address update(Address a) throws PersistenceException;
+	public Address update(Address a) throws ServiceException;
 
 	/**
 	 * Deletes an existing address
@@ -37,21 +37,21 @@ public interface IAddressDAO {
 	 * @param a
 	 *            Address to be deleted
 	 */
-	public void delete(Address a) throws PersistenceException;
+	public void delete(Address a) throws ServiceException;
 
 	/**
 	 * Retrieves entire Address table
 	 * 
 	 * @return List of all addresses
 	 */
-	public List<Address> getAll() throws PersistenceException;
+	public List<Address> getAll() throws ServiceException;
 
 	/**
 	 * Retrieves Address by ID
 	 * 
 	 * @param id
 	 *            unique address identification number
-	 * @return Address based on given id
+	 * @return Address based on given id or NULL if id non existent
 	 */
-	public Address getByID(int id) throws PersistenceException;
+	public Address getByID(int id) throws ServiceException;
 }

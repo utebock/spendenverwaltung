@@ -38,6 +38,6 @@ public interface IPersonService {
 	 * @param id unique person identification number
 	 * @return Person based on retrieved id
 	 */
-	public Person getByID(int id) throws ServiceException;
+	public Person getById(int id) throws ServiceException;
 	
 }
