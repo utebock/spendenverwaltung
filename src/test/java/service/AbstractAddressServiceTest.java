@@ -213,11 +213,11 @@ public abstract class AbstractAddressServiceTest {
 		}
 	}
 
-	@Test(expected = EmptyResultDataAccessException.class)
+	@Test (expected = EmptyResultDataAccessException.class)
 	@Transactional(readOnly=true)
 	public void getWithInvalidId_ThrowsException() {
 		try {
-			addressService.getByID(100);
+			addressService.getByID(10000);
 		} catch (ServiceException e) {
 			fail();
 		}

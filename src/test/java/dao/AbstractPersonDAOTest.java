@@ -169,7 +169,7 @@ public abstract class AbstractPersonDAOTest {
 	@Transactional(readOnly=true)
 	public void getByIdOfNonExistentPersonShouldThrowException() throws PersistenceException{
 		@SuppressWarnings("unused")
-		Person person = personDAO.getById(100);
+		Person person = personDAO.getById(10000);
 	}
 	
 	@Test (expected = EmptyResultDataAccessException.class)

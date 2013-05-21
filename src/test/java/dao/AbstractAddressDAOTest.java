@@ -214,7 +214,7 @@ public abstract class AbstractAddressDAOTest {
 	@Transactional(readOnly=true)
 	public void getWithInvalidId_ThrowsException() {
 		try {
-			addressDAO.getByID(100);
+			addressDAO.getByID(10000);
 		} catch (PersistenceException e) {
 			fail();
 		}
