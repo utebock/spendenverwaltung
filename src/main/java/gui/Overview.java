@@ -1,7 +1,9 @@
 package gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -17,9 +19,17 @@ public class Overview extends JPanel{
 	private IPersonService personService;
 	private IAddressService addressService;
 	private ComponentBuilder builder = new ComponentBuilder();
-	private ButtonListener buttonListener = new ButtonListener();
+	private ButtonListener buttonListener;
 	private JButton person;
 	private JLabel general;
+	private JLabel empty;
+	private JButton filter;
+	private ImageIcon space;
+	private ImageIcon separator;
+	private JLabel separatorLabel;
+	private JLabel persons;
+	private JLabel filterLabel;
+	
 	public Overview(IPersonService personService, IAddressService addressService){
 		super(new MigLayout());
 		this.personService = personService;
@@ -34,9 +44,26 @@ public class Overview extends JPanel{
 		personsPanel.setPreferredSize(new Dimension(800,160));
 		this.add(personsPanel);
 		general = builder.createLabel("Allgemein");
+		empty = builder.createLabel(" ");		
 		personsPanel.add(general, "wrap");
+		personsPanel.add(empty, "wrap");
 		person = builder.createImageButton("images/template.jpg", buttonListener);
+		person.setActionCommand("person_overview");
 		personsPanel.add(person);
+		
+		filter = builder.createImageButton("images/template.jpg", buttonListener);
+		personsPanel.add(filter, "wrap, gap 25");
+		//button labels
+		persons = builder.createLabel("Personen");
+		personsPanel.add(persons, "gap 22");
+		filterLabel = builder.createLabel("Filter");
+		personsPanel.add(filterLabel, "wrap, gap 58");
+		
+		/**
+		separator = builder.createImageIcon("images/separator.gif");
+		separatorLabel = builder.createImageLabel(separator);
+		//personsPanel.add(separatorLabel);
+		*/
 		
 	}
 	

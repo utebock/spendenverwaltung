@@ -23,4 +23,13 @@ public class ComponentBuilder {
 	public JLabel createLabel(String text){
 		return new JLabel(text);
 	}
+	
+	public JLabel createImageLabel(ImageIcon img){
+		return new JLabel(img);
+	}
+
+	public ImageIcon createImageIcon(String path) {
+		java.net.URL url = getClass().getResource(path);
+		return new ImageIcon(url);
+	}
 }

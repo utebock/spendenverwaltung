@@ -50,9 +50,7 @@ public class MainFrame extends JFrame{
 
 	
 	private static void setUpGUI() {
-		/**
-		 * FIXME: Setting up connection here
-		 */
+		
 		MainFrame frame = new MainFrame();
 		JPanel panel = new JPanel();
 		frame.add(new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
