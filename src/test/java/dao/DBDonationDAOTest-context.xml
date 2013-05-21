@@ -21,7 +21,9 @@
 	<property name="password" value="ubadmin" />
 </bean>
 <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-	<property name="dataSource" ref="dataSource" />
+<property name="dataSource">
+<ref bean="dataSource"/>
+</property>
 </bean>
 <bean id="personValidator" class="service.PersonValidator">
 </bean>
@@ -29,8 +31,6 @@
 </bean>
 <bean id="donationDao" class="dao.DonationDAOImplemented">
 	<property name="jdbcTemplate" ref="jdbcTemplate" />
-	<property name="personDao" ref="personDao" />
-	<property name="donationValidator" ref="donationValidator" />
 </bean>
 <bean id="addressDao" class="dao.AddressDAOImplemented">
 	<property name="jdbcTemplate" ref="jdbcTemplate" />
