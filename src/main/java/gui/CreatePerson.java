@@ -261,6 +261,8 @@ public class CreatePerson extends JPanel{
 		String country = countryField.getText();
 		addr.setCountry(country);
 		
+		p.setMailingAddress(addr);
+		
 		if(notifyMail.isSelected()){
 			p.setNotificationType(Person.NotificationType.MAIL);
 		}
