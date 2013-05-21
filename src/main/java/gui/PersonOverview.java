@@ -3,6 +3,7 @@ package gui;
 import java.awt.Dimension;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
@@ -24,15 +25,23 @@ public class PersonOverview extends JPanel{
 	private JButton show;
 	private JButton search;
 	private JPanel panel;
+	private JLabel createLabel;
+	private JLabel editLabel;
+	private JLabel deleteLabel;
+	private JLabel showLabel;
+	private JLabel searchLabel;
 	
 	public PersonOverview(IPersonService personService, IAddressService addressService, Overview overview){
 		super(new MigLayout());
-		
-		this.overview = overview;
+	
 		this.personService = personService;
 		this.addressService = addressService;
+		this.overview = overview;
+		System.out.println("Hello");
+		
 		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
+		
 		panel = builder.createPanel();
 		panel.setLayout(new MigLayout());
 		panel.setPreferredSize(new Dimension(800, 800));
@@ -43,18 +52,47 @@ public class PersonOverview extends JPanel{
 		panel.add(create);
 		
 		edit = builder.createImageButton("images/template.jpg", buttonListener, "edit_person");
-		panel.add(edit, "gap 25");
+		panel.add(edit, "gap 30");
 		
 		delete = builder.createImageButton("images/template.jpg", buttonListener, "delete_person");
-		panel.add(delete, "gap 25");
+		panel.add(delete, "gap 30");
 		
 		show = builder.createImageButton("images/template.jpg", buttonListener, "show_person");
-		panel.add(show, "gap 25");
+		panel.add(show, "gap 30");
 		
 		search = builder.createImageButton("images/template.jpg", buttonListener, "search_person");
-		panel.add(search);
+		panel.add(search, "gap 30, wrap");
 		
+		createLabel = builder.createLabel("Person anlegen");
+		panel.add(createLabel, "gap 5");
 		
+		editLabel = builder.createLabel("Person bearbeiten");
+		panel.add(editLabel, "gap 25");
+		
+		deleteLabel = builder.createLabel("Person loeschen");
+		panel.add(deleteLabel, "gap 30");
+		
+		showLabel = builder.createLabel("Personen anzeigen");
+		panel.add(showLabel, "gap 22");
+		
+		searchLabel = builder.createLabel("Personen suchen");
+		panel.add(searchLabel, "gap 28");
+	}
+	
+	public void goToCreate(){
+		CreatePerson cp = new CreatePerson(personService, addressService, this);
+		removeAll();
+		revalidate();
+		repaint();
+		add(cp);
+	}
+	
+	public void goToDelete(){
+		DeletePerson cp = new DeletePerson(personService, addressService, this);
+		removeAll();
+		revalidate();
+		repaint();
+		add(cp);
 	}
 	
 }

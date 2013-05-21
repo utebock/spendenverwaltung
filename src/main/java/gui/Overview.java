@@ -69,9 +69,11 @@ public class Overview extends JPanel{
 	
 	public void goToPersons(){
 		PersonOverview po = new PersonOverview(personService, addressService, this);
-		this.removeAll();
-		this.repaint();
-		this.add(po);
+		removeAll();
+		revalidate();
+		repaint();
+		add(po);
+		
 
 	}
 	
