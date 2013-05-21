@@ -87,7 +87,7 @@ public class AddressDAOImplemented implements IAddressDAO {
 
 	@Override
 	public Address create(final Address a) throws PersistenceException {
-		log.info("Creating Address: " + a.toString());
+		log.info("Creating Address...");
 
 		AddressValidator.validate(a);
 
@@ -97,24 +97,22 @@ public class AddressDAOImplemented implements IAddressDAO {
 		// set address id to update result
 		a.setId(keyHolder.getKey().intValue());
 
-		log.info("Address entity with id='" + a.getId()
-				+ "' successfully created.");
+		log.info("Address entity successfully created:" + a.toString());
 		return a;
 	}
 
 	@Override
 	public Address update(final Address a) throws PersistenceException {
-		log.info("Updating Address: " + a.toString());
+		log.info("Updating Address...");
 		AddressValidator.validate(a);
 		jdbcTemplate.update(new UpdateAddressStatementCreator(a));
-		log.info("Address entity with id='" + a.getId()
-				+ "' successfully updated.");
+		log.info("Address entity successfully updated:" + a.toString());
 		return a;
 	}
 
 	@Override
 	public void delete(final Address a) throws PersistenceException {
-		log.info("Deleting Address: " + a.toString());
+		log.info("Deleting Address...");
 		AddressValidator.validate(a);
 		jdbcTemplate.update(new PreparedStatementCreator() {
 
@@ -130,8 +128,7 @@ public class AddressDAOImplemented implements IAddressDAO {
 
 		});
 
-		log.info("Address entity with id='" + a.getId()
-				+ "' successfully deleted.");
+		log.info("Address entity successfully deleted:" + a.toString());
 	}
 
 	@Override
