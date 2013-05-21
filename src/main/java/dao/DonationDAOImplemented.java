@@ -142,7 +142,7 @@ public class DonationDAOImplemented implements IDonationDAO{
 			Donation donation = new Donation();
 			donation.setId(rs.getInt("id"));
 			try {
-				donation.setPerson(personDAO.getByID(rs.getInt("person_id")));
+				donation.setPerson(personDAO.getById(rs.getInt("person_id")));
 			} catch (PersistenceException e) {
 				throw new IllegalDBStateException(e);
 			}

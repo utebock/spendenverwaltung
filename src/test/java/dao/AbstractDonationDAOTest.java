@@ -23,7 +23,7 @@ import domain.Person;
 import exceptions.PersistenceException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("DBDonationDAOTest-context.xml")
+@ContextConfiguration("../testspring.xml")
 @TransactionConfiguration(defaultRollback=true)
 public abstract class AbstractDonationDAOTest {
 	private static final Logger log = Logger.getLogger(AbstractDonationDAOTest.class);

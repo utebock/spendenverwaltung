@@ -20,7 +20,7 @@
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
 		<property name="url"
 			value="jdbc:mysql://localhost:3306/ub_spenderverwaltung" />
-		<property name="username" value="ubadministrative" />
+		<property name="username" value="dbadministrative" />
 		<property name="password" value="ubadmin" />
 		<property name="defaultAutoCommit" value="false" />
 	</bean>
@@ -39,12 +39,19 @@
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="personValidator" ref="personValidator" />
 	</bean>
+	<bean id="donationDao" class="dao.DonationDAOImplemented">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<property name="donationValidator" ref="donationValidator" />
+		<property name="personDao" ref="personDao" />
+	</bean>
 
 	<!-- BEANS FOR SERVICES -->
 	<bean id="addressService" class="service.AddressServiceImplemented">
 		<property name="addressDAO" ref="addressDao" />
 	</bean>
 	<bean id="personValidator" class="service.PersonValidator">
+	</bean>
+	<bean id="donationValidator" class="service.DonationValidator">
 	</bean>
 	
 	<bean id="personService" class="service.PersonServiceImplemented">
