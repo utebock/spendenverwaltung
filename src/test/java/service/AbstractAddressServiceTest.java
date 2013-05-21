@@ -17,11 +17,16 @@ import exceptions.ServiceException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("../testspring.xml")
-@TransactionConfiguration(defaultRollback=true)
+@TransactionConfiguration(defaultRollback = true)
 public abstract class AbstractAddressServiceTest {
 
 	protected static IAddressService addressService;
 	
+	protected static Address testAddress;
+	protected static Address testAddress2;
+	protected static Address nullAddress;
+	protected static Address testAddressCreated;
+
 	public static void setAddressService(IAddressService addressService) {
 		AbstractAddressServiceTest.addressService = addressService;
 	}
@@ -44,7 +49,7 @@ public abstract class AbstractAddressServiceTest {
 	@Transactional
 	public void createWithInvalidStateParameter_ThrowsException() {
 		try {
-			addressService.create(new Address()); // all values are null
+			addressService.create(nullAddress); // all values are null
 		} catch (ServiceException e) {
 			fail();
 		}
@@ -53,22 +58,16 @@ public abstract class AbstractAddressServiceTest {
 	@Test
 	@Transactional
 	public void createWithValidParameter_ReturnsSavedAddress() {
-
-		Address address = new Address();
-		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
-		address.setCity("Testcity");
-		address.setCountry("Testcountry");
-
+		
 		try {
-			Address returnedAddress = addressService.create(address);
-			address.setId(returnedAddress.getId()); // for #equals
+			Address returnedAddress = addressService.create(testAddress);
+			testAddress.setId(returnedAddress.getId()); // for #equals
 
 			Address savedAddress = addressService.getByID(returnedAddress
 					.getId());
 
 			// check if address was returned correctly
-			assert (returnedAddress.equals(address));
+			assert (returnedAddress.equals(testAddress));
 
 			// check if address was saved correctly
 			assert (savedAddress.equals(returnedAddress));
@@ -95,17 +94,8 @@ public abstract class AbstractAddressServiceTest {
 	@Test(expected = IllegalArgumentException.class)
 	@Transactional
 	public void updateWithInvalidStateParameter_ThrowsException() {
-		Address address = new Address();
-		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
-		address.setCity("Testcity");
-		address.setCountry("Testcountry");
-
 		try {
-			address = addressService.create(address);
-			address.setCity(null); // not allowed null value
-
-			addressService.update(address);
+			addressService.update(nullAddress);
 		} catch (ServiceException e) {
 			fail();
 		}
@@ -114,37 +104,10 @@ public abstract class AbstractAddressServiceTest {
 	@Test
 	@Transactional
 	public void updateWithValidParameters_ReturnsUpdatedAddress() {
-		Address address = new Address();
-		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
-		address.setCity("Testcity");
-		address.setCountry("Testcountry");
-
 		try {
-			address = addressService.create(address);
-			address.setCity("AnotherCity");
-
-			Address returnedAddress = addressService.update(address);
-			Address updatedAddress = addressService.getByID(address.getId());
-
-			// check if returned address is correct
-			assert (returnedAddress.getId() == address.getId());
-			assert (returnedAddress.getStreet().equals(address.getStreet()));
-			assert (returnedAddress.getPostalCode() == address.getPostalCode());
-			assert (returnedAddress.getCountry().equals(address.getCountry()));
-			assert (!returnedAddress.getCity().equals(address.getCity())); // different
-																			// city
-
-			// check if address was updated correctly
-			assert (updatedAddress.getId() == address.getId());
-			assert (updatedAddress.getStreet().equals(address.getStreet()));
-			assert (updatedAddress.getPostalCode() == address.getPostalCode());
-			assert (updatedAddress.getCountry().equals(address.getCountry()));
-			assert (!updatedAddress.getCity().equals(address.getCity())); // different
-																			// city
-
-			assert (returnedAddress.getCity() == updatedAddress.getCity());
-
+			Address returnedAddress = addressService.update(testAddress);
+			
+			assert (returnedAddress.equals(testAddressCreated));
 		} catch (ServiceException e) {
 			fail();
 		}
@@ -167,18 +130,9 @@ public abstract class AbstractAddressServiceTest {
 	@Test
 	@Transactional
 	public void deleteWithValidParameter_RemovesEntity() {
-		Address address = new Address();
-		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
-		address.setCity("Testcity");
-		address.setCountry("Testcountry");
-		
 		try {
-			address = addressService.create(address);
-			addressService.delete(address);
-			List<Address> allAddresses = addressService.getAll();
-			assert(!allAddresses.contains(address));
-
+			addressService.delete(testAddress);
+			//TODO verify verwenden
 		} catch (ServiceException e) {
 			fail();
 		}
@@ -189,32 +143,20 @@ public abstract class AbstractAddressServiceTest {
 	 */
 
 	@Test
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	public void getAll_ReturnsAllEntities() {
-		Address address = new Address();
-		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
-		address.setCity("Testcity");
-		address.setCountry("Testcountry");
-
-		Address address2 = new Address();
-		address2.setStreet("Teststreet2 1/1");
-		address2.setPostalCode(00001);
-		address2.setCity("Testcity2");
-		address2.setCountry("Testcountry2");
 		try {
-			addressService.create(address);
-			addressService.create(address2);
-
 			List<Address> addressList = addressService.getAll();
+			
 			assert (addressList != null && addressList.size() == 2);
+			assert(addressList.get(0).equals(testAddress) && addressList.get(1).equals(testAddress2));
 		} catch (ServiceException e) {
 			fail();
 		}
 	}
 
 	@Test(expected = EmptyResultDataAccessException.class)
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	public void getWithInvalidId_ThrowsException() {
 		try {
 			addressService.getByID(100);
@@ -222,22 +164,26 @@ public abstract class AbstractAddressServiceTest {
 			fail();
 		}
 	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	@Transactional(readOnly = true)
+	public void getWithNegativeId_ThrowsException() {
+		try {
+			addressService.getByID(-1);
+		} catch (ServiceException e) {
+			fail();
+		}
+	}
 
 	@Test
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	public void getWithValidId_ReturnsEntity() {
-		Address address = new Address();
-		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
-		address.setCity("Testcity");
-		address.setCountry("Testcountry");
 
 		try {
-			Address createdAddress = addressService.create(address);
-			Address foundAddress = addressService.getByID(createdAddress
+			Address foundAddress = addressService.getByID(testAddressCreated
 					.getId());
 
-			assert (foundAddress != null && foundAddress.getId() == createdAddress
+			assert (foundAddress != null && foundAddress.getId() == testAddressCreated
 					.getId());
 		} catch (ServiceException e) {
 			fail();
