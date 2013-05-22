@@ -7,22 +7,41 @@ public class Person {
 
 	private int id;
 	
-	public static enum Salutation{
-		HERR, FRAU, FA, FAM
-	};
-	private Salutation salutation;
+	public static enum Sex{
+		MALE("male"), FEMALE("female"), FAMILY("family"), COMPANY("company");
+		
+		private final String name;
+		
+		private Sex(String name) {
+			this.name = name;
+		}
+
+		public String getName() {
+			return name;
+		}
+		
+		public static Sex getByName(String name) {
+			switch(name) {
+			case "male": return MALE;
+			case "female": return FEMALE;
+			case "family": return FAMILY;
+			case "company": return COMPANY;
+			default: throw new IllegalArgumentException("No such Sex");
+			}
+		}
+	}
+	
+	private Sex sex;
 	private String title;
 	private String company;
 	private String givenName;
 	private String surname;
 	private List<Address> addresses = new ArrayList<Address>();
-	private Address mailing_address;
+	private Address mainAddress;
 	private String email;
 	private String telephone;
-	public static enum NotificationType{
-		MAIL, POST
-	};
-	private NotificationType notificationType;
+	private boolean emailNotification = true;
+	private boolean postalNotification = true;
 	private String note;
 	
 	public Person(){
@@ -36,11 +55,27 @@ public class Person {
 		this.id = id;
 	}
 	
-	public Salutation getSalutation(){
-		return salutation;
+	public boolean isEmailNotification() {
+		return emailNotification;
 	}
-	public void setSalutation(Salutation salutation){
-		this.salutation = salutation;
+
+	public void setEmailNotification(boolean emailNotification) {
+		this.emailNotification = emailNotification;
+	}
+
+	public boolean isPostalNotification() {
+		return postalNotification;
+	}
+
+	public void setPostalNotification(boolean postalNotification) {
+		this.postalNotification = postalNotification;
+	}
+	
+	public Sex getSalutation(){
+		return sex;
+	}
+	public void setSalutation(Sex salutation){
+		this.sex = salutation;
 	}
 	
 	public String getGivenName(){
@@ -60,6 +95,7 @@ public class Person {
 	public List<Address> getAddresses(){
 		return addresses;
 	}
+	
 	public void setAddresses(List<Address> addresses){
 		this.addresses = addresses;
 	}
@@ -88,30 +124,33 @@ public class Person {
 	public String getTelephone(){
 		return telephone;
 	}
+	
+	/**
+	 * @param telephone must be of format +(country code) (number)
+	 * eg. "+43 660234352" 
+	 */
 	public void setTelephone(String telephone){
 		this.telephone = telephone;
-	}
-	
-	public NotificationType getNotificationType(){
-		return notificationType;
-	}
-	public void setNotificationType(NotificationType notificationType){
-		this.notificationType = notificationType;
 	}
 	
 	public String getNote(){
 		return note;
 	}
+	
 	public void setNote(String note){
 		this.note = note;
 	}
 
-	public Address getMailingAddress() {
-		return mailing_address;
+	public Address getMainAddress() {
+		return mainAddress;
 	}
 
-	public void setMailingAddress(Address mailing_address) {
-		this.mailing_address = mailing_address;
+	/**
+	 * @Precondition mainAddress is contained in the list of Addresses
+	 * of this Person
+	 */
+	public void setMainAddress(Address mainAddress) {
+		this.mainAddress = mainAddress;
 	}
 	
 	@Override
@@ -142,11 +181,12 @@ public class Person {
 				&& this.getAddresses().equals(other.getAddresses())
 				&& this.getSalutation().equals(other.getSalutation())
 				&& this.getCompany().equals(other.getCompany())
-				&& this.getMailingAddress().equals(other.getMailingAddress())
+				&& this.getMainAddress().equals(other.getMainAddress())
 				&& this.getNote().equals(other.getNote())
 				&& this.getTitle().equals(other.getTitle())
 				&& this.getTelephone().equals(other.getTelephone())
-				&& this.getNotificationType().equals(other.getNotificationType())
+				&& this.isEmailNotification()==other.isEmailNotification()
+				&& this.isPostalNotification()==other.isPostalNotification()
 				&& this.getEmail().equals(other.getEmail())){
 			return true;
 		}

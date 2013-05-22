@@ -10,10 +10,10 @@ public class Address {
 
 	private int id;
 	private String street;
-	private int postalCode;
+	private String postalCode;
 	private String city;
 	private String country;
-
+	
 	public int getId() {
 		return id;
 	}
@@ -30,11 +30,11 @@ public class Address {
 		this.street = street;
 	}
 
-	public int getPostalCode() {
+	public String getPostalCode() {
 		return postalCode;
 	}
 
-	public void setPostalCode(int postalCode) {
+	public void setPostalCode(String postalCode) {
 		this.postalCode = postalCode;
 	}
 

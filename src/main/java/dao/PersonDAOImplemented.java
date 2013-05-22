@@ -67,7 +67,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 					Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, person.getGivenName());
 			ps.setString(2, person.getSurname());
-			ps.setInt(3, person.getMailingAddress().getId());
+			ps.setInt(3, person.getMainAddress().getId());
 			ps.setString(4, person.getEmail());
 			ps.setString(5, person.getSalutation().toString());
 			ps.setString(6, person.getTitle());
@@ -86,9 +86,9 @@ public class PersonDAOImplemented implements IPersonDAO {
 		personValidator.validate(person);
 		
 		// save address
-		Address mailingAddr = person.getMailingAddress();
+		Address mailingAddr = person.getMainAddress();
 		mailingAddr = addressDAO.create(mailingAddr);
-		person.setMailingAddress(mailingAddr);
+		person.setMainAddress(mailingAddr);
 
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -122,7 +122,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 				+ "company = ?, telephone = ?, notification_type = ?, note = ? where id = ?;";
 
 		Object[] params = new Object[] { person.getGivenName(),
-				person.getSurname(), person.getMailingAddress().getId(),
+				person.getSurname(), person.getMainAddress().getId(),
 				person.getEmail(), person.getSalutation(), person.getTitle(),
 				person.getCompany(), person.getTelephone(),
 				person.getNotificationType(), person.getNote(), person.getId() };
@@ -307,7 +307,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 			Person person = new Person();
 			person.setId(rs.getInt("id"));
 			try {
-				person.setMailingAddress(addressDAO.getByID(rs
+				person.setMainAddress(addressDAO.getByID(rs
 						.getInt("mailing_address")));
 			} catch (PersistenceException e) {
 				/**

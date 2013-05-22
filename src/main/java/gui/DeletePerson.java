@@ -104,7 +104,7 @@ public class DeletePerson extends JPanel{
 			obj.add(p.getId());
 			obj.add(p.getGivenName());
 			obj.add(p.getSurname());
-			obj.add(p.getMailingAddress().getStreet());
+			obj.add(p.getMainAddress().getStreet());
 			deleteModel.addRow(obj);
 			deleteTable.revalidate();
 		}	

@@ -51,7 +51,7 @@ public abstract class AbstractPersonDAOTest {
 		addresses.add(address);
 		
 		person.setAddresses(addresses);
-		person.setMailingAddress(address);
+		person.setMainAddress(address);
 		
 		person.setSalutation(Person.Salutation.HERR);
 		person.setCompany("IBM");
@@ -93,7 +93,7 @@ public abstract class AbstractPersonDAOTest {
 		addresses.add(address);
 		
 		person.setAddresses(addresses);
-		person.setMailingAddress(address);
+		person.setMainAddress(address);
 		
 		person.setSalutation(Person.Salutation.HERR);
 		person.setCompany("IBM");
@@ -146,7 +146,7 @@ public abstract class AbstractPersonDAOTest {
 		addresses.add(address);
 		
 		person.setAddresses(addresses);
-		person.setMailingAddress(address);
+		person.setMainAddress(address);
 		
 		person.setSalutation(Person.Salutation.HERR);
 		person.setCompany("IBM");
@@ -187,7 +187,7 @@ public abstract class AbstractPersonDAOTest {
 		addresses.add(address);
 		
 		person.setAddresses(addresses);
-		person.setMailingAddress(address);
+		person.setMainAddress(address);
 		
 		person.setSalutation(Person.Salutation.HERR);
 		person.setCompany("IBM");
@@ -240,7 +240,7 @@ public abstract class AbstractPersonDAOTest {
 		addresses.add(address);
 		
 		person.setAddresses(addresses);
-		person.setMailingAddress(address);
+		person.setMainAddress(address);
 		
 		person.setSalutation(Person.Salutation.HERR);
 		person.setCompany("IBM");
@@ -265,7 +265,7 @@ public abstract class AbstractPersonDAOTest {
 		addresses2.add(address2);
 		
 		person2.setAddresses(addresses2);
-		person2.setMailingAddress(address2);
+		person2.setMainAddress(address2);
 		
 		person2.setSalutation(Person.Salutation.HERR);
 		person2.setCompany("IBM");
@@ -301,7 +301,7 @@ public abstract class AbstractPersonDAOTest {
 		addresses.add(address);
 		
 		person.setAddresses(addresses);
-		person.setMailingAddress(address);
+		person.setMainAddress(address);
 		
 		person.setSalutation(Person.Salutation.HERR);
 		person.setCompany("IBM");

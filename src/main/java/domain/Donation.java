@@ -11,11 +11,11 @@ import java.util.Date;
 public class Donation {
 	private int id;
 	private Person person;
-	private int amount;
+	private long amount;
 	private Date date;
 	private String dedication;
 	public static enum DonationType{
-		SMS, SHOP, BANKING
+		SMS, BAR, BANK_TRANSFER, MERCHANDISE, ONLINE
 	};
 	private DonationType type;
 	private String note;
@@ -32,10 +32,10 @@ public class Donation {
 	public void setPerson(Person person) {
 		this.person = person;
 	}
-	public double getAmount() {
+	public long getAmount() {
 		return amount;
 	}
-	public void setAmount(int amount) {
+	public void setAmount(long amount) {
 		this.amount = amount;
 	}
 	public Date getDate() {
