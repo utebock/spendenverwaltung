@@ -210,7 +210,7 @@ public class CreatePerson extends JPanel{
 		
 		ok = builder.createButton("Anlegen", buttonListener, "create_person_in_db");
 		panel.add(ok);
-		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_person");
+		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_person_in_db");
 		panel.add(cancel, "split 2, wrap");
 	}
 	

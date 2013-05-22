@@ -45,7 +45,7 @@ public class ButtonListener implements ActionListener{
 			createPerson.createPersonInDb();
 		}
 		
-		if(cmd.equals("cancel_person")){
+		if(cmd.equals("cancel_person_in_db")){
 			createPerson.returnTo();
 		}
 		
@@ -53,6 +53,13 @@ public class ButtonListener implements ActionListener{
 			personOverview.goToDelete();
 		}
 		
+		if(cmd.equals("delete_person_from_db")){
+			deletePerson.deletePersonFromDb();
+		}
+		
+		if(cmd.equals("cancel_delete_person_from_db")){
+			deletePerson.returnTo();
+		}
 	}
 
 }
