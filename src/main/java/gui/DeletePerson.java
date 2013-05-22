@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -8,6 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 
 import domain.Person;
@@ -39,6 +41,8 @@ public class DeletePerson extends JPanel{
 		this.personOverview = personOverview;
 		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
+		
+		deleteModel = new DeleteTableModel();
 		setUp();
 	}
 	
@@ -49,33 +53,54 @@ public class DeletePerson extends JPanel{
 		panel.setPreferredSize(new Dimension(700, 700));
 		this.add(panel);
 		
-		deleteTable = builder.createRTable(getPersons());
-		pane = builder.createScrollPane(deleteTable);
+		deleteTable = new JTable(deleteModel);
+		deleteTable.setFillsViewportHeight(true);
+		deleteTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		pane = new JScrollPane(deleteTable);
 		pane.setPreferredSize(new Dimension(800,800));
 		panel.add(pane);
+		getColumns();
 		
 	}
 
-	private DeleteTableModel getPersons() {
-		Vector<String> header = new Vector<String>();
+	private void getColumns() {
+		deleteTable.getColumn("Loeschen");
+		deleteTable.getColumn("Id");
+		deleteTable.getColumn("Vorname");
+		deleteTable.getColumn("Nachname");
+		deleteTable.getColumn("Adresse");
+		getPersons();
 		
-		header = new Vector<String>();
-		header.add("Id");
-    	header.add("Anrede");
-    	header.add("Vorname");
-    	header.add("Nachname");
-    	header.add("Adresse");
-    	try{
-    		list = personService.getAll();
-    	}
-    	catch(ServiceException e){
-    		JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-    		//return;
-    	}
-    	return new DeleteTableModel(list, header);
-    	
 	}
-
+	
+	private void getPersons(){
+		list = new ArrayList<Person>();
+		Vector<Object> obj;
+		
+		try{
+			list = personService.getAll();
+			System.out.println("list: "+list.toString());
+		}
+		catch(ServiceException e){
+			JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+		    e.printStackTrace();
+		    return;
+		}
+		if(list == null){
+			JOptionPane.showMessageDialog(this, "GetAll() returns null.", "Error", JOptionPane.ERROR_MESSAGE);
+		    return;
+		}
+		for(Person p : list){
+			obj = new Vector<Object>();
+			obj.add(p.getDeleted());
+			obj.add(p.getId());
+			obj.add(p.getGivenName());
+			obj.add(p.getSurname());
+			obj.add(p.getMailingAddress().getStreet());
+			deleteModel.addRow(obj);
+			deleteTable.revalidate();
+		}
+		
+	}
 
 }

@@ -281,6 +281,7 @@ public class CreatePerson extends JPanel{
 	            e.printStackTrace();
 	    		return;
 		}
+		JOptionPane.showMessageDialog(this, "Person erfolgreich angelegt", "Information", JOptionPane.INFORMATION_MESSAGE);
 		returnTo();
 	}
 	

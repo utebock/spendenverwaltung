@@ -75,55 +75,5 @@ public class ComponentBuilder {
 		return button;
 	}
 	
-	public JScrollPane createTable(Object...columns) {
-		JTable table = new JTable(new Object[0][0], columns);
-		JScrollPane scrollPane = new JScrollPane(table);
-		table.setFillsViewportHeight(true);
-		return scrollPane;
-	}
 	
-	@SuppressWarnings("serial")
-	public JScrollPane createTable(Vector<Vector<String>> rows, Vector<String> header) {
-		JTable table = new JTable(rows, header){
-			@Override
-			public boolean isCellEditable(int rowIndex, int colIndex){
-				return false;
-			}
-		};
-		JScrollPane scrollPane = new JScrollPane(table);
-		table.setFillsViewportHeight(true);
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		return scrollPane;
-	}
-	
-	@SuppressWarnings("serial")
-	public JTable createRTable(AbstractTableModel model) {
-		JTable table = new JTable(model){
-			@Override
-			public boolean isCellEditable(int rowIndex, int colIndex){
-				return false;
-			}
-		};
-		table.setFillsViewportHeight(true);
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		return table;
-	}
-	
-	public JScrollPane createScrollPane(JTable table){
-		return new JScrollPane(table);
-	}
-	
-	@SuppressWarnings("serial")
-	public JScrollPane createTable(AbstractTableModel model){
-		JTable table = new JTable(model){
-			@Override
-			public boolean isCellEditable(int rowIndex, int colIndex){
-				return false;
-			}
-		};
-		JScrollPane scrollPane = new JScrollPane(table);
-		table.setFillsViewportHeight(true);
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		return scrollPane;
-	}
 }
