@@ -222,6 +222,7 @@ public class CreatePerson extends JPanel{
 	}
 	
 	public void createDonationInDb(){
+		//TODO: gehoert noch ausgebaut. Felder fuer die Attribute in der GUI fehlen auch noch
 		if(!amount.getText().equals("")){
 			int typeId = donationCombo.getSelectedIndex();
 			d.setType(donationService.getDonationTypeByIndex(typeId));
