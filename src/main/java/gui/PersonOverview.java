@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 import net.miginfocom.swing.MigLayout;
 
 import service.IAddressService;
+import service.IDonationService;
 import service.IPersonService;
 
 public class PersonOverview extends JPanel{
@@ -16,6 +17,7 @@ public class PersonOverview extends JPanel{
 	private static final long serialVersionUID = 1L;
 	private IPersonService personService;
 	private IAddressService addressService;
+	private IDonationService donationService;
 	private Overview overview;
 	private ComponentBuilder builder;
 	private ButtonListener buttonListener;
@@ -31,11 +33,12 @@ public class PersonOverview extends JPanel{
 	private JLabel showLabel;
 	private JLabel searchLabel;
 	
-	public PersonOverview(IPersonService personService, IAddressService addressService, Overview overview){
+	public PersonOverview(IPersonService personService, IAddressService addressService, IDonationService donationService, Overview overview){
 		super(new MigLayout());
 	
 		this.personService = personService;
 		this.addressService = addressService;
+		this.donationService = donationService;
 		this.overview = overview;
 		setUp();
 	}
@@ -83,7 +86,7 @@ public class PersonOverview extends JPanel{
 	}
 	
 	public void goToCreate(){
-		CreatePerson cp = new CreatePerson(personService, addressService, this);
+		CreatePerson cp = new CreatePerson(personService, addressService, donationService, this);
 		removeAll();
 		revalidate();
 		repaint();

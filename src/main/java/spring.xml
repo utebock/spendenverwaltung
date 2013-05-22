@@ -39,6 +39,11 @@
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="personValidator" ref="personValidator" />
 	</bean>
+	<bean id="donationDao" class="dao.DonationDAOImplemented">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<property name="donationValidator" ref="donationValidator" />
+		<property name="personDao" ref="personDao" />
+	</bean>
 
 	<!-- BEANS FOR SERVICES -->
 	<bean id="addressService" class="service.AddressServiceImplemented">
@@ -49,6 +54,11 @@
 	
 	<bean id="personService" class="service.PersonServiceImplemented">
 		<property name="personDAO" ref="personDao" />
+	</bean>
+	<bean id="donationValidator" class="service.DonationValidator">
+	</bean>
+	<bean id="donationService" class="service.DonationServiceImplemented">
+		<property name="donationDAO" ref="donationDao" />
 	</bean>
 	
 </beans>

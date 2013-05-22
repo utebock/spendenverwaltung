@@ -7,6 +7,7 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import service.IAddressService;
+import service.IDonationService;
 import service.IPersonService;
 
 public class App {
@@ -16,10 +17,12 @@ public class App {
 		
         IPersonService personService = context.getBean("personService", IPersonService.class);
         IAddressService addressService = context.getBean("addressService", IAddressService.class);
+        IDonationService donationService = context.getBean("donationService", IDonationService.class);
         MainFrame mf = new MainFrame();
         
         mf.setPersonService(personService);
         mf.setAddressService(addressService);
+        mf.setDonationService(donationService);
         MainFrame.openMainWindow();
         
 		if(context != null) {
