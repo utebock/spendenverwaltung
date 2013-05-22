@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,6 +20,7 @@ import service.DonationValidator;
 
 import domain.Address;
 import domain.Donation;
+import domain.DonationFilter;
 import domain.Person;
 import exceptions.IllegalDBStateException;
 import exceptions.PersistenceException;
@@ -131,6 +133,60 @@ public class DonationDAOImplemented implements IDonationDAO{
 		String select = "select * from donations where person_id = ?;";
 		
 		List<Donation> donations = jdbcTemplate.query(select, new Object[] {p.getId()}, new DonationMapper());
+		
+		return donations;
+	}
+	
+	@Override 
+	public List<Donation> getByFilter(DonationFilter filter) throws PersistenceException{
+		
+		if(filter == null || filter.isEmpty()){
+			//return getAll();
+		}
+		
+		String select = "SELECT * FROM donations WHERE";
+		ArrayList<Object> args = new ArrayList<Object>();
+		
+		if(filter.getDedicationPart() != null){
+			select += " dediction like '%?%' AND";
+			args.add(filter.getDedicationPart());
+		}
+		
+		if(filter.getMaxAmount() != null){
+			select += " amount <= ? AND";
+			args.add(filter.getMaxAmount());
+		}
+		
+		if(filter.getMinAmount() != null){
+			select += " amount >= ? AND";
+			args.add(filter.getMinAmount());
+		}
+		
+		if(filter.getMaxDate() != null){
+			select += " date <= ? AND";
+			args.add(new Timestamp(filter.getMaxDate().getTime()));
+		}
+		
+		if(filter.getMinDate() != null){
+			select += " date >= ? AND";
+			args.add(new Timestamp(filter.getMinDate().getTime()));
+		}
+		
+		if(filter.getNotePart()!=null){
+			select += " note like '%?%' AND";
+			args.add(filter.getNotePart());
+		}
+		
+		if(filter.getType()!=null){
+			select += " type = ? AND";
+			args.add(filter.getType());
+		}
+		
+		//remove last AND
+		select = select.substring(0, select.length() - 3);
+		
+		List<Donation> donations = jdbcTemplate.query(select, args.toArray(), new DonationMapper());
+		
 		
 		return donations;
 	}

@@ -4,6 +4,7 @@ import java.util.List;
 
 import domain.Address;
 import domain.Donation;
+import domain.DonationFilter;
 import domain.Person;
 import exceptions.PersistenceException;
 
@@ -58,5 +59,14 @@ public interface IDonationDAO {
 	 */
 	public List<Donation> getByPerson(Person p) throws PersistenceException;
 	
+	/**
+	 * Retrieves donations matching the given filter
+	 * 
+	 * @param filter
+	 *			used filter
+	 * @return 	List of all matching donations
+	 * @throws PersistenceException
+	 */
+	public List<Donation> getByFilter(DonationFilter filter) throws PersistenceException;
 	
 }

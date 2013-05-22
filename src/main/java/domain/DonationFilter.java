@@ -29,6 +29,15 @@ public class DonationFilter {
 	}
 
 	/**
+	 * @return whether all criteria are set to <code>null</code>, so that the
+	 *         new filter matches all donations.
+	 */
+	public boolean isEmpty(){
+		return minAmount == null && maxAmount == null && minDate == null &&
+				maxDate == null && dedicationPart == null && notePart == null &&
+				type == null;
+	}
+	/**
 	 * @return the minimum amount a matching donation has to be of, or
 	 *         <code>null</code> if the is no lower bound for this filter
 	 */

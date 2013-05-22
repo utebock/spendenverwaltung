@@ -21,7 +21,7 @@ public class MailingFilter {
 	private Date minDate, maxDate;
 	private NotificationType notificationType;
 	
-	//private MailingType mailingType;     //will be defined in Mailing
+	//TODO private MailingType mailingType;     //will be defined in Mailing
 	
 	/**
 	 * default construtor. Sets all criteria to <code>null</code>, so that the 
@@ -31,6 +31,15 @@ public class MailingFilter {
 		minDate = null;
 		maxDate = null;
 		notificationType = null;
+	}
+	
+	/**
+	 * @return whether all criteria are set to <code>null</code>, so that the
+	 *         new filter matches all mailings.
+	 */
+	public boolean isEmpty(){
+		return minDate == null && maxDate == null && notificationType == null;
+		//TODO ADD MAILINGTYPE
 	}
 	
 	/**
