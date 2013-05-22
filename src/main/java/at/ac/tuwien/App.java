@@ -1,17 +1,29 @@
 package at.ac.tuwien;
 
-import service.AddressServiceImplemented;
-import service.PersonServiceImplemented;
 import gui.MainFrame;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import service.IAddressService;
+import service.IPersonService;
 
 public class App {
 	
     public static void main( String[] args )   {
+		ApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		
+        IPersonService personService = context.getBean("personService", IPersonService.class);
+        IAddressService addressService = context.getBean("addressService", IAddressService.class);
         MainFrame mf = new MainFrame();
-        PersonServiceImplemented personService = new PersonServiceImplemented();
-        AddressServiceImplemented addressService = new AddressServiceImplemented();
+        
         mf.setPersonService(personService);
         mf.setAddressService(addressService);
-        MainFrame.openMainWindow();       
+        MainFrame.openMainWindow();
+        
+		if(context != null) {
+			((AbstractApplicationContext) context).close();
+		}
     }
 }

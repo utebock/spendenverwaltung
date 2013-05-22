@@ -22,7 +22,7 @@
 			value="jdbc:mysql://localhost:3306/ub_spenderverwaltung" />
 		<property name="username" value="ubadministrative" />
 		<property name="password" value="ubadmin" />
-		<property name="defaultAutoCommit" value="false" />
+		<property name="defaultAutoCommit" value="true" />
 	</bean>
 	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<property name="dataSource">
@@ -39,19 +39,12 @@
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="personValidator" ref="personValidator" />
 	</bean>
-	<bean id="donationDao" class="dao.DonationDAOImplemented">
-		<property name="jdbcTemplate" ref="jdbcTemplate" />
-		<property name="donationValidator" ref="donationValidator" />
-		<property name="personDao" ref="personDao" />
-	</bean>
 
 	<!-- BEANS FOR SERVICES -->
 	<bean id="addressService" class="service.AddressServiceImplemented">
 		<property name="addressDAO" ref="addressDao" />
 	</bean>
 	<bean id="personValidator" class="service.PersonValidator">
-	</bean>
-	<bean id="donationValidator" class="service.DonationValidator">
 	</bean>
 	
 	<bean id="personService" class="service.PersonServiceImplemented">

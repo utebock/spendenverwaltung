@@ -69,6 +69,7 @@ public abstract class AbstractDonationDAOTest {
 		address.setCountry("Testcountry");
 		
 		person.setSalutation(Person.Salutation.HERR);
+		person.setDeleted(false);
 		person.setCompany("IBM");
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
@@ -137,6 +138,7 @@ public abstract class AbstractDonationDAOTest {
 		
 		person.setSalutation(Person.Salutation.HERR);
 		person.setCompany("IBM");
+		person.setDeleted(false);
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
 		person.setSurname("Oberhummer");
@@ -188,6 +190,7 @@ public abstract class AbstractDonationDAOTest {
 
 		person.setSalutation(Person.Salutation.HERR);
 		person.setCompany("IBM");
+		person.setDeleted(false);
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
 		person.setSurname("Oberhummer");
@@ -256,6 +259,7 @@ public abstract class AbstractDonationDAOTest {
 
 		person.setSalutation(Person.Salutation.HERR);
 		person.setCompany("IBM");
+		person.setDeleted(false);
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
 		person.setSurname("Oberhummer");
@@ -317,6 +321,7 @@ public abstract class AbstractDonationDAOTest {
 		person1.setSalutation(Person.Salutation.HERR);
 		person1.setCompany("IBM");
 		person1.setTitle("Prof. Dr.");
+		person1.setDeleted(false);
 		person1.setGivenName("Heinz");
 		person1.setSurname("Oberhummer");
 		person1.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
@@ -326,6 +331,7 @@ public abstract class AbstractDonationDAOTest {
 
 		person2.setSalutation(Person.Salutation.FRAU);
 		person2.setCompany("Mustercompany");
+		person2.setDeleted(false);
 		person2.setTitle("MSc");
 		person2.setGivenName("Maxi");
 		person2.setSurname("Musti");
@@ -418,6 +424,7 @@ public abstract class AbstractDonationDAOTest {
 
 		person.setSalutation(Person.Salutation.HERR);
 		person.setCompany("IBM");
+		person.setDeleted(false);
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
 		person.setSurname("Oberhummer");

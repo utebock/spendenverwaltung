@@ -13,13 +13,12 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import domain.Address;
-import domain.Person;
-import exceptions.ServiceException;
-
 import net.miginfocom.swing.MigLayout;
 import service.IAddressService;
 import service.IPersonService;
+import domain.Address;
+import domain.Person;
+import exceptions.ServiceException;
 
 public class CreatePerson extends JPanel{
 	
@@ -211,7 +210,7 @@ public class CreatePerson extends JPanel{
 		
 		ok = builder.createButton("Anlegen", buttonListener, "create_person_in_db");
 		panel.add(ok);
-		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_person");
+		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_person_in_db");
 		panel.add(cancel, "split 2, wrap");
 	}
 	
@@ -261,6 +260,8 @@ public class CreatePerson extends JPanel{
 		String country = countryField.getText();
 		addr.setCountry(country);
 		
+		p.setMailingAddress(addr);
+		
 		if(notifyMail.isSelected()){
 			p.setNotificationType(Person.NotificationType.MAIL);
 		}
@@ -272,7 +273,7 @@ public class CreatePerson extends JPanel{
 		p.setNote(note);
 		
 		try{
-			addressService.create(addr);
+//			addressService.create(addr); // will now be created when person is created - pm
 			personService.create(p);
 		}
 		catch(ServiceException e){
@@ -280,6 +281,7 @@ public class CreatePerson extends JPanel{
 	            e.printStackTrace();
 	    		return;
 		}
+		JOptionPane.showMessageDialog(this, "Person erfolgreich angelegt", "Information", JOptionPane.INFORMATION_MESSAGE);
 		returnTo();
 	}
 	

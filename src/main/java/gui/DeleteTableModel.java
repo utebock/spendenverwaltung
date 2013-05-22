@@ -1,85 +1,43 @@
 package gui;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
+import javax.swing.table.DefaultTableModel;
 
-import javax.swing.table.AbstractTableModel;
-
-import domain.Person;
-
-public class DeleteTableModel extends AbstractTableModel{
+public class DeleteTableModel extends DefaultTableModel{
 
 	private static final long serialVersionUID = 1L;
-	private List<Person> list;
-	private Vector<String> header;
 	
-	public DeleteTableModel(List<Person> list, Vector<String> header){
-		if(list == null){
-			this.list = new ArrayList<Person>();
+	private String[] columnNames = new String[]{"Loeschen", "Id", "Vorname", "Nachname", "Adresse"};
+
+	public Class<?> getColumnClass(int col) {
+		
+		switch (col) {
+		case 0:
+			return Boolean.class;
+		case 1:
+			return Integer.class;
+		case 2:
+			return String.class;
+		case 3:
+			return String.class;
+		case 4: 
+			return String.class;
 		}
-		else{
-			this.list = list;
-		}
-		this.header = header;
-	}
-	@Override
-	public int getRowCount() {
-		if(list == null){
-			return 0;
-		}
-		else{
-			return list.size();
-		}
+		return null;
 	}
 
 	@Override
 	public int getColumnCount() {
-		return header.size();
+		return columnNames.length;
+	}
+	
+	@Override
+	public String getColumnName(int col) {
+		return columnNames[col];
 	}
 
 	@Override
-	public Object getValueAt(int rowIndex, int columnIndex) {
-		Person p = list.get(rowIndex);
-		switch(columnIndex){
-		case 0:
-			return p.getId();
-		case 1: 
-			return p.getSalutation();
-		case 2: 
-			return p.getGivenName();
-		case 3:
-			return p.getSurname();
-		case 4:
-			return p.getMailingAddress();
-		}
-		return null;
+	public boolean isCellEditable(int row, int col) {
+		return true;
 	}
-	
-	public List<Person> addRow(Person p){
-		list.add(p);
-		return list;
-	}
-	
-	public String getColumnName(int col){
-		return header.get(col);
-	}
-	
-	public Person getRow(int row){
-		if(list == null){
-			return null;
-		}
-		else{
-			return list.get(row);
-		}
-	}
-	
-	public Vector<String> getHeader(){
-		return this.header;
-	}
-	
-	public List<Person> getPersons(){
-		return list;
-	}
-
 }
+

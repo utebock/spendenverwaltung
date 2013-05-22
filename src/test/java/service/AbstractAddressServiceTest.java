@@ -1,7 +1,9 @@
 package service;
 
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
@@ -12,16 +14,24 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
+import dao.IAddressDAO;
 import domain.Address;
+import exceptions.PersistenceException;
 import exceptions.ServiceException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("../testspring.xml")
-@TransactionConfiguration(defaultRollback=true)
+@TransactionConfiguration(defaultRollback = true)
 public abstract class AbstractAddressServiceTest {
 
 	protected static IAddressService addressService;
-	
+
+	protected static IAddressDAO addressDAO;
+	protected static Address testAddress;
+	protected static Address testAddress2;
+	protected static Address nullAddress;
+	protected static Address testAddressCreated;
+
 	public static void setAddressService(IAddressService addressService) {
 		AbstractAddressServiceTest.addressService = addressService;
 	}
@@ -34,8 +44,13 @@ public abstract class AbstractAddressServiceTest {
 	@Transactional
 	public void createWithNullParameter_ThrowsException() {
 		try {
+			when(addressDAO.create(null)).thenThrow(
+					new IllegalArgumentException());
+			
 			addressService.create(null);
 		} catch (ServiceException e) {
+			fail();
+		} catch (PersistenceException e) {
 			fail();
 		}
 	}
@@ -44,8 +59,13 @@ public abstract class AbstractAddressServiceTest {
 	@Transactional
 	public void createWithInvalidStateParameter_ThrowsException() {
 		try {
-			addressService.create(new Address()); // all values are null
+			when(addressDAO.create(nullAddress)).thenThrow(
+					new IllegalArgumentException());
+
+			addressService.create(nullAddress); // all values are null
 		} catch (ServiceException e) {
+			fail();
+		} catch (PersistenceException e) {
 			fail();
 		}
 	}
@@ -53,27 +73,14 @@ public abstract class AbstractAddressServiceTest {
 	@Test
 	@Transactional
 	public void createWithValidParameter_ReturnsSavedAddress() {
-
-		Address address = new Address();
-		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
-		address.setCity("Testcity");
-		address.setCountry("Testcountry");
-
 		try {
-			Address returnedAddress = addressService.create(address);
-			address.setId(returnedAddress.getId()); // for #equals
+			when(addressDAO.create(testAddress)).thenReturn(testAddressCreated);
 
-			Address savedAddress = addressService.getByID(returnedAddress
-					.getId());
-
-			// check if address was returned correctly
-			assert (returnedAddress.equals(address));
-
-			// check if address was saved correctly
-			assert (savedAddress.equals(returnedAddress));
-
+			Address returnedAddress = addressService.create(testAddress);
+			assert (returnedAddress.equals(testAddressCreated));
 		} catch (ServiceException e) {
+			fail();
+		} catch (PersistenceException e) {
 			fail();
 		}
 	}
@@ -86,8 +93,13 @@ public abstract class AbstractAddressServiceTest {
 	@Transactional
 	public void updateWithNullParameter_ThrowsException() {
 		try {
+			when(addressDAO.update(null)).thenThrow(
+					new IllegalArgumentException());
+			
 			addressService.update(null);
 		} catch (ServiceException e) {
+			fail();
+		} catch (PersistenceException e) {
 			fail();
 		}
 	}
@@ -95,18 +107,14 @@ public abstract class AbstractAddressServiceTest {
 	@Test(expected = IllegalArgumentException.class)
 	@Transactional
 	public void updateWithInvalidStateParameter_ThrowsException() {
-		Address address = new Address();
-		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
-		address.setCity("Testcity");
-		address.setCountry("Testcountry");
-
 		try {
-			address = addressService.create(address);
-			address.setCity(null); // not allowed null value
+			when(addressDAO.update(nullAddress)).thenThrow(
+					new IllegalArgumentException());
 
-			addressService.update(address);
+			addressService.update(nullAddress);
 		} catch (ServiceException e) {
+			fail();
+		} catch (PersistenceException e) {
 			fail();
 		}
 	}
@@ -114,38 +122,15 @@ public abstract class AbstractAddressServiceTest {
 	@Test
 	@Transactional
 	public void updateWithValidParameters_ReturnsUpdatedAddress() {
-		Address address = new Address();
-		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
-		address.setCity("Testcity");
-		address.setCountry("Testcountry");
-
 		try {
-			address = addressService.create(address);
-			address.setCity("AnotherCity");
+			when(addressDAO.update(testAddressCreated)).thenReturn(
+					testAddressCreated);
 
-			Address returnedAddress = addressService.update(address);
-			Address updatedAddress = addressService.getByID(address.getId());
-
-			// check if returned address is correct
-			assert (returnedAddress.getId() == address.getId());
-			assert (returnedAddress.getStreet().equals(address.getStreet()));
-			assert (returnedAddress.getPostalCode() == address.getPostalCode());
-			assert (returnedAddress.getCountry().equals(address.getCountry()));
-			assert (!returnedAddress.getCity().equals(address.getCity())); // different
-																			// city
-
-			// check if address was updated correctly
-			assert (updatedAddress.getId() == address.getId());
-			assert (updatedAddress.getStreet().equals(address.getStreet()));
-			assert (updatedAddress.getPostalCode() == address.getPostalCode());
-			assert (updatedAddress.getCountry().equals(address.getCountry()));
-			assert (!updatedAddress.getCity().equals(address.getCity())); // different
-																			// city
-
-			assert (returnedAddress.getCity() == updatedAddress.getCity());
-
+			Address returnedAddress = addressService.update(testAddressCreated);
+			assert (returnedAddress.equals(testAddressCreated));
 		} catch (ServiceException e) {
+			fail();
+		} catch (PersistenceException e) {
 			fail();
 		}
 	}
@@ -158,8 +143,12 @@ public abstract class AbstractAddressServiceTest {
 	@Transactional
 	public void deleteWithNullParameter_ThrowsException() {
 		try {
+			doThrow(new IllegalArgumentException()).when(addressDAO).delete(null);
+			
 			addressService.delete(null);
 		} catch (ServiceException e) {
+			fail();
+		} catch (PersistenceException e) {
 			fail();
 		}
 	}
@@ -167,19 +156,12 @@ public abstract class AbstractAddressServiceTest {
 	@Test
 	@Transactional
 	public void deleteWithValidParameter_RemovesEntity() {
-		Address address = new Address();
-		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
-		address.setCity("Testcity");
-		address.setCountry("Testcountry");
-		
 		try {
-			address = addressService.create(address);
-			addressService.delete(address);
-			List<Address> allAddresses = addressService.getAll();
-			assert(!allAddresses.contains(address));
-
+			addressService.delete(testAddress);
+			verify(addressDAO).delete(testAddress);
 		} catch (ServiceException e) {
+			fail();
+		} catch (PersistenceException e) {
 			fail();
 		}
 	}
@@ -189,59 +171,90 @@ public abstract class AbstractAddressServiceTest {
 	 */
 
 	@Test
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	public void getAll_ReturnsAllEntities() {
-		Address address = new Address();
-		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
-		address.setCity("Testcity");
-		address.setCountry("Testcountry");
-
-		Address address2 = new Address();
-		address2.setStreet("Teststreet2 1/1");
-		address2.setPostalCode(00001);
-		address2.setCity("Testcity2");
-		address2.setCountry("Testcountry2");
 		try {
-			addressService.create(address);
-			addressService.create(address2);
+			List<Address> allAddresses = new ArrayList<Address>();
+			allAddresses.add(testAddress);
+			allAddresses.add(testAddress2);
+			when(addressDAO.getAll()).thenReturn(allAddresses);
 
 			List<Address> addressList = addressService.getAll();
 			assert (addressList != null && addressList.size() == 2);
+			assert (addressList.get(0).equals(testAddress) && addressList
+					.get(1).equals(testAddress2));
 		} catch (ServiceException e) {
+			fail();
+		} catch (PersistenceException e) {
 			fail();
 		}
 	}
 
-	@Test (expected = EmptyResultDataAccessException.class)
-	@Transactional(readOnly=true)
+	@Test(expected = EmptyResultDataAccessException.class)
+	@Transactional(readOnly = true)
 	public void getWithInvalidId_ThrowsException() {
 		try {
-			addressService.getByID(10000);
+			when(addressDAO.getByID(100)).thenThrow(
+					new EmptyResultDataAccessException(0));
+
+			addressService.getByID(100);
 		} catch (ServiceException e) {
+			fail();
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	@Transactional(readOnly = true)
+	public void getWithNegativeId_ThrowsException() {
+		try {
+			when(addressDAO.getByID(-1)).thenThrow(
+					new IllegalArgumentException());
+
+			addressService.getByID(-1);
+		} catch (ServiceException e) {
+			fail();
+		} catch (PersistenceException e) {
 			fail();
 		}
 	}
 
 	@Test
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	public void getWithValidId_ReturnsEntity() {
-		Address address = new Address();
-		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
-		address.setCity("Testcity");
-		address.setCountry("Testcountry");
-
 		try {
-			Address createdAddress = addressService.create(address);
-			Address foundAddress = addressService.getByID(createdAddress
+			when(addressDAO.getByID(testAddressCreated.getId())).thenReturn(
+					testAddressCreated);
+
+			Address foundAddress = addressService.getByID(testAddressCreated
 					.getId());
 
-			assert (foundAddress != null && foundAddress.getId() == createdAddress
-					.getId());
+			assert (testAddressCreated.equals(foundAddress));
 		} catch (ServiceException e) {
 			fail();
+		} catch (PersistenceException e) {
+			fail();
 		}
+	}
+
+	protected static void init() {
+		testAddress = new Address();
+		testAddress.setStreet("Teststreet 1/1");
+		testAddress.setPostalCode(00000);
+		testAddress.setCity("Testcity");
+		testAddress.setCountry("Testcountry");
+		
+		testAddressCreated = testAddress;
+		testAddressCreated.setId(1);
+
+		testAddress2 = new Address();
+		testAddress2.setStreet("Teststreet2 1/1");
+		testAddress2.setPostalCode(00001);
+		testAddress2.setCity("Testcity2");
+		testAddress2.setCountry("Testcountry2");
+
+		nullAddress = new Address();
 	}
 
 }

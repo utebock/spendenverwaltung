@@ -1,27 +1,25 @@
 package service;
 
+import static org.mockito.Mockito.mock;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import dao.IAddressDAO;
 
 public class DBAddressServiceTest extends AbstractAddressServiceTest {
 
-	private static ApplicationContext context;
-
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		context = new ClassPathXmlApplicationContext("testspring.xml");
-
-		setAddressService(context.getBean("addressService",
-				IAddressService.class));
+		init();
+		addressDAO = mock(IAddressDAO.class);
+		AddressServiceImplemented service = new AddressServiceImplemented();
+		service.setAddressDAO(addressDAO);
+		setAddressService(service);
 	}
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
-		if (context != null) {
-			((AbstractApplicationContext) context).close();
-		}
+
 	}
 }

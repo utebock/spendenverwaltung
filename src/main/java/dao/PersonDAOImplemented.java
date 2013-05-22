@@ -81,9 +81,14 @@ public class PersonDAOImplemented implements IPersonDAO {
 	}
 
 	@Override
-	public Person create(Person person) {
+	public Person create(Person person) throws PersistenceException {
 
 		personValidator.validate(person);
+		
+		// save address
+		Address mailingAddr = person.getMailingAddress();
+		mailingAddr = addressDAO.create(mailingAddr);
+		person.setMailingAddress(mailingAddr);
 
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -109,7 +114,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 	}
 
 	@Override
-	public Person update(Person person) {
+	public Person update(Person person) throws PersistenceException {
 
 		personValidator.validate(person);
 
@@ -148,7 +153,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 	}
 
 	@Override
-	public void delete(Person person) {
+	public void delete(Person person) throws PersistenceException {
 
 		personValidator.validate(person);
 
@@ -165,7 +170,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 	}
 
 	@Override
-	public List<Person> getAll() {
+	public List<Person> getAll() throws PersistenceException {
 
 		String select = "select * from persons";
 		List<Person> personList = jdbcTemplate
@@ -183,7 +188,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 	}
 
 	@Override
-	public Person getById(int id) {
+	public Person getById(int id) throws PersistenceException {
 
 		if (id < 0) {
 			throw new IllegalArgumentException("Id must not be less than 0");

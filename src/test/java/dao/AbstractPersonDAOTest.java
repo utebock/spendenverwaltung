@@ -279,6 +279,7 @@ public abstract class AbstractPersonDAOTest {
 		personDAO.create(person2);
 		
 		List<Person> list = personDAO.getAll();
+		System.out.println(list.size()+ " inhalt: "+list.toString()+"\n");
 		assertThat(list.isEmpty(), is(false));
 		assertThat(list.size(), is(2)); //should return 2 after rollback
 		
