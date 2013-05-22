@@ -6,16 +6,17 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import dao.IPersonDAO;
+import exceptions.PersistenceException;
 
-public abstract class DBPersonServiceTest extends AbstractPersonServiceTest{
+public class DBPersonServiceTest extends AbstractPersonServiceTest{
 	
 	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
+	public static void setUpBeforeClass() throws Exception, PersistenceException {
 		init();
 		personDAO = mock(IPersonDAO.class);
-		AddressServiceImplemented service = new AddressServiceImplemented();
-		service.setAddressDAO(addressDAO);
-		setAddressService(service);
+		PersonServiceImplemented service = new PersonServiceImplemented();
+		service.setPersonDAO(personDAO);
+		setPersonService(service);
 	}
 
 	@AfterClass
