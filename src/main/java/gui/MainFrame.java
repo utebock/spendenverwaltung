@@ -9,6 +9,7 @@ import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 
 import service.IAddressService;
+import service.IDonationService;
 import service.IPersonService;
 
 public class MainFrame extends JFrame{
@@ -16,6 +17,7 @@ public class MainFrame extends JFrame{
 	private static final long serialVersionUID = 1L;
 	private static IPersonService personService;
 	private static IAddressService addressService;
+	private static IDonationService donationService;
 	
 	public MainFrame(){
 		super("Ute Bock Spendenverwaltungssystem");
@@ -30,6 +32,9 @@ public class MainFrame extends JFrame{
 	}
 	public void setAddressService(IAddressService addressService){
 		MainFrame.addressService = addressService;
+	}
+	public void setDonationService(IDonationService donationService){
+		MainFrame.donationService = donationService;
 	}
 	
 	public static void openMainWindow(){
@@ -54,7 +59,7 @@ public class MainFrame extends JFrame{
 		MainFrame frame = new MainFrame();
 		JPanel panel = new JPanel();
 		frame.add(new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
-		frame.add(new Overview(personService, addressService));
+		frame.add(new Overview(personService, addressService, donationService));
 		frame.setSize(800, 800);
 		frame.setLocation(100,100);
 		frame.setResizable(true);

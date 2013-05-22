@@ -9,6 +9,7 @@ import dao.IAddressDAO;
 import dao.IDonationDAO;
 import domain.Address;
 import domain.Donation;
+import domain.Donation.DonationType;
 import domain.Person;
 import exceptions.PersistenceException;
 import exceptions.ServiceException;
@@ -79,5 +80,22 @@ public class DonationServiceImplemented implements IDonationService {
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
+	}
+
+	@Override
+	public String[] getDonationTypes() {
+		DonationType[] donationTypes = Donation.DonationType.values();
+		String[] stringDonationTypes = new String[donationTypes.length];
+		int counter = 0;
+		
+		for(DonationType type : donationTypes)
+			stringDonationTypes[counter++] = type.toString();
+		
+		return stringDonationTypes;
+	}
+
+	@Override
+	public DonationType getDonationTypeByIndex(int index) {
+		return Donation.DonationType.values()[index];
 	}
 }

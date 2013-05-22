@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import net.miginfocom.swing.MigLayout;
 
 import service.IAddressService;
+import service.IDonationService;
 import service.IPersonService;
 
 public class Overview extends JPanel{
@@ -18,6 +19,7 @@ public class Overview extends JPanel{
 	private static final long serialVersionUID = 1L;
 	private IPersonService personService;
 	private IAddressService addressService;
+	private IDonationService donationService;
 	private ComponentBuilder builder;
 	private ButtonListener buttonListener;
 	private JButton person;
@@ -30,10 +32,11 @@ public class Overview extends JPanel{
 	private JLabel persons;
 	private JLabel filterLabel;
 	
-	public Overview(IPersonService personService, IAddressService addressService){
+	public Overview(IPersonService personService, IAddressService addressService, IDonationService donationService){
 		super(new MigLayout());
 		this.personService = personService;
 		this.addressService = addressService;
+		this.donationService = donationService;
 		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
 		setUpPersons();
@@ -68,7 +71,7 @@ public class Overview extends JPanel{
 	}
 	
 	public void goToPersons(){
-		PersonOverview po = new PersonOverview(personService, addressService, this);
+		PersonOverview po = new PersonOverview(personService, addressService, donationService, this);
 		removeAll();
 		revalidate();
 		repaint();

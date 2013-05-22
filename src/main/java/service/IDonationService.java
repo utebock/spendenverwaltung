@@ -4,6 +4,7 @@ import java.util.List;
 
 import domain.Address;
 import domain.Donation;
+import domain.Donation.DonationType;
 import domain.Person;
 import exceptions.ServiceException;
 
@@ -56,4 +57,20 @@ public interface IDonationService {
 	 * @return List of all addresses
 	 */
 	public List<Donation> getByPerson(Person p) throws ServiceException;
+	
+	/**
+	 * Puts all Donation Types in a String Array
+	 * 
+	 * @return Returns a String Array including all Donation Types
+	 */
+	public String[] getDonationTypes();
+	
+	/**
+	 * Returns the DonationType by a given index
+	 * 
+	 * @param index
+	 * 			Index of the selected Donationtype
+	 * @return DonationType with index "index"
+	 */
+	public DonationType getDonationTypeByIndex(int index);
 }

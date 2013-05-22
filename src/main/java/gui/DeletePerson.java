@@ -74,7 +74,6 @@ public class DeletePerson extends JPanel{
 	}
 
 	private void getColumns() {
-		deleteTable.getColumn("Loeschen");
 		deleteTable.getColumn("Id");
 		deleteTable.getColumn("Vorname");
 		deleteTable.getColumn("Nachname");
@@ -102,7 +101,6 @@ public class DeletePerson extends JPanel{
 		}
 		for(Person p : list){
 			obj = new Vector<Object>();
-			obj.add(p.getDeleted());
 			obj.add(p.getId());
 			obj.add(p.getGivenName());
 			obj.add(p.getSurname());
@@ -124,7 +122,7 @@ public class DeletePerson extends JPanel{
 			return;
 		}
 		
-		int id = (Integer) deleteModel.getValueAt(row, 1);
+		int id = (Integer) deleteModel.getValueAt(row, 0);
 		
 		try{
 			p = personService.getById(id);

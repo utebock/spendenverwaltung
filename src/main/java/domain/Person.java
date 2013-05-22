@@ -11,7 +11,6 @@ public class Person {
 		HERR, FRAU, FA, FAM
 	};
 	private Salutation salutation;
-	private boolean isDeleted;
 	private String title;
 	private String company;
 	private String givenName;
@@ -42,14 +41,6 @@ public class Person {
 	}
 	public void setSalutation(Salutation salutation){
 		this.salutation = salutation;
-	}
-	
-	public boolean getDeleted(){
-		return isDeleted;
-	}
-	
-	public void setDeleted(boolean isDeleted){
-		this.isDeleted = isDeleted;
 	}
 	
 	public String getGivenName(){
