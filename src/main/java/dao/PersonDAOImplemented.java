@@ -34,7 +34,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 	private static final Logger log = Logger
 			.getLogger(PersonDAOImplemented.class);
 
-	private String addressQuery = "select * from livesat where personid = ?";
+	private String addressQuery = "select * from livesat where pid = ?";
 
 	public void setPersonValidator(PersonValidator personValidator) {
 		this.personValidator = personValidator;
@@ -92,7 +92,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 
 		person.setId(keyHolder.getKey().intValue());
 
-		String insertLivesAt = "insert into livesat (personid, addressid, ismain) values (?, ?, ?)";
+		String insertLivesAt = "insert into livesat (pid, aid, ismain) values (?, ?, ?)";
 
 		List<Address> addresses = person.getAddresses();
 
@@ -127,7 +127,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 
 		int[] types = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
 				Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-				Types.VARCHAR, Types.BOOLEAN, Types.BOOLEAN, Types.VARCHAR };
+				Types.BOOLEAN, Types.BOOLEAN, Types.VARCHAR, Types.INTEGER };
 
 		/**
 		 * set person id to update result
@@ -137,7 +137,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 		/**
 		 * ismain must only be true once per person
 		 */
-		String updateLivesAt = "insert into livesat (personid, addressid, ismain) values (?, ?, ?)";
+		String updateLivesAt = "insert into livesat (pid, aid, ismain) values (?, ?, ?)";
 
 		List<Address> addresses = person.getAddresses();
 
@@ -164,7 +164,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 		personValidator.validate(person);
 
 		String deletePersons = "delete from persons where id = ?;";
-		String removeLivesAt = "delete from livesat where personid = ?";
+		String removeLivesAt = "delete from livesat where pid = ?";
 
 		Object[] params = new Object[] { person.getId() };
 
@@ -289,7 +289,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 		@Override
 		public Address mapRow(ResultSet rs, int rowNum) throws SQLException {
 			try {
-				return addressDAO.getByID(rs.getInt("addressid"));
+				return addressDAO.getByID(rs.getInt("aid"));
 			} catch (PersistenceException e) {
 				/**
 				 * this should NEVER happen, so we rethrow an unchecked
@@ -316,7 +316,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 			person.setGivenName(rs.getString("givenname"));
 			person.setSurname(rs.getString("surname"));
 			person.setEmail(rs.getString("email"));
-			person.setSex(Person.Sex.valueOf(rs
+			person.setSex(Person.Sex.getByName(rs
 					.getString("sex")));
 			person.setTitle(rs.getString("title"));
 			person.setCompany(rs.getString("company"));

@@ -48,7 +48,7 @@ public class DonationDAOImplemented implements IDonationDAO{
 			this.donation = donation;
 		}
 		
-		private String createDonations = "insert into donations (personid, amount, date, dedication, type, note) values (?,?,?,?,?,?)";
+		private String createDonations = "insert into donations (personid, amount, donationdate, dedication, type, note) values (?,?,?,?,?,?)";
 				
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
@@ -81,9 +81,9 @@ public class DonationDAOImplemented implements IDonationDAO{
 	public Donation update(Donation d) throws PersistenceException {
 		donationValidator.validate(d);
 		
-		String updateStatement = "update donations set personid = ?, amount = ?, date = ?, dedication = ?, type = ?, note = ? where id = ?;";
+		String updateStatement = "update donations set personid = ?, amount = ?, donationdate = ?, dedication = ?, type = ?, note = ? where id = ?;";
 		
-		Object[] params = new Object[] { d.getPerson().getId(), d.getAmount(), d.getDate(), 
+		Object[] params = new Object[] { d.getPerson().getId(), d.getAmount(), d.getDate().getTime(), 
 				d.getDedication(), d.getType(), d.getNote(), d.getId() };
 		
 		int[] types = new int[] { Types.INTEGER, Types.DECIMAL, Types.TIMESTAMP, Types.VARCHAR, 

@@ -155,8 +155,8 @@ public class AddressDAOImplemented implements IAddressDAO {
 	
 	@Override
 	public Address getMainAddressByPerson(Person person) {
-		return jdbcTemplate.queryForObject("select id,city,country,postcode,street from " +
-				" addresses a,livesat l where l.addressid=a.id and l.personid = ? and l.ismain=true",
+		return jdbcTemplate.queryForObject("select * from " +
+				" addresses a,livesat l where l.aid=a.id and l.pid = ? and l.ismain=true",
 				new Object[] { person.getId() }, new int[] {Types.INTEGER}, new AddressMapper());
 	}
 

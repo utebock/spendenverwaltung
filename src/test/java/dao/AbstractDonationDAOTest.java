@@ -171,6 +171,7 @@ public abstract class AbstractDonationDAOTest {
 			donation.setPerson(null);
 
 			donationDAO.update(donation);
+			
 		} catch (PersistenceException e) {
 			fail();
 		}
