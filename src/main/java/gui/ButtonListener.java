@@ -43,7 +43,9 @@ public class ButtonListener implements ActionListener{
 		
 		if(cmd.equals("create_person_and_donation_in_db")){
 			createPerson.createPersonInDb();
-			createPerson.createDonationInDb();
+			
+			//TODO why did this break on refactoring??
+//			createPerson.createDonationInDb();
 		}
 		
 		if(cmd.equals("cancel_person_in_db")){
