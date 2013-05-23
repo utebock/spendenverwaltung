@@ -18,7 +18,6 @@ import org.springframework.jdbc.support.KeyHolder;
 
 import service.DonationValidator;
 
-import domain.Address;
 import domain.Donation;
 import domain.DonationFilter;
 import domain.Person;
@@ -49,7 +48,7 @@ public class DonationDAOImplemented implements IDonationDAO{
 			this.donation = donation;
 		}
 		
-		private String createDonations = "insert into donations (person_id, amount, date, dedication, type, note) values (?,?,?,?,?,?)";
+		private String createDonations = "insert into donations (personid, amount, date, dedication, type, note) values (?,?,?,?,?,?)";
 				
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
@@ -82,7 +81,7 @@ public class DonationDAOImplemented implements IDonationDAO{
 	public Donation update(Donation d) throws PersistenceException {
 		donationValidator.validate(d);
 		
-		String updateStatement = "update donations set person_id = ?, amount = ?, date = ?, dedication = ?, type = ?, note = ? where id = ?;";
+		String updateStatement = "update donations set personid = ?, amount = ?, date = ?, dedication = ?, type = ?, note = ? where id = ?;";
 		
 		Object[] params = new Object[] { d.getPerson().getId(), d.getAmount(), d.getDate(), 
 				d.getDedication(), d.getType(), d.getNote(), d.getId() };
@@ -130,7 +129,7 @@ public class DonationDAOImplemented implements IDonationDAO{
 			throw new IllegalArgumentException("person must not be null");
 		}
 
-		String select = "select * from donations where person_id = ?;";
+		String select = "select * from donations where personid = ?;";
 		
 		List<Donation> donations = jdbcTemplate.query(select, new Object[] {p.getId()}, new DonationMapper());
 		
@@ -198,7 +197,7 @@ public class DonationDAOImplemented implements IDonationDAO{
 			Donation donation = new Donation();
 			donation.setId(rs.getInt("id"));
 			try {
-				donation.setPerson(personDAO.getById(rs.getInt("person_id")));
+				donation.setPerson(personDAO.getById(rs.getInt("personid")));
 			} catch (PersistenceException e) {
 				throw new IllegalDBStateException(e);
 			}

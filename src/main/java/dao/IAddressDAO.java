@@ -3,6 +3,7 @@ package dao;
 import java.util.List;
 
 import domain.Address;
+import domain.Person;
 import exceptions.PersistenceException;
 
 /**
@@ -54,4 +55,6 @@ public interface IAddressDAO {
 	 * @return Address based on given id
 	 */
 	public Address getByID(int id) throws PersistenceException;
+
+	public Address getMainAddressByPerson(Person person);
 }

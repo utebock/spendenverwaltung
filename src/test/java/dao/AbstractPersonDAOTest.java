@@ -3,7 +3,7 @@ package dao;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -26,7 +26,8 @@ public abstract class AbstractPersonDAOTest {
 
 	protected static IPersonDAO personDAO;
 	protected static IAddressDAO addressDAO;
-	private static final Logger log = Logger.getLogger(AbstractPersonDAOTest.class);
+//	private static final Logger log = Logger.getLogger(AbstractPersonDAOTest.class);
+	//TODO use logger?
 	
 	public static void setAddressDao(IAddressDAO addressDAO) {
 		AbstractPersonDAOTest.addressDAO = addressDAO;
@@ -42,7 +43,7 @@ public abstract class AbstractPersonDAOTest {
 		Person person = new Person();
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
+		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
@@ -53,14 +54,13 @@ public abstract class AbstractPersonDAOTest {
 		person.setAddresses(addresses);
 		person.setMainAddress(address);
 		
-		person.setSalutation(Person.Salutation.HERR);
+		person.setSex(Person.Sex.MALE);
 		person.setCompany("IBM");
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Test");
 		person.setSurname("Test");
 		person.setEmail("test@test.at");
 		person.setTelephone("01234567889");
-		person.setNotificationType(Person.NotificationType.MAIL);
 		person.setNote("");
 		
 		Person test = personDAO.create(person);
@@ -84,7 +84,7 @@ public abstract class AbstractPersonDAOTest {
 		Person person = new Person();
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
+		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
@@ -95,14 +95,13 @@ public abstract class AbstractPersonDAOTest {
 		person.setAddresses(addresses);
 		person.setMainAddress(address);
 		
-		person.setSalutation(Person.Salutation.HERR);
+		person.setSex(Person.Sex.MALE);
 		person.setCompany("IBM");
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Test");
 		person.setSurname("Test");
 		person.setEmail("test@test.at");
 		person.setTelephone("01234567889");
-		person.setNotificationType(Person.NotificationType.MAIL);
 		person.setNote("");
 		
 		person = personDAO.create(person);
@@ -137,7 +136,7 @@ public abstract class AbstractPersonDAOTest {
 		Person person = new Person();
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
+		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
@@ -148,14 +147,13 @@ public abstract class AbstractPersonDAOTest {
 		person.setAddresses(addresses);
 		person.setMainAddress(address);
 		
-		person.setSalutation(Person.Salutation.HERR);
+		person.setSex(Person.Sex.MALE);
 		person.setCompany("IBM");
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Test");
 		person.setSurname("Test");
 		person.setEmail("test@test.at");
 		person.setTelephone("01234567889");
-		person.setNotificationType(Person.NotificationType.MAIL);
 		person.setNote("");
 		
 		person = personDAO.create(person);
@@ -178,7 +176,7 @@ public abstract class AbstractPersonDAOTest {
 		Person person = new Person();
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
+		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
@@ -189,14 +187,13 @@ public abstract class AbstractPersonDAOTest {
 		person.setAddresses(addresses);
 		person.setMainAddress(address);
 		
-		person.setSalutation(Person.Salutation.HERR);
+		person.setSex(Person.Sex.MALE);
 		person.setCompany("IBM");
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Test");
 		person.setSurname("Test");
 		person.setEmail("test@test.at");
 		person.setTelephone("01234567889");
-		person.setNotificationType(Person.NotificationType.MAIL);
 		person.setNote("");
 		
 		person = personDAO.create(person);
@@ -231,7 +228,7 @@ public abstract class AbstractPersonDAOTest {
 		
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
+		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
@@ -242,21 +239,20 @@ public abstract class AbstractPersonDAOTest {
 		person.setAddresses(addresses);
 		person.setMainAddress(address);
 		
-		person.setSalutation(Person.Salutation.HERR);
+		person.setSex(Person.Sex.MALE);
 		person.setCompany("IBM");
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
 		person.setSurname("Oberhummer");
 		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
 		person.setTelephone("01234567889");
-		person.setNotificationType(Person.NotificationType.MAIL);
 		person.setNote("");
 		personDAO.create(person);
 		
 		Person person2 = new Person();
 		Address address2 = new Address();
 		address2.setStreet("Teststreet 1/1");
-		address2.setPostalCode(00000);
+		address2.setPostalCode("00000");
 		address2.setCity("Testcity");
 		address2.setCountry("Testcountry");
 
@@ -267,14 +263,13 @@ public abstract class AbstractPersonDAOTest {
 		person2.setAddresses(addresses2);
 		person2.setMainAddress(address2);
 		
-		person2.setSalutation(Person.Salutation.HERR);
+		person2.setSex(Person.Sex.MALE);
 		person2.setCompany("IBM");
 		person2.setTitle("Prof. Dr.");
 		person2.setGivenName("Heinz");
 		person2.setSurname("Oberhummer");
 		person2.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
 		person2.setTelephone("01234567889");
-		person2.setNotificationType(Person.NotificationType.MAIL);
 		person2.setNote("");
 		personDAO.create(person2);
 		
@@ -292,7 +287,7 @@ public abstract class AbstractPersonDAOTest {
 		
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
+		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
@@ -303,14 +298,13 @@ public abstract class AbstractPersonDAOTest {
 		person.setAddresses(addresses);
 		person.setMainAddress(address);
 		
-		person.setSalutation(Person.Salutation.HERR);
+		person.setSex(Person.Sex.MALE);
 		person.setCompany("IBM");
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
 		person.setSurname("Oberhummer");
 		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
 		person.setTelephone("01234567889");
-		person.setNotificationType(Person.NotificationType.MAIL);
 		person.setNote("");
 		personDAO.create(person);
 		

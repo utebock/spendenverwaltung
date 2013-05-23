@@ -241,7 +241,7 @@ public abstract class AbstractAddressServiceTest {
 	protected static void init() {
 		testAddress = new Address();
 		testAddress.setStreet("Teststreet 1/1");
-		testAddress.setPostalCode(00000);
+		testAddress.setPostalCode("00000");
 		testAddress.setCity("Testcity");
 		testAddress.setCountry("Testcountry");
 		
@@ -250,7 +250,7 @@ public abstract class AbstractAddressServiceTest {
 
 		testAddress2 = new Address();
 		testAddress2.setStreet("Teststreet2 1/1");
-		testAddress2.setPostalCode(00001);
+		testAddress2.setPostalCode("00001");
 		testAddress2.setCity("Testcity2");
 		testAddress2.setCountry("Testcountry2");
 

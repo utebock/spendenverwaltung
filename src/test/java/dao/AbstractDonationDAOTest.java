@@ -66,11 +66,11 @@ public abstract class AbstractDonationDAOTest {
 		Address address = new Address();
 
 		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
+		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 		
-		person.setSalutation(Person.Salutation.HERR);
+		person.setSex(Person.Sex.MALE);
 		
 		person.setCompany("IBM");
 		person.setTitle("Prof. Dr.");
@@ -78,7 +78,6 @@ public abstract class AbstractDonationDAOTest {
 		person.setSurname("Oberhummer");
 		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
 		person.setTelephone("01234567889");
-		person.setNotificationType(Person.NotificationType.MAIL);
 		person.setNote("Test Note");
 		
 		try {
@@ -87,7 +86,7 @@ public abstract class AbstractDonationDAOTest {
 			addresses.add(address);
 			
 			person.setAddresses(addresses);
-			person.setMailingAddress(address);
+			person.setMainAddress(address);
 			personDAO.create(person);
 		} catch (PersistenceException e) {
 			fail();
@@ -134,11 +133,11 @@ public abstract class AbstractDonationDAOTest {
 		Address address = new Address();
 
 		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
+		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 		
-		person.setSalutation(Person.Salutation.HERR);
+		person.setSex(Person.Sex.MALE);
 		person.setCompany("IBM");
 		
 		person.setTitle("Prof. Dr.");
@@ -146,7 +145,6 @@ public abstract class AbstractDonationDAOTest {
 		person.setSurname("Oberhummer");
 		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
 		person.setTelephone("01234567889");
-		person.setNotificationType(Person.NotificationType.MAIL);
 		person.setNote("Test Note");
 		
 		try {
@@ -155,7 +153,7 @@ public abstract class AbstractDonationDAOTest {
 			addresses.add(address);
 			
 			person.setAddresses(addresses);
-			person.setMailingAddress(address);
+			person.setMainAddress(address);
 			person = personDAO.create(person);
 		} catch (PersistenceException e) {
 			fail();
@@ -166,7 +164,7 @@ public abstract class AbstractDonationDAOTest {
 		donation.setDate(new Date());
 		donation.setDedication("test");
 		donation.setNote("lkj");
-		donation.setType(Donation.DonationType.BANKING);
+		donation.setType(Donation.DonationType.BANK_TRANSFER);
 
 		try {
 			donation = donationDAO.create(donation);
@@ -186,11 +184,11 @@ public abstract class AbstractDonationDAOTest {
 		Address address = new Address();
 
 		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
+		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
-		person.setSalutation(Person.Salutation.HERR);
+		person.setSex(Person.Sex.MALE);
 		person.setCompany("IBM");
 		
 		person.setTitle("Prof. Dr.");
@@ -198,7 +196,6 @@ public abstract class AbstractDonationDAOTest {
 		person.setSurname("Oberhummer");
 		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
 		person.setTelephone("01234567889");
-		person.setNotificationType(Person.NotificationType.MAIL);
 		person.setNote("Test Note");
 		
 		try {
@@ -207,7 +204,7 @@ public abstract class AbstractDonationDAOTest {
 			addresses.add(address);
 			
 			person.setAddresses(addresses);
-			person.setMailingAddress(address);
+			person.setMainAddress(address);
 			person = personDAO.create(person);
 		} catch (PersistenceException e) {
 			fail();
@@ -218,7 +215,6 @@ public abstract class AbstractDonationDAOTest {
 		donation.setDate(new Date());
 		donation.setDedication("test");
 		donation.setNote("lkj");
-		donation.setType(Donation.DonationType.BANKING);
 
 		try {
 			donation = donationDAO.create(donation);
@@ -255,11 +251,11 @@ public abstract class AbstractDonationDAOTest {
 		Address address = new Address();
 
 		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
+		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
-		person.setSalutation(Person.Salutation.HERR);
+		person.setSex(Person.Sex.MALE);
 		person.setCompany("IBM");
 		
 		person.setTitle("Prof. Dr.");
@@ -267,7 +263,6 @@ public abstract class AbstractDonationDAOTest {
 		person.setSurname("Oberhummer");
 		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
 		person.setTelephone("01234567889");
-		person.setNotificationType(Person.NotificationType.MAIL);
 		person.setNote("Test Note");
 		
 		try {
@@ -276,7 +271,7 @@ public abstract class AbstractDonationDAOTest {
 			addresses.add(address);
 			
 			person.setAddresses(addresses);
-			person.setMailingAddress(address);
+			person.setMainAddress(address);
 			person = personDAO.create(person);
 		} catch (PersistenceException e) {
 			fail();
@@ -287,7 +282,7 @@ public abstract class AbstractDonationDAOTest {
 		donation.setDate(new Date());
 		donation.setDedication("test");
 		donation.setNote("bla");
-		donation.setType(Donation.DonationType.BANKING);
+		donation.setType(Donation.DonationType.BANK_TRANSFER);
 
 		try {
 			donation = donationDAO.create(donation);
@@ -316,28 +311,26 @@ public abstract class AbstractDonationDAOTest {
 		Address address = new Address();
 
 		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
+		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
-		person1.setSalutation(Person.Salutation.HERR);
+		person1.setSex(Person.Sex.MALE);
 		person1.setCompany("IBM");
 		person1.setTitle("Prof. Dr.");
 		person1.setGivenName("Heinz");
 		person1.setSurname("Oberhummer");
 		person1.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
 		person1.setTelephone("01234567889");
-		person1.setNotificationType(Person.NotificationType.MAIL);
 		person1.setNote("Test Note");
 
-		person2.setSalutation(Person.Salutation.FRAU);
+		person2.setSex(Person.Sex.FEMALE);
 		person2.setCompany("Mustercompany");
 		person2.setTitle("MSc");
 		person2.setGivenName("Maxi");
 		person2.setSurname("Musti");
 		person2.setEmail("maximusti@maximusti.at");
 		person2.setTelephone("01234567889");
-		person2.setNotificationType(Person.NotificationType.POST);
 		person2.setNote("Musternotiz");
 
 		try {
@@ -346,9 +339,9 @@ public abstract class AbstractDonationDAOTest {
 			addresses.add(address);
 			
 			person1.setAddresses(addresses);
-			person1.setMailingAddress(address);
+			person1.setMainAddress(address);
 			person2.setAddresses(addresses);
-			person2.setMailingAddress(address);
+			person2.setMainAddress(address);
 			person1 = personDAO.create(person1);
 			person2 = personDAO.create(person2);
 		} catch (PersistenceException e) {
@@ -360,7 +353,7 @@ public abstract class AbstractDonationDAOTest {
 		donation1.setDate(new Date());
 		donation1.setDedication("test");
 		donation1.setNote("bla");
-		donation1.setType(Donation.DonationType.BANKING);
+		donation1.setType(Donation.DonationType.BANK_TRANSFER);
 		
 		donation2.setPerson(person1);
 		donation2.setAmount(1);
@@ -374,7 +367,7 @@ public abstract class AbstractDonationDAOTest {
 		donation3.setDate(new Date());
 		donation3.setDedication("test3");
 		donation3.setNote("bla3");
-		donation3.setType(Donation.DonationType.BANKING);
+		donation3.setType(Donation.DonationType.BANK_TRANSFER);
 
 		try {
 			donation1 = donationDAO.create(donation1);
@@ -418,11 +411,11 @@ public abstract class AbstractDonationDAOTest {
 		Address address = new Address();
 
 		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
+		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
-		person.setSalutation(Person.Salutation.HERR);
+		person.setSex(Person.Sex.MALE);
 		person.setCompany("IBM");
 		
 		person.setTitle("Prof. Dr.");
@@ -430,7 +423,6 @@ public abstract class AbstractDonationDAOTest {
 		person.setSurname("Oberhummer");
 		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
 		person.setTelephone("01234567889");
-		person.setNotificationType(Person.NotificationType.MAIL);
 		person.setNote("Test Note");
 		
 		try {
@@ -439,7 +431,7 @@ public abstract class AbstractDonationDAOTest {
 			addresses.add(address);
 			
 			person.setAddresses(addresses);
-			person.setMailingAddress(address);
+			person.setMainAddress(address);
 			person = personDAO.create(person);
 		} catch (PersistenceException e) {
 			fail();
@@ -450,7 +442,7 @@ public abstract class AbstractDonationDAOTest {
 		donation.setDate(new Date());
 		donation.setDedication("test");
 		donation.setNote("bla");
-		donation.setType(Donation.DonationType.BANKING);
+		donation.setType(Donation.DonationType.BANK_TRANSFER);
 
 		try {
 			donation = donationDAO.create(donation);
@@ -474,28 +466,26 @@ public abstract class AbstractDonationDAOTest {
 		Address address = new Address();
 
 		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
+		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
-		person1.setSalutation(Person.Salutation.HERR);
+		person1.setSex(Person.Sex.MALE);
 		person1.setCompany("IBM");
 		person1.setTitle("Prof. Dr.");
 		person1.setGivenName("Heinz");
 		person1.setSurname("Oberhummer");
 		person1.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
 		person1.setTelephone("01234567889");
-		person1.setNotificationType(Person.NotificationType.MAIL);
 		person1.setNote("Test Note");
 
-		person2.setSalutation(Person.Salutation.FRAU);
+		person2.setSex(Person.Sex.FEMALE);
 		person2.setCompany("Mustercompany");
 		person2.setTitle("MSc");
 		person2.setGivenName("Maxi");
 		person2.setSurname("Musti");
 		person2.setEmail("maximusti@maximusti.at");
 		person2.setTelephone("01234567889");
-		person2.setNotificationType(Person.NotificationType.POST);
 		person2.setNote("Musternotiz");
 
 		try {
@@ -504,9 +494,9 @@ public abstract class AbstractDonationDAOTest {
 			addresses.add(address);
 			
 			person1.setAddresses(addresses);
-			person1.setMailingAddress(address);
+			person1.setMainAddress(address);
 			person2.setAddresses(addresses);
-			person2.setMailingAddress(address);
+			person2.setMainAddress(address);
 			person1 = personDAO.create(person1);
 			person2 = personDAO.create(person2);
 		} catch (PersistenceException e) {
@@ -525,7 +515,7 @@ public abstract class AbstractDonationDAOTest {
 		donation1.setDate(cal1.getTime());
 		donation1.setDedication("test");
 		donation1.setNote("bla");
-		donation1.setType(Donation.DonationType.BANKING);
+		donation1.setType(Donation.DonationType.BANK_TRANSFER);
 		
 		donation2.setPerson(person1);
 		donation2.setAmount(1);
@@ -539,7 +529,7 @@ public abstract class AbstractDonationDAOTest {
 		donation3.setDate(cal3.getTime());
 		donation3.setDedication("test3");
 		donation3.setNote("bla3");
-		donation3.setType(Donation.DonationType.BANKING);
+		donation3.setType(Donation.DonationType.BANK_TRANSFER);
 		
 		Calendar minCal = Calendar.getInstance();
 		minCal.set(2013, Calendar.JANUARY, 1);

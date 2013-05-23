@@ -37,7 +37,7 @@ public class Person {
 	private String givenName;
 	private String surname;
 	private List<Address> addresses = new ArrayList<Address>();
-	private Address mainAddress;
+	private Address mainAddress = new Address();
 	private String email;
 	private String telephone;
 	private boolean emailNotification = true;
@@ -71,11 +71,11 @@ public class Person {
 		this.postalNotification = postalNotification;
 	}
 	
-	public Sex getSalutation(){
+	public Sex getSex(){
 		return sex;
 	}
-	public void setSalutation(Sex salutation){
-		this.sex = salutation;
+	public void setSex(Sex sex){
+		this.sex = sex;
 	}
 	
 	public String getGivenName(){
@@ -179,7 +179,7 @@ public class Person {
 				&& this.getGivenName().equals(other.getGivenName())
 				&& this.getSurname().equals(other.getSurname())
 				&& this.getAddresses().equals(other.getAddresses())
-				&& this.getSalutation().equals(other.getSalutation())
+				&& this.getSex().equals(other.getSex())
 				&& this.getCompany().equals(other.getCompany())
 				&& this.getMainAddress().equals(other.getMainAddress())
 				&& this.getNote().equals(other.getNote())

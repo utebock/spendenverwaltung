@@ -56,7 +56,7 @@ public abstract class AbstractAddressDAOTest {
 
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
+		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
@@ -96,7 +96,7 @@ public abstract class AbstractAddressDAOTest {
 	public void updateWithInvalidStateParameter_ThrowsException() {
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
+		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
@@ -115,7 +115,7 @@ public abstract class AbstractAddressDAOTest {
 	public void updateWithValidParameters_ReturnsUpdatedAddress() {
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
+		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
@@ -168,7 +168,7 @@ public abstract class AbstractAddressDAOTest {
 	public void deleteWithValidParameter_RemovesEntity() {
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
+		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
@@ -192,13 +192,13 @@ public abstract class AbstractAddressDAOTest {
 	public void getAll_ReturnsAllEntities() {
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
+		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
 		Address address2 = new Address();
 		address2.setStreet("Teststreet2 1/1");
-		address2.setPostalCode(00001);
+		address2.setPostalCode("00001");
 		address2.setCity("Testcity2");
 		address2.setCountry("Testcountry2");
 		try {
@@ -237,7 +237,7 @@ public abstract class AbstractAddressDAOTest {
 	public void getWithValidId_ReturnsEntity() {
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
-		address.setPostalCode(00000);
+		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 

@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -16,6 +17,7 @@ import org.springframework.jdbc.support.KeyHolder;
 
 import service.AddressValidator;
 import domain.Address;
+import domain.Person;
 import exceptions.PersistenceException;
 
 /**
@@ -47,13 +49,13 @@ public class AddressDAOImplemented implements IAddressDAO {
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
 				throws SQLException {
-			String createAddress = "insert into addresses (street_no, postal_code, "
+			String createAddress = "insert into addresses (street, postcode, "
 					+ "city, country) values (?,?,?,?)";
 
 			PreparedStatement ps = connection.prepareStatement(createAddress,
 					Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, address.getStreet());
-			ps.setInt(2, address.getPostalCode());
+			ps.setString(2, address.getPostalCode());
 			ps.setString(3, address.getCity());
 			ps.setString(4, address.getCountry());
 			return ps;
@@ -72,12 +74,12 @@ public class AddressDAOImplemented implements IAddressDAO {
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
 				throws SQLException {
-			String updateAddress = "update addresses set street_no=?, "
-					+ "postal_code=?, city=?, country=? where id=?";
+			String updateAddress = "update addresses set street=?, "
+					+ "postcode=?, city=?, country=? where id=?";
 
 			PreparedStatement ps = connection.prepareStatement(updateAddress);
 			ps.setString(1, address.getStreet());
-			ps.setInt(2, address.getPostalCode());
+			ps.setString(2, address.getPostalCode());
 			ps.setString(3, address.getCity());
 			ps.setString(4, address.getCountry());
 			ps.setInt(5, address.getId());
@@ -150,6 +152,13 @@ public class AddressDAOImplemented implements IAddressDAO {
 				"select * from addresses where id = ?;", new Object[] { id },
 				new AddressMapper());
 	}
+	
+	@Override
+	public Address getMainAddressByPerson(Person person) {
+		return jdbcTemplate.queryForObject("select id,city,country,postcode,street from " +
+				" addresses a,livesat l where l.addressid=a.id and l.personid = ? and l.ismain=true",
+				new Object[] { person.getId() }, new int[] {Types.INTEGER}, new AddressMapper());
+	}
 
 	private class AddressMapper implements RowMapper<Address> {
 
@@ -158,8 +167,8 @@ public class AddressDAOImplemented implements IAddressDAO {
 			address.setId(rs.getInt("id"));
 			address.setCity(rs.getString("city"));
 			address.setCountry(rs.getString("country"));
-			address.setPostalCode(rs.getInt("postal_code"));
-			address.setStreet(rs.getString("street_no"));
+			address.setPostalCode(rs.getString("postcode"));
+			address.setStreet(rs.getString("street"));
 			return address;
 		}
 	}

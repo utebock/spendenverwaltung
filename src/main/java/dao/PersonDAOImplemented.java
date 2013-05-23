@@ -34,7 +34,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 	private static final Logger log = Logger
 			.getLogger(PersonDAOImplemented.class);
 
-	private String addressQuery = "select * from lives_at where person_id = ?";
+	private String addressQuery = "select * from livesat where personid = ?";
 
 	public void setPersonValidator(PersonValidator personValidator) {
 		this.personValidator = personValidator;
@@ -57,8 +57,8 @@ public class PersonDAOImplemented implements IPersonDAO {
 			this.person = person;
 		}
 
-		private String createPersons = "insert into persons (given_name, surname, mailing_address, email, salutation, title, "
-				+ "company, telephone, notification_type, note) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		private String createPersons = "insert into persons (givenname, surname, email, sex, title, "
+				+ "company, telephone, emailnotification, postalnotification, note) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
@@ -67,13 +67,13 @@ public class PersonDAOImplemented implements IPersonDAO {
 					Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, person.getGivenName());
 			ps.setString(2, person.getSurname());
-			ps.setInt(3, person.getMainAddress().getId());
-			ps.setString(4, person.getEmail());
-			ps.setString(5, person.getSalutation().toString());
-			ps.setString(6, person.getTitle());
-			ps.setString(7, person.getCompany());
-			ps.setString(8, person.getTelephone());
-			ps.setString(9, person.getNotificationType().toString());
+			ps.setString(3, person.getEmail());
+			ps.setString(4, person.getSex().toString());
+			ps.setString(5, person.getTitle());
+			ps.setString(6, person.getCompany());
+			ps.setString(7, person.getTelephone());
+			ps.setBoolean(8, person.isEmailNotification());
+			ps.setBoolean(9, person.isPostalNotification());
 			ps.setString(10, person.getNote());
 
 			return ps;
@@ -84,11 +84,6 @@ public class PersonDAOImplemented implements IPersonDAO {
 	public Person create(Person person) throws PersistenceException {
 
 		personValidator.validate(person);
-		
-		// save address
-		Address mailingAddr = person.getMainAddress();
-		mailingAddr = addressDAO.create(mailingAddr);
-		person.setMainAddress(mailingAddr);
 
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -97,17 +92,21 @@ public class PersonDAOImplemented implements IPersonDAO {
 
 		person.setId(keyHolder.getKey().intValue());
 
-		String insertLivesAt = "insert into lives_at (person_id, address_id) values (?, ?)";
+		String insertLivesAt = "insert into livesat (personid, addressid, ismain) values (?, ?, ?)";
 
 		List<Address> addresses = person.getAddresses();
 
 		/**
-		 * inserting relevant lives_at entries
+		 * inserting relevant livesat entries
 		 */
 		for (Address address : addresses) {
+			boolean isMain = false;
+			if(address.equals(person.getMainAddress())) {
+				isMain = true;
+			}
 			jdbcTemplate.update(insertLivesAt, new Object[] { person.getId(),
-					address.getId() },
-					new int[] { Types.INTEGER, Types.INTEGER });
+					address.getId(), isMain },
+					new int[] { Types.INTEGER, Types.INTEGER, Types.BOOLEAN });
 		}
 
 		return person;
@@ -118,35 +117,42 @@ public class PersonDAOImplemented implements IPersonDAO {
 
 		personValidator.validate(person);
 
-		String updatePersons = "update persons set given_name = ?, surname = ?, mailing_address = ?, email = ?, salutation = ?, title = ?, "
-				+ "company = ?, telephone = ?, notification_type = ?, note = ? where id = ?;";
+		String updatePersons = "update persons set givenname = ?, surname = ?, email = ?, sex = ?, title = ?, "
+				+ "company = ?, telephone = ?, emailnotification = ?, postalnotification = ?, note = ? where id = ?;";
 
 		Object[] params = new Object[] { person.getGivenName(),
-				person.getSurname(), person.getMainAddress().getId(),
-				person.getEmail(), person.getSalutation(), person.getTitle(),
-				person.getCompany(), person.getTelephone(),
-				person.getNotificationType(), person.getNote(), person.getId() };
+				person.getSurname(), person.getEmail(), person.getSex(), 
+				person.getTitle(), person.getCompany(), person.getTelephone(),
+				person.isEmailNotification(), person.isPostalNotification(), person.getNote(), person.getId() };
 
-		int[] types = new int[] { Types.VARCHAR, Types.VARCHAR, Types.INTEGER,
+		int[] types = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
 				Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-				Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR };
+				Types.VARCHAR, Types.BOOLEAN, Types.BOOLEAN, Types.VARCHAR };
 
 		/**
 		 * set person id to update result
 		 */
 		jdbcTemplate.update(updatePersons, params, types);
 
-		String updateLivesAt = "insert into lives_at (person_id, address_id) values (?, ?)";
+		/**
+		 * ismain must only be true once per person
+		 */
+		String updateLivesAt = "insert into livesat (personid, addressid, ismain) values (?, ?, ?)";
 
 		List<Address> addresses = person.getAddresses();
 
 		/**
-		 * inserting relevant lives_at entries
+		 * inserting relevant livesat entries
 		 */
 		for (Address address : addresses) {
+			boolean isMain = false;
+			
+			if(address.equals(person.getMainAddress())) {
+				isMain = true;
+			}
 			jdbcTemplate.update(updateLivesAt, new Object[] { person.getId(),
-					address.getId() },
-					new int[] { Types.INTEGER, Types.INTEGER });
+					address.getId(), isMain},
+					new int[] { Types.INTEGER, Types.INTEGER, Types.BOOLEAN });
 		}
 
 		return person;
@@ -158,7 +164,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 		personValidator.validate(person);
 
 		String deletePersons = "delete from persons where id = ?;";
-		String removeLivesAt = "delete from lives_at where person_id = ?";
+		String removeLivesAt = "delete from livesat where personid = ?";
 
 		Object[] params = new Object[] { person.getId() };
 
@@ -218,7 +224,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 		ArrayList<Object> args = new ArrayList<Object>();
 
 		if (filter.getGivenNamePart() != null) {
-			select += " given_name LIKE %?% AND";
+			select += " givenname LIKE %?% AND";
 			args.add(filter.getGivenNamePart());
 		}
 		if (filter.getSurnamePart() != null) {
@@ -255,9 +261,9 @@ public class PersonDAOImplemented implements IPersonDAO {
 			; // TODO way of saving information must be redefined first!
 		if (filter.getWantsEmailNotification() != null)
 			; // TODO way of saving information must be redefined first!
-		if (filter.getSalutation() != null) {
-			select += " salutation = ? AND";
-			args.add(filter.getSalutation());
+		if (filter.getSex() != null) {
+			select += " sex = ? AND";
+			args.add(filter.getSex());
 		}
 
 		// omit last "AND":
@@ -283,7 +289,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 		@Override
 		public Address mapRow(ResultSet rs, int rowNum) throws SQLException {
 			try {
-				return addressDAO.getByID(rs.getInt("address_id"));
+				return addressDAO.getByID(rs.getInt("addressid"));
 			} catch (PersistenceException e) {
 				/**
 				 * this should NEVER happen, so we rethrow an unchecked
@@ -299,33 +305,33 @@ public class PersonDAOImplemented implements IPersonDAO {
 		/**
 		 * TODO: Map Addresses to Person after calling this, otherwise the
 		 * person objects have no address lists. Will need another RowMapper to
-		 * process a query on "lives_at" table in order to obtain the Addresses
+		 * process a query on "livesat" table in order to obtain the Addresses
 		 * (do this in another method that is called by findPerson & findAll
 		 * methods).
 		 */
 		public Person mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Person person = new Person();
 			person.setId(rs.getInt("id"));
-			try {
-				person.setMainAddress(addressDAO.getByID(rs
-						.getInt("mailing_address")));
-			} catch (PersistenceException e) {
-				/**
-				 * this should NEVER happen, so we rethrow an unchecked
-				 * exception
-				 */
-				throw new IllegalDBStateException(e);
-			}
-			person.setGivenName(rs.getString("given_name"));
+			person.setMainAddress(addressDAO.getMainAddressByPerson(person));
+			person.setGivenName(rs.getString("givenname"));
 			person.setSurname(rs.getString("surname"));
 			person.setEmail(rs.getString("email"));
-			person.setSalutation(Person.Salutation.valueOf(rs
-					.getString("salutation")));
+			person.setSex(Person.Sex.valueOf(rs
+					.getString("sex")));
 			person.setTitle(rs.getString("title"));
 			person.setCompany(rs.getString("company"));
 			person.setTelephone(rs.getString("telephone"));
-			person.setNotificationType(Person.NotificationType.valueOf(rs
-					.getString("notification_type")));
+			
+			/**
+			 * these values default to true
+			 */
+			if(!rs.getBoolean("emailnotification")) {
+				person.setEmailNotification(false);
+			}
+			if(!rs.getBoolean("postalnotification")) {
+				person.setEmailNotification(false);
+			}
+			
 			person.setNote(rs.getString("note"));
 
 			return person;

@@ -2,7 +2,6 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.util.Date;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -16,10 +15,8 @@ import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
 import service.IAddressService;
-import service.IDonationService;
 import service.IPersonService;
 import domain.Address;
-import domain.Donation;
 import domain.Person;
 import exceptions.ServiceException;
 
@@ -28,7 +25,6 @@ public class CreatePerson extends JPanel{
 	private static final long serialVersionUID = 1L;
 	private IPersonService personService;
 	private IAddressService addressService;
-	private IDonationService donationService;
 	private PersonOverview personOverview;
 	private ComponentBuilder builder;
 	private ButtonListener buttonListener;
@@ -89,14 +85,12 @@ public class CreatePerson extends JPanel{
 	
 	private Person p = new Person();
 	private Address addr = new Address();
-	private Donation d = new Donation();
 	
-	public CreatePerson(IPersonService personService, IAddressService addressService, IDonationService donationService, PersonOverview personOverview){
+	public CreatePerson(IPersonService personService, IAddressService addressService, PersonOverview personOverview){
 		super(new MigLayout());
 		
 		this.personService = personService;
 		this.addressService = addressService;
-		this.donationService = donationService;
 		this.personOverview = personOverview;
 		buttonListener = new ButtonListener(this);
 		actionHandler = new ActionHandler(this);
@@ -205,8 +199,7 @@ public class CreatePerson extends JPanel{
 		panel.add(addDonation, "wrap");
 		
 		String[] donationString = new String[]{"Ueberweisung", "Veranstaltung", "Online-Shop"};
-		
-		donationCombo = builder.createComboBox(donationService.getDonationTypes(), actionHandler, "donationCombo");
+		donationCombo = builder.createComboBox(donationString, actionHandler, "donationCombo");
 		donation = builder.createLabel("Spende durch: ");
 		panel.add(donation);
 		panel.add(donationCombo);
@@ -215,41 +208,10 @@ public class CreatePerson extends JPanel{
 		
 		panel.add(empty, "wrap");
 		
-		ok = builder.createButton("Anlegen", buttonListener, "create_person_and_donation_in_db");
+		ok = builder.createButton("Anlegen", buttonListener, "create_person_in_db");
 		panel.add(ok);
 		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_person_in_db");
 		panel.add(cancel, "split 2, wrap");
-	}
-	
-	public void createDonationInDb(){
-		//TODO: gehoert noch ausgebaut. Felder fuer die Attribute in der GUI fehlen auch noch
-		if(!amount.getText().equals("")){
-			int typeId = donationCombo.getSelectedIndex();
-			d.setType(donationService.getDonationTypeByIndex(typeId));
-			
-			int donationAmount = Integer.parseInt(amount.getText()) * 100;
-			d.setAmount(donationAmount);
-			
-			d.setDate(new Date());
-			
-			d.setDedication("");
-			
-			d.setNote("");
-			
-			d.setPerson(p);
-	
-			try{
-				d = donationService.create(d);
-			}
-			catch(ServiceException e){
-				 JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
-		            e.printStackTrace();
-		    		return;
-			}
-		}
-		
-		JOptionPane.showMessageDialog(this, "Person erfolgreich angelegt", "Information", JOptionPane.INFORMATION_MESSAGE);
-		returnTo();
 	}
 	
 	public void createPersonInDb(){
@@ -263,7 +225,8 @@ public class CreatePerson extends JPanel{
 		if(salutation.getSelectedItem().equals("FA.")){
 			salut = "FA.";
 		}
-		p.setSalutation(Person.Salutation.valueOf(salut));
+		//TODO fix error code
+//		p.setSalutation(Person.Salutation.valueOf(salut));
 		
 		String title = "Ing.";
 		if(titleBox.getSelectedItem().equals("DI")){
@@ -290,7 +253,8 @@ public class CreatePerson extends JPanel{
 		addr.setStreet(street);
 		
 		int postal = Integer.parseInt(postalField.getText());
-		addr.setPostalCode(postal);
+		//TODO fix error code
+//		addr.setPostalCode(postal);
 		
 		String city = cityField.getText();
 		addr.setCity(city);
@@ -298,13 +262,15 @@ public class CreatePerson extends JPanel{
 		String country = countryField.getText();
 		addr.setCountry(country);
 		
-		p.setMailingAddress(addr);
+		//TODO fix error code
+//		p.setMailingAddress(addr);
 		
+		//TODO fix error code
 		if(notifyMail.isSelected()){
-			p.setNotificationType(Person.NotificationType.MAIL);
+//			p.setNotificationType(Person.NotificationType.MAIL);
 		}
 		else{
-			p.setNotificationType(Person.NotificationType.POST);
+//			p.setNotificationType(Person.NotificationType.POST);
 		}
 		
 		String note = noteArea.getText();
@@ -312,13 +278,15 @@ public class CreatePerson extends JPanel{
 		
 		try{
 //			addressService.create(addr); // will now be created when person is created - pm
-			p = personService.create(p);
+			personService.create(p);
 		}
 		catch(ServiceException e){
 			 JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
 	            e.printStackTrace();
 	    		return;
 		}
+		JOptionPane.showMessageDialog(this, "Person erfolgreich angelegt", "Information", JOptionPane.INFORMATION_MESSAGE);
+		returnTo();
 	}
 	
 	public void returnTo(){

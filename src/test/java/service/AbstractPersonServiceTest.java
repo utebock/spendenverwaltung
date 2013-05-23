@@ -255,7 +255,7 @@ public abstract class AbstractPersonServiceTest {
 	protected static void init() throws PersistenceException {
 		testAddress = new Address();
 		testAddress.setStreet("Teststreet 1/1");
-		testAddress.setPostalCode(00000);
+		testAddress.setPostalCode("00000");
 		testAddress.setCity("Testcity");
 		testAddress.setCountry("Testcountry");
 		
@@ -268,7 +268,7 @@ public abstract class AbstractPersonServiceTest {
 
 		testAddress2 = new Address();
 		testAddress2.setStreet("Teststreet2 1/1");
-		testAddress2.setPostalCode(00001);
+		testAddress2.setPostalCode("00001");
 		testAddress2.setCity("Testcity2");
 		testAddress2.setCountry("Testcountry2");
 		
@@ -277,27 +277,25 @@ public abstract class AbstractPersonServiceTest {
 		listTest2.add(testAddress2);
 		
 		person = new Person();
-		person.setSalutation(Person.Salutation.HERR);
+		person.setSex(Person.Sex.MALE);
 		person.setCompany("IBM");
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Test");
 		person.setSurname("Test");
 		person.setEmail("test@test.at");
 		person.setTelephone("01234567889");
-		person.setNotificationType(Person.NotificationType.MAIL);
 		person.setNote("");
 		//person.setAddresses(listTest);
 		//person.setMailingAddress(testAddress);
 		
 		person2 = new Person();
-		person2.setSalutation(Person.Salutation.HERR);
+		person2.setSex(Person.Sex.MALE);
 		person2.setCompany("IBM");
 		person2.setTitle("Prof. Dr.");
 		person2.setGivenName("Test2");
 		person2.setSurname("Test2");
 		person2.setEmail("test2@test2.at");
 		person2.setTelephone("02234567889");
-		person2.setNotificationType(Person.NotificationType.MAIL);
 		person2.setNote("");
 		//person2.setAddresses(listTest2);
 		//person2.setMailingAddress(testAddress2);

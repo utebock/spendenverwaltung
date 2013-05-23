@@ -2,8 +2,6 @@ package domain;
 
 import java.util.Date;
 
-import domain.Person.NotificationType;
-
 /**
  * A mailing filter is a set of criteria a mailing may or may not fulfill.
  * 
@@ -20,6 +18,10 @@ public class MailingFilter {
 	
 	private Date minDate, maxDate;
 	private NotificationType notificationType;
+	
+	public static enum NotificationType{
+		POSTAL, EMAIL
+	}
 	
 	//TODO private MailingType mailingType;     //will be defined in Mailing
 	

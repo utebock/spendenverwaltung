@@ -18,7 +18,7 @@ public class PersonFilter {
 	private Boolean addressSet, emailSet, telephoneSet;
 	private String telephonePart, notePart;
 	private Boolean wantsPostalNotification, wantsEmailNotification;
-	private Person.Salutation salutation;
+	private Person.Sex sex;
 
 	/**
 	 * default constructor. Sets all criteria to <code>null</code>, so that the
@@ -36,7 +36,7 @@ public class PersonFilter {
 				&& titlePart == null && addressSet == null && emailSet == null
 				&& telephoneSet == null && telephonePart == null
 				&& notePart == null && wantsEmailNotification == null
-				&& wantsPostalNotification == null && salutation == null;
+				&& wantsPostalNotification == null && sex == null;
 	}
 
 	/**
@@ -230,20 +230,20 @@ public class PersonFilter {
 	}
 
 	/**
-	 * @return the salutation matching persons have to have, or
-	 *         <code>null</code> if the salutation is irrelevant for this filter
+	 * @return the sex matching persons have to have, or
+	 *         <code>null</code> if the sex is irrelevant for this filter
 	 */
-	public Person.Salutation getSalutation() {
-		return salutation;
+	public Person.Sex getSex() {
+		return sex;
 	}
 
 	/**
-	 * @param salutation
-	 *            the salutation matching persons have to have, or
-	 *            <code>null</code> if the salutation shall be irrelevant for
+	 * @param sex
+	 *            the sex matching persons have to have, or
+	 *            <code>null</code> if the sex shall be irrelevant for
 	 *            this filter
 	 */
-	public void setSalutation(Person.Salutation salutation) {
-		this.salutation = salutation;
+	public void setsex(Person.Sex sex) {
+		this.sex = sex;
 	}
 }

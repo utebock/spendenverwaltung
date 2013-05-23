@@ -2,7 +2,6 @@ package dao;
 
 import java.util.List;
 
-import domain.Address;
 import domain.Donation;
 import domain.DonationFilter;
 import domain.Person;
