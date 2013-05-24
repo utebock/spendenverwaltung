@@ -56,9 +56,7 @@ public abstract class AbstractPersonServiceTest {
 	@Transactional
 	public void createWithNullParameter_ThrowsException() {
 		try {
-			when(personDAO.create(null)).thenThrow(
-					new IllegalArgumentException());
-			
+			doThrow(new IllegalArgumentException()).when(personDAO).insertOrUpdate(null);
 			personService.create(null);
 		} catch (ServiceException e) {
 			fail();
@@ -71,9 +69,7 @@ public abstract class AbstractPersonServiceTest {
 	@Transactional
 	public void createWithInvalidStateParameter_ThrowsException() {
 		try {
-			when(personDAO.create(nullPerson)).thenThrow(
-					new IllegalArgumentException());
-
+			doThrow(new IllegalArgumentException()).when(personDAO).insertOrUpdate(nullPerson);
 			personService.create(nullPerson); // all values are null
 		} catch (ServiceException e) {
 			fail();
@@ -86,8 +82,7 @@ public abstract class AbstractPersonServiceTest {
 	@Transactional
 	public void createWithValidParameter_ReturnsSavedPerson() {
 		try {
-			when(personDAO.create(person)).thenReturn(personCreated);
-
+			doReturn(personCreated).when(personDAO).insertOrUpdate(person);
 			Person returned = personService.create(person);
 			assert (returned.equals(personCreated));
 		} catch (ServiceException e) {
@@ -105,9 +100,7 @@ public abstract class AbstractPersonServiceTest {
 	@Transactional
 	public void updateWithNullParameter_ThrowsException() {
 		try {
-			when(personDAO.update(null)).thenThrow(
-					new IllegalArgumentException());
-			
+			doThrow(new IllegalArgumentException()).when(personDAO).insertOrUpdate(null);
 			personService.update(null);
 		} catch (ServiceException e) {
 			fail();
@@ -120,9 +113,7 @@ public abstract class AbstractPersonServiceTest {
 	@Transactional
 	public void updateWithInvalidStateParameter_ThrowsException() {
 		try {
-			when(personDAO.update(nullPerson)).thenThrow(
-					new IllegalArgumentException());
-
+			doThrow(new IllegalArgumentException()).when(personDAO).insertOrUpdate(nullPerson);
 			personService.update(nullPerson);
 		} catch (ServiceException e) {
 			fail();
@@ -135,9 +126,7 @@ public abstract class AbstractPersonServiceTest {
 	@Transactional
 	public void updateWithValidParameters_ReturnsUpdatedPerson() {
 		try {
-			when(personDAO.update(personCreated)).thenReturn(
-					personCreated);
-
+			doReturn(personCreated).when(personDAO).insertOrUpdate(personCreated);
 			Person returned = personService.update(personCreated);
 			assert (returned.equals(personCreated));
 		} catch (ServiceException e) {
