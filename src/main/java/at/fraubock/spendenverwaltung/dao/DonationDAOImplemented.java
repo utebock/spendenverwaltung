@@ -177,8 +177,8 @@ public class DonationDAOImplemented implements IDonationDAO {
 		ArrayList<Object> args = new ArrayList<Object>();
 
 		if (filter.getDedicationPart() != null) {
-			where += "dediction like '%?%' AND ";
-			args.add(filter.getDedicationPart());
+			where += "dedication like ? AND ";
+			args.add("%"+filter.getDedicationPart()+"%");
 		}
 
 		if (filter.getMaxAmount() != null) {
@@ -202,8 +202,8 @@ public class DonationDAOImplemented implements IDonationDAO {
 		}
 
 		if (filter.getNotePart() != null) {
-			where += "note like '%?%' AND ";
-			args.add(filter.getNotePart());
+			where += "note like ? AND ";
+			args.add("%"+filter.getNotePart()+"%");
 		}
 
 		if (filter.getType() != null) {
