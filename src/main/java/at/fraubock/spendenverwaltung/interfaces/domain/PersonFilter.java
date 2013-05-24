@@ -9,6 +9,9 @@ package at.fraubock.spendenverwaltung.interfaces.domain;
  * The criteria of a filter are to be understood conjunctive, i.e. only persons
  * matching ALL of the given criteria are meant to match the filter.
  * 
+ * String filter parts may use wildcards: '?' for a single character, '%' for
+ * any number of concatenated characters (including 0)
+ * 
  * @author manuel-bichler
  * 
  */
@@ -230,8 +233,8 @@ public class PersonFilter {
 	}
 
 	/**
-	 * @return the sex matching persons have to have, or
-	 *         <code>null</code> if the sex is irrelevant for this filter
+	 * @return the sex matching persons have to have, or <code>null</code> if
+	 *         the sex is irrelevant for this filter
 	 */
 	public Person.Sex getSex() {
 		return sex;
@@ -239,9 +242,8 @@ public class PersonFilter {
 
 	/**
 	 * @param sex
-	 *            the sex matching persons have to have, or
-	 *            <code>null</code> if the sex shall be irrelevant for
-	 *            this filter
+	 *            the sex matching persons have to have, or <code>null</code> if
+	 *            the sex shall be irrelevant for this filter
 	 */
 	public void setsex(Person.Sex sex) {
 		this.sex = sex;

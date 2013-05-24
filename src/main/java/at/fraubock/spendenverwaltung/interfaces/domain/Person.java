@@ -41,7 +41,7 @@ public class Person {
 	private String givenName;
 	private String surname;
 	private List<Address> addresses = new ArrayList<Address>();
-	private Address mainAddress = new Address();
+	private Address mainAddress;
 	private String email;
 	private String telephone;
 	private boolean emailNotification = true;

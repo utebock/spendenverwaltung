@@ -26,8 +26,6 @@ import at.fraubock.spendenverwaltung.service.PersonValidator;
 
 import java.sql.PreparedStatement;
 
-
-
 public class PersonDAOImplemented implements IPersonDAO {
 
 	private IAddressDAO addressDAO;
@@ -121,11 +119,74 @@ public class PersonDAOImplemented implements IPersonDAO {
 			// to update address relationhips, simply delete them and then
 			// insert the new ones
 
-			jdbcTemplate.update("DELETE FROM livesat WHERE pid = ?",
-					new Object[] { person.getId() },
-					new int[] { Types.INTEGER });
+			Person temp = new Person();
+			temp.setId(person.getId());
+			fetchAddresses(temp);
 
-			insertAddresses(person);
+			List<Address> oldAddresses = temp.getAddresses();
+			Address oldMainAddress = temp.getMainAddress();
+
+			// first, check changes to all addresses:
+			for (Address oldAddress : oldAddresses) {
+				if (!person.getAddresses().contains(oldAddress)) {
+					jdbcTemplate
+							.update("DELETE FROM livesat WHERE pid = ? AND aid = ?",
+									new Object[] { person.getId(),
+											oldAddress.getId() }, new int[] {
+											Types.INTEGER, Types.INTEGER, });
+				}
+			}
+			for (Address newAddress : person.getAddresses()) {
+				if (!oldAddresses.contains(newAddress)) {
+					jdbcTemplate
+							.update("INSERT INTO livesat(pid, aid, ismain) VALUES (?,?,?) ",
+									new Object[] {
+											person.getId(),
+											newAddress.getId(),
+											newAddress.equals(person
+													.getMainAddress()) },
+									new int[] { Types.INTEGER, Types.INTEGER,
+											Types.BOOLEAN });
+				}
+			}
+
+			// now, check changes to mainAddress:
+			if (oldMainAddress == null && person.getMainAddress() != null
+					&& oldAddresses.contains(person.getMainAddress())) {
+				// main address set, was not set before, but address was already
+				// set to the person
+				jdbcTemplate
+						.update("UPDATE livesat SET ismain = TRUE WHERE pid = ? AND aid = ?",
+								new Object[] { person.getId(),
+										person.getMainAddress().getId() },
+								new int[] { Types.INTEGER, Types.INTEGER });
+			}
+			if (person.getMainAddress() == null && oldMainAddress != null
+					&& person.getAddresses().contains(oldMainAddress)) {
+				// if there is no new main address but one was set previously and the 
+				// previously set address is still contained in the address list
+				jdbcTemplate
+						.update("UPDATE livesat SET ismain = FALSE WHERE pid = ? AND aid = ?",
+								new Object[] { person.getId(),
+										oldMainAddress.getId() }, new int[] {
+										Types.INTEGER, Types.INTEGER });
+			}
+			if (person.getMainAddress() != null && oldMainAddress != null
+					&& !person.getMainAddress().equals(oldMainAddress) && person.getAddresses().contains(oldMainAddress)
+					&& oldAddresses.contains(person.getMainAddress())) {
+				// if there is a change in the main address but both addresses are still
+				// set to the person
+				jdbcTemplate
+						.update("UPDATE livesat SET ismain = FALSE WHERE pid = ? AND aid = ?",
+								new Object[] { person.getId(),
+										oldMainAddress.getId() }, new int[] {
+										Types.INTEGER, Types.INTEGER });
+				jdbcTemplate
+						.update("UPDATE livesat SET ismain = TRUE WHERE pid = ? AND aid = ?",
+								new Object[] { person.getId(),
+										person.getMainAddress().getId() }, new int[] {
+										Types.INTEGER, Types.INTEGER });
+			}
 		}
 	}
 

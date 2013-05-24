@@ -34,13 +34,11 @@ public class CreatePerson extends JPanel{
 	
 	private JLabel addDonation;
 	private JLabel addPerson;
-	@SuppressWarnings("rawtypes")
-	private JComboBox salutation;
+	private JComboBox<String> salutation;
 	private JLabel salutLabel;
 	
 	private JLabel title;
-	@SuppressWarnings("rawtypes")
-	private JComboBox titleBox;
+	private JComboBox<String> titleBox;
 	
 	private JLabel company;
 	private JTextField companyField;
