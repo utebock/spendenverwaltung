@@ -187,10 +187,9 @@ public class Person {
 
 		Person other = (Person) obj;
 
-		if (this.getId() == other.getId()
+		if (this.getId().equals(other.getId())
 				&& this.getGivenName().equals(other.getGivenName())
 				&& this.getSurname().equals(other.getSurname())
-				&& this.getAddresses().equals(other.getAddresses())
 				&& this.getSex().equals(other.getSex())
 				&& this.getCompany().equals(other.getCompany())
 				&& this.getMainAddress().equals(other.getMainAddress())

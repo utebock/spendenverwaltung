@@ -1,12 +1,12 @@
 package dao;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
@@ -34,7 +34,7 @@ public abstract class AbstractAddressDAOTest {
 	@Transactional
 	public void createWithNullParameter_ThrowsException() {
 		try {
-			addressDAO.create(null);
+			addressDAO.insertOrUpdate(null);
 		} catch (PersistenceException e) {
 			fail();
 		}
@@ -44,7 +44,7 @@ public abstract class AbstractAddressDAOTest {
 	@Transactional
 	public void createWithInvalidStateParameter_ThrowsException() {
 		try {
-			addressDAO.create(new Address()); // all values are null
+			addressDAO.insertOrUpdate(new Address()); // all values are null
 		} catch (PersistenceException e) {
 			fail();
 		}
@@ -61,16 +61,12 @@ public abstract class AbstractAddressDAOTest {
 		address.setCountry("Testcountry");
 
 		try {
-			Address returnedAddress = addressDAO.create(address);
-			address.setId(returnedAddress.getId()); // for #equals
+			addressDAO.insertOrUpdate(address);
 
-			Address savedAddress = addressDAO.getByID(returnedAddress.getId());
-
-			// check if address was returned correctly
-			assert (returnedAddress.equals(address));
+			Address savedAddress = addressDAO.getByID(address.getId());
 
 			// check if address was saved correctly
-			assert (savedAddress.equals(returnedAddress));
+			assert (savedAddress.equals(address));
 
 		} catch (PersistenceException e) {
 			fail();
@@ -85,7 +81,7 @@ public abstract class AbstractAddressDAOTest {
 	@Transactional
 	public void updateWithNullParameter_ThrowsException() {
 		try {
-			addressDAO.update(null);
+			addressDAO.insertOrUpdate(null);
 		} catch (PersistenceException e) {
 			fail();
 		}
@@ -101,10 +97,10 @@ public abstract class AbstractAddressDAOTest {
 		address.setCountry("Testcountry");
 
 		try {
-			address = addressDAO.create(address);
+			addressDAO.insertOrUpdate(address);
 			address.setCity(null); // not allowed null value
 
-			addressDAO.update(address);
+			addressDAO.insertOrUpdate(address);
 		} catch (PersistenceException e) {
 			fail();
 		}
@@ -120,19 +116,11 @@ public abstract class AbstractAddressDAOTest {
 		address.setCountry("Testcountry");
 
 		try {
-			address = addressDAO.create(address);
+			addressDAO.insertOrUpdate(address);
 			address.setCity("AnotherCity");
 
-			Address returnedAddress = addressDAO.update(address);
+			addressDAO.insertOrUpdate(address);
 			Address updatedAddress = addressDAO.getByID(address.getId());
-
-			// check if returned address is correct
-			assert (returnedAddress.getId() == address.getId());
-			assert (returnedAddress.getStreet().equals(address.getStreet()));
-			assert (returnedAddress.getPostalCode() == address.getPostalCode());
-			assert (returnedAddress.getCountry().equals(address.getCountry()));
-			assert (!returnedAddress.getCity().equals(address.getCity())); // different
-																			// city
 
 			// check if address was updated correctly
 			assert (updatedAddress.getId() == address.getId());
@@ -142,7 +130,7 @@ public abstract class AbstractAddressDAOTest {
 			assert (!updatedAddress.getCity().equals(address.getCity())); // different
 																			// city
 
-			assert (returnedAddress.getCity() == updatedAddress.getCity());
+			assert (address.getCity() == updatedAddress.getCity());
 
 		} catch (PersistenceException e) {
 			fail();
@@ -173,7 +161,7 @@ public abstract class AbstractAddressDAOTest {
 		address.setCountry("Testcountry");
 
 		try {
-			address = addressDAO.create(address);
+			addressDAO.insertOrUpdate(address);
 			addressDAO.delete(address);
 			List<Address> allAddresses = addressDAO.getAll();
 			assert (!allAddresses.contains(address));
@@ -202,8 +190,8 @@ public abstract class AbstractAddressDAOTest {
 		address2.setCity("Testcity2");
 		address2.setCountry("Testcountry2");
 		try {
-			addressDAO.create(address);
-			addressDAO.create(address2);
+			addressDAO.insertOrUpdate(address);
+			addressDAO.insertOrUpdate(address2);
 
 			List<Address> addressList = addressDAO.getAll();
 			assert (addressList != null && addressList.size() == 2);
@@ -212,14 +200,10 @@ public abstract class AbstractAddressDAOTest {
 		}
 	}
 
-	@Test(expected = EmptyResultDataAccessException.class)
+	@Test
 	@Transactional(readOnly = true)
-	public void getWithInvalidId_ThrowsException() {
-		try {
-			addressDAO.getByID(10000);
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void getWithInvalidId_ReturnsNull() throws PersistenceException {
+		assertNull(addressDAO.getByID(10000));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -242,10 +226,10 @@ public abstract class AbstractAddressDAOTest {
 		address.setCountry("Testcountry");
 
 		try {
-			Address createdAddress = addressDAO.create(address);
-			Address foundAddress = addressDAO.getByID(createdAddress.getId());
+			addressDAO.insertOrUpdate(address);
+			Address foundAddress = addressDAO.getByID(address.getId());
 
-			assert (foundAddress != null && foundAddress.getId() == createdAddress
+			assert (foundAddress != null && foundAddress.getId() == address
 					.getId());
 		} catch (PersistenceException e) {
 			fail();

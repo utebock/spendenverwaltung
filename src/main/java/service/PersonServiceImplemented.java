@@ -10,78 +10,71 @@ import domain.Person;
 import exceptions.PersistenceException;
 import exceptions.ServiceException;
 
-public class PersonServiceImplemented implements IPersonService{
+public class PersonServiceImplemented implements IPersonService {
 
 	private IPersonDAO personDAO;
-	
-	public IPersonDAO getPersonDAO(){
+
+	public IPersonDAO getPersonDAO() {
 
 		return personDAO;
 	}
-	
-	public void setPersonDAO(IPersonDAO personDAO){
+
+	public void setPersonDAO(IPersonDAO personDAO) {
 		this.personDAO = personDAO;
 	}
-	
+
 	@Override
-	@Transactional(isolation=Isolation.SERIALIZABLE)
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public Person create(Person p) throws ServiceException {
-		Person person = null;
-		try{
-			person = personDAO.create(p);
-		}
-		catch(PersistenceException e){
+		try {
+			personDAO.insertOrUpdate(p);
+		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
-		return person;
+		return p;
 	}
 
 	@Override
-	@Transactional(isolation=Isolation.SERIALIZABLE)
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public Person update(Person p) throws ServiceException {
-		Person person = null;
-		try{
-			person = personDAO.update(p);
-		}
-		catch(PersistenceException e){
+		try {
+			personDAO.insertOrUpdate(p);
+		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
-		return person;
+		return p;
 	}
 
 	@Override
-	@Transactional(isolation=Isolation.SERIALIZABLE)
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public void delete(Person p) throws ServiceException {
-		try{
+		try {
 			personDAO.delete(p);
-		}
-		catch(PersistenceException e){
+		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
-		
+
 	}
 
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	public List<Person> getAll() throws ServiceException {
 		List<Person> list = null;
-		try{
+		try {
 			list = personDAO.getAll();
-		}
-		catch(PersistenceException e){
+		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
 		return list;
 	}
 
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	public Person getById(int id) throws ServiceException {
 		Person person = null;
-		try{
+		try {
 			person = personDAO.getById(id);
-		}
-		catch(PersistenceException e){
+		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
 		return person;

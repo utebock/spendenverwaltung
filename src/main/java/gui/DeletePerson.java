@@ -11,15 +11,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.AbstractTableModel;
-
-import domain.Person;
-import exceptions.ServiceException;
 
 import net.miginfocom.swing.MigLayout;
 import service.IAddressService;
 import service.IPersonService;
+import domain.Person;
+import exceptions.ServiceException;
 
 public class DeletePerson extends JPanel{
 	

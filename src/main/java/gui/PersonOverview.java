@@ -7,7 +7,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
-
 import service.IAddressService;
 import service.IDonationService;
 import service.IPersonService;

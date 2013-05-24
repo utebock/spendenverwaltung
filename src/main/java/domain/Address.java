@@ -71,8 +71,8 @@ public class Address {
 
 		Address other = (Address) obj;
 
-		if (this.getId() == other.getId()
-				&& this.getPostalCode() == other.getPostalCode()
+		if (this.getId().equals(other.getId())
+				&& this.getPostalCode().equals(other.getPostalCode())
 				&& this.getStreet().equals(other.getStreet())
 				&& this.getCity().equals(other.getCity())
 				&& this.getCountry().equals(other.getCountry())) {

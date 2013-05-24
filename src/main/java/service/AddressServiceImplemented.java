@@ -29,27 +29,29 @@ public class AddressServiceImplemented implements IAddressService {
 	}
 
 	@Override
-	@Transactional(isolation=Isolation.SERIALIZABLE)
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public Address create(Address a) throws ServiceException {
 		try {
-			return addressDAO.create(a);
+			addressDAO.insertOrUpdate(a);
+			return a;
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
 	}
 
 	@Override
-	@Transactional(isolation=Isolation.SERIALIZABLE)
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public Address update(Address a) throws ServiceException {
 		try {
-			return addressDAO.update(a);
+			addressDAO.insertOrUpdate(a);
+			return a;
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
 	}
 
 	@Override
-	@Transactional(isolation=Isolation.SERIALIZABLE)
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public void delete(Address a) throws ServiceException {
 		try {
 			addressDAO.delete(a);
@@ -59,7 +61,7 @@ public class AddressServiceImplemented implements IAddressService {
 	}
 
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	public List<Address> getAll() throws ServiceException {
 		try {
 			return addressDAO.getAll();
@@ -69,7 +71,7 @@ public class AddressServiceImplemented implements IAddressService {
 	}
 
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	public Address getByID(int id) throws ServiceException {
 		try {
 			return addressDAO.getByID(id);

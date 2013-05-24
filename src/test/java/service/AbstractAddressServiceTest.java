@@ -44,7 +44,7 @@ public abstract class AbstractAddressServiceTest {
 	@Transactional
 	public void createWithNullParameter_ThrowsException() {
 		try {
-			when(addressDAO.create(null)).thenThrow(
+			when(addressDAO.insertOrUpdate(null)).thenThrow(
 					new IllegalArgumentException());
 			
 			addressService.create(null);

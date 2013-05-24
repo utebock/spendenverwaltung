@@ -1,6 +1,9 @@
 package dao;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -12,11 +15,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import domain.Address;
 import domain.Donation;
@@ -26,9 +28,10 @@ import exceptions.PersistenceException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("../testspring.xml")
-@TransactionConfiguration(defaultRollback=true)
+@TransactionConfiguration(defaultRollback = true)
 public abstract class AbstractDonationDAOTest {
-	private static final Logger log = Logger.getLogger(AbstractDonationDAOTest.class);
+	private static final Logger log = Logger
+			.getLogger(AbstractDonationDAOTest.class);
 
 	protected static IPersonDAO personDAO;
 	protected static IDonationDAO donationDAO;
@@ -37,13 +40,15 @@ public abstract class AbstractDonationDAOTest {
 	public static void setDonationDao(IDonationDAO donationDAO) {
 		AbstractDonationDAOTest.donationDAO = donationDAO;
 	}
+
 	public static void setPersonDao(IPersonDAO personDAO) {
 		AbstractDonationDAOTest.personDAO = personDAO;
 	}
+
 	public static void setAddressDao(IAddressDAO addressDAO) {
 		AbstractDonationDAOTest.addressDAO = addressDAO;
 	}
-	
+
 	/*
 	 * testing create
 	 */
@@ -52,7 +57,7 @@ public abstract class AbstractDonationDAOTest {
 	@Transactional
 	public void createWithNullParameterShouldThrowException() {
 		try {
-			donationDAO.create(null);
+			donationDAO.insertOrUpdate(null);
 		} catch (PersistenceException e) {
 			fail();
 		}
@@ -69,9 +74,9 @@ public abstract class AbstractDonationDAOTest {
 		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
-		
+
 		person.setSex(Person.Sex.MALE);
-		
+
 		person.setCompany("IBM");
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
@@ -79,33 +84,34 @@ public abstract class AbstractDonationDAOTest {
 		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
 		person.setTelephone("01234567889");
 		person.setNote("Test Note");
-		
+
 		try {
-			address = addressDAO.create(address);
+			addressDAO.insertOrUpdate(address);
 			List<Address> addresses = new ArrayList<Address>();
 			addresses.add(address);
-			
+
 			person.setAddresses(addresses);
 			person.setMainAddress(address);
-			personDAO.create(person);
+			personDAO.insertOrUpdate(person);
 		} catch (PersistenceException e) {
 			fail();
 		}
-		
-		log.info("Created person: "+ person.getGivenName() +" "+ person.getSurname());
-		
+
+		log.info("Created person: " + person.getGivenName() + " "
+				+ person.getSurname());
+
 		donation.setDonator(person);
-		donation.setAmount(100);
+		donation.setAmount(100L);
 		donation.setDate(new Date());
 		donation.setDedication("Test dedication");
 		donation.setNote("Test note");
 		donation.setType(Donation.DonationType.SMS);
-		
+
 		try {
-			Donation returnedDonation = donationDAO.create(donation);
-			Donation savedDonation = donationDAO.getByID(returnedDonation.getId());
-			assert(returnedDonation.equals(savedDonation));
-			
+			donationDAO.insertOrUpdate(donation);
+			Donation savedDonation = donationDAO.getByID(donation.getId());
+			assertEquals(donation, savedDonation);
+
 		} catch (PersistenceException e) {
 			fail();
 		}
@@ -119,7 +125,7 @@ public abstract class AbstractDonationDAOTest {
 	@Transactional
 	public void updateWithNullParameterShouldThrowException() {
 		try {
-			donationDAO.update(null);
+			donationDAO.insertOrUpdate(null);
 		} catch (PersistenceException e) {
 			fail();
 		}
@@ -136,94 +142,42 @@ public abstract class AbstractDonationDAOTest {
 		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
-		
+
 		person.setSex(Person.Sex.MALE);
 		person.setCompany("IBM");
-		
+
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
 		person.setSurname("Oberhummer");
 		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
 		person.setTelephone("01234567889");
 		person.setNote("Test Note");
-		
+
 		try {
-			address = addressDAO.create(address);
+			addressDAO.insertOrUpdate(address);
 			List<Address> addresses = new ArrayList<Address>();
 			addresses.add(address);
-			
+
 			person.setAddresses(addresses);
 			person.setMainAddress(address);
-			person = personDAO.create(person);
+			personDAO.insertOrUpdate(person);
 		} catch (PersistenceException e) {
 			fail();
 		}
 
 		donation.setDonator(person);
-		donation.setAmount(9999);
+		donation.setAmount(9999L);
 		donation.setDate(new Date());
 		donation.setDedication("test");
 		donation.setNote("lkj");
 		donation.setType(Donation.DonationType.BANK_TRANSFER);
 
 		try {
-			donation = donationDAO.create(donation);
+			donationDAO.insertOrUpdate(donation);
 			donation.setDonator(null);
 
-			donationDAO.update(donation);
-			
-		} catch (PersistenceException e) {
-			fail();
-		}
-	}
+			donationDAO.insertOrUpdate(donation);
 
-	@Test
-	@Transactional
-	public void updateWithValidParametersShouldReturnUpdatedDonation() {
-		Person person = new Person();
-		Donation donation = new Donation();
-		Address address = new Address();
-
-		address.setStreet("Teststreet 1/1");
-		address.setPostalCode("00000");
-		address.setCity("Testcity");
-		address.setCountry("Testcountry");
-
-		person.setSex(Person.Sex.MALE);
-		person.setCompany("IBM");
-		
-		person.setTitle("Prof. Dr.");
-		person.setGivenName("Heinz");
-		person.setSurname("Oberhummer");
-		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
-		person.setTelephone("01234567889");
-		person.setNote("Test Note");
-		
-		try {
-			address = addressDAO.create(address);
-			List<Address> addresses = new ArrayList<Address>();
-			addresses.add(address);
-			
-			person.setAddresses(addresses);
-			person.setMainAddress(address);
-			person = personDAO.create(person);
-		} catch (PersistenceException e) {
-			fail();
-		}
-
-		donation.setDonator(person);
-		donation.setAmount(9999);
-		donation.setDate(new Date());
-		donation.setDedication("test");
-		donation.setNote("lkj");
-
-		try {
-			donation = donationDAO.create(donation);
-			donation.setAmount(5);
-
-			Donation returnedDonation = donationDAO.update(donation);
-			
-			assertThat(donation.getAmount() == returnedDonation.getAmount(), is(true));
 		} catch (PersistenceException e) {
 			fail();
 		}
@@ -232,7 +186,7 @@ public abstract class AbstractDonationDAOTest {
 	/*
 	 * testing delete
 	 */
-	
+
 	@Test(expected = IllegalArgumentException.class)
 	@Transactional
 	public void deleteWithNullParameterShouldThrowException() {
@@ -243,7 +197,7 @@ public abstract class AbstractDonationDAOTest {
 		}
 	}
 
-	@Test(expected = EmptyResultDataAccessException.class)
+	@Test
 	@Transactional
 	public void deleteWithValidParameterRemovesEntity() {
 
@@ -258,40 +212,41 @@ public abstract class AbstractDonationDAOTest {
 
 		person.setSex(Person.Sex.MALE);
 		person.setCompany("IBM");
-		
+
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
 		person.setSurname("Oberhummer");
 		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
 		person.setTelephone("01234567889");
 		person.setNote("Test Note");
-		
+
 		try {
-			address = addressDAO.create(address);
+			addressDAO.insertOrUpdate(address);
 			List<Address> addresses = new ArrayList<Address>();
 			addresses.add(address);
-			
+
 			person.setAddresses(addresses);
 			person.setMainAddress(address);
-			person = personDAO.create(person);
+			personDAO.insertOrUpdate(person);
 		} catch (PersistenceException e) {
 			fail();
 		}
 
 		donation.setDonator(person);
-		donation.setAmount(9999);
+		donation.setAmount(9999L);
 		donation.setDate(new Date());
 		donation.setDedication("test");
 		donation.setNote("bla");
 		donation.setType(Donation.DonationType.BANK_TRANSFER);
 
 		try {
-			donation = donationDAO.create(donation);
+			donationDAO.insertOrUpdate(donation);
 			Donation createdDonation = donationDAO.getByID(donation.getId());
-			assertThat(createdDonation != null && createdDonation.getId() == donation.getId(), is(true));
-			
+			assertThat(createdDonation != null
+					&& createdDonation.getId() == donation.getId(), is(true));
+
 			donationDAO.delete(donation);
-			Donation deletedDonation = donationDAO.getByID(donation.getId());
+			assertNull(donationDAO.getByID(donation.getId()));
 		} catch (PersistenceException e) {
 			fail();
 		}
@@ -302,7 +257,7 @@ public abstract class AbstractDonationDAOTest {
 	 */
 
 	@Test
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	public void getAllByPersonReturnsAllEntitiesForPerson() {
 		Person person1 = new Person();
 		Person person2 = new Person();
@@ -335,77 +290,77 @@ public abstract class AbstractDonationDAOTest {
 		person2.setNote("Musternotiz");
 
 		try {
-			address = addressDAO.create(address);
+			addressDAO.insertOrUpdate(address);
 			List<Address> addresses = new ArrayList<Address>();
 			addresses.add(address);
-			
+
 			person1.setAddresses(addresses);
 			person1.setMainAddress(address);
 			person2.setAddresses(addresses);
 			person2.setMainAddress(address);
-			person1 = personDAO.create(person1);
-			person2 = personDAO.create(person2);
+			personDAO.insertOrUpdate(person1);
+			personDAO.insertOrUpdate(person2);
 		} catch (PersistenceException e) {
 			fail();
 		}
-		
+
 		donation1.setDonator(person1);
-		donation1.setAmount(9999);
+		donation1.setAmount(9999L);
 		donation1.setDate(new Date());
 		donation1.setDedication("test");
 		donation1.setNote("bla");
 		donation1.setType(Donation.DonationType.BANK_TRANSFER);
-		
+
 		donation2.setDonator(person1);
-		donation2.setAmount(1);
+		donation2.setAmount(1L);
 		donation2.setDate(new Date());
 		donation2.setDedication("test2");
 		donation2.setNote("bla2");
 		donation2.setType(Donation.DonationType.SMS);
-		
+
 		donation3.setDonator(person2);
-		donation3.setAmount(50);
+		donation3.setAmount(50L);
 		donation3.setDate(new Date());
 		donation3.setDedication("test3");
 		donation3.setNote("bla3");
 		donation3.setType(Donation.DonationType.BANK_TRANSFER);
 
 		try {
-			donation1 = donationDAO.create(donation1);
-			donation2 = donationDAO.create(donation2);
-			donation3 = donationDAO.create(donation3);
-			
+			donationDAO.insertOrUpdate(donation1);
+			donationDAO.insertOrUpdate(donation2);
+			donationDAO.insertOrUpdate(donation3);
+
 			List<Donation> donationList1 = donationDAO.getByPerson(person1);
 			List<Donation> donationList2 = donationDAO.getByPerson(person2);
-			
-			assertThat(donationList1 != null
-					&& donationList1.size() == 2
-					&& donationList1.get(0).getId() == donation1.getId() 
-					&& donationList1.get(1).getId() == donation2.getId(), is(true));
-			
-			assertThat((donationList1 != null
-					&& donationList2.size() == 1
-					&& donationList2.get(0).getId() == donation3.getId()), is(true));
-			
+
+			assertNotNull(donationList1);
+			assertEquals(donationList1.size(), 2);
+			// reverse order (descending id sort)
+			assertEquals(donationList1.get(1).getId(), donation1.getId());
+			assertEquals(donationList1.get(0).getId(), donation2.getId());
+
+			assertNotNull(donationList2);
+			assertEquals(donationList2.size(), 1);
+			assertEquals(donationList2.get(0).getId(), donation3.getId());
+
 		} catch (PersistenceException e) {
 			fail();
 		}
 
 	}
-	
-	@Test (expected = EmptyResultDataAccessException.class)
-	@Transactional(readOnly=true)
+
+	@Test
+	@Transactional(readOnly = true)
 	public void getWithInvalidIdReturnsNull() {
 		try {
-			@SuppressWarnings("unused")
-			Donation donation = donationDAO.getByID(999999);
+			assertNull(donationDAO.getByID(999999));
 		} catch (PersistenceException e) {
 			fail();
 		}
 	}
-	
+
 	@Test
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	public void getWithValidIdReturnsEntity() {
 		Person person = new Person();
 		Donation donation = new Donation();
@@ -418,47 +373,48 @@ public abstract class AbstractDonationDAOTest {
 
 		person.setSex(Person.Sex.MALE);
 		person.setCompany("IBM");
-		
+
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Heinz");
 		person.setSurname("Oberhummer");
 		person.setEmail("heinz-oberhummer@diekonfessionsfreien.at");
 		person.setTelephone("01234567889");
 		person.setNote("Test Note");
-		
+
 		try {
-			address = addressDAO.create(address);
+			addressDAO.insertOrUpdate(address);
 			List<Address> addresses = new ArrayList<Address>();
 			addresses.add(address);
-			
+
 			person.setAddresses(addresses);
 			person.setMainAddress(address);
-			person = personDAO.create(person);
+			personDAO.insertOrUpdate(person);
 		} catch (PersistenceException e) {
 			fail();
 		}
 
 		donation.setDonator(person);
-		donation.setAmount(9999);
+		donation.setAmount(9999L);
 		donation.setDate(new Date());
 		donation.setDedication("test");
 		donation.setNote("bla");
 		donation.setType(Donation.DonationType.BANK_TRANSFER);
 
 		try {
-			donation = donationDAO.create(donation);
+			donationDAO.insertOrUpdate(donation);
 			Donation createdDonation = donationDAO.getByID(donation.getId());
-			
-			assertThat(createdDonation!=null && createdDonation.getId()==donation.getId(), is(true));
-			
+
+			assertThat(createdDonation != null
+					&& createdDonation.getId() == donation.getId(), is(true));
+
 		} catch (PersistenceException e) {
 			fail();
 		}
 	}
-	
+
 	@Test
 	@Transactional(readOnly = true)
-	public void getByFilterWithDateReturnsOneEntity(){
+	public void getByFilterWithDateReturnsOneEntity() {
 		Person person1 = new Person();
 		Person person2 = new Person();
 		Donation donation1 = new Donation();
@@ -490,67 +446,68 @@ public abstract class AbstractDonationDAOTest {
 		person2.setNote("Musternotiz");
 
 		try {
-			address = addressDAO.create(address);
+			addressDAO.insertOrUpdate(address);
 			List<Address> addresses = new ArrayList<Address>();
 			addresses.add(address);
-			
+
 			person1.setAddresses(addresses);
 			person1.setMainAddress(address);
 			person2.setAddresses(addresses);
 			person2.setMainAddress(address);
-			person1 = personDAO.create(person1);
-			person2 = personDAO.create(person2);
+			personDAO.insertOrUpdate(person1);
+			personDAO.insertOrUpdate(person2);
 		} catch (PersistenceException e) {
 			fail();
 		}
-		
+
 		Calendar cal1 = Calendar.getInstance();
 		cal1.set(2012, Calendar.JUNE, 20);
 		Calendar cal2 = Calendar.getInstance();
 		cal2.set(2013, Calendar.JANUARY, 3);
 		Calendar cal3 = Calendar.getInstance();
 		cal3.set(2013, Calendar.MAY, 20);
-		
+
 		donation1.setDonator(person1);
-		donation1.setAmount(9999);
+		donation1.setAmount(9999L);
 		donation1.setDate(cal1.getTime());
 		donation1.setDedication("test");
 		donation1.setNote("bla");
 		donation1.setType(Donation.DonationType.BANK_TRANSFER);
-		
+
 		donation2.setDonator(person1);
-		donation2.setAmount(1);
+		donation2.setAmount(1L);
 		donation2.setDate(cal2.getTime());
 		donation2.setDedication("Spendenaufruf Neujahr 2013");
 		donation2.setNote("bla2");
 		donation2.setType(Donation.DonationType.SMS);
-		
+
 		donation3.setDonator(person2);
-		donation3.setAmount(50);
+		donation3.setAmount(50L);
 		donation3.setDate(cal3.getTime());
 		donation3.setDedication("test3");
 		donation3.setNote("bla3");
 		donation3.setType(Donation.DonationType.BANK_TRANSFER);
-		
+
 		Calendar minCal = Calendar.getInstance();
 		minCal.set(2013, Calendar.JANUARY, 1);
 		Calendar maxCal = Calendar.getInstance();
-		maxCal.set(2013,  Calendar.MARCH, 20);
-		
+		maxCal.set(2013, Calendar.MARCH, 20);
+
 		DonationFilter filter = new DonationFilter();
 		filter.setMinDate(minCal.getTime());
 		filter.setMaxDate(maxCal.getTime());
-		
+
 		try {
-			donation1 = donationDAO.create(donation1);
-			donation2 = donationDAO.create(donation2);
-			donation3 = donationDAO.create(donation3);
-			
+			donationDAO.insertOrUpdate(donation1);
+			donationDAO.insertOrUpdate(donation2);
+			donationDAO.insertOrUpdate(donation3);
+
 			List<Donation> donations = donationDAO.getByFilter(filter);
-			
-			
-			assertThat(donations != null && donations.size() == 1 && donations.get(0).getId() == donation2.getId(), is(true) );
-			log.debug("\n\n\n\nDONATION DATE: "+donations.get(0).getDate()+"\n\n\n");
+
+			assertThat(donations != null && donations.size() == 1
+					&& donations.get(0).getId() == donation2.getId(), is(true));
+			log.debug("\n\n\n\nDONATION DATE: " + donations.get(0).getDate()
+					+ "\n\n\n");
 		} catch (PersistenceException e) {
 			fail();
 		}

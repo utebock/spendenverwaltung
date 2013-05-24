@@ -2,6 +2,8 @@ package domain;
 
 import java.util.Date;
 
+import util.DateComparer;
+
 /**
  * Domain model representing Donation
  * 
@@ -127,15 +129,15 @@ public class Donation {
 			return false;
 		}
 
-		Donation donation = (Donation) obj;
+		Donation other = (Donation) obj;
 
-		if (this.getId() == donation.getId()
-				&& this.getAmount() == donation.getAmount()
-				&& this.getDate().equals(donation.getDate())
-				&& this.getDedication() == donation.getDedication()
-				&& this.getDonator().getId() == donation.getDonator().getId()
-				&& this.getType() == donation.getType()
-				&& this.getNote().equals(donation.getNote())) {
+		if (this.getId().equals(other.getId())
+				&& this.getAmount() == other.getAmount()
+				&& DateComparer.isSameDay(this.date, other.date)
+				&& this.getDedication().equals(other.getDedication())
+				&& this.getDonator().getId().equals(other.getDonator().getId())
+				&& this.getType().equals(other.getType())
+				&& this.getNote().equals(other.getNote())) {
 			return true;
 		}
 

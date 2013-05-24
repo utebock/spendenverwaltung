@@ -5,9 +5,7 @@ import java.util.List;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import dao.IAddressDAO;
 import dao.IDonationDAO;
-import domain.Address;
 import domain.Donation;
 import domain.Donation.DonationType;
 import domain.Person;
@@ -36,7 +34,8 @@ public class DonationServiceImplemented implements IDonationService {
 	@Transactional(isolation=Isolation.SERIALIZABLE)
 	public Donation create(Donation d) throws ServiceException {
 		try {
-			return donationDAO.create(d);
+			donationDAO.insertOrUpdate(d);
+			return d;
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
@@ -46,7 +45,8 @@ public class DonationServiceImplemented implements IDonationService {
 	@Transactional(isolation=Isolation.SERIALIZABLE)
 	public Donation update(Donation d) throws ServiceException {
 		try {
-			return donationDAO.update(d);
+			donationDAO.insertOrUpdate(d);
+			return d;
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}

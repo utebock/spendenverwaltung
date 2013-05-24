@@ -18,6 +18,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import service.DonationValidator;
+import util.Pair;
 
 import domain.Donation;
 import domain.DonationFilter;
@@ -162,24 +163,6 @@ public class DonationDAOImplemented implements IDonationDAO {
 	}
 
 	/**
-	 * Simple implementation of a different-type pair
-	 * 
-	 * @author manuel-bichler
-	 * 
-	 * @param <A>
-	 * @param <B>
-	 */
-	private static class Pair<A, B> {
-		public A a;
-		public B b;
-
-		public Pair(A a, B b) {
-			this.a = a;
-			this.b = b;
-		}
-	}
-
-	/**
 	 * @param filter
 	 *            a not-null, not-empty donation filter
 	 * @return a pair consisting of the mysql WHERE clause to this filter
@@ -206,12 +189,12 @@ public class DonationDAOImplemented implements IDonationDAO {
 		}
 
 		if (filter.getMaxDate() != null) {
-			where += "date <= ? AND ";
+			where += "donationdate <= ? AND ";
 			args.add(new Timestamp(filter.getMaxDate().getTime()));
 		}
 
 		if (filter.getMinDate() != null) {
-			where += "date >= ? AND ";
+			where += "donationdate >= ? AND ";
 			args.add(new Timestamp(filter.getMinDate().getTime()));
 		}
 
@@ -275,7 +258,7 @@ public class DonationDAOImplemented implements IDonationDAO {
 				throw new SQLException(e);
 			}
 			donation.setAmount(rs.getLong("amount"));
-			donation.setDate(rs.getDate("date"));
+			donation.setDate(rs.getDate("donationdate"));
 			donation.setDedication(rs.getString("dedication"));
 			donation.setNote(rs.getString("note"));
 			donation.setType(Donation.DonationType.getByName(rs
