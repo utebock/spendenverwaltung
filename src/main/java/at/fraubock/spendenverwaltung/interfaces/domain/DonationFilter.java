@@ -16,6 +16,9 @@ import java.util.Date;
  */
 public class DonationFilter {
 
+	private DonationFilter childFilter;
+	private PersonFilter personFilter;
+	
 	private Long minAmount, maxAmount;
 	private Date minDate, maxDate;
 	private String dedicationPart, notePart;

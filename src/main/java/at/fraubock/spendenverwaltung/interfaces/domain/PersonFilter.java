@@ -16,11 +16,30 @@ package at.fraubock.spendenverwaltung.interfaces.domain;
  * 
  */
 public class PersonFilter {
-
+	
+	private String name;
+	
+	private PersonFilter childFilter;
+	private DonationFilter donationFilter;
+	private Integer donationFrequencyMin;
+	private Integer donationFrequencyMax;
+	private Long donationSumMin;
+	private Long donationSumMax;
+	private MailingFilter mailingFilter;
+	private Integer mailingFrequencyMin;
+	private Integer mailingFrequencyMax;
+	
+	public static enum FilterConnection {
+		AND, OR, XOR, AND_NOT
+	}
+	
 	private String givenNamePart, surnamePart, titlePart;
+	private String cityPart, countryPart, postalCodePart;
 	private Boolean addressSet, emailSet, telephoneSet;
 	private String telephonePart, notePart;
 	private Boolean wantsPostalNotification, wantsEmailNotification;
+	//if a person has never made a donation, following will be false
+	private Boolean hasNotReceivedMailingSinceLastDonation;
 	private Person.Sex sex;
 
 	/**
@@ -164,7 +183,7 @@ public class PersonFilter {
 
 	/**
 	 * @param telephonePart
-	 *            a sting a matching person's telephone number must contain, or
+	 *            a string a matching person's telephone number must contain, or
 	 *            <code>null</code> if the telephone number shall be irrelevant
 	 *            for this filter
 	 */
@@ -173,7 +192,7 @@ public class PersonFilter {
 	}
 
 	/**
-	 * @return a sting a matching person's note must contain, or
+	 * @return a string a matching person's note must contain, or
 	 *         <code>null</code> if the note is irrelevant for this filter
 	 */
 	public String getNotePart() {
@@ -182,7 +201,7 @@ public class PersonFilter {
 
 	/**
 	 * @param notePart
-	 *            a sting a matching person's note must contain, or
+	 *            a string a matching person's note must contain, or
 	 *            <code>null</code> if the note shall be irrelevant for this
 	 *            filter
 	 */
@@ -245,7 +264,65 @@ public class PersonFilter {
 	 *            the sex matching persons have to have, or <code>null</code> if
 	 *            the sex shall be irrelevant for this filter
 	 */
-	public void setsex(Person.Sex sex) {
+	public void setSex(Person.Sex sex) {
 		this.sex = sex;
+	}
+
+	/**
+	 * @return a string a matching person's main address's city must contain, or
+	 *         <code>null</code> if the city is irrelevant for this filter
+	 */
+	public String getCityPart() {
+		return cityPart;
+	}
+
+	/**
+	 * 
+	 * @param cityPart
+	 *            a string a matching person's main address's city must contain,
+	 *            or <code>null</code> if the city shall be irrelevant for this
+	 *            filter
+	 */
+	public void setCityPart(String cityPart) {
+		this.cityPart = cityPart;
+	}
+
+	/**
+	 * @return a string a matching person's main address's country must contain,
+	 *         or <code>null</code> if the country is irrelevant for this filter
+	 */
+	public String getCountryPart() {
+		return countryPart;
+	}
+
+	/**
+	 * 
+	 * @param countryPart
+	 *            a string a matching person's main address's country must
+	 *            contain, or <code>null</code> if the country shall be
+	 *            irrelevant for this filter
+	 */
+	public void setCountryPart(String countryPart) {
+		this.countryPart = countryPart;
+	}
+
+	/**
+	 * @return a string a matching person's main address's postal code must
+	 *         contain, or <code>null</code> if the postal code is irrelevant
+	 *         for this filter
+	 */
+	public String getPostalCodePart() {
+		return postalCodePart;
+	}
+
+	/**
+	 * 
+	 * @param postalCodePart
+	 *            a string a matching person's main address's postal code must
+	 *            contain, or <code>null</code> if the postal code shall
+	 *            irrelevant for this filter
+	 */
+	public void setPostalCodePart(String postalCodePart) {
+		this.postalCodePart = postalCodePart;
 	}
 }

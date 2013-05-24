@@ -16,6 +16,9 @@ import java.util.Date;
  */
 public class MailingFilter {
 	
+	private MailingFilter childFilter;
+	private PersonFilter personFilter;
+	
 	private Date minDate, maxDate;
 	private NotificationType notificationType;
 	
