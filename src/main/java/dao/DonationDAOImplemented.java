@@ -53,7 +53,7 @@ public class DonationDAOImplemented implements IDonationDAO{
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
 					PreparedStatement ps = connection.prepareStatement(createDonations, Statement.RETURN_GENERATED_KEYS);
-					ps.setInt(1, donation.getPerson().getId());
+					ps.setInt(1, donation.getDonator().getId());
 					ps.setDouble(2, donation.getAmount());
 					ps.setTimestamp(3, new Timestamp(donation.getDate().getTime()));
 					ps.setString(4, donation.getDedication());
@@ -83,7 +83,7 @@ public class DonationDAOImplemented implements IDonationDAO{
 		
 		String updateStatement = "update donations set personid = ?, amount = ?, donationdate = ?, dedication = ?, type = ?, note = ? where id = ?;";
 		
-		Object[] params = new Object[] { d.getPerson().getId(), d.getAmount(), d.getDate().getTime(), 
+		Object[] params = new Object[] { d.getDonator().getId(), d.getAmount(), d.getDate().getTime(), 
 				d.getDedication(), d.getType(), d.getNote(), d.getId() };
 		
 		int[] types = new int[] { Types.INTEGER, Types.DECIMAL, Types.TIMESTAMP, Types.VARCHAR, 
@@ -197,7 +197,7 @@ public class DonationDAOImplemented implements IDonationDAO{
 			Donation donation = new Donation();
 			donation.setId(rs.getInt("id"));
 			try {
-				donation.setPerson(personDAO.getById(rs.getInt("personid")));
+				donation.setDonator(personDAO.getById(rs.getInt("personid")));
 			} catch (PersistenceException e) {
 				throw new IllegalDBStateException(e);
 			}

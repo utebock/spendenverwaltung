@@ -8,17 +8,17 @@ package domain;
  */
 public class Address {
 
-	private int id;
+	private Integer id;
 	private String street;
 	private String postalCode;
 	private String city;
 	private String country;
-	
-	public int getId() {
+
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -78,16 +78,17 @@ public class Address {
 				&& this.getCountry().equals(other.getCountry())) {
 			return true;
 		}
-		
+
 		return false;
 	}
-	
-	//TODO override #hashCode for hash-based data structures
-	
+
+	// TODO override #hashCode for hash-based data structures
+
 	@Override
 	public String toString() {
-		return "id='" + this.getId() + "', street='" + this.getStreet() + "', city='"
-				+ this.getCity() + "', country='" + this.getCountry()
-				+ "', postal code='" + this.getPostalCode() + "'";
+		return "id='" + this.getId() + "', street='" + this.getStreet()
+				+ "', city='" + this.getCity() + "', country='"
+				+ this.getCountry() + "', postal code='" + this.getPostalCode()
+				+ "'";
 	}
 }

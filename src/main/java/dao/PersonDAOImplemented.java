@@ -81,81 +81,78 @@ public class PersonDAOImplemented implements IPersonDAO {
 	}
 
 	@Override
-	public Person create(Person person) throws PersistenceException {
+	public void insertOrUpdate(Person person) throws PersistenceException {
 
 		personValidator.validate(person);
 
-		KeyHolder keyHolder = new GeneratedKeyHolder();
+		if (person.getId() == null) {
+			// new person to be inserted
+			KeyHolder keyHolder = new GeneratedKeyHolder();
 
-		jdbcTemplate
-				.update(new CreatePersonStatementCreator(person), keyHolder);
+			jdbcTemplate.update(new CreatePersonStatementCreator(person),
+					keyHolder);
 
-		person.setId(keyHolder.getKey().intValue());
+			person.setId(keyHolder.getKey().intValue());
 
-		String insertLivesAt = "insert into livesat (pid, aid, ismain) values (?, ?, ?)";
+			String insertLivesAt = "insert into livesat (pid, aid, ismain) values (?, ?, ?)";
 
-		List<Address> addresses = person.getAddresses();
+			List<Address> addresses = person.getAddresses();
 
-		/**
-		 * inserting relevant livesat entries
-		 */
-		for (Address address : addresses) {
-			boolean isMain = false;
-			if(address.equals(person.getMainAddress())) {
-				isMain = true;
+			/*
+			 * inserting relevant livesat entries
+			 */
+			for (Address address : addresses) {
+				boolean isMain = false;
+				if (address.equals(person.getMainAddress())) {
+					isMain = true;
+				}
+				jdbcTemplate
+						.update(insertLivesAt, new Object[] { person.getId(),
+								address.getId(), isMain }, new int[] {
+								Types.INTEGER, Types.INTEGER, Types.BOOLEAN });
 			}
-			jdbcTemplate.update(insertLivesAt, new Object[] { person.getId(),
-					address.getId(), isMain },
-					new int[] { Types.INTEGER, Types.INTEGER, Types.BOOLEAN });
-		}
+		} else {
+			// person to be updated
 
-		return person;
-	}
+			String updatePersons = "update persons set givenname = ?, surname = ?, email = ?, sex = ?, title = ?, "
+					+ "company = ?, telephone = ?, emailnotification = ?, postalnotification = ?, note = ? where id = ?;";
 
-	@Override
-	public Person update(Person person) throws PersistenceException {
+			Object[] params = new Object[] { person.getGivenName(),
+					person.getSurname(), person.getEmail(), person.getSex(),
+					person.getTitle(), person.getCompany(),
+					person.getTelephone(), person.isEmailNotification(),
+					person.isPostalNotification(), person.getNote(),
+					person.getId() };
 
-		personValidator.validate(person);
+			int[] types = new int[] { Types.VARCHAR, Types.VARCHAR,
+					Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
+					Types.VARCHAR, Types.BOOLEAN, Types.BOOLEAN, Types.VARCHAR,
+					Types.INTEGER };
 
-		String updatePersons = "update persons set givenname = ?, surname = ?, email = ?, sex = ?, title = ?, "
-				+ "company = ?, telephone = ?, emailnotification = ?, postalnotification = ?, note = ? where id = ?;";
+			jdbcTemplate.update(updatePersons, params, types);
 
-		Object[] params = new Object[] { person.getGivenName(),
-				person.getSurname(), person.getEmail(), person.getSex(), 
-				person.getTitle(), person.getCompany(), person.getTelephone(),
-				person.isEmailNotification(), person.isPostalNotification(), person.getNote(), person.getId() };
+			/*
+			 * ismain must only be true once per person
+			 */
+			String updateLivesAt = "insert into livesat (pid, aid, ismain) values (?, ?, ?)";
 
-		int[] types = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-				Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-				Types.BOOLEAN, Types.BOOLEAN, Types.VARCHAR, Types.INTEGER };
+			List<Address> addresses = person.getAddresses();
 
-		/**
-		 * set person id to update result
-		 */
-		jdbcTemplate.update(updatePersons, params, types);
+			/*
+			 * inserting relevant livesat entries
+			 */
+			for (Address address : addresses) {
+				boolean isMain = false;
 
-		/**
-		 * ismain must only be true once per person
-		 */
-		String updateLivesAt = "insert into livesat (pid, aid, ismain) values (?, ?, ?)";
-
-		List<Address> addresses = person.getAddresses();
-
-		/**
-		 * inserting relevant livesat entries
-		 */
-		for (Address address : addresses) {
-			boolean isMain = false;
-			
-			if(address.equals(person.getMainAddress())) {
-				isMain = true;
+				if (address.equals(person.getMainAddress())) {
+					isMain = true;
+				}
+				jdbcTemplate
+						.update(updateLivesAt, new Object[] { person.getId(),
+								address.getId(), isMain }, new int[] {
+								Types.INTEGER, Types.INTEGER, Types.BOOLEAN });
 			}
-			jdbcTemplate.update(updateLivesAt, new Object[] { person.getId(),
-					address.getId(), isMain},
-					new int[] { Types.INTEGER, Types.INTEGER, Types.BOOLEAN });
 		}
-
-		return person;
 	}
 
 	@Override
@@ -316,22 +313,21 @@ public class PersonDAOImplemented implements IPersonDAO {
 			person.setGivenName(rs.getString("givenname"));
 			person.setSurname(rs.getString("surname"));
 			person.setEmail(rs.getString("email"));
-			person.setSex(Person.Sex.getByName(rs
-					.getString("sex")));
+			person.setSex(Person.Sex.getByName(rs.getString("sex")));
 			person.setTitle(rs.getString("title"));
 			person.setCompany(rs.getString("company"));
 			person.setTelephone(rs.getString("telephone"));
-			
+
 			/**
 			 * these values default to true
 			 */
-			if(!rs.getBoolean("emailnotification")) {
+			if (!rs.getBoolean("emailnotification")) {
 				person.setEmailNotification(false);
 			}
-			if(!rs.getBoolean("postalnotification")) {
+			if (!rs.getBoolean("postalnotification")) {
 				person.setEmailNotification(false);
 			}
-			
+
 			person.setNote(rs.getString("note"));
 
 			return person;

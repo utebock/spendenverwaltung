@@ -293,7 +293,7 @@ public abstract class AbstractDonationServiceTest {
 		donation.setDate(new Date());
 		donation.setDedication("test");
 		donation.setNote("test");
-		donation.setPerson(person);
+		donation.setDonator(person);
 		donation.setType(Donation.DonationType.BANKING);
 		
 		donation2 = new Donation();
@@ -301,7 +301,7 @@ public abstract class AbstractDonationServiceTest {
 		donation2.setDate(new Date());
 		donation2.setDedication("test2");
 		donation2.setNote("test2");
-		donation2.setPerson(person);
+		donation2.setDonator(person);
 		donation2.setType(Donation.DonationType.SMS);
 		
 		donation3 = new Donation();
@@ -309,7 +309,7 @@ public abstract class AbstractDonationServiceTest {
 		donation3.setDate(new Date());
 		donation3.setDedication("test3");
 		donation3.setNote("test3");
-		donation3.setPerson(person3);
+		donation3.setDonator(person3);
 		donation3.setType(Donation.DonationType.SHOP);
 		
 		donationCreated = donation;

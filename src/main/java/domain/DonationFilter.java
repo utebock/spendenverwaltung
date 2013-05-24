@@ -16,7 +16,7 @@ import java.util.Date;
  */
 public class DonationFilter {
 
-	private Integer minAmount, maxAmount;
+	private Long minAmount, maxAmount;
 	private Date minDate, maxDate;
 	private String dedicationPart, notePart;
 	private Donation.DonationType type;
@@ -32,44 +32,47 @@ public class DonationFilter {
 	 * @return whether all criteria are set to <code>null</code>, so that the
 	 *         new filter matches all donations.
 	 */
-	public boolean isEmpty(){
-		return minAmount == null && maxAmount == null && minDate == null &&
-				maxDate == null && dedicationPart == null && notePart == null &&
-				type == null;
+	public boolean isEmpty() {
+		return minAmount == null && maxAmount == null && minDate == null
+				&& maxDate == null && dedicationPart == null
+				&& notePart == null && type == null;
 	}
+
 	/**
-	 * @return the minimum amount a matching donation has to be of, or
-	 *         <code>null</code> if the is no lower bound for this filter
+	 * @return the minimum amount a matching donation has to be of (in
+	 *         EUR-cents), or <code>null</code> if the is no lower bound for
+	 *         this filter
 	 */
-	public Integer getMinAmount() {
+	public Long getMinAmount() {
 		return minAmount;
 	}
 
 	/**
 	 * @param minAmount
-	 *            the minimum amount a matching donation has to be of, or
-	 *            <code>null</code> if the shall be no lower bound for this
-	 *            filter
+	 *            the minimum amount a matching donation has to be of (in
+	 *            EUR-cents), or <code>null</code> if the shall be no lower
+	 *            bound for this filter
 	 */
-	public void setMinAmount(Integer minAmount) {
+	public void setMinAmount(Long minAmount) {
 		this.minAmount = minAmount;
 	}
 
 	/**
-	 * @return the maximum amount a matching donation has to be of, or
-	 *         <code>null</code> if the is no upper bound for this filter
+	 * @return the maximum amount a matching donation has to be of (in
+	 *         EUR-cents), or <code>null</code> if the is no upper bound for
+	 *         this filter
 	 */
-	public Integer getMaxAmount() {
+	public Long getMaxAmount() {
 		return maxAmount;
 	}
 
 	/**
 	 * @param maxAmount
-	 *            the maximum amount a matching donation has to be of, or
-	 *            <code>null</code> if the shall be no upper bound for this
-	 *            filter
+	 *            the maximum amount a matching donation has to be of (in
+	 *            EUR-cents), or <code>null</code> if the shall be no upper
+	 *            bound for this filter
 	 */
-	public void setMaxAmount(Integer maxAmount) {
+	public void setMaxAmount(Long maxAmount) {
 		this.maxAmount = maxAmount;
 	}
 

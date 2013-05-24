@@ -1,8 +1,8 @@
 package exceptions;
 
 /**
- * exception thrown by the DAOs. occurs whenever writing to/reading
- * from the underlying persistence API fails.
+ * exception thrown by the DAOs. occurs whenever writing to/reading from the
+ * underlying persistence API fails.
  * 
  * @author philipp muhoray
  * 

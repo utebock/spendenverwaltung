@@ -8,35 +8,37 @@ import domain.Person;
 import exceptions.PersistenceException;
 
 /**
+ * Interface to the data source for {@link Donation} entities
  * 
  * @author Thomas
- *
+ * @author manuel-bichler
+ * 
  */
 public interface IDonationDAO {
 
 	/**
-	 * Creates a new Donation
-	 * @param d
-	 * 		   Donation to be created
-	 * @return Fully defined Donation
-	 * @throws PersistenceException
-	 */
-	public Donation create(Donation d) throws PersistenceException;
-	
-	/**
-	 * Updates an existing donation
+	 * Inserts a new donation to the persistence layer (if its id is null or not
+	 * yet existent) or updates the donation with the already existent id. If
+	 * the donation is inserted, its id will and other fields may be set.
+	 * 
+	 * The donator of this donation must have been persisted or retrieved using
+	 * an {@link IPersonDAO} prior to calling this method.
 	 * 
 	 * @param d
-	 *            Donation to be updated
-	 * @return Updated donation
+	 *            Donation to be inserted or updated
+	 * @throws PersistenceException
+	 *             if communication to the underlying persistence system failed
 	 */
-	public Donation update(Donation d) throws PersistenceException;
+	public void insertOrUpdate(Donation d) throws PersistenceException;
 
 	/**
-	 * Deletes an existing donation
+	 * Deletes a donation from the underlying persistence layer.
 	 * 
 	 * @param d
-	 *            Donatino to be deleted
+	 *            donation to be deleted. Its id must be set, i.e. it must be
+	 *            persisted or retrieved by this DAO.
+	 * @throws PersistenceException
+	 *             if communication to the underlying persistence system failed
 	 */
 	public void delete(Donation d) throws PersistenceException;
 
@@ -45,27 +47,55 @@ public interface IDonationDAO {
 	 * 
 	 * @param id
 	 *            unique donation identification number
-	 * @return Donation based on given id or NULL if id non existent
+	 * @return the donation stored with the given id (including its donator), or
+	 *         null if no such donation exists
 	 */
 	public Donation getByID(int id) throws PersistenceException;
 
 	/**
-	 * Retrieves donations by PersonID
+	 * Retrieves donations by the given person
 	 * 
-	 * @param p
-	 *            person which provides id for filtering
-	 * @return List of donations for a single person with id (p.id) NULL if id non existent
+	 * @param donator
+	 *            the person having commissioned the desired donations. This
+	 *            person must have an id, i.e. must have been persisted or
+	 *            retrieved by an {@link IPersonDAO} prior to calling this
+	 *            method.
+	 * @return a list of all donations by the given person, sorted by id
+	 *         descending, including their donator
+	 * @throws PersistenceException
+	 *             if communication to the underlying persistence system failed
 	 */
-	public List<Donation> getByPerson(Person p) throws PersistenceException;
-	
+	public List<Donation> getByPerson(Person donator)
+			throws PersistenceException;
+
 	/**
 	 * Retrieves donations matching the given filter
 	 * 
 	 * @param filter
-	 *			used filter
-	 * @return 	List of all matching donations
+	 *            the filter to be used
+	 * @return a list of all those donations matching the given filter, sorted
+	 *         by id descending, including their donators
 	 * @throws PersistenceException
+	 *             if communication to the underlying persistence system failed
 	 */
-	public List<Donation> getByFilter(DonationFilter filter) throws PersistenceException;
-	
+	public List<Donation> getByFilter(DonationFilter filter)
+			throws PersistenceException;
+
+	/**
+	 * Calculates the sum of the donations matching the given filter.
+	 * 
+	 * Using this method might be more efficient than first retrieving all
+	 * donation objects by {@link #getByFilter(DonationFilter)} (including their
+	 * donators and their addresses) and then summing up their amounts,
+	 * especially for non-local persistence systems.
+	 * 
+	 * @param filter
+	 *            the filter to be used
+	 * @return the sum of all those donations matching the given filter, in
+	 *         EUR-cents
+	 * @throws PersistenceException
+	 *             if communication to the underlying persistence system failed
+	 */
+	public long sumByFilter(DonationFilter filter) throws PersistenceException;
+
 }

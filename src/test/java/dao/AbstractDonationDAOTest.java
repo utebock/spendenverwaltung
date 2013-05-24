@@ -94,7 +94,7 @@ public abstract class AbstractDonationDAOTest {
 		
 		log.info("Created person: "+ person.getGivenName() +" "+ person.getSurname());
 		
-		donation.setPerson(person);
+		donation.setDonator(person);
 		donation.setAmount(100);
 		donation.setDate(new Date());
 		donation.setDedication("Test dedication");
@@ -159,7 +159,7 @@ public abstract class AbstractDonationDAOTest {
 			fail();
 		}
 
-		donation.setPerson(person);
+		donation.setDonator(person);
 		donation.setAmount(9999);
 		donation.setDate(new Date());
 		donation.setDedication("test");
@@ -168,7 +168,7 @@ public abstract class AbstractDonationDAOTest {
 
 		try {
 			donation = donationDAO.create(donation);
-			donation.setPerson(null);
+			donation.setDonator(null);
 
 			donationDAO.update(donation);
 			
@@ -211,7 +211,7 @@ public abstract class AbstractDonationDAOTest {
 			fail();
 		}
 
-		donation.setPerson(person);
+		donation.setDonator(person);
 		donation.setAmount(9999);
 		donation.setDate(new Date());
 		donation.setDedication("test");
@@ -278,7 +278,7 @@ public abstract class AbstractDonationDAOTest {
 			fail();
 		}
 
-		donation.setPerson(person);
+		donation.setDonator(person);
 		donation.setAmount(9999);
 		donation.setDate(new Date());
 		donation.setDedication("test");
@@ -349,21 +349,21 @@ public abstract class AbstractDonationDAOTest {
 			fail();
 		}
 		
-		donation1.setPerson(person1);
+		donation1.setDonator(person1);
 		donation1.setAmount(9999);
 		donation1.setDate(new Date());
 		donation1.setDedication("test");
 		donation1.setNote("bla");
 		donation1.setType(Donation.DonationType.BANK_TRANSFER);
 		
-		donation2.setPerson(person1);
+		donation2.setDonator(person1);
 		donation2.setAmount(1);
 		donation2.setDate(new Date());
 		donation2.setDedication("test2");
 		donation2.setNote("bla2");
 		donation2.setType(Donation.DonationType.SMS);
 		
-		donation3.setPerson(person2);
+		donation3.setDonator(person2);
 		donation3.setAmount(50);
 		donation3.setDate(new Date());
 		donation3.setDedication("test3");
@@ -438,7 +438,7 @@ public abstract class AbstractDonationDAOTest {
 			fail();
 		}
 
-		donation.setPerson(person);
+		donation.setDonator(person);
 		donation.setAmount(9999);
 		donation.setDate(new Date());
 		donation.setDedication("test");
@@ -511,21 +511,21 @@ public abstract class AbstractDonationDAOTest {
 		Calendar cal3 = Calendar.getInstance();
 		cal3.set(2013, Calendar.MAY, 20);
 		
-		donation1.setPerson(person1);
+		donation1.setDonator(person1);
 		donation1.setAmount(9999);
 		donation1.setDate(cal1.getTime());
 		donation1.setDedication("test");
 		donation1.setNote("bla");
 		donation1.setType(Donation.DonationType.BANK_TRANSFER);
 		
-		donation2.setPerson(person1);
+		donation2.setDonator(person1);
 		donation2.setAmount(1);
 		donation2.setDate(cal2.getTime());
 		donation2.setDedication("Spendenaufruf Neujahr 2013");
 		donation2.setNote("bla2");
 		donation2.setType(Donation.DonationType.SMS);
 		
-		donation3.setPerson(person2);
+		donation3.setDonator(person2);
 		donation3.setAmount(50);
 		donation3.setDate(cal3.getTime());
 		donation3.setDedication("test3");
