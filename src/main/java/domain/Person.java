@@ -5,8 +5,6 @@ import java.util.List;
 
 public class Person {
 
-	private Integer id;
-
 	public static enum Sex {
 		MALE("male"), FEMALE("female"), FAMILY("family"), COMPANY("company");
 
@@ -36,6 +34,7 @@ public class Person {
 		}
 	}
 
+	private Integer id;
 	private Sex sex;
 	private String title;
 	private String company;

@@ -10,6 +10,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -21,193 +22,267 @@ import service.DonationValidator;
 import domain.Donation;
 import domain.DonationFilter;
 import domain.Person;
-import exceptions.IllegalDBStateException;
 import exceptions.PersistenceException;
 
-public class DonationDAOImplemented implements IDonationDAO{
+/**
+ * 
+ * @author manuel-bichler
+ * 
+ */
+public class DonationDAOImplemented implements IDonationDAO {
 
 	private JdbcTemplate jdbcTemplate;
 	private IPersonDAO personDAO;
 	private DonationValidator donationValidator;
-	
+
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
+
 	public void setPersonDao(IPersonDAO personDAO) {
 		this.personDAO = personDAO;
 	}
-	public void setDonationValidator(DonationValidator donationValidator){
+
+	public void setDonationValidator(DonationValidator donationValidator) {
 		this.donationValidator = donationValidator;
 	}
-	
-	private class CreateDonationStatementCreator implements PreparedStatementCreator {
+
+	private class CreateDonationStatementCreator implements
+			PreparedStatementCreator {
 
 		private Donation donation;
-		
+
 		CreateDonationStatementCreator(Donation donation) {
 			this.donation = donation;
 		}
-		
+
 		private String createDonations = "insert into donations (personid, amount, donationdate, dedication, type, note) values (?,?,?,?,?,?)";
-				
+
 		@Override
-		public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-					PreparedStatement ps = connection.prepareStatement(createDonations, Statement.RETURN_GENERATED_KEYS);
-					ps.setInt(1, donation.getDonator().getId());
-					ps.setDouble(2, donation.getAmount());
-					ps.setTimestamp(3, new Timestamp(donation.getDate().getTime()));
-					ps.setString(4, donation.getDedication());
-					ps.setString(5, donation.getType().toString());
-					ps.setString(6, donation.getNote());
-					
-					return ps;
+		public PreparedStatement createPreparedStatement(Connection connection)
+				throws SQLException {
+			PreparedStatement ps = connection.prepareStatement(createDonations,
+					Statement.RETURN_GENERATED_KEYS);
+			ps.setInt(1, donation.getDonator().getId());
+			ps.setDouble(2, donation.getAmount());
+			ps.setTimestamp(3, new Timestamp(donation.getDate().getTime()));
+			ps.setString(4, donation.getDedication());
+			ps.setString(5, donation.getType().getName());
+			ps.setString(6, donation.getNote());
+
+			return ps;
 		}
 	}
-	
-	@Override
-	public Donation create(Donation d) throws PersistenceException {
-		donationValidator.validate(d);
-		
-		KeyHolder keyHolder = new GeneratedKeyHolder();
-
-		jdbcTemplate.update(new CreateDonationStatementCreator(d), keyHolder);
-		
-		d.setId(keyHolder.getKey().intValue());
-		
-		return d;
-	}
 
 	@Override
-	public Donation update(Donation d) throws PersistenceException {
+	public void insertOrUpdate(Donation d) throws PersistenceException {
 		donationValidator.validate(d);
-		
-		String updateStatement = "update donations set personid = ?, amount = ?, donationdate = ?, dedication = ?, type = ?, note = ? where id = ?;";
-		
-		Object[] params = new Object[] { d.getDonator().getId(), d.getAmount(), d.getDate().getTime(), 
-				d.getDedication(), d.getType(), d.getNote(), d.getId() };
-		
-		int[] types = new int[] { Types.INTEGER, Types.DECIMAL, Types.TIMESTAMP, Types.VARCHAR, 
-				Types.VARCHAR, Types.VARCHAR, Types.INTEGER };
-		
-		jdbcTemplate.update(updateStatement, params, types);
-		
-		return d;
+
+		if (d.getId() == null) {
+			// insert
+			KeyHolder keyHolder = new GeneratedKeyHolder();
+
+			jdbcTemplate.update(new CreateDonationStatementCreator(d),
+					keyHolder);
+
+			d.setId(keyHolder.getKey().intValue());
+
+		} else {
+			// update
+			String updateStatement = "update donations set personid = ?, amount = ?, donationdate = ?, dedication = ?, type = ?, note = ? where id = ?";
+
+			Object[] params = new Object[] { d.getDonator().getId(),
+					d.getAmount(), d.getDate().getTime(), d.getDedication(),
+					d.getType().getName(), d.getNote(), d.getId() };
+
+			int[] types = new int[] { Types.INTEGER, Types.BIGINT,
+					Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR,
+					Types.VARCHAR, Types.INTEGER };
+
+			jdbcTemplate.update(updateStatement, params, types);
+		}
 	}
 
 	@Override
 	public void delete(Donation d) throws PersistenceException {
 		donationValidator.validate(d);
-		
-		String deleteStatement = "delete from donations where id = ?;";
-		
+
+		String deleteStatement = "delete from donations where id = ?";
+
 		Object[] params = new Object[] { d.getId() };
-		
-		int[] types = new int[] {Types.INTEGER};
-		
+
+		int[] types = new int[] { Types.INTEGER };
+
 		jdbcTemplate.update(deleteStatement, params, types);
 	}
 
 	@Override
+	public List<Donation> getAll() throws PersistenceException {
+
+		String select = "SELECT * FROM donations ORDER BY id DESC";
+
+		List<Donation> donations = jdbcTemplate.query(select,
+				new DonationMapper());
+
+		return donations;
+	}
+
+	@Override
 	public Donation getByID(int id) throws PersistenceException {
-		
-		if(id < 0){
+
+		if (id < 0) {
 			throw new IllegalArgumentException("Id must not be less than 0");
 		}
-		
-		Donation donation;
-		
-		String select = "select * from donations where id = ?;";
-		
-		donation = jdbcTemplate.queryForObject(select, new Object[]{id}, new DonationMapper());
-	
-		return donation;
+
+		String select = "select * from donations where id = ?";
+
+		try {
+			return jdbcTemplate.queryForObject(select, new Object[] { id },
+					new DonationMapper());
+		} catch (IncorrectResultSizeDataAccessException e) {
+			if (e.getActualSize() == 0)
+				return null;
+			else
+				throw new PersistenceException(e);
+		}
 	}
 
 	@Override
 	public List<Donation> getByPerson(Person p) throws PersistenceException {
-		if(p == null){
+		if (p == null) {
 			throw new IllegalArgumentException("person must not be null");
 		}
 
-		String select = "select * from donations where personid = ?;";
-		
-		List<Donation> donations = jdbcTemplate.query(select, new Object[] {p.getId()}, new DonationMapper());
-		
-		return donations;
-	}
-	
-	@Override 
-	public List<Donation> getByFilter(DonationFilter filter) throws PersistenceException{
-		
-		if(filter == null || filter.isEmpty()){
-			//return getAll();
-		}
-		
-		String select = "SELECT * FROM donations WHERE";
-		ArrayList<Object> args = new ArrayList<Object>();
-		
-		if(filter.getDedicationPart() != null){
-			select += " dediction like '%?%' AND";
-			args.add(filter.getDedicationPart());
-		}
-		
-		if(filter.getMaxAmount() != null){
-			select += " amount <= ? AND";
-			args.add(filter.getMaxAmount());
-		}
-		
-		if(filter.getMinAmount() != null){
-			select += " amount >= ? AND";
-			args.add(filter.getMinAmount());
-		}
-		
-		if(filter.getMaxDate() != null){
-			select += " date <= ? AND";
-			args.add(new Timestamp(filter.getMaxDate().getTime()));
-		}
-		
-		if(filter.getMinDate() != null){
-			select += " date >= ? AND";
-			args.add(new Timestamp(filter.getMinDate().getTime()));
-		}
-		
-		if(filter.getNotePart()!=null){
-			select += " note like '%?%' AND";
-			args.add(filter.getNotePart());
-		}
-		
-		if(filter.getType()!=null){
-			select += " type = ? AND";
-			args.add(filter.getType());
-		}
-		
-		//remove last AND
-		select = select.substring(0, select.length() - 3);
-		
-		List<Donation> donations = jdbcTemplate.query(select, args.toArray(), new DonationMapper());
-		
-		
+		String select = "select * from donations where personid = ? ORDER BY id DESC";
+
+		List<Donation> donations = jdbcTemplate.query(select,
+				new Object[] { p.getId() }, new DonationMapper());
+
 		return donations;
 	}
 
-	
+	/**
+	 * Simple implementation of a different-type pair
+	 * 
+	 * @author manuel-bichler
+	 * 
+	 * @param <A>
+	 * @param <B>
+	 */
+	private static class Pair<A, B> {
+		public A a;
+		public B b;
+
+		public Pair(A a, B b) {
+			this.a = a;
+			this.b = b;
+		}
+	}
+
+	/**
+	 * @param filter
+	 *            a not-null, not-empty donation filter
+	 * @return a pair consisting of the mysql WHERE clause to this filter
+	 *         (without the "WHERE", including placeholders) and the array for
+	 *         filling the placeholders
+	 */
+	private Pair<String, Object[]> createFilterWhereClause(DonationFilter filter) {
+		String where = "";
+		ArrayList<Object> args = new ArrayList<Object>();
+
+		if (filter.getDedicationPart() != null) {
+			where += "dediction like '%?%' AND ";
+			args.add(filter.getDedicationPart());
+		}
+
+		if (filter.getMaxAmount() != null) {
+			where += "amount <= ? AND ";
+			args.add(filter.getMaxAmount());
+		}
+
+		if (filter.getMinAmount() != null) {
+			where += "amount >= ? AND ";
+			args.add(filter.getMinAmount());
+		}
+
+		if (filter.getMaxDate() != null) {
+			where += "date <= ? AND ";
+			args.add(new Timestamp(filter.getMaxDate().getTime()));
+		}
+
+		if (filter.getMinDate() != null) {
+			where += "date >= ? AND ";
+			args.add(new Timestamp(filter.getMinDate().getTime()));
+		}
+
+		if (filter.getNotePart() != null) {
+			where += "note like '%?%' AND ";
+			args.add(filter.getNotePart());
+		}
+
+		if (filter.getType() != null) {
+			where += "type = ? AND ";
+			args.add(filter.getType().getName());
+		}
+
+		// remove last "AND "
+		where = where.substring(0, where.length() - 4);
+
+		return new Pair<String, Object[]>(where, args.toArray());
+	}
+
+	@Override
+	public List<Donation> getByFilter(DonationFilter filter)
+			throws PersistenceException {
+
+		if (filter == null || filter.isEmpty()) {
+			return getAll();
+		}
+
+		Pair<String, Object[]> clause = createFilterWhereClause(filter);
+
+		String select = "SELECT * FROM donations WHERE " + clause.a
+				+ " ORDER BY id DESC";
+
+		List<Donation> donations = jdbcTemplate.query(select, clause.b,
+				new DonationMapper());
+
+		return donations;
+	}
+
+	@Override
+	public long sumByFilter(DonationFilter filter) throws PersistenceException {
+		if (filter == null || filter.isEmpty()) {
+			return jdbcTemplate.queryForObject(
+					"SELECT SUM(amount) FROM donations", Long.class);
+		}
+
+		Pair<String, Object[]> clause = createFilterWhereClause(filter);
+
+		String select = "SELECT SUM(amount) FROM donations WHERE " + clause.a;
+
+		return jdbcTemplate.queryForObject(select, clause.b, Long.class);
+	}
+
 	private class DonationMapper implements RowMapper<Donation> {
-		
-		public Donation mapRow(ResultSet rs, int rowNum) throws SQLException{
+
+		public Donation mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Donation donation = new Donation();
 			donation.setId(rs.getInt("id"));
 			try {
 				donation.setDonator(personDAO.getById(rs.getInt("personid")));
 			} catch (PersistenceException e) {
-				throw new IllegalDBStateException(e);
+				throw new SQLException(e);
 			}
-			donation.setAmount(rs.getInt("amount"));
+			donation.setAmount(rs.getLong("amount"));
 			donation.setDate(rs.getDate("date"));
 			donation.setDedication(rs.getString("dedication"));
 			donation.setNote(rs.getString("note"));
-			donation.setType(Donation.DonationType.valueOf(rs.getString("type")));
-			
+			donation.setType(Donation.DonationType.getByName(rs
+					.getString("type")));
+
 			return donation;
 		}
 	}
+
 }

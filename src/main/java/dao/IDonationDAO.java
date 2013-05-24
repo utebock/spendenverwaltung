@@ -43,6 +43,16 @@ public interface IDonationDAO {
 	public void delete(Donation d) throws PersistenceException;
 
 	/**
+	 * Retrieves all donations stored in the underlying persistence layer
+	 * 
+	 * @return List of all donations, sorted by id descending, including their
+	 *         donators.
+	 * @throws PersistenceException
+	 *             if communication to the underlying persistence system failed
+	 */
+	public List<Donation> getAll() throws PersistenceException;
+
+	/**
 	 * Retrieves donation by ID
 	 * 
 	 * @param id

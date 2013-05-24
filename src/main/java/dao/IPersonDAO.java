@@ -74,8 +74,11 @@ public interface IPersonDAO {
 	 *            {@link IAddressDAO} prior to calling this method.
 	 * @return a list of persons sharing the given address, sorted by id
 	 *         descending, including their addresses
+	 * @throws PersistenceException
+	 *             if communication to the underlying persistence system failed
 	 */
-	public List<Person> getByAddress(Address address);
+	public List<Person> getByAddress(Address address)
+			throws PersistenceException;
 
 	/**
 	 * Retrieves those persons matching the given filter

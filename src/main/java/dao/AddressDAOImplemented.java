@@ -9,6 +9,7 @@ import java.sql.Types;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -24,6 +25,7 @@ import exceptions.PersistenceException;
  * implementation of {@link IAddressDAO}
  * 
  * @author philipp muhoray
+ * @author manuel-bichler
  * 
  */
 public class AddressDAOImplemented implements IAddressDAO {
@@ -88,28 +90,24 @@ public class AddressDAOImplemented implements IAddressDAO {
 	}
 
 	@Override
-	public Address create(final Address a) throws PersistenceException {
-		log.info("Creating Address...");
-
+	public void insertOrUpdate(final Address a) throws PersistenceException {
 		AddressValidator.validate(a);
+		if (a.getId() == null) {
+			log.info("Inserting Address...");
 
-		KeyHolder keyHolder = new GeneratedKeyHolder();
-		jdbcTemplate.update(new CreateAddressStatementCreator(a), keyHolder);
+			KeyHolder keyHolder = new GeneratedKeyHolder();
+			jdbcTemplate
+					.update(new CreateAddressStatementCreator(a), keyHolder);
 
-		// set address id to update result
-		a.setId(keyHolder.getKey().intValue());
+			// set address id to update result
+			a.setId(keyHolder.getKey().intValue());
 
-		log.info("Address entity successfully created:" + a.toString());
-		return a;
-	}
-
-	@Override
-	public Address update(final Address a) throws PersistenceException {
-		log.info("Updating Address...");
-		AddressValidator.validate(a);
-		jdbcTemplate.update(new UpdateAddressStatementCreator(a));
-		log.info("Address entity successfully updated:" + a.toString());
-		return a;
+			log.info("Address entity successfully created:" + a.toString());
+		} else {
+			log.info("Updating Address...");
+			jdbcTemplate.update(new UpdateAddressStatementCreator(a));
+			log.info("Address entity successfully updated:" + a.toString());
+		}
 	}
 
 	@Override
@@ -136,7 +134,7 @@ public class AddressDAOImplemented implements IAddressDAO {
 	@Override
 	public List<Address> getAll() throws PersistenceException {
 		log.info("Reading all Addresses.");
-		return jdbcTemplate.query("select * from addresses",
+		return jdbcTemplate.query("select * from addresses ORDER BY id DESC",
 				new AddressMapper());
 	}
 
@@ -144,20 +142,39 @@ public class AddressDAOImplemented implements IAddressDAO {
 	public Address getByID(int id) throws PersistenceException {
 		log.info("Reading Address with id='" + id + "'");
 		if (id < 0) {
-			log.info("Error reading Address with id='" + id + "': Id was less than 0");
+			log.info("Error reading Address with id='" + id
+					+ "': Id was less than 0");
 			throw new IllegalArgumentException("Id must not be less than 0");
 		}
 
-		return jdbcTemplate.queryForObject(
-				"select * from addresses where id = ?;", new Object[] { id },
-				new AddressMapper());
+		try {
+			return jdbcTemplate.queryForObject(
+					"select * from addresses where id = ?;",
+					new Object[] { id }, new AddressMapper());
+		} catch (IncorrectResultSizeDataAccessException e) {
+			if (e.getActualSize() == 0)
+				return null;
+			else
+				throw new PersistenceException(e);
+		}
 	}
-	
+
 	@Override
-	public Address getMainAddressByPerson(Person person) {
-		return jdbcTemplate.queryForObject("select * from " +
-				" addresses a,livesat l where l.aid=a.id and l.pid = ? and l.ismain=true",
-				new Object[] { person.getId() }, new int[] {Types.INTEGER}, new AddressMapper());
+	public Address getMainAddressByPerson(Person person)
+			throws PersistenceException {
+		try {
+			return jdbcTemplate
+					.queryForObject(
+							"select a.* from "
+									+ " addresses a,livesat l where l.aid=a.id and l.pid = ? and l.ismain=true",
+							new Object[] { person.getId() },
+							new int[] { Types.INTEGER }, new AddressMapper());
+		} catch (IncorrectResultSizeDataAccessException e) {
+			if (e.getActualSize() == 0)
+				return null;
+			else
+				throw new PersistenceException(e);
+		}
 	}
 
 	private class AddressMapper implements RowMapper<Address> {
@@ -172,4 +189,5 @@ public class AddressDAOImplemented implements IAddressDAO {
 			return address;
 		}
 	}
+
 }

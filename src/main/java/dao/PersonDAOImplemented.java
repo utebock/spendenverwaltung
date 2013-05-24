@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -22,7 +23,6 @@ import service.PersonValidator;
 import domain.Address;
 import domain.Person;
 import domain.PersonFilter;
-import exceptions.IllegalDBStateException;
 import exceptions.PersistenceException;
 
 public class PersonDAOImplemented implements IPersonDAO {
@@ -33,8 +33,6 @@ public class PersonDAOImplemented implements IPersonDAO {
 
 	private static final Logger log = Logger
 			.getLogger(PersonDAOImplemented.class);
-
-	private String addressQuery = "select * from livesat where pid = ?";
 
 	public void setPersonValidator(PersonValidator personValidator) {
 		this.personValidator = personValidator;
@@ -68,7 +66,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 			ps.setString(1, person.getGivenName());
 			ps.setString(2, person.getSurname());
 			ps.setString(3, person.getEmail());
-			ps.setString(4, person.getSex().toString());
+			ps.setString(4, person.getSex().getName());
 			ps.setString(5, person.getTitle());
 			ps.setString(6, person.getCompany());
 			ps.setString(7, person.getTelephone());
@@ -94,23 +92,8 @@ public class PersonDAOImplemented implements IPersonDAO {
 
 			person.setId(keyHolder.getKey().intValue());
 
-			String insertLivesAt = "insert into livesat (pid, aid, ismain) values (?, ?, ?)";
+			insertAddresses(person);
 
-			List<Address> addresses = person.getAddresses();
-
-			/*
-			 * inserting relevant livesat entries
-			 */
-			for (Address address : addresses) {
-				boolean isMain = false;
-				if (address.equals(person.getMainAddress())) {
-					isMain = true;
-				}
-				jdbcTemplate
-						.update(insertLivesAt, new Object[] { person.getId(),
-								address.getId(), isMain }, new int[] {
-								Types.INTEGER, Types.INTEGER, Types.BOOLEAN });
-			}
 		} else {
 			// person to be updated
 
@@ -118,9 +101,10 @@ public class PersonDAOImplemented implements IPersonDAO {
 					+ "company = ?, telephone = ?, emailnotification = ?, postalnotification = ?, note = ? where id = ?;";
 
 			Object[] params = new Object[] { person.getGivenName(),
-					person.getSurname(), person.getEmail(), person.getSex(),
-					person.getTitle(), person.getCompany(),
-					person.getTelephone(), person.isEmailNotification(),
+					person.getSurname(), person.getEmail(),
+					person.getSex().getName(), person.getTitle(),
+					person.getCompany(), person.getTelephone(),
+					person.isEmailNotification(),
 					person.isPostalNotification(), person.getNote(),
 					person.getId() };
 
@@ -131,60 +115,98 @@ public class PersonDAOImplemented implements IPersonDAO {
 
 			jdbcTemplate.update(updatePersons, params, types);
 
-			/*
-			 * ismain must only be true once per person
-			 */
-			String updateLivesAt = "insert into livesat (pid, aid, ismain) values (?, ?, ?)";
+			// to update address relationhips, simply delete them and then
+			// insert the new ones
 
-			List<Address> addresses = person.getAddresses();
+			jdbcTemplate.update("DELETE FROM livesat WHERE pid = ?",
+					new Object[] { person.getId() },
+					new int[] { Types.INTEGER });
 
-			/*
-			 * inserting relevant livesat entries
-			 */
-			for (Address address : addresses) {
-				boolean isMain = false;
+			insertAddresses(person);
+		}
+	}
 
-				if (address.equals(person.getMainAddress())) {
-					isMain = true;
-				}
-				jdbcTemplate
-						.update(updateLivesAt, new Object[] { person.getId(),
-								address.getId(), isMain }, new int[] {
-								Types.INTEGER, Types.INTEGER, Types.BOOLEAN });
+	/**
+	 * inserts the relevant entries to 'livesat' table
+	 * 
+	 * @param person
+	 *            the person whose addresses should be linked to the person
+	 * @throws PersistenceException
+	 */
+	private void insertAddresses(Person person) throws PersistenceException {
+		String insertLivesAt = "insert into livesat (pid, aid, ismain) values (?, ?, ?)";
+
+		List<Address> addresses = person.getAddresses();
+
+		/*
+		 * inserting relevant livesat entries
+		 */
+		for (Address address : addresses) {
+			boolean isMain = false;
+			if (address.equals(person.getMainAddress())) {
+				isMain = true;
 			}
+			jdbcTemplate.update(insertLivesAt, new Object[] { person.getId(),
+					address.getId(), isMain }, new int[] { Types.INTEGER,
+					Types.INTEGER, Types.BOOLEAN });
 		}
 	}
 
 	@Override
 	public void delete(Person person) throws PersistenceException {
 
+		// we don't need to delete references in 'livesat', since ON DELETE is
+		// set to CASCADE
+
 		personValidator.validate(person);
 
-		String deletePersons = "delete from persons where id = ?;";
-		String removeLivesAt = "delete from livesat where pid = ?";
+		String deletePersons = "delete from persons where id = ?";
 
 		Object[] params = new Object[] { person.getId() };
 
 		int[] types = new int[] { Types.INTEGER };
 
-		jdbcTemplate.update(removeLivesAt, params, types);
-
 		jdbcTemplate.update(deletePersons, params, types);
+	}
+
+	/**
+	 * fetches the person's addresses into the person object and sets the main
+	 * address
+	 * 
+	 * @param person
+	 *            the person whose addresses to fetch
+	 * @throws PersistenceException
+	 */
+	private void fetchAddresses(Person person) throws PersistenceException {
+		List<Address> addresses = jdbcTemplate.query(
+				"SELECT * FROM livesat l WHERE l.pid = ? ORDER BY aid DESC",
+				new Object[] { person.getId() }, new AddressMapper());
+		person.setAddresses(addresses);
+		try {
+			Address mainAddress = jdbcTemplate
+					.queryForObject(
+							"SELECT * FROM livesat l WHERE l.pid = ? AND l.ismain = TRUE",
+							new Object[] { person.getId() },
+							new AddressMapper());
+			person.setMainAddress(mainAddress);
+		} catch (IncorrectResultSizeDataAccessException e) {
+			if (e.getActualSize() != 0)
+				throw new PersistenceException(e);
+			// otherwise, just leave the main field blank
+		}
 	}
 
 	@Override
 	public List<Person> getAll() throws PersistenceException {
 
-		String select = "select * from persons";
+		String select = "SELECT * FROM persons ORDER BY id DESC";
 		List<Person> personList = jdbcTemplate
 				.query(select, new PersonMapper());
 		log.info(personList.size() + " list size");
 
+		// now, load their addresses
 		for (Person entry : personList) {
-
-			List<Address> addresses = jdbcTemplate.query(addressQuery,
-					new Object[] { entry.getId() }, new AddressMapper());
-			entry.setAddresses(addresses);
+			fetchAddresses(entry);
 		}
 
 		return personList;
@@ -197,18 +219,31 @@ public class PersonDAOImplemented implements IPersonDAO {
 			throw new IllegalArgumentException("Id must not be less than 0");
 		}
 
-		Person person;
-
 		String select = "select * from persons where id = ?;";
 
-		person = jdbcTemplate.queryForObject(select, new Object[] { id },
-				new PersonMapper());
+		Person person = jdbcTemplate.queryForObject(select,
+				new Object[] { id }, new PersonMapper());
 
-		List<Address> addresses = jdbcTemplate.query(addressQuery,
-				new Object[] { person.getId() }, new AddressMapper());
-		person.setAddresses(addresses);
+		fetchAddresses(person);
 
 		return person;
+	}
+
+	@Override
+	public List<Person> getByAddress(Address address)
+			throws PersistenceException {
+
+		String select = "SELECT p.* FROM persons p JOIN livesat l ON p.id = l.pid WHERE l.aid = ? ORDER BY p.id DESC";
+		List<Person> personList = jdbcTemplate.query(select,
+				new Object[] { address.getId() }, new PersonMapper());
+		log.info(personList.size() + " list size");
+
+		// now, load their addresses
+		for (Person entry : personList) {
+			fetchAddresses(entry);
+		}
+
+		return personList;
 	}
 
 	@Override
@@ -266,6 +301,8 @@ public class PersonDAOImplemented implements IPersonDAO {
 		// omit last "AND":
 		select = select.substring(0, select.length() - 3);
 
+		select += " ORDER BY id DESC";
+
 		List<Person> persons = jdbcTemplate.query(select, args.toArray(),
 				new PersonMapper());
 
@@ -273,9 +310,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 
 		for (Person entry : persons) {
 
-			List<Address> addresses = jdbcTemplate.query(addressQuery,
-					new Object[] { entry.getId() }, new AddressMapper());
-			entry.setAddresses(addresses);
+			fetchAddresses(entry);
 		}
 
 		return persons;
@@ -288,28 +323,25 @@ public class PersonDAOImplemented implements IPersonDAO {
 			try {
 				return addressDAO.getByID(rs.getInt("aid"));
 			} catch (PersistenceException e) {
-				/**
-				 * this should NEVER happen, so we rethrow an unchecked
-				 * exception
-				 */
-				throw new IllegalDBStateException(e);
+				throw new SQLException(e);
 			}
 		}
 	}
 
+	/**
+	 * Class helping mapping a result set to a person object.
+	 * 
+	 * Note that no address information whatsoever will be stored in the person
+	 * object.
+	 * 
+	 * @author manuel-bichler
+	 * 
+	 */
 	private class PersonMapper implements RowMapper<Person> {
 
-		/**
-		 * TODO: Map Addresses to Person after calling this, otherwise the
-		 * person objects have no address lists. Will need another RowMapper to
-		 * process a query on "livesat" table in order to obtain the Addresses
-		 * (do this in another method that is called by findPerson & findAll
-		 * methods).
-		 */
 		public Person mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Person person = new Person();
 			person.setId(rs.getInt("id"));
-			person.setMainAddress(addressDAO.getMainAddressByPerson(person));
 			person.setGivenName(rs.getString("givenname"));
 			person.setSurname(rs.getString("surname"));
 			person.setEmail(rs.getString("email"));
@@ -317,20 +349,12 @@ public class PersonDAOImplemented implements IPersonDAO {
 			person.setTitle(rs.getString("title"));
 			person.setCompany(rs.getString("company"));
 			person.setTelephone(rs.getString("telephone"));
-
-			/**
-			 * these values default to true
-			 */
-			if (!rs.getBoolean("emailnotification")) {
-				person.setEmailNotification(false);
-			}
-			if (!rs.getBoolean("postalnotification")) {
-				person.setEmailNotification(false);
-			}
-
+			person.setEmailNotification(rs.getBoolean("emailnotification"));
+			person.setPostalNotification(rs.getBoolean("postalnotification"));
 			person.setNote(rs.getString("note"));
 
 			return person;
 		}
 	}
+
 }

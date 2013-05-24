@@ -9,16 +9,43 @@ import java.util.Date;
  * @author manuel-bichler
  */
 public class Donation {
+	public static enum DonationType {
+		SMS("sms"), BAR("bar"), BANK_TRANSFER("bank transfer"), MERCHANDISE(
+				"merchandise"), ONLINE("online");
+
+		private final String name;
+
+		private DonationType(String name) {
+			this.name = name;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public static DonationType getByName(String name) {
+			switch (name) {
+			case "sms":
+				return SMS;
+			case "bar":
+				return BAR;
+			case "bank transfer":
+				return BANK_TRANSFER;
+			case "merchandise":
+				return MERCHANDISE;
+			case "online":
+				return ONLINE;
+			default:
+				throw new IllegalArgumentException("No such donation type");
+			}
+		}
+	};
+
 	private Integer id;
 	private Person donator;
 	private Long amount;
 	private Date date;
 	private String dedication;
-
-	public static enum DonationType {
-		SMS, BAR, BANK_TRANSFER, MERCHANDISE, ONLINE
-	};
-
 	private DonationType type;
 	private String note;
 

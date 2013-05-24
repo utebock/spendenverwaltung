@@ -76,8 +76,12 @@ public interface IAddressDAO {
 	 *            the person to retrieve the main address from, must have been
 	 *            persisted or retrieved using an {@link IPersonDAO} prior to
 	 *            calling this method
-	 * @return the main address of the given person
+	 * @return the main address of the given person, or null if the given person
+	 *         has no main address
+	 * @throws PersistenceException
+	 *             if communication to the underlying persistence system failed
 	 */
 	@Deprecated
-	public Address getMainAddressByPerson(Person person);
+	public Address getMainAddressByPerson(Person person)
+			throws PersistenceException;
 }
