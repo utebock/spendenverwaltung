@@ -22,7 +22,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("../testspring.xml")
+@ContextConfiguration("/testspring.xml")
 @TransactionConfiguration(defaultRollback = true)
 public abstract class AbstractAddressServiceTest {
 

@@ -86,12 +86,11 @@ public class PersonOverview extends JPanel{
 	}
 	
 	public void goToCreate(){
-		//TODO: Broke on refactoring
-//		CreatePerson cp = new CreatePerson(personService, addressService, donationService, this);
+		CreatePerson cp = new CreatePerson(personService, addressService, this);
 		removeAll();
 		revalidate();
 		repaint();
-//		add(cp);
+		add(cp);
 	}
 	
 	public void goToDelete(){

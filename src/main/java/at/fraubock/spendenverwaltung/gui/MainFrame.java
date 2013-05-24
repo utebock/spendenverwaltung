@@ -1,8 +1,5 @@
 package at.fraubock.spendenverwaltung.gui;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -16,29 +13,26 @@ import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 public class MainFrame extends JFrame{
 
 	private static final long serialVersionUID = 1L;
-	private static IPersonService personService;
-	private static IAddressService addressService;
-	private static IDonationService donationService;
+	private IPersonService personService;
+	private IAddressService addressService;
+	private IDonationService donationService;
 	
 	public MainFrame(){
 		super("Ute Bock Spendenverwaltungssystem");
-		this.addWindowListener(new WindowAdapter(){ 
-			public void windowClosing(WindowEvent wE) {
-				System.exit(0);
-			}});
+		this.addWindowListener(new WindowHandler());
 	}
 	
 	public void setPersonService(IPersonService personService){
-		MainFrame.personService = personService;
+		this.personService = personService;
 	}
 	public void setAddressService(IAddressService addressService){
-		MainFrame.addressService = addressService;
+		this.addressService = addressService;
 	}
 	public void setDonationService(IDonationService donationService){
-		MainFrame.donationService = donationService;
+		this.donationService = donationService;
 	}
 	
-	public static void openMainWindow(){
+	public void openMainWindow(){
 		setUpGUI();
 		
 		Runnable run = new Runnable(){
@@ -55,7 +49,7 @@ public class MainFrame extends JFrame{
 	}
 
 	
-	private static void setUpGUI() {
+	private void setUpGUI() {
 		
 		MainFrame frame = new MainFrame();
 		JPanel panel = new JPanel();

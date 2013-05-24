@@ -3,6 +3,8 @@ package at.fraubock.spendenverwaltung.service;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
+import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
@@ -24,7 +26,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("../testspring.xml")
+@ContextConfiguration("/testspring.xml")
 @TransactionConfiguration(defaultRollback=true)
 
 public abstract class AbstractPersonServiceTest {
@@ -231,7 +233,7 @@ public abstract class AbstractPersonServiceTest {
 			Person found = personService.getById(personCreated
 					.getId());
 
-			assert (personCreated.equals(found));
+			assertThat(personCreated, is(found));
 		} catch (ServiceException e) {
 			fail();
 		} catch (PersistenceException e) {
