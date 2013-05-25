@@ -84,9 +84,11 @@ public abstract class AbstractPersonServiceTest {
 	@Transactional
 	public void createWithValidParameter_ReturnsSavedPerson() {
 		try {
-			doReturn(personCreated).when(personDAO).insertOrUpdate(person);
 			Person returned = personService.create(person);
+			
 			assert (returned.equals(personCreated));
+			
+			verify(personDAO).insertOrUpdate(person);
 		} catch (ServiceException e) {
 			fail();
 		} catch (PersistenceException e) {
@@ -128,9 +130,10 @@ public abstract class AbstractPersonServiceTest {
 	@Transactional
 	public void updateWithValidParameters_ReturnsUpdatedPerson() {
 		try {
-			doReturn(personCreated).when(personDAO).insertOrUpdate(personCreated);
 			Person returned = personService.update(personCreated);
+			
 			assert (returned.equals(personCreated));
+			verify(personDAO).insertOrUpdate(personCreated);
 		} catch (ServiceException e) {
 			fail();
 		} catch (PersistenceException e) {
