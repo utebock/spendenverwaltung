@@ -97,9 +97,7 @@ public class CreatePerson extends JPanel{
 		actionHandler = new ActionHandler(this);
 		builder = new ComponentBuilder();
 		
-		panel = builder.createPanel();
-		panel.setLayout(new MigLayout());
-		panel.setPreferredSize(new Dimension(800, 800));
+		panel = builder.createPanel(800,800);
 		this.add(panel);
 		
 		setUpCreate();

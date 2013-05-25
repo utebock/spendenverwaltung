@@ -14,6 +14,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import net.miginfocom.swing.MigLayout;
+
 public class ComponentBuilder {
 
 	public JButton createImageButton(String path, ActionListener listener, String actionCommand){
@@ -24,8 +26,11 @@ public class ComponentBuilder {
 		return button;
 	}
 	
-	public JPanel createPanel(){
-		return new JPanel();
+	public JPanel createPanel(int x, int y){
+		JPanel panel = new JPanel();
+		panel.setLayout(new MigLayout());
+		panel.setPreferredSize(new Dimension(x,y));
+		return panel;
 	}
 	
 	public JLabel createLabel(String text){

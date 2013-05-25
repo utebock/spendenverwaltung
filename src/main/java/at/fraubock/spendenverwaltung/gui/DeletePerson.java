@@ -49,9 +49,7 @@ public class DeletePerson extends JPanel{
 	
 	public void setUp(){
 
-		panel = builder.createPanel();
-		panel.setLayout(new MigLayout());
-		panel.setPreferredSize(new Dimension(700, 700));
+		panel = builder.createPanel(700, 700);
 		this.add(panel);
 		
 		deleteTable = new JTable(deleteModel);

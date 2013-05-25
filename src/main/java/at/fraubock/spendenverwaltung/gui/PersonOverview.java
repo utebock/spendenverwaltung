@@ -49,10 +49,7 @@ public class PersonOverview extends JPanel{
 		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
 		
-		panel = builder.createPanel();
-		panel.setLayout(new MigLayout());
-		panel.setPreferredSize(new Dimension(800, 800));
-		
+		panel = builder.createPanel(800,800);
 		this.add(panel);
 		create = builder.createImageButton("/images/template.jpg", buttonListener, "create_person");
 		panel.add(create);
