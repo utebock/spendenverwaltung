@@ -104,11 +104,11 @@ public class AddressDAOImplemented implements IAddressDAO {
 			// set address id to update result
 			a.setId(keyHolder.getKey().intValue());
 
-			log.info("Address entity successfully created:" + a.toString());
+			log.info("Address entity successfully created: " + a.toString());
 		} else {
 			log.info("Updating Address...");
 			jdbcTemplate.update(new UpdateAddressStatementCreator(a));
-			log.info("Address entity successfully updated:" + a.toString());
+			log.info("Address entity successfully updated: " + a.toString());
 		}
 	}
 
