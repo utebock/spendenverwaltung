@@ -2,6 +2,8 @@ package at.fraubock.spendenverwaltung.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -98,7 +100,6 @@ public class CreatePerson extends JPanel{
 		panel = builder.createPanel();
 		panel.setLayout(new MigLayout());
 		panel.setPreferredSize(new Dimension(800, 800));
-		panel.setBackground(Color.WHITE);
 		this.add(panel);
 		
 		setUpCreate();

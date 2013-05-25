@@ -1,11 +1,14 @@
 package at.fraubock.spendenverwaltung.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
@@ -25,11 +28,9 @@ public class Overview extends JPanel{
 	private JLabel general;
 	private JLabel empty;
 	private JButton filter;
-	private ImageIcon space;
-	private ImageIcon separator;
-	private JLabel separatorLabel;
 	private JLabel persons;
 	private JLabel filterLabel;
+	private JSeparator separator;
 	
 	public Overview(IPersonService personService, IAddressService addressService, IDonationService donationService){
 		super(new MigLayout());
@@ -42,11 +43,15 @@ public class Overview extends JPanel{
 	}
 
 	private void setUpPersons() {
+		/**
+		 * normal font is 13pt
+		 */
 		JPanel personsPanel = builder.createPanel();
 		personsPanel.setLayout(new MigLayout());
 		personsPanel.setPreferredSize(new Dimension(800,160));
-		this.add(personsPanel);
+		this.add(personsPanel, "wrap");
 		general = builder.createLabel("Allgemein");
+		general.setFont(new Font("Headline", Font.PLAIN, 14));
 		empty = builder.createLabel(" ");		
 		personsPanel.add(general, "wrap");
 		personsPanel.add(empty, "wrap");
@@ -61,11 +66,12 @@ public class Overview extends JPanel{
 		filterLabel = builder.createLabel("Filter");
 		personsPanel.add(filterLabel, "wrap, gap 58");
 		
-		/**
-		separator = builder.createImageIcon("images/separator.gif");
-		separatorLabel = builder.createImageLabel(separator);
-		//personsPanel.add(separatorLabel);
-		*/
+		//separator for next section
+		separator = builder.createSeparator();
+		this.add(separator, "wrap, growx");
+		
+		
+		
 		
 	}
 	

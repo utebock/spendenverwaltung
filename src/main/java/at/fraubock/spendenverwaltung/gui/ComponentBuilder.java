@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.gui;
 
+import java.awt.Dimension;
 import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
@@ -8,8 +9,10 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 public class ComponentBuilder {
 
@@ -36,6 +39,11 @@ public class ComponentBuilder {
 	public ImageIcon createImageIcon(String path) {
 		java.net.URL url = getClass().getResource(path);
 		return new ImageIcon(url);
+	}
+	
+	public JSeparator createSeparator(){
+		JSeparator sep = new JSeparator();
+		return sep;
 	}
 	
 	public JRadioButton createRadioButton(String text, ActionListener listener, String actionCommand){
