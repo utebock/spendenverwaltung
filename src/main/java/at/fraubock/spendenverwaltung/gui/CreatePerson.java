@@ -188,9 +188,9 @@ public class CreatePerson extends JPanel{
 		panel.add(note, "gap 90");
 		panel.add(noteArea, "wrap");
 		
-		/**
-		 * Next section
-		 */
+/**
+* Next section
+*/
 		panel.add(empty,"wrap");
 		
 		addDonation = builder.createLabel("Neue Spende anlegen");

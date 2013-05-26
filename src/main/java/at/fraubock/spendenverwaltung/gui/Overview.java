@@ -1,10 +1,7 @@
 package at.fraubock.spendenverwaltung.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Font;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -88,7 +85,7 @@ public class Overview extends JPanel{
 		general.setFont(new Font("Headline", Font.PLAIN, 14));
 		personsPanel.add(general, "wrap");
 		//personsPanel.add(empty, "wrap");
-		person = builder.createImageButton("/images/template.jpg", buttonListener, "person_overview");
+		person = builder.createImageButton("/images/persons.gif", buttonListener, "person_overview");
 		personsPanel.add(person);
 		
 		filter = builder.createImageButton("/images/template.jpg", buttonListener, "filter_overview");
