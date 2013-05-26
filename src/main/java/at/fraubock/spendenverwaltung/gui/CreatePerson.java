@@ -3,6 +3,7 @@ package at.fraubock.spendenverwaltung.gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 
 import javax.swing.ButtonGroup;
@@ -70,7 +71,6 @@ public class CreatePerson extends JPanel{
 	private JTextField countryField;
 	
 	private JLabel notifyType;
-	private ButtonGroup buttonGroupNotify;
 	private JRadioButton notifyMail;
 	private JRadioButton notifyPost;
 	
@@ -109,21 +109,23 @@ public class CreatePerson extends JPanel{
 		
 	}
 
+	@SuppressWarnings("unchecked")
 	private void setUpCreate() {
 		
 		addPerson = builder.createLabel("Personendaten eintragen");
+		addPerson.setFont(new Font("Headline", Font.PLAIN, 14));
 		panel.add(addPerson, "wrap");
 		JLabel empty = builder.createLabel("		");
 		panel.add(empty, "wrap");
 		
-		String[] salutCombo = new String[]{"Herr", "Frau", "Fam.", "FA."};
+		String[] salutCombo = new String[]{"Herr", "Frau", "Fam.", "Firma"};
 		salutation = builder.createComboBox(salutCombo, actionHandler, "salutCombo");
 		salutLabel = builder.createLabel("Anrede: ");
 		panel.add(salutLabel);
 		panel.add(salutation, "wrap");
 		
 		title = builder.createLabel("Titel: ");
-		String[] titleCombo = new String[]{"Ing.", "DI"};
+		String[] titleCombo = new String[]{"-", "BA", "BSc", "DI", "Dr.", "Ing.", "MA", "Mag.", "MSc.", "Prof."};
 		titleBox = builder.createComboBox(titleCombo, actionHandler, "titleCombo");
 		panel.add(title);
 		panel.add(titleBox);
@@ -174,14 +176,12 @@ public class CreatePerson extends JPanel{
 		panel.add(countryField, "wrap");
 		
 		notifyType = builder.createLabel("Notification Type: ");
-		buttonGroupNotify = new ButtonGroup();
 		notifyMail = builder.createRadioButton("E-Mail", actionHandler, "notifyMail");
 		notifyPost = builder.createRadioButton("Post", actionHandler, "notifyPost");
-		buttonGroupNotify.add(notifyMail);
-		buttonGroupNotify.add(notifyPost);
+
 		panel.add(notifyType);
 		panel.add(notifyMail);
-		panel.add(notifyPost, "split 3");
+		panel.add(notifyPost, "split 2");
 		
 		note = builder.createLabel("Notiz: ");
 		noteArea = builder.createTextArea(5, 20);
@@ -194,9 +194,10 @@ public class CreatePerson extends JPanel{
 		panel.add(empty,"wrap");
 		
 		addDonation = builder.createLabel("Neue Spende anlegen");
+		addDonation.setFont(new Font("Headline", Font.PLAIN, 14));
 		panel.add(addDonation, "wrap");
 		
-		String[] donationString = new String[]{"Ueberweisung", "Veranstaltung", "Online-Shop"};
+		String[] donationString = new String[]{"\u00DCberweisung", "Veranstaltung", "Online-Shop"};
 		donationCombo = builder.createComboBox(donationString, actionHandler, "donationCombo");
 		donation = builder.createLabel("Spende durch: ");
 		panel.add(donation);
@@ -213,64 +214,121 @@ public class CreatePerson extends JPanel{
 	}
 	
 	public void createPersonInDb(){
-		String salut = "HERR";
+		/**
+		 * Sex
+		 */
+		String sex = "Herr";
+		
+		if(salutation.getSelectedItem().equals(sex)){
+			sex = "MALE";
+		}
 		if(salutation.getSelectedItem().equals("Frau")){
-			salut = "FRAU";
+			sex = "FEMALE";
 		}
 		if(salutation.getSelectedItem().equals("Fam.")){
-			salut = "FAM.";
+			sex = "FAMILY";
 		}
-		if(salutation.getSelectedItem().equals("FA.")){
-			salut = "FA.";
+		if(salutation.getSelectedItem().equals("Firma")){
+			sex = "COMPANY";
 		}
-		//TODO fix error code
-//		p.setSalutation(Person.Salutation.valueOf(salut));
 		
-		String title = "Ing.";
+		p.setSex(Person.Sex.valueOf(sex));
+		
+		/**
+		 * Title
+		 */
+		String title = "-";
+		
+		if(titleBox.getSelectedItem().equals("BA")){
+			title = "BA";
+		}
+		if(titleBox.getSelectedItem().equals("BSc")){
+			title = "BSc";
+		}
 		if(titleBox.getSelectedItem().equals("DI")){
 			title = "DI";
 		}
+		if(titleBox.getSelectedItem().equals("Dr.")){
+			title = "Dr.";
+		}
+		if(titleBox.getSelectedItem().equals("Ing.")){
+			title = "Ing.";
+		}
+		if(titleBox.getSelectedItem().equals("MA")){
+			title = "MA";
+		}
+		if(titleBox.getSelectedItem().equals("Mag.")){
+			title = "Mag.";
+		}
+		if(titleBox.getSelectedItem().equals("MSc")){
+			title = "MSc";
+		}
+		if(titleBox.getSelectedItem().equals("Prof.")){
+			title = "Prof.";
+		}
+		
 		p.setTitle(title);
 		
-		String company = companyField.getText();
-		p.setCompany(company);
+		/**
+		 * Company
+		 */
+		p.setCompany(companyField.getText());
 		
-		String givenName = givenField.getText();
-		p.setGivenName(givenName);
+		/**
+		 * Given name
+		 */
+		p.setGivenName(givenField.getText());
 		
-		String surname = surnameField.getText();
-		p.setSurname(surname);
+		/**
+		 * Surname
+		 */
+		p.setSurname(surnameField.getText());
 		
-		String tel = telephoneField.getText();
-		p.setTelephone(tel);
+		/**
+		 * Telephone
+		 */
+		p.setTelephone(telephoneField.getText());
 		
-		String mail = mailField.getText();
-		p.setEmail(mail);
+		/**
+		 * Mail
+		 */
+		p.setEmail(mailField.getText());
 		
-		String street = streetField.getText();
-		addr.setStreet(street);
+		/**
+		 * Address: Street
+		 */
+		addr.setStreet(streetField.getText());
 		
-		int postal = Integer.parseInt(postalField.getText());
-		//TODO fix error code
-//		addr.setPostalCode(postal);
+		/**
+		 * Address: Postal code
+		 */
+		addr.setPostalCode(postalField.getText());
 		
-		String city = cityField.getText();
-		addr.setCity(city);
+		/**
+		 * Address: City
+		 */
+		addr.setCity(cityField.getText());
 		
-		String country = countryField.getText();
-		addr.setCountry(country);
+		/**
+		 * Address: Country
+		 */
+		addr.setCountry(countryField.getText());
+
+		p.setMainAddress(addr);
 		
-		//TODO fix error code
-//		p.setMailingAddress(addr);
-		
-		//TODO fix error code
+		/**
+		 * Notification type
+		 */
 		if(notifyMail.isSelected()){
-//			p.setNotificationType(Person.NotificationType.MAIL);
+			p.setEmailNotification(true);
 		}
-		else{
-//			p.setNotificationType(Person.NotificationType.POST);
+		if(notifyPost.isSelected()){
+			p.setPostalNotification(true);
 		}
 		
+		/**
+		 * Note
+		 */
 		String note = noteArea.getText();
 		p.setNote(note);
 		
