@@ -9,6 +9,7 @@ public class ButtonListener implements ActionListener{
 	private PersonOverview personOverview;
 	private CreatePerson createPerson;
 	private DeletePerson deletePerson;
+	private ShowPerson showPerson;
 	
 	public ButtonListener(Overview overview){
 		this.overview = overview;
@@ -23,6 +24,10 @@ public class ButtonListener implements ActionListener{
 	
 	public ButtonListener(DeletePerson deletePerson) {
 		this.deletePerson = deletePerson;
+	}
+	
+	public ButtonListener(ShowPerson showPerson) {
+		this.showPerson = showPerson;
 	}
 	
 	

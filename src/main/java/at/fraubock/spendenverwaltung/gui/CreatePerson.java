@@ -33,6 +33,7 @@ public class CreatePerson extends JPanel{
 	private ComponentBuilder builder;
 	private ButtonListener buttonListener;
 	private ActionHandler actionHandler;
+	private PersonTableModel personModel;
 	private JPanel panel;
 	
 	private JLabel addDonation;
@@ -93,6 +94,7 @@ public class CreatePerson extends JPanel{
 		this.personService = personService;
 		this.addressService = addressService;
 		this.personOverview = personOverview;
+		this.personModel = this.personOverview.getPersonModel();
 		buttonListener = new ButtonListener(this);
 		actionHandler = new ActionHandler(this);
 		builder = new ComponentBuilder();
@@ -333,8 +335,10 @@ public class CreatePerson extends JPanel{
 		p.setNote(note);
 		
 		try{
-//			addressService.create(addr); // will now be created when person is created - pm
-			personService.create(p);
+			addressService.create(addr); // will now be created when person is created - pm
+			Person createdPerson = personService.create(p);
+			
+			personModel.addPerson(createdPerson);
 		}
 		catch(ServiceException e){
 			 JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);

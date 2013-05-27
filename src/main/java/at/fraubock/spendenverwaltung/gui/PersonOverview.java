@@ -1,26 +1,44 @@
 package at.fraubock.spendenverwaltung.gui;
 
 import java.awt.Dimension;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 
+import org.apache.log4j.Logger;
+
+import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 import net.miginfocom.swing.MigLayout;
 
-public class PersonOverview extends JPanel{
+public class PersonOverview extends JPanel implements MouseListener{
 
 	private static final long serialVersionUID = 1L;
+	private static final Logger log = Logger.getLogger(PersonOverview.class);
 	private IPersonService personService;
 	private IAddressService addressService;
 	private IDonationService donationService;
 	private Overview overview;
 	private ComponentBuilder builder;
 	private ButtonListener buttonListener;
+	private PersonTableModel personModel;
+	private JTable showTable;
+	private JScrollPane scrollPane;
+	private List<Person> personList;
 	private JButton create;
 	private JButton edit;
 	private JButton delete;
@@ -40,17 +58,33 @@ public class PersonOverview extends JPanel{
 		this.addressService = addressService;
 		this.donationService = donationService;
 		this.overview = overview;
+		initTable();
 		setUp();
+	}
+	
+	public void initTable(){
+		personModel = new PersonTableModel();
+		getPersons();
+		showTable = new JTable(personModel);
+		
+		showTable.setFillsViewportHeight(true);
+		showTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+		scrollPane = new JScrollPane(showTable);
+		scrollPane.setPreferredSize(new Dimension(650,700));
+		
+		showTable.addMouseListener(this);
 	}
 	
 	public void setUp(){
 		System.out.println("Hello");
-		
+
 		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
 		
 		panel = builder.createPanel(800,800);
 		this.add(panel);
+		
 		create = builder.createImageButton("/images/template.jpg", buttonListener, "create_person");
 		panel.add(create);
 		
@@ -79,7 +113,34 @@ public class PersonOverview extends JPanel{
 		panel.add(showLabel, "gap 22");
 		
 		searchLabel = builder.createLabel("Personen suchen");
-		panel.add(searchLabel, "gap 28");
+		panel.add(searchLabel, "gap 28, wrap");
+
+		panel.add(scrollPane, "span 5, gaptop 25");
+	}
+	
+	public PersonTableModel getPersonModel(){
+		return this.personModel;
+	}
+	
+	private void getPersons(){
+		personList = new ArrayList<Person>();
+		
+		try{
+			personList = personService.getAll();
+			log.info("List " + personList.size() + " persons");
+		}
+		catch(ServiceException e){
+			JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+		    e.printStackTrace();
+		    return;
+		}
+		if(personList == null){
+			JOptionPane.showMessageDialog(this, "GetAll() returns null.", "Error", JOptionPane.ERROR_MESSAGE);
+		    return;
+		}
+		for(Person p : personList){
+			personModel.addPerson(p);
+		}	
 	}
 	
 	public void goToCreate(){
@@ -96,6 +157,45 @@ public class PersonOverview extends JPanel{
 		revalidate();
 		repaint();
 		add(cp);
+	}
+	
+	public void goToShow(Person p){
+		ShowPerson sp = new ShowPerson(p, personService, addressService, donationService, this);
+		removeAll();
+		revalidate();
+		repaint();
+		add(sp);
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		if(e.getClickCount() == 2){
+			goToShow(personModel.getPersonRow(showTable.getSelectedRow()));
+		}
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

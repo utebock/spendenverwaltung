@@ -29,7 +29,7 @@ public class DeletePerson extends JPanel{
 	private ButtonListener buttonListener;
 	private JPanel panel;
 	private JTable deleteTable;
-	private DeleteTableModel deleteModel;
+	private PersonTableModel deleteModel;
 	private JScrollPane pane;
 	private List<Person> list;
 	private JButton ok;
@@ -43,7 +43,7 @@ public class DeletePerson extends JPanel{
 		this.personOverview = personOverview;
 		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
-		deleteModel = new DeleteTableModel();
+		deleteModel = new PersonTableModel();
 		setUp();
 	}
 	
@@ -80,7 +80,6 @@ public class DeletePerson extends JPanel{
 	
 	private void getPersons(){
 		list = new ArrayList<Person>();
-		Vector<Object> obj;
 		
 		try{
 			list = personService.getAll();
@@ -96,18 +95,13 @@ public class DeletePerson extends JPanel{
 		    return;
 		}
 		for(Person p : list){
-			obj = new Vector<Object>();
-			obj.add(p.getId());
-			obj.add(p.getGivenName());
-			obj.add(p.getSurname());
-			obj.add(p.getMainAddress().getStreet());
-			deleteModel.addRow(obj);
+			deleteModel.addPerson(p);
 			deleteTable.revalidate();
 		}	
 	}
 	public void removeRow(){
 		int row = deleteTable.getSelectedRow();
-		deleteModel.removeRow(row);
+		deleteModel.removePerson(row);
 	}
 	
 	public void deletePersonFromDb(){
@@ -142,7 +136,7 @@ public class DeletePerson extends JPanel{
 				return;
 			}
 				
-			deleteModel.removeRow(row);
+			deleteModel.removePerson(row);
 			JOptionPane.showMessageDialog(this, "Person wurde geloescht", "Information", JOptionPane.INFORMATION_MESSAGE);
 			
 		}
