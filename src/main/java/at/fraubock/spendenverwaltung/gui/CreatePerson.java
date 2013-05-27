@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -86,6 +87,8 @@ public class CreatePerson extends JPanel{
 	
 	private Person p = new Person();
 	private Address addr = new Address();
+	private JSeparator separator;
+	private JPanel donationPanel;
 	
 	public CreatePerson(IPersonService personService, IAddressService addressService, PersonOverview personOverview){
 		super(new MigLayout());
@@ -97,17 +100,12 @@ public class CreatePerson extends JPanel{
 		actionHandler = new ActionHandler(this);
 		builder = new ComponentBuilder();
 		
-		panel = builder.createPanel(800,800);
+		panel = builder.createPanel(800,500);
 		this.add(panel);
 		
 		setUpCreate();
-		setUpDonation();
 	}
 
-	private void setUpDonation() {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@SuppressWarnings("unchecked")
 	private void setUpCreate() {
@@ -128,89 +126,95 @@ public class CreatePerson extends JPanel{
 		String[] titleCombo = new String[]{"-", "BA", "BSc", "DI", "Dr.", "Ing.", "MA", "Mag.", "MSc.", "Prof."};
 		titleBox = builder.createComboBox(titleCombo, actionHandler, "titleCombo");
 		panel.add(title);
-		panel.add(titleBox);
+		panel.add(titleBox, "wrap");
 		
 		company = builder.createLabel("Firma: ");
-		companyField = builder.createTextField(50);
-		panel.add(company, "gap 150");
-		panel.add(companyField, "wrap");
+		companyField = builder.createTextField(150);
+		panel.add(company);
+		panel.add(companyField, "wrap, growx");
 		
 		given_name = builder.createLabel("Vorname: ");
-		givenField = builder.createTextField(30);
+		givenField = builder.createTextField(150);
 		panel.add(given_name);
-		panel.add(givenField);
+		panel.add(givenField, "wrap, growx");
 		
 		surname = builder.createLabel("Nachname: ");
-		surnameField = builder.createTextField(50);
-		panel.add(surname, "gap 150");
-		panel.add(surnameField, "wrap");
+		surnameField = builder.createTextField(150);
+		panel.add(surname);
+		panel.add(surnameField, "wrap, growx");
 		
 		telephone = builder.createLabel("Telephon: ");
-		telephoneField = builder.createTextField(30);
+		telephoneField = builder.createTextField(150);
 		panel.add(telephone);
-		panel.add(telephoneField);
+		panel.add(telephoneField, "wrap, growx");
 		
 		mail = builder.createLabel("E-Mail: ");
-		mailField = builder.createTextField(50);
-		panel.add(mail, "gap 150");
-		panel.add(mailField, "wrap");
+		mailField = builder.createTextField(150);
+		panel.add(mail);
+		panel.add(mailField, "wrap, growx");
 		
-		street = builder.createLabel("Strasse: ");
-		streetField = builder.createTextField(30);
+		street = builder.createLabel("Stra\u00DFe: ");
+		streetField = builder.createTextField(150);
 		panel.add(street);
-		panel.add(streetField);
+		panel.add(streetField, "wrap, growx");
 		
 		postal = builder.createLabel("PLZ: ");
-		postalField = builder.createTextField(30);
-		panel.add(postal, "gap 150");
-		panel.add(postalField, "wrap");
+		postalField = builder.createTextField(10);
+		panel.add(postal);
+		panel.add(postalField, "wrap, growx");
 		
 		city = builder.createLabel("Ort: ");
-		cityField = builder.createTextField(30);
+		cityField = builder.createTextField(150);
 		panel.add(city);
-		panel.add(cityField);
+		panel.add(cityField, "wrap, growx");
 		
 		country = builder.createLabel("Land: ");
-		countryField = builder.createTextField(50);
-		panel.add(country, "gap 150");
-		panel.add(countryField, "wrap");
+		countryField = builder.createTextField(150);
+		panel.add(country);
+		panel.add(countryField, "wrap, growx");
 		
 		notifyType = builder.createLabel("Notification Type: ");
 		notifyMail = builder.createRadioButton("E-Mail", actionHandler, "notifyMail");
 		notifyPost = builder.createRadioButton("Post", actionHandler, "notifyPost");
 
 		panel.add(notifyType);
-		panel.add(notifyMail);
-		panel.add(notifyPost, "split 2");
+		panel.add(notifyMail, "split 2");
+		panel.add(notifyPost, "wrap");
 		
 		note = builder.createLabel("Notiz: ");
-		noteArea = builder.createTextArea(5, 20);
-		panel.add(note, "gap 90");
-		panel.add(noteArea, "wrap");
-		
+		noteArea = builder.createTextArea(5, 5);
+		panel.add(note);
+		panel.add(noteArea, "wrap, growx");
+		panel.add(empty, "wrap");
+
 /**
 * Next section
 */
-		panel.add(empty,"wrap");
+		
+		separator = builder.createSeparator();
+		this.add(separator, "wrap, growx");
+		
+		donationPanel = builder.createPanel(800, 450);
+		this.add(donationPanel);
 		
 		addDonation = builder.createLabel("Neue Spende anlegen");
 		addDonation.setFont(new Font("Headline", Font.PLAIN, 14));
-		panel.add(addDonation, "wrap");
+		donationPanel.add(addDonation, "wrap");
 		
 		String[] donationString = new String[]{"\u00DCberweisung", "Veranstaltung", "Online-Shop"};
 		donationCombo = builder.createComboBox(donationString, actionHandler, "donationCombo");
 		donation = builder.createLabel("Spende durch: ");
-		panel.add(donation);
-		panel.add(donationCombo);
-		amount = builder.createTextField(10);
-		panel.add(amount, "wrap");
+		donationPanel.add(donation);
+		donationPanel.add(donationCombo, "split 2");
+		amount = builder.createTextField(30);
+		donationPanel.add(amount, "wrap, growx");
 		
-		panel.add(empty, "wrap");
+		donationPanel.add(empty, "wrap");
 		
 		ok = builder.createButton("Anlegen", buttonListener, "create_person_in_db");
-		panel.add(ok);
+		donationPanel.add(ok, "split 2");
 		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_person_in_db");
-		panel.add(cancel, "split 2, wrap");
+		donationPanel.add(cancel, "wrap");
 	}
 	
 	public void createPersonInDb(){
