@@ -33,6 +33,7 @@ public class AbstractMailingDAOTest {
 	protected static IAddressDAO addressDAO;
 	protected static IMailingDAO mailingDAO;
 	
+	
 	@Test(expected = IllegalArgumentException.class)
 	@Transactional
 	public void createWithNullParameter_ThrowsException() {

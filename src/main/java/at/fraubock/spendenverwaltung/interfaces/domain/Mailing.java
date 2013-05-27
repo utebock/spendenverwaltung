@@ -17,10 +17,17 @@ public class Mailing {
 	
 	//TODO: private SomeType template;
 	
+	/**
+	 * @param person the person to add to persons
+	 * @Precondition person has been validated prior
+	 */
 	public void addPerson(Person person) {
 		persons.add(person);
 	}
 	
+	/**
+	 * @param person the person to remove from persons
+	 */
 	public void removePerson(Person person) {
 		persons.remove(person);
 	}
