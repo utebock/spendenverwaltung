@@ -85,7 +85,7 @@ public class Overview extends JPanel{
 		general.setFont(new Font("Headline", Font.PLAIN, 14));
 		personsPanel.add(general, "wrap");
 		//personsPanel.add(empty, "wrap");
-		person = builder.createImageButton("/images/persons.gif", buttonListener, "person_overview");
+		person = builder.createImageButton("/images/persons.jpeg", buttonListener, "person_overview");
 		personsPanel.add(person);
 		
 		filter = builder.createImageButton("/images/template.jpg", buttonListener, "filter_overview");
