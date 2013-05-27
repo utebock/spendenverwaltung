@@ -58,8 +58,7 @@ public abstract class AbstractDonationServiceTest {
 	@Transactional
 	public void createWithNullParameterShouldThrowException() {
 		try {
-			when(donationDAO.create(null)).thenThrow(
-					new IllegalArgumentException());
+			doThrow(new IllegalArgumentException()).when(donationDAO).insertOrUpdate(null);
 			
 			donationService.create(null);
 		} catch (ServiceException e) {
@@ -73,10 +72,9 @@ public abstract class AbstractDonationServiceTest {
 	@Transactional
 	public void createWithValidParameterShouldReturnDonation() {
 		try {
-			when(donationDAO.create(donation)).thenReturn(donationCreated);
-
 			Donation returned = donationService.create(donation);
 			assert (returned.equals(donationCreated));
+			verify(donationDAO).insertOrUpdate(donation);
 		} catch (ServiceException e) {
 			fail();
 		} catch (PersistenceException e) {
@@ -92,8 +90,7 @@ public abstract class AbstractDonationServiceTest {
 	@Transactional
 	public void updateWithNullParameterShouldThrowException() {
 		try {
-			when(donationDAO.update(null)).thenThrow(
-					new IllegalArgumentException());
+			doThrow(new IllegalArgumentException()).when(donationDAO).insertOrUpdate(null);
 			
 			donationService.update(null);
 		} catch (ServiceException e) {
@@ -107,8 +104,7 @@ public abstract class AbstractDonationServiceTest {
 	@Transactional
 	public void updateWithInvalidParameterShouldThrowException() {
 		try {
-			when(donationDAO.update(nullDonation)).thenThrow(
-					new IllegalArgumentException());
+			doThrow(new IllegalArgumentException()).when(donationDAO).insertOrUpdate(nullDonation);
 
 			donationService.update(nullDonation);
 		} catch (ServiceException e) {
@@ -122,11 +118,9 @@ public abstract class AbstractDonationServiceTest {
 	@Transactional
 	public void updateWithValidParametersShouldReturnUpdatedDonation() {
 		try {
-			when(donationDAO.update(donationCreated)).thenReturn(
-					donationCreated);
-
 			Donation returned = donationService.update(donationCreated);
 			assert (returned.equals(donationCreated));
+			verify(donationDAO).insertOrUpdate(donationCreated);
 		} catch (ServiceException e) {
 			fail();
 		} catch (PersistenceException e) {
@@ -243,7 +237,7 @@ public abstract class AbstractDonationServiceTest {
 	protected static void init() throws PersistenceException {
 		testAddress = new Address();
 		testAddress.setStreet("Teststreet 1/1");
-		testAddress.setPostalCode(00000);
+		testAddress.setPostalCode("00000");
 		testAddress.setCity("Testcity");
 		testAddress.setCountry("Testcountry");
 		
@@ -252,54 +246,54 @@ public abstract class AbstractDonationServiceTest {
 		listTest.add(testAddress);
 		
 		person = new Person();
-		person.setSalutation(Person.Salutation.HERR);
+		person.setSex(Person.Sex.MALE);
 		person.setCompany("IBM");
 		person.setTitle("Prof. Dr.");
 		person.setGivenName("Test");
 		person.setSurname("Test");
 		person.setEmail("test@test.at");
 		person.setTelephone("01234567889");
-		person.setNotificationType(Person.NotificationType.MAIL);
+		person.setEmailNotification(true);
 		person.setNote("");
 		//person.setAddresses(listTest);
 		//person.setMailingAddress(testAddress);
 		
 		person2 = new Person();
-		person2.setSalutation(Person.Salutation.HERR);
+		person2.setSex(Person.Sex.MALE);
 		person2.setCompany("IBM");
 		person2.setTitle("Prof. Dr.");
 		person2.setGivenName("Test2");
 		person2.setSurname("Test2");
 		person2.setEmail("test2@test2.at");
 		person2.setTelephone("02234567889");
-		person2.setNotificationType(Person.NotificationType.MAIL);
+		person2.setEmailNotification(true);
 		person2.setNote("");
 		//person2.setAddresses(listTest2);
 		//person2.setMailingAddress(testAddress2);
 		
 		person3 = new Person();
-		person3.setSalutation(Person.Salutation.HERR);
+		person3.setSex(Person.Sex.MALE);
 		person3.setCompany("asfd");
 		person3.setTitle("b");
 		person3.setGivenName("dfdasd");
 		person3.setSurname("ffff");
 		person3.setEmail("test2@ff.at");
 		person3.setTelephone("111");
-		person3.setNotificationType(Person.NotificationType.MAIL);
+		person2.setEmailNotification(true);
 		person3.setNote("");
 		//person2.setAddresses(listTest2);
 		//person2.setMailingAddress(testAddress2);
 		
 		donation = new Donation();
-		donation.setAmount(100);
+		donation.setAmount(new Long(100));
 		donation.setDate(new Date());
 		donation.setDedication("test");
 		donation.setNote("test");
 		donation.setDonator(person);
-		donation.setType(Donation.DonationType.BANKING);
+		donation.setType(Donation.DonationType.BANK_TRANSFER);
 		
 		donation2 = new Donation();
-		donation2.setAmount(200);
+		donation2.setAmount(new Long(200));
 		donation2.setDate(new Date());
 		donation2.setDedication("test2");
 		donation2.setNote("test2");
@@ -307,12 +301,12 @@ public abstract class AbstractDonationServiceTest {
 		donation2.setType(Donation.DonationType.SMS);
 		
 		donation3 = new Donation();
-		donation3.setAmount(300);
+		donation3.setAmount(new Long(300));
 		donation3.setDate(new Date());
 		donation3.setDedication("test3");
 		donation3.setNote("test3");
 		donation3.setDonator(person3);
-		donation3.setType(Donation.DonationType.SHOP);
+		donation3.setType(Donation.DonationType.MERCHANDISE);
 		
 		donationCreated = donation;
 		donationCreated.setId(1);
