@@ -51,19 +51,19 @@ public class PersonOverview extends JPanel{
 		
 		panel = builder.createPanel(800,800);
 		this.add(panel);
-		create = builder.createImageButton("/images/template.jpg", buttonListener, "create_person");
+		create = builder.createImageButton("/images/createPerson.jpg", buttonListener, "create_person");
 		panel.add(create);
 		
-		edit = builder.createImageButton("/images/template.jpg", buttonListener, "edit_person");
+		edit = builder.createImageButton("/images/editPerson.jpg", buttonListener, "edit_person");
 		panel.add(edit, "gap 30");
 		
-		delete = builder.createImageButton("/images/template.jpg", buttonListener, "delete_person");
+		delete = builder.createImageButton("/images/deletePerson.jpg", buttonListener, "delete_person");
 		panel.add(delete, "gap 30");
 		
-		show = builder.createImageButton("/images/template.jpg", buttonListener, "show_person");
+		show = builder.createImageButton("/images/showPersons.jpg", buttonListener, "show_person");
 		panel.add(show, "gap 30");
 		
-		search = builder.createImageButton("/images/template.jpg", buttonListener, "search_person");
+		search = builder.createImageButton("/images/getPersons.jpg", buttonListener, "search_person");
 		panel.add(search, "gap 30, wrap");
 		
 		createLabel = builder.createLabel("Person anlegen");
