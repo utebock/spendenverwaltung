@@ -85,11 +85,11 @@ public class Overview extends JPanel{
 		general.setFont(new Font("Headline", Font.PLAIN, 14));
 		personsPanel.add(general, "wrap");
 		//personsPanel.add(empty, "wrap");
-		person = builder.createImageButton("/images/persons.gif", buttonListener, "person_overview");
+		person = builder.createImageButton("/images/persons.jpeg", buttonListener, "person_overview");
 		personsPanel.add(person);
 		
-		filter = builder.createImageButton("/images/template.jpg", buttonListener, "filter_overview");
-		personsPanel.add(filter, "wrap, gap 25");
+		filter = builder.createImageButton("/images/filter.jpg", buttonListener, "filter_overview");
+		personsPanel.add(filter, "wrap, gap 35");
 		//button labels
 		persons = builder.createLabel("Personen");
 		personsPanel.add(persons, "gap 22");
@@ -110,15 +110,15 @@ public class Overview extends JPanel{
 		donationImport.setFont(new Font("Headline", Font.PLAIN, 14));
 		importPanel.add(donationImport, "wrap");
 		//importPanel.add(empty, "wrap");
-		imports = builder.createImageButton("/images/template.jpg", buttonListener, "donationImport_overview");
-		importPanel.add(imports);
-		validation = builder.createImageButton("/images/template.jpg", buttonListener, "donation_validation");
-		importPanel.add(validation, "wrap, gap 25");
+		imports = builder.createImageButton("/images/importOverview.jpg", buttonListener, "donationImport_overview");
+		importPanel.add(imports, "split 2");
+		validation = builder.createImageButton("/images/importValidate.jpg", buttonListener, "donation_validation");
+		importPanel.add(validation, "wrap, gap 35");
 		
 		importLabel = builder.createLabel("Importe");
-		importPanel.add(importLabel, "gap 22");
+		importPanel.add(importLabel, "split 2, gap 22");
 		validationLabel = builder.createLabel("Validierung");
-		importPanel.add(validationLabel, "wrap, gap 45");
+		importPanel.add(validationLabel, "wrap, gap 65");
 		
 		importSeparator = builder.createSeparator();
 		this.add(importSeparator, "wrap, growx");
@@ -135,14 +135,14 @@ public class Overview extends JPanel{
 		confirmPanel.add(confirm, "wrap");
 		//importPanel.add(empty, "wrap");
 		createConfirm = builder.createImageButton("/images/template.jpg", buttonListener, "create_donation_confirmation");
-		confirmPanel.add(createConfirm);
+		confirmPanel.add(createConfirm, "split 2");
 		obtainConfirm = builder.createImageButton("/images/template.jpg", buttonListener, "obtain_donation_confirmation");
 		confirmPanel.add(obtainConfirm, "wrap, gap 35");
 		
 		createConfirmLabel = builder.createLabel("<html><center>Best\u00E4tigung <br> erstellen</html>");
-		confirmPanel.add(createConfirmLabel);
+		confirmPanel.add(createConfirmLabel, "split 2");
 		obtainConfirmLabel = builder.createLabel("<html><center>Best\u00E4tigung <br>abrufen</html>");
-		confirmPanel.add(obtainConfirmLabel, "wrap, gap 35");
+		confirmPanel.add(obtainConfirmLabel, "wrap, gap 65");
 		
 		confirmSeparator = builder.createSeparator();
 		this.add(confirmSeparator, "wrap, growx");
@@ -159,20 +159,20 @@ public class Overview extends JPanel{
 		sendPanel.add(sending, "wrap");
 		//importPanel.add(empty, "wrap");
 		eSending = builder.createImageButton("/images/template.jpg", buttonListener, "create_eSending");
-		sendPanel.add(eSending);
+		sendPanel.add(eSending, "split 2");
 		postalSending = builder.createImageButton("/images/template.jpg", buttonListener, "obtain_postalSending");
 		sendPanel.add(postalSending, "gap 35");
 		showSendings = builder.createImageButton("/images/template.jpg", buttonListener, "show_sendings");
 		sendPanel.add(showSendings, "gap 35");
-		confirmSendings = builder.createImageButton("/images/template.jpg", buttonListener, "confirm_sendings");
+		confirmSendings = builder.createImageButton("/images/confirmSendings.jpg", buttonListener, "confirm_sendings");
 		sendPanel.add(confirmSendings, "gap 35");
 		deleteSendings = builder.createImageButton("/images/template.jpg", buttonListener, "delete_sendings");
 		sendPanel.add(deleteSendings, "wrap, gap 35");
 		
 		eSendingLabel = builder.createLabel("<html><center>E-Aussendung<br>erstellen");
-		sendPanel.add(eSendingLabel);
+		sendPanel.add(eSendingLabel, "split 2");
 		postalSendingLabel = builder.createLabel("<html><center>Briefaussendung<br>erstellen</html>");
-		sendPanel.add(postalSendingLabel, "gap 35");
+		sendPanel.add(postalSendingLabel, "gap 30");
 		
 		showSendingsLabel = builder.createLabel("<html><center>Aussendungen<br>anzeigen");
 		sendPanel.add(showSendingsLabel, "gap 35");
@@ -208,7 +208,7 @@ public class Overview extends JPanel{
 		statsSendingsLabel = builder.createLabel("Aussendungen");
 		statsPanel.add(statsSendingsLabel, "gap 35");
 		statsPersonsLabel = builder.createLabel("Personen");
-		statsPanel.add(statsPersonsLabel, "gap 35");
+		statsPanel.add(statsPersonsLabel, "gap 45");
 	}
 	
 	public void goToPersons(){
