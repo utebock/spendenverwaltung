@@ -1,6 +1,5 @@
 package at.fraubock.spendenverwaltung.interfaces.domain;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Person {
