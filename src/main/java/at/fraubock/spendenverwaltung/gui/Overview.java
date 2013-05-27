@@ -112,7 +112,7 @@ public class Overview extends JPanel{
 		//importPanel.add(empty, "wrap");
 		imports = builder.createImageButton("/images/importOverview.jpg", buttonListener, "donationImport_overview");
 		importPanel.add(imports, "split 2");
-		validation = builder.createImageButton("/images/template.jpg", buttonListener, "donation_validation");
+		validation = builder.createImageButton("/images/importValidate.jpg", buttonListener, "donation_validation");
 		importPanel.add(validation, "wrap, gap 35");
 		
 		importLabel = builder.createLabel("Importe");
@@ -164,7 +164,7 @@ public class Overview extends JPanel{
 		sendPanel.add(postalSending, "gap 35");
 		showSendings = builder.createImageButton("/images/template.jpg", buttonListener, "show_sendings");
 		sendPanel.add(showSendings, "gap 35");
-		confirmSendings = builder.createImageButton("/images/template.jpg", buttonListener, "confirm_sendings");
+		confirmSendings = builder.createImageButton("/images/confirmSendings.jpg", buttonListener, "confirm_sendings");
 		sendPanel.add(confirmSendings, "gap 35");
 		deleteSendings = builder.createImageButton("/images/template.jpg", buttonListener, "delete_sendings");
 		sendPanel.add(deleteSendings, "wrap, gap 35");
@@ -208,7 +208,7 @@ public class Overview extends JPanel{
 		statsSendingsLabel = builder.createLabel("Aussendungen");
 		statsPanel.add(statsSendingsLabel, "gap 35");
 		statsPersonsLabel = builder.createLabel("Personen");
-		statsPanel.add(statsPersonsLabel, "gap 35");
+		statsPanel.add(statsPersonsLabel, "gap 45");
 	}
 	
 	public void goToPersons(){
