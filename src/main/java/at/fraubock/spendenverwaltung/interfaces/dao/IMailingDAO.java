@@ -66,7 +66,8 @@ public interface IMailingDAO {
 	 *            the person to retrieve the main mailing from, must have been
 	 *            persisted or retrieved using an {@link IPersonDAO} prior to
 	 *            calling this method
-	 * @return all mailings that have been sent to the specified person
+	 * @return all mailings that have been sent to the specified person or null
+	 * 			if no mailings were found
 	 * 
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed

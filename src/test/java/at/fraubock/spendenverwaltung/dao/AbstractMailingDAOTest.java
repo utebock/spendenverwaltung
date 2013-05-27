@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
+import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
@@ -33,6 +34,35 @@ public class AbstractMailingDAOTest {
 	protected static IAddressDAO addressDAO;
 	protected static IMailingDAO mailingDAO;
 	
+	/**
+	 * defining some valid and invalid entities
+	 */
+	protected static Address validAddressOne = new Address();
+	protected static Address validAddressTwo = new Address();
+	protected static Address validAddressThree = new Address();
+	
+	protected static Address invalidAddressOne = new Address();
+
+	protected static Person validPersonOne = new Person();
+	protected static Person validPersonTwo_hasNoEmail = new Person();
+	protected static Person validPersonThree_hasNoPostalAddress = new Person();
+	
+	protected static Person invalidPersonOne = new Person();
+	
+	//mailing instance used by tests
+	protected static Mailing mailing = new Mailing();
+	
+	public static void setAddressDAO(IAddressDAO addressDAO) {
+		AbstractMailingDAOTest.addressDAO = addressDAO;
+	}
+	
+	public static void setPersonDAO(IPersonDAO personDAO) {
+		AbstractMailingDAOTest.personDAO = personDAO;
+	}
+	
+	public static void setMailingDAO(IMailingDAO MailingDAO) {
+		AbstractMailingDAOTest.mailingDAO = MailingDAO;
+	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	@Transactional
@@ -57,6 +87,81 @@ public class AbstractMailingDAOTest {
 		}
 	}
 	
+	@Test
+	@Transactional
+	public void createWithValidParameters() {
+		
+	}
 	
-
+	@Test
+	@Transactional
+	public void updateWithValidParameters() {
+		
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	@Transactional
+	public void createWithInvalidParameters_ThrowsException() {
+		
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	@Transactional
+	public void updateWithInvalidParameters_ThrowsException() {
+		
+	}
+	
+	@Test
+	@Transactional
+	public void getAll_shouldReturnList() {
+		
+	}
+	
+	@Test
+	@Transactional
+	public void getAll_shouldReturnEmptyList() {
+		
+	}
+	
+	@Test
+	@Transactional
+	public void findByValidId() {
+		
+	}
+	
+	@Transactional
+	public void findByInvalidId_shouldReturnNull() {
+		
+	}
+	
+	@Test
+	@Transactional
+	public void deleteWithValidId() {
+		
+	}
+	
+	@Transactional
+	public void deleteWithInvalidId_shouldReturnNull() {
+		
+	}
+	
+	@Test
+	@Transactional	
+	public void getMailingsByValidPerson() {
+		
+	}
+	
+	@Test
+	@Transactional	
+	public void getMailingsByValidPersonWithNoMailings_shouldReturnNull() {
+		
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	@Transactional	
+	public void getMailingsByInvalidPerson_throwsException() {
+		
+	}
+	
+	
 }

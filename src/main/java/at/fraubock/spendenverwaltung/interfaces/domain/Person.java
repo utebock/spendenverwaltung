@@ -40,7 +40,7 @@ public class Person {
 	private String company;
 	private String givenName;
 	private String surname;
-	private List<Address> addresses = new ArrayList<Address>();
+	private List<Address> addresses;
 	private Address mainAddress;
 	private String email;
 	private String telephone;

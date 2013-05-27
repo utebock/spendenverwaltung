@@ -89,7 +89,7 @@ public class Overview extends JPanel{
 		personsPanel.add(person);
 		
 		filter = builder.createImageButton("/images/template.jpg", buttonListener, "filter_overview");
-		personsPanel.add(filter, "wrap, gap 25");
+		personsPanel.add(filter, "wrap, gap 35");
 		//button labels
 		persons = builder.createLabel("Personen");
 		personsPanel.add(persons, "gap 22");
@@ -137,7 +137,7 @@ public class Overview extends JPanel{
 		createConfirm = builder.createImageButton("/images/template.jpg", buttonListener, "create_donation_confirmation");
 		confirmPanel.add(createConfirm);
 		obtainConfirm = builder.createImageButton("/images/template.jpg", buttonListener, "obtain_donation_confirmation");
-		confirmPanel.add(obtainConfirm, "wrap, gap 35");
+		confirmPanel.add(obtainConfirm, "wrap");
 		
 		createConfirmLabel = builder.createLabel("<html><center>Best\u00E4tigung <br> erstellen</html>");
 		confirmPanel.add(createConfirmLabel);
