@@ -96,7 +96,7 @@ public class DonationDAOImplemented implements IDonationDAO {
 			String updateStatement = "update donations set personid = ?, amount = ?, donationdate = ?, dedication = ?, type = ?, note = ? where id = ?";
 
 			Object[] params = new Object[] { d.getDonator().getId(),
-					d.getAmount(), d.getDate().getTime(), d.getDedication(),
+					d.getAmount(), d.getDate(), d.getDedication(),
 					d.getType().getName(), d.getNote(), d.getId() };
 
 			int[] types = new int[] { Types.INTEGER, Types.BIGINT,

@@ -3,11 +3,15 @@ package at.fraubock.spendenverwaltung.gui;
 import java.util.Date;
 import java.util.Vector;
 
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
+import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 
 public class DonationTableModel extends AbstractTableModel{
 
@@ -15,7 +19,14 @@ public class DonationTableModel extends AbstractTableModel{
 	
 	private String[] columnNames = new String[]{"Id", "Betrag", "Datum", "Widmung", "Typ", "Notiz"};
 	private Vector<Donation> donations = new Vector<Donation>();
+	private IDonationService donationService;
+	private JPanel parent;
 
+	public DonationTableModel(JPanel parent, IDonationService donationService){
+		this.parent = parent;
+		this.donationService = donationService;
+	}
+	
 	public void addDonation (Donation donation){
 		donations.add(donation);
 	}
@@ -49,6 +60,37 @@ public class DonationTableModel extends AbstractTableModel{
 		}
 	}
 	
+    public void setValueAt(Object value, int rowIndex, int columnIndex) {
+        Donation updateDonation = donations.get(rowIndex);
+        
+        switch(columnIndex){
+        	case 0: return;
+        	case 1: updateDonation.setAmount((Long) value);
+        			break;
+        	case 2: updateDonation.setDate((Date) value);
+					break;
+        	case 3: updateDonation.setDedication((String) value);
+					break;
+        	case 4: updateDonation.setType((Donation.DonationType) value);
+					break;
+        	case 5: updateDonation.setNote((String) value);
+					break;
+        }
+        
+			try {
+				updateDonation = donationService.update(updateDonation);
+			} catch (ServiceException e) {
+				JOptionPane.showMessageDialog(parent, "Updating Donation failed", "Error", JOptionPane.ERROR_MESSAGE);
+		        e.printStackTrace();
+		        return;
+			}
+		
+		JOptionPane.showMessageDialog(parent, "Successfully updated donation", "Information", JOptionPane.INFORMATION_MESSAGE);
+	    
+		donations.set(rowIndex, updateDonation);
+        fireTableCellUpdated(rowIndex, columnIndex);
+    }
+	
 	public Class<?> getColumnClass(int col) {
 		
 		switch (col) {
@@ -80,7 +122,10 @@ public class DonationTableModel extends AbstractTableModel{
 
 	@Override
 	public boolean isCellEditable(int row, int col) {
-		return false;
+		switch(col){
+			case 0: return false;
+			default: return true;
+		}
 	}
 }
 
