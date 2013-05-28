@@ -15,11 +15,13 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
+import at.fraubock.spendenverwaltung.interfaces.dao.IFilterDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -37,6 +39,7 @@ public class AbstractMailingDAOTest {
 	protected static IPersonDAO personDAO;
 	protected static IAddressDAO addressDAO;
 	protected static IMailingDAO mailingDAO;
+	protected static IFilterDAO filterDAO;
 	
 	/**
 	 * defining some valid and invalid entities
@@ -52,6 +55,10 @@ public class AbstractMailingDAOTest {
 	//mailing instance used by tests
 	protected static Mailing mailing = new Mailing();
 	
+	protected static Filter filterOnePerson = new Filter();
+	protected static Filter filterTwoPeople = new Filter();
+	protected static Filter filterNoPeople = new Filter();
+	
 	public static void setAddressDAO(IAddressDAO addressDAO) {
 		AbstractMailingDAOTest.addressDAO = addressDAO;
 	}
@@ -62,6 +69,10 @@ public class AbstractMailingDAOTest {
 	
 	public static void setMailingDAO(IMailingDAO MailingDAO) {
 		AbstractMailingDAOTest.mailingDAO = MailingDAO;
+	}
+	
+	public static void setFilterDAO(IFilterDAO bean) {
+		AbstractMailingDAOTest.filterDAO = filterDAO;
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
@@ -93,8 +104,8 @@ public class AbstractMailingDAOTest {
 
 		mailing = new Mailing();
 		mailing.setMedium(Mailing.Medium.EMAIL);
-		mailing.setType("Dankesschreiben");
-		//TODO: mailing.setPersonFilter
+		mailing.setType(Mailing.MailingType.DANKESBRIEF);
+		mailing.setFilter(filterOnePerson);
 		
 		Date currentDate = new Date(System.currentTimeMillis());
 		
@@ -110,6 +121,34 @@ public class AbstractMailingDAOTest {
 			Mailing result = mailingDAO.getById(mailing.getId());
 			
 			assertEquals(result, mailing);
+		
+			//TODO getMailingByPerson call to check if the right
+			// people got the right mails
+		} catch (PersistenceException e) {
+			fail();
+		}
+		
+		mailing = new Mailing();
+		mailing.setMedium(Mailing.Medium.POSTAL);
+		mailing.setType(Mailing.MailingType.DANKESBRIEF);
+		mailing.setFilter(filterTwoPeople);
+		
+		currentDate = new Date(System.currentTimeMillis());
+		mailing.setDate(currentDate);
+				
+		try {
+			mailingDAO.insertOrUpdate(mailing);
+		} catch (PersistenceException e) {
+			fail();
+		}
+		
+		try {
+			Mailing result = mailingDAO.getById(mailing.getId());
+			
+			assertEquals(result, mailing);
+			
+			//TODO getMailingByPerson call to check if the right
+			// people got the right mails
 		} catch (PersistenceException e) {
 			fail();
 		}
@@ -120,7 +159,7 @@ public class AbstractMailingDAOTest {
 	public void updateWithValidParameters() {
 		mailing = new Mailing();
 		mailing.setMedium(Mailing.Medium.EMAIL);
-		mailing.setType("Tippfehler");
+		mailing.setType(Mailing.MailingType.DANKESBRIEF);
 		//TODO: mailing.setPersonFilter
 
 		
@@ -134,7 +173,7 @@ public class AbstractMailingDAOTest {
 			fail();
 		}
 		
-		mailing.setType("Dankesschreiben");
+		mailing.setType(Mailing.MailingType.DAUERSPENDER_DANKESBRIEF);
 		
 		try {
 			mailingDAO.insertOrUpdate(mailing);
@@ -193,6 +232,7 @@ public class AbstractMailingDAOTest {
 		
 		try {
 			Mailing result = mailingDAO.getById(mailing.getId());
+			assertEquals(result, mailing);
 		} catch (PersistenceException e) {
 			fail();
 		}
@@ -241,6 +281,7 @@ public class AbstractMailingDAOTest {
 	
 	@Transactional
 	public void deleteWithInvalidId_shouldReturnNull() {
+		
 		
 	}
 	
@@ -294,4 +335,6 @@ public class AbstractMailingDAOTest {
 			fail();
 		}
 	}
+
+
 }
