@@ -134,9 +134,9 @@ public class Overview extends JPanel{
 		confirm.setFont(new Font("Headline", Font.PLAIN, 14));
 		confirmPanel.add(confirm, "wrap");
 		//importPanel.add(empty, "wrap");
-		createConfirm = builder.createImageButton("/images/template.jpg", buttonListener, "create_donation_confirmation");
+		createConfirm = builder.createImageButton("/images/createDonationConfirmation.jpg", buttonListener, "create_donation_confirmation");
 		confirmPanel.add(createConfirm, "split 2");
-		obtainConfirm = builder.createImageButton("/images/template.jpg", buttonListener, "obtain_donation_confirmation");
+		obtainConfirm = builder.createImageButton("/images/obtainDonationConfirmation.jpg", buttonListener, "obtain_donation_confirmation");
 		confirmPanel.add(obtainConfirm, "wrap, gap 35");
 		
 		createConfirmLabel = builder.createLabel("<html><center>Best\u00E4tigung <br> erstellen</html>");
