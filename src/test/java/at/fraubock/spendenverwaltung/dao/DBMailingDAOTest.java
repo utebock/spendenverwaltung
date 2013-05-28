@@ -32,22 +32,24 @@ public class DBMailingDAOTest extends AbstractMailingDAOTest {
 		
 		addressOne.setStreet("Nussdorferstrasse 12");
 		addressOne.setCity("Wien");
-		addressOne.setCountry("Oesterreich");
+		addressOne.setCountry("Österreich");
 		addressOne.setPostalCode("1090");
 
 		addressTwo.setStreet("Lobaustrasse 1");
 		addressTwo.setCity("Grossenzersdorf");
-		addressTwo.setCountry("Oesterreich");
+		addressTwo.setCountry("Österreich");
 		addressTwo.setPostalCode("2301");
 		
 		addressThree.setStreet("Bienerstrasse 20");
 		addressThree.setCity("Innsbruck");
-		addressThree.setCountry("Oesterreich");
+		addressThree.setCountry("Österreich");
 		addressThree.setPostalCode("6020");
 		
 		addressDAO.insertOrUpdate(addressOne);
 		addressDAO.insertOrUpdate(addressTwo);
 		addressDAO.insertOrUpdate(addressThree);
+		
+		//TODO initialize filters
 		
 		personOne.setGivenName("Ralf");
 		personOne.setSurname("Mueller");
@@ -62,7 +64,6 @@ public class DBMailingDAOTest extends AbstractMailingDAOTest {
 		daisyAddresses.add(addressTwo);
 		daisyAddresses.add(addressThree);
 
-		
 		personThree.setGivenName("Donald");
 		personThree.setEmail("donald@duckburg.net");
 		personThree.setSex(Person.Sex.MALE);

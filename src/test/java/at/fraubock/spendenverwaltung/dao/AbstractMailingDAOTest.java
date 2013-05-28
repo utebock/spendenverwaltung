@@ -1,9 +1,10 @@
 package at.fraubock.spendenverwaltung.dao;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
@@ -112,9 +113,6 @@ public class AbstractMailingDAOTest {
 		} catch (PersistenceException e) {
 			fail();
 		}
-
-		//TODO define behaviour when mailing is created without
-		//the relevant address being set, create mailing with more people
 	}
 	
 	@Test
@@ -123,6 +121,8 @@ public class AbstractMailingDAOTest {
 		mailing = new Mailing();
 		mailing.setMedium(Mailing.Medium.EMAIL);
 		mailing.setType("Tippfehler");
+		//TODO: mailing.setPersonFilter
+
 		
 		Date currentDate = new Date(System.currentTimeMillis());
 		
@@ -138,51 +138,105 @@ public class AbstractMailingDAOTest {
 		
 		try {
 			mailingDAO.insertOrUpdate(mailing);
+			
+			Mailing result = mailingDAO.getById(mailing.getId());
+
+			assertEquals(mailing, result);
 		} catch (PersistenceException e) {
 			fail();
 		}
 		
 	}
-	
-	@Test(expected = IllegalArgumentException.class)
-	@Transactional
-	public void createWithInvalidParameters_ThrowsException() {
 		
-	}
-	
-	@Test(expected = IllegalArgumentException.class)
-	@Transactional
-	public void updateWithInvalidParameters_ThrowsException() {
-		
-	}
-	
 	@Test
 	@Transactional
 	public void getAll_shouldReturnList() {
 		
+		//TODO initialize mailings with valid data
+		
+		List<Mailing> createdMailings = new ArrayList<Mailing>();
+		List<Mailing> results;
+		
+		
+		try {
+			results = mailingDAO.getAll();
+		
+			assertEquals(createdMailings, results);
+		} catch (PersistenceException e) {
+			fail();
+		}
 	}
 	
 	@Test
 	@Transactional
 	public void getAll_shouldReturnEmptyList() {
-		
+		try {
+			List<Mailing> results = mailingDAO.getAll();
+			assertTrue(results.isEmpty());
+		} catch (PersistenceException e) {
+			fail();
+		}
 	}
 	
 	@Test
 	@Transactional
 	public void findByValidId() {
+		//TODO create mailing
 		
+		Mailing initial = new Mailing();
+		
+		try {
+			mailingDAO.insertOrUpdate(initial);
+		} catch (PersistenceException e1) {
+			fail();
+		}
+		
+		try {
+			Mailing result = mailingDAO.getById(mailing.getId());
+		} catch (PersistenceException e) {
+			fail();
+		}
 	}
 	
 	@Transactional
 	public void findByInvalidId_shouldReturnNull() {
-		
+		try {
+			assertNull(mailingDAO.getById(-1));
+		} catch (PersistenceException e) {
+			fail();
+		}
 	}
 	
 	@Test
 	@Transactional
-	public void deleteWithValidId() {
+	public void deleteWithCreatedMailing() {
 		
+		//todo create valid mailing
+		
+		Mailing mailing = new Mailing();
+		Integer oldId = null;
+		
+		try {
+			mailingDAO.insertOrUpdate(mailing);
+			oldId = mailing.getId();
+		} catch (PersistenceException e) {
+			fail();
+		}
+		
+		try {
+			mailingDAO.delete(mailing);
+		} catch (PersistenceException e) {
+			fail();
+		}
+		
+		Mailing result;
+		
+		try {
+			result = mailingDAO.getById(oldId);
+			assertNull(result);
+		} catch (PersistenceException e) {
+			fail();
+		}
 	}
 	
 	@Transactional
@@ -193,20 +247,51 @@ public class AbstractMailingDAOTest {
 	@Test
 	@Transactional	
 	public void getMailingsByValidPerson() {
+		//TODO insertAndUpdate mailings with filter that would return personOne
 		
+		Mailing mailingOne = new Mailing();
+		Mailing mailingTwo = new Mailing();
+		Mailing mailingThree = new Mailing();
+		
+		List<Mailing> mailingList = new ArrayList<Mailing>();
+		mailingList.add(mailingOne);
+		mailingList.add(mailingTwo);
+		mailingList.add(mailingThree);
+		
+		try {
+			mailingDAO.insertOrUpdate(mailingOne);
+			mailingDAO.insertOrUpdate(mailingTwo);
+			mailingDAO.insertOrUpdate(mailingThree);
+		} catch (PersistenceException e1) {
+			fail();
+		}
+		
+		try {
+			List<Mailing> results = mailingDAO.getMailingsByPerson(personOne);
+			
+			assertEquals(results, mailingList);
+		} catch (PersistenceException e) {
+			fail();
+		}	
 	}
 	
 	@Test
 	@Transactional	
 	public void getMailingsByValidPersonWithNoMailings_shouldReturnNull() {
-		
+		try {
+			assertNull(mailingDAO.getMailingsByPerson(personOne));
+		} catch (PersistenceException e) {
+			fail();
+		}
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	@Transactional	
 	public void getMailingsByInvalidPerson_throwsException() {
-		
+		try {
+			mailingDAO.getMailingsByPerson(new Person());
+		} catch (PersistenceException e) {
+			fail();
+		}
 	}
-	
-	
 }
