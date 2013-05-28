@@ -30,50 +30,46 @@ public class DBMailingDAOTest extends AbstractMailingDAOTest {
 		AbstractMailingDAOTest.setMailingDAO(context.getBean("mailingDAO", IMailingDAO.class));
 		AbstractMailingDAOTest.setPersonDAO(context.getBean("personDAO", IPersonDAO.class));
 		
-		validAddressOne.setStreet("Nussdorferstrasse 12");
-		validAddressOne.setCity("Wien");
-		validAddressOne.setCountry("Oesterreich");
-		validAddressOne.setPostalCode("1090");
+		addressOne.setStreet("Nussdorferstrasse 12");
+		addressOne.setCity("Wien");
+		addressOne.setCountry("Oesterreich");
+		addressOne.setPostalCode("1090");
 
-		validAddressTwo.setStreet("Lobaustrasse 1");
-		validAddressTwo.setCity("Grossenzersdorf");
-		validAddressTwo.setCountry("Oesterreich");
-		validAddressTwo.setPostalCode("2301");
+		addressTwo.setStreet("Lobaustrasse 1");
+		addressTwo.setCity("Grossenzersdorf");
+		addressTwo.setCountry("Oesterreich");
+		addressTwo.setPostalCode("2301");
 		
-		validAddressThree.setStreet("Bienerstrasse 20");
-		validAddressThree.setCity("Innsbruck");
-		validAddressThree.setCountry("Oesterreich");
-		validAddressThree.setPostalCode("6020");
+		addressThree.setStreet("Bienerstrasse 20");
+		addressThree.setCity("Innsbruck");
+		addressThree.setCountry("Oesterreich");
+		addressThree.setPostalCode("6020");
 		
-		addressDAO.insertOrUpdate(validAddressOne);
-		addressDAO.insertOrUpdate(validAddressTwo);
-		addressDAO.insertOrUpdate(validAddressThree);
+		addressDAO.insertOrUpdate(addressOne);
+		addressDAO.insertOrUpdate(addressTwo);
+		addressDAO.insertOrUpdate(addressThree);
 		
-		validPersonOne.setGivenName("Ralf");
-		validPersonOne.setSurname("Mueller");
+		personOne.setGivenName("Ralf");
+		personOne.setSurname("Mueller");
 		List<Address> ralfAddresses = new ArrayList<Address>();
-		ralfAddresses.add(validAddressOne);
-		validPersonOne.setAddresses(ralfAddresses);
-		validPersonOne.setMainAddress(validAddressOne);
-		validPersonOne.setSex(Person.Sex.MALE);
-		validPersonOne.setEmail("ralfm1379@hotmail.com");
-		
-		validPersonTwo_hasNoEmail.setGivenName("Daisy");
-		validPersonTwo_hasNoEmail.setSurname("Duck");
+		ralfAddresses.add(addressOne);
+		personOne.setAddresses(ralfAddresses);
+		personOne.setMainAddress(addressOne);
+		personOne.setSex(Person.Sex.MALE);
+		personOne.setEmail("ralfm1379@hotmail.com");
+
 		List<Address> daisyAddresses = new ArrayList<Address>();
-		daisyAddresses.add(validAddressTwo);
-		daisyAddresses.add(validAddressThree);
-		validPersonTwo_hasNoEmail.setAddresses(daisyAddresses);
-		validPersonTwo_hasNoEmail.setMainAddress(validAddressTwo);
-		validPersonTwo_hasNoEmail.setSex(Person.Sex.FEMALE);
+		daisyAddresses.add(addressTwo);
+		daisyAddresses.add(addressThree);
+
 		
-		validPersonThree_hasNoPostalAddress.setGivenName("Donald");
-		validPersonThree_hasNoPostalAddress.setEmail("donald@duckburg.net");
-		validPersonThree_hasNoPostalAddress.setSex(Person.Sex.MALE);
+		personThree.setGivenName("Donald");
+		personThree.setEmail("donald@duckburg.net");
+		personThree.setSex(Person.Sex.MALE);
 		
-		personDAO.insertOrUpdate(validPersonOne);
-		personDAO.insertOrUpdate(validPersonTwo_hasNoEmail);
-		personDAO.insertOrUpdate(validPersonThree_hasNoPostalAddress);
+		personDAO.insertOrUpdate(personOne);
+		personDAO.insertOrUpdate(personTwo);
+		personDAO.insertOrUpdate(personThree);
 	}
 	
 	/**
@@ -82,12 +78,12 @@ public class DBMailingDAOTest extends AbstractMailingDAOTest {
 	 */
 	@AfterClass 
 	static void deleteData() throws PersistenceException {
-		personDAO.delete(validPersonOne);
-		personDAO.delete(validPersonTwo_hasNoEmail);
-		personDAO.delete(validPersonThree_hasNoPostalAddress);
+		personDAO.delete(personOne);
+		personDAO.delete(personTwo);
+		personDAO.delete(personThree);
 		
-		addressDAO.delete(validAddressOne);
-		addressDAO.delete(validAddressTwo);
-		addressDAO.delete(validAddressThree);
+		addressDAO.delete(addressOne);
+		addressDAO.delete(addressTwo);
+		addressDAO.delete(addressThree);
 	}
 }

@@ -1,39 +1,21 @@
 package at.fraubock.spendenverwaltung.interfaces.domain;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 
 public class Mailing {
 	
-	public static enum Medium {
-		EMAIL, POSTAL
-	}
+	private Integer id;
 	
-	private List<Person> persons = new ArrayList<Person>();
+	private Filter personFilter;
 	
-	//TODO:enum possible for type?
 	private String type;
 	private Medium medium;
 	
-	//TODO: private SomeType template;
+	private Date date;
 	
-	/**
-	 * @param person the person to add to persons
-	 * @Precondition person has been validated prior
-	 */
-	public void addPerson(Person person) {
-		persons.add(person);
-	}
-	
-	/**
-	 * @param person the person to remove from persons
-	 */
-	public void removePerson(Person person) {
-		persons.remove(person);
-	}
-	
-	public List<Person> getPersons() {
-		return persons;
+	public static enum Medium {
+		EMAIL, POSTAL
 	}
 
 	public String getType() {
@@ -50,5 +32,29 @@ public class Mailing {
 
 	public void setMedium(Medium medium) {
 		this.medium = medium;
+	}
+	
+	public Filter getFilter() {
+		return personFilter;
+	}
+	
+	public void setFilter(Filter personFilter) {
+		this.personFilter = personFilter;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
 }

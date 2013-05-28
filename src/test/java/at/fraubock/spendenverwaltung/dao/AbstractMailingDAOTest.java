@@ -1,6 +1,9 @@
 package at.fraubock.spendenverwaltung.dao;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
+
+import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
@@ -10,12 +13,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
-import at.fraubock.spendenverwaltung.interfaces.domain.Address;
-import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
-import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
+import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
+import at.fraubock.spendenverwaltung.interfaces.domain.Address;
+import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
+import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -37,17 +40,13 @@ public class AbstractMailingDAOTest {
 	/**
 	 * defining some valid and invalid entities
 	 */
-	protected static Address validAddressOne = new Address();
-	protected static Address validAddressTwo = new Address();
-	protected static Address validAddressThree = new Address();
+	protected static Address addressOne = new Address();
+	protected static Address addressTwo = new Address();
+	protected static Address addressThree = new Address();
 	
-	protected static Address invalidAddressOne = new Address();
-
-	protected static Person validPersonOne = new Person();
-	protected static Person validPersonTwo_hasNoEmail = new Person();
-	protected static Person validPersonThree_hasNoPostalAddress = new Person();
-	
-	protected static Person invalidPersonOne = new Person();
+	protected static Person personOne = new Person();
+	protected static Person personTwo = new Person();
+	protected static Person personThree = new Person();
 	
 	//mailing instance used by tests
 	protected static Mailing mailing = new Mailing();
@@ -90,12 +89,58 @@ public class AbstractMailingDAOTest {
 	@Test
 	@Transactional
 	public void createWithValidParameters() {
+
+		mailing = new Mailing();
+		mailing.setMedium(Mailing.Medium.EMAIL);
+		mailing.setType("Dankesschreiben");
+		//TODO: mailing.setPersonFilter
 		
+		Date currentDate = new Date(System.currentTimeMillis());
+		
+		mailing.setDate(currentDate);
+				
+		try {
+			mailingDAO.insertOrUpdate(mailing);
+		} catch (PersistenceException e) {
+			fail();
+		}
+		
+		try {
+			Mailing result = mailingDAO.getById(mailing.getId());
+			
+			assertEquals(result, mailing);
+		} catch (PersistenceException e) {
+			fail();
+		}
+
+		//TODO define behaviour when mailing is created without
+		//the relevant address being set, create mailing with more people
 	}
 	
 	@Test
 	@Transactional
 	public void updateWithValidParameters() {
+		mailing = new Mailing();
+		mailing.setMedium(Mailing.Medium.EMAIL);
+		mailing.setType("Tippfehler");
+		
+		Date currentDate = new Date(System.currentTimeMillis());
+		
+		mailing.setDate(currentDate);
+				
+		try {
+			mailingDAO.insertOrUpdate(mailing);
+		} catch (PersistenceException e) {
+			fail();
+		}
+		
+		mailing.setType("Dankesschreiben");
+		
+		try {
+			mailingDAO.insertOrUpdate(mailing);
+		} catch (PersistenceException e) {
+			fail();
+		}
 		
 	}
 	
