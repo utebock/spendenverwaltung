@@ -3,8 +3,8 @@ package at.fraubock.spendenverwaltung.interfaces.dao;
 import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
-import at.fraubock.spendenverwaltung.interfaces.domain.DonationFilter;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.DonationFilter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 
 

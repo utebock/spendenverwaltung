@@ -1,6 +1,9 @@
-package at.fraubock.spendenverwaltung.interfaces.domain;
+package at.fraubock.spendenverwaltung.interfaces.domain.filter;
 
 import java.util.Date;
+
+import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
+import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
 
 /**
  * a donation filter is a set of criteria a donation may or may not fulfill.
@@ -14,6 +17,7 @@ import java.util.Date;
  * @author manuel-bichler
  * 
  */
+@Deprecated
 public class DonationFilter {
 
 	private DonationFilter childFilter;

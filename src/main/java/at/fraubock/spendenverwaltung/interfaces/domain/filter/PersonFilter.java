@@ -1,4 +1,7 @@
-package at.fraubock.spendenverwaltung.interfaces.domain;
+package at.fraubock.spendenverwaltung.interfaces.domain.filter;
+
+import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.Person.Sex;
 
 /**
  * a person filter is a set of criteria a person may or may not fulfill.
@@ -15,6 +18,7 @@ package at.fraubock.spendenverwaltung.interfaces.domain;
  * @author manuel-bichler
  * 
  */
+@Deprecated
 public class PersonFilter {
 	
 	private String name;
@@ -23,7 +27,7 @@ public class PersonFilter {
 	private DonationFilter donationFilter;
 	private Integer donationFrequencyMin;
 	private Integer donationFrequencyMax;
-	private Long donationSumMin;
+	private Long donationSumMin; 
 	private Long donationSumMax;
 	private MailingFilter mailingFilter;
 	private Integer mailingFrequencyMin;

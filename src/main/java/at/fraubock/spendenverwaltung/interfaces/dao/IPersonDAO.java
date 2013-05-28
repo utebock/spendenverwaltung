@@ -4,7 +4,8 @@ import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
-import at.fraubock.spendenverwaltung.interfaces.domain.PersonFilter;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.PersonFilter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 
 
@@ -92,5 +93,8 @@ public interface IPersonDAO {
 	 *             if communication to the underlying persistence system failed
 	 */
 	public List<Person> getByFilter(PersonFilter filter)
+			throws PersistenceException;
+	
+	public List<Person> getByFilter(Filter filter)
 			throws PersistenceException;
 }

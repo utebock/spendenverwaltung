@@ -1,4 +1,4 @@
-package at.fraubock.spendenverwaltung.interfaces.domain;
+package at.fraubock.spendenverwaltung.interfaces.domain.filter;
 
 import java.util.Date;
 
@@ -14,6 +14,7 @@ import java.util.Date;
  * @author romanvoglhuber
  *
  */
+@Deprecated
 public class MailingFilter {
 	
 	private MailingFilter childFilter;
