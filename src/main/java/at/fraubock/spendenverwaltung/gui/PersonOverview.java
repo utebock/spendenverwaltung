@@ -77,7 +77,7 @@ public class PersonOverview extends JPanel implements MouseListener{
 	}
 	
 	public void setUp(){
-		System.out.println("Hello");
+		//System.out.println("Hello");
 
 		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();

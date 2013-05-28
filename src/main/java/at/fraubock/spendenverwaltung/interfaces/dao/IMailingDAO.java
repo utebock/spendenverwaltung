@@ -57,7 +57,7 @@ public interface IMailingDAO {
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
-	public Mailing getByID(int id) throws PersistenceException;
+	public Mailing getById(int id) throws PersistenceException;
 
 	/**
 	 * Retrieves all mailings associated with a specific Person

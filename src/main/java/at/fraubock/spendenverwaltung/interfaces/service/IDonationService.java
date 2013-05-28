@@ -2,15 +2,14 @@ package at.fraubock.spendenverwaltung.interfaces.service;
 
 import java.util.List;
 
-import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
-import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
+import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 
 
 /**
- * service providing functionality for {@link Address}
+ * service providing functionality for {@link Donation}
  * 
  * @author Thomas
  *
@@ -53,9 +52,9 @@ public interface IDonationService {
 	public Donation getByID(int id) throws ServiceException;
 
 	/**
-	 * Retrieves entire Address table
+	 * Retrieves entire Donation table
 	 * 
-	 * @return List of all addresses
+	 * @return List of all donations
 	 */
 	public List<Donation> getByPerson(Person p) throws ServiceException;
 	

@@ -20,7 +20,8 @@ import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
-import at.fraubock.spendenverwaltung.interfaces.domain.PersonFilter;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.PersonFilter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.service.PersonValidator;
 
@@ -378,6 +379,21 @@ public class PersonDAOImplemented implements IPersonDAO {
 		}
 
 		return persons;
+	}
+	
+	@Override
+	public List<Person> getByFilter(Filter filter) throws PersistenceException {
+		String select = filter.createSqlStatement();
+		List<Person> personList = jdbcTemplate
+				.query(select, new PersonMapper());
+		log.info(personList.size() + " list size");
+
+		// now, load their addresses
+		for (Person entry : personList) {
+			fetchAddresses(entry);
+		}
+
+		return personList;
 	}
 
 	private class AddressMapper implements RowMapper<Address> {
