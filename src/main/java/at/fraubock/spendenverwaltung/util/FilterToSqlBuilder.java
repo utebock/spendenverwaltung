@@ -28,7 +28,7 @@ public class FilterToSqlBuilder {
 		if (criterion instanceof PropertyCriterion) {
 			PropertyCriterion prop = (PropertyCriterion) criterion;
 			String expr = prop.getType() + "." + prop.getProperty()
-					+ prop.getRelationalOperator().getMath();
+					+ " " + prop.getRelationalOperator().getMath();
 
 			if (prop.getNumValue() != null) {
 				expr += prop.getNumValue();

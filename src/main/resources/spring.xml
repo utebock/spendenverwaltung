@@ -73,4 +73,7 @@
 		<property name="donationDAO" ref="donationDao" />
 	</bean>
 	
+	<bean id="mailingValidator" class="at.fraubock.spendenverwaltung.service.MailingValidator">
+	</bean>
+	
 </beans>

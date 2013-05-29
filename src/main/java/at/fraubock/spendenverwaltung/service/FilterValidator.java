@@ -86,14 +86,15 @@ public class FilterValidator {
 			throw new IllegalArgumentException("Property must not be null");
 		}
 
-		if (!(criterion.getNumValue() != null ^ criterion.getStrValue() != null
-				^ criterion.getDateValue() != null
-				^ criterion.getDaysBack() != null
-				^ criterion.getBoolValue() != null)) {
-			log.error("More or less than one value was set for this PropertyCriterion");
-			throw new IllegalArgumentException(
-					"Exactly one value must be set for a PropertyCriterion");
-		}
+		//TODO zero or one value must be set
+//		if (!(criterion.getNumValue() != null ^ criterion.getStrValue() != null
+//				^ criterion.getDateValue() != null
+//				^ criterion.getDaysBack() != null
+//				^ criterion.getBoolValue() != null)) {
+//			log.error("More or less than one value was set for this PropertyCriterion");
+//			throw new IllegalArgumentException(
+//					"Exactly one value must be set for a PropertyCriterion");
+//		}
 	}
 	
 	public void validate(MountedFilterCriterion criterion) {
