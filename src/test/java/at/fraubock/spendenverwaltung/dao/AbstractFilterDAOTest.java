@@ -22,7 +22,7 @@ import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/testspring.xml")
-//@TransactionConfiguration(defaultRollback = true)
+@TransactionConfiguration(defaultRollback = true)
 public class AbstractFilterDAOTest {
 
 	protected static IFilterDAO filterDAO;
@@ -62,7 +62,7 @@ public class AbstractFilterDAOTest {
 
 	@Test
 	@Transactional
-	public void createWithValidParameter_ReturnsSavedAddress() {
+	public void createWithValidParameter_ReturnsSavedFilter() {
 
 		try {
 			filterDAO.insertOrUpdate(testFilter);

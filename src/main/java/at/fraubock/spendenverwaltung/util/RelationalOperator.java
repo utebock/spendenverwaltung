@@ -2,7 +2,7 @@ package at.fraubock.spendenverwaltung.util;
 
 public enum RelationalOperator {
 	GREATER(">"), LESS("<"), EQUALS("="), LIKE("~"), 
-	GREATER_EQ(">="), LESS_EQ("<=");
+	GREATER_EQ(">="), LESS_EQ("<="), EQUALS_NULL("IS NULL");
 	
 	private String math;
 	

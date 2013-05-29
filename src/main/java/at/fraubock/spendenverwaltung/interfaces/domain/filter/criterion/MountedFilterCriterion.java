@@ -6,21 +6,12 @@ import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
 public class MountedFilterCriterion extends Criterion {
 
-	private Integer id;
 	private Filter mount;
 	private RelationalOperator relationalOperator;
 	private Integer count;
 	private FilterProperty property;
 	private Double sum;
 	private Double avg;
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
 
 	public Filter getMount() {
 		return mount;

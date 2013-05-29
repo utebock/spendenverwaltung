@@ -7,7 +7,6 @@ import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
 public class PropertyCriterion extends Criterion {
 
-	private Integer id;
 	private FilterProperty property;
 	private RelationalOperator relationalOperator;
 	private Double numValue;
@@ -15,14 +14,6 @@ public class PropertyCriterion extends Criterion {
 	private Date dateValue;
 	private Boolean boolValue;
 	private Integer daysBack;
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
 
 	public FilterProperty getProperty() {
 		return property;

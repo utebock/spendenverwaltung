@@ -1,6 +1,7 @@
 package at.fraubock.spendenverwaltung.dao;
 
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -19,6 +20,10 @@ public class DBFilterDAOTest extends AbstractFilterDAOTest {
 		context = new ClassPathXmlApplicationContext("testspring.xml");
 
 		setFilterDao(context.getBean("filterDao", IFilterDAO.class));
+	}
+	
+	@Before
+	public void refreshInit() {
 		init();
 	}
 

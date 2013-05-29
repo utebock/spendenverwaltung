@@ -4,17 +4,8 @@ import at.fraubock.spendenverwaltung.util.LogicalOperator;
 
 public class ConnectedCriterion extends Criterion {
 
-	private Integer id;
 	private Criterion operand1, operand2;
 	private LogicalOperator logicalOperator;
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
 
 	public Criterion getOperand1() {
 		return operand1;

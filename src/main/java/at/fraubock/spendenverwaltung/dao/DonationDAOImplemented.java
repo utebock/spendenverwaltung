@@ -49,10 +49,6 @@ public class DonationDAOImplemented implements IDonationDAO {
 	public void setDonationValidator(DonationValidator donationValidator) {
 		this.donationValidator = donationValidator;
 	}
-	
-	public void setFilterToSqlBuilder(FilterToSqlBuilder filterToSqlBuilder) {
-		this.filterToSqlBuilder = filterToSqlBuilder;
-	}
 
 	private class CreateDonationStatementCreator implements
 			PreparedStatementCreator {
@@ -166,6 +162,14 @@ public class DonationDAOImplemented implements IDonationDAO {
 				new Object[] { p.getId() }, new DonationMapper());
 
 		return donations;
+	}
+
+	public FilterToSqlBuilder getFilterToSqlBuilder() {
+		return filterToSqlBuilder;
+	}
+
+	public void setFilterToSqlBuilder(FilterToSqlBuilder filterToSqlBuilder) {
+		this.filterToSqlBuilder = filterToSqlBuilder;
 	}
 
 	/**
