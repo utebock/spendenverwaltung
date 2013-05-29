@@ -1,11 +1,11 @@
 package at.fraubock.spendenverwaltung.dao;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -21,11 +21,9 @@ import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
-import at.fraubock.spendenverwaltung.interfaces.domain.filter.PersonFilter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.service.PersonValidator;
-
-import java.sql.PreparedStatement;
+import at.fraubock.spendenverwaltung.util.FilterToSqlBuilder;
 
 public class PersonDAOImplemented implements IPersonDAO {
 
@@ -311,79 +309,79 @@ public class PersonDAOImplemented implements IPersonDAO {
 		return personList;
 	}
 
-	@Override
-	public List<Person> getByFilter(PersonFilter filter)
-			throws PersistenceException {
-		if (filter == null || filter.isEmpty())
-			return getAll();
-
-		String select = "SELECT * FROM persons WHERE";
-		ArrayList<Object> args = new ArrayList<Object>();
-
-		if (filter.getGivenNamePart() != null) {
-			select += " givenname LIKE %?% AND";
-			args.add(filter.getGivenNamePart());
-		}
-		if (filter.getSurnamePart() != null) {
-			select += " surname LIKE %?% AND";
-			args.add(filter.getSurnamePart());
-		}
-		if (filter.getTitlePart() != null) {
-			select += " title LIKE %?% AND";
-			args.add(filter.getTitlePart());
-		}
-		if (filter.getAddressSet() != null)
-			;// TODO address-person mapping has to be redefined first!
-		if (filter.getEmailSet() != null) {
-			if (filter.getEmailSet())
-				select += " email IS NOT NULL AND";
-			else
-				select += " email IS NULL AND";
-		}
-		if (filter.getTelephoneSet() != null) {
-			if (filter.getTelephoneSet())
-				select += " telephone IS NOT NULL AND";
-			else
-				select += " telephone IS NULL AND";
-		}
-		if (filter.getTelephonePart() != null) {
-			select += " telephone LIKE %?% AND";
-			args.add(filter.getTelephonePart());
-		}
-		if (filter.getNotePart() != null) {
-			select += " note LIKE %?% AND";
-			args.add(filter.getNotePart());
-		}
-		if (filter.getWantsPostalNotification() != null)
-			; // TODO way of saving information must be redefined first!
-		if (filter.getWantsEmailNotification() != null)
-			; // TODO way of saving information must be redefined first!
-		if (filter.getSex() != null) {
-			select += " sex = ? AND";
-			args.add(filter.getSex());
-		}
-
-		// omit last "AND":
-		select = select.substring(0, select.length() - 3);
-
-		select += " ORDER BY id DESC";
-
-		List<Person> persons = jdbcTemplate.query(select, args.toArray(),
-				new PersonMapper());
-
-		log.info(persons.size() + " list size");
-
-		for (Person entry : persons) {
-
-			fetchAddresses(entry);
-		}
-
-		return persons;
-	}
+//	@Override
+//	public List<Person> getByFilter(PersonFilter filter)
+//			throws PersistenceException {
+//		if (filter == null || filter.isEmpty())
+//			return getAll();
+//
+//		String select = "SELECT * FROM persons WHERE";
+//		ArrayList<Object> args = new ArrayList<Object>();
+//
+//		if (filter.getGivenNamePart() != null) {
+//			select += " givenname LIKE %?% AND";
+//			args.add(filter.getGivenNamePart());
+//		}
+//		if (filter.getSurnamePart() != null) {
+//			select += " surname LIKE %?% AND";
+//			args.add(filter.getSurnamePart());
+//		}
+//		if (filter.getTitlePart() != null) {
+//			select += " title LIKE %?% AND";
+//			args.add(filter.getTitlePart());
+//		}
+//		if (filter.getAddressSet() != null)
+//			;// TODO address-person mapping has to be redefined first!
+//		if (filter.getEmailSet() != null) {
+//			if (filter.getEmailSet())
+//				select += " email IS NOT NULL AND";
+//			else
+//				select += " email IS NULL AND";
+//		}
+//		if (filter.getTelephoneSet() != null) {
+//			if (filter.getTelephoneSet())
+//				select += " telephone IS NOT NULL AND";
+//			else
+//				select += " telephone IS NULL AND";
+//		}
+//		if (filter.getTelephonePart() != null) {
+//			select += " telephone LIKE %?% AND";
+//			args.add(filter.getTelephonePart());
+//		}
+//		if (filter.getNotePart() != null) {
+//			select += " note LIKE %?% AND";
+//			args.add(filter.getNotePart());
+//		}
+//		if (filter.getWantsPostalNotification() != null)
+//			; // TODO way of saving information must be redefined first!
+//		if (filter.getWantsEmailNotification() != null)
+//			; // TODO way of saving information must be redefined first!
+//		if (filter.getSex() != null) {
+//			select += " sex = ? AND";
+//			args.add(filter.getSex());
+//		}
+//
+//		// omit last "AND":
+//		select = select.substring(0, select.length() - 3);
+//
+//		select += " ORDER BY id DESC";
+//
+//		List<Person> persons = jdbcTemplate.query(select, args.toArray(),
+//				new PersonMapper());
+//
+//		log.info(persons.size() + " list size");
+//
+//		for (Person entry : persons) {
+//
+//			fetchAddresses(entry);
+//		}
+//
+//		return persons;
+//	}
 	
 	@Override
 	public List<Person> getByFilter(Filter filter) throws PersistenceException {
-		String select = filter.createSqlStatement();
+		String select = FilterToSqlBuilder.createSqlStatement(filter);
 		List<Person> personList = jdbcTemplate
 				.query(select, new PersonMapper());
 		log.info(personList.size() + " list size");

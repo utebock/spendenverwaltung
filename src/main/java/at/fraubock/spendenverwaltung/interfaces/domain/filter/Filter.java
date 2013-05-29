@@ -1,25 +1,27 @@
 package at.fraubock.spendenverwaltung.interfaces.domain.filter;
 
-import at.fraubock.spendenverwaltung.interfaces.domain.filter.cells.FilterCell;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
+import at.fraubock.spendenverwaltung.util.FilterType;
 
 public class Filter {
 	
 	private Integer id;
-	protected String type;
-	protected String name;
-	protected boolean anonymous;
-	protected FilterCell head;
+	private FilterType type;
+	private Criterion criterion;
+	private String name;
+	private boolean anonymous = false;
 	
-	public String createSqlStatement() {
-		return "select * from "+type+" as "+type+" where "+head.createSqlExpression();
+	public Filter(FilterType type, Criterion head) {
+		this.type = type;
+		this.criterion = head;
 	}
 
-	public String getType() {
+	public FilterType getType() {
 		return type;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public Criterion getCriterion() {
+		return criterion;
 	}
 
 	public String getName() {
@@ -28,14 +30,6 @@ public class Filter {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public FilterCell getHead() {
-		return head;
-	}
-
-	public void setHead(FilterCell head) {
-		this.head = head;
 	}
 
 	public boolean isAnonymous() {

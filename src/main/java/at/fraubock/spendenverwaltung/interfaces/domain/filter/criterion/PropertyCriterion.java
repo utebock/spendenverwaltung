@@ -1,14 +1,15 @@
-package at.fraubock.spendenverwaltung.interfaces.domain.filter.cells;
+package at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion;
 
 import java.sql.Date;
 
+import at.fraubock.spendenverwaltung.util.FilterProperty;
+import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
-public class PropertyFilter extends FilterCell {
+public class PropertyCriterion extends Criterion {
 	
 	private Integer id;
-	private String type;
-	private String property;
+	private FilterProperty property;
 	private RelationalOperator relationalOperator;
 	private Double numValue;
 	private String strValue;
@@ -16,37 +17,20 @@ public class PropertyFilter extends FilterCell {
 	private Boolean boolValue;
 	private Integer daysBack;
 	
-	@Override
-	public String createSqlExpression() {
-		String expr = type+"."+property+relationalOperator.getMath();
-		
-		if(numValue!=null) {
-			expr+=getNumValue();
-		} else if(strValue!=null) {
-			expr+="'"+strValue+"'";
-		} else if(dateValue!=null) {
-			expr+="'"+dateValue+"'";
-		} else if(boolValue!=null) {
-			expr+=boolValue;
-		} else if(daysBack!=null) {
-			expr+=daysBack;
-		}
-		
-		return expr;
+	public PropertyCriterion(FilterType type, FilterProperty property, RelationalOperator relationalOperator) {
+		this.type = type;
+		this.property = property;
+		this.relationalOperator = relationalOperator;
 	}
 
-	public String getProperty() {
+	public FilterProperty getProperty() {
 		return property;
 	}
-	public void setProperty(String property) {
-		this.property = property;
-	}
+	
 	public RelationalOperator getRelationalOperator() {
 		return relationalOperator;
 	}
-	public void setRelationalOperator(RelationalOperator relationalOperator) {
-		this.relationalOperator = relationalOperator;
-	}
+
 	public Double getNumValue() {
 		return numValue;
 	}
@@ -71,19 +55,11 @@ public class PropertyFilter extends FilterCell {
 	public void setBoolValue(Boolean boolValue) {
 		this.boolValue = boolValue;
 	}
-	public int getDaysBack() {
+	public Integer getDaysBack() {
 		return daysBack;
 	}
 	public void setDaysBack(int daysBack) {
 		this.daysBack = daysBack;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
 	}
 
 	public Integer getId() {

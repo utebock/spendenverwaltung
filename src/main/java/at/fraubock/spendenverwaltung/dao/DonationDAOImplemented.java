@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -21,10 +20,8 @@ import at.fraubock.spendenverwaltung.interfaces.dao.IDonationDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
-import at.fraubock.spendenverwaltung.interfaces.domain.filter.DonationFilter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.service.DonationValidator;
-import at.fraubock.spendenverwaltung.util.Pair;
 
 
 
@@ -172,83 +169,83 @@ public class DonationDAOImplemented implements IDonationDAO {
 	 *         (without the "WHERE", including placeholders) and the array for
 	 *         filling the placeholders
 	 */
-	private Pair<String, Object[]> createFilterWhereClause(DonationFilter filter) {
-		String where = "";
-		ArrayList<Object> args = new ArrayList<Object>();
+//	private Pair<String, Object[]> createFilterWhereClause(DonationFilter filter) {
+//		String where = "";
+//		ArrayList<Object> args = new ArrayList<Object>();
+//
+//		if (filter.getDedicationPart() != null) {
+//			where += "dedication like ? AND ";
+//			args.add("%"+filter.getDedicationPart()+"%");
+//		}
+//
+//		if (filter.getMaxAmount() != null) {
+//			where += "amount <= ? AND ";
+//			args.add(filter.getMaxAmount());
+//		}
+//
+//		if (filter.getMinAmount() != null) {
+//			where += "amount >= ? AND ";
+//			args.add(filter.getMinAmount());
+//		}
+//
+//		if (filter.getMaxDate() != null) {
+//			where += "donationdate <= ? AND ";
+//			args.add(new Timestamp(filter.getMaxDate().getTime()));
+//		}
+//
+//		if (filter.getMinDate() != null) {
+//			where += "donationdate >= ? AND ";
+//			args.add(new Timestamp(filter.getMinDate().getTime()));
+//		}
+//
+//		if (filter.getNotePart() != null) {
+//			where += "note like ? AND ";
+//			args.add("%"+filter.getNotePart()+"%");
+//		}
+//
+//		if (filter.getType() != null) {
+//			where += "type = ? AND ";
+//			args.add(filter.getType().getName());
+//		}
+//
+//		// remove last "AND "
+//		where = where.substring(0, where.length() - 4);
+//
+//		return new Pair<String, Object[]>(where, args.toArray());
+//	}
 
-		if (filter.getDedicationPart() != null) {
-			where += "dedication like ? AND ";
-			args.add("%"+filter.getDedicationPart()+"%");
-		}
+//	@Override
+//	public List<Donation> getByFilter(DonationFilter filter)
+//			throws PersistenceException {
+//
+//		if (filter == null || filter.isEmpty()) {
+//			return getAll();
+//		}
+//
+//		Pair<String, Object[]> clause = createFilterWhereClause(filter);
+//
+//		String select = "SELECT * FROM donations WHERE " + clause.a
+//				+ " ORDER BY id DESC";
+//
+//		List<Donation> donations = jdbcTemplate.query(select, clause.b,
+//				new DonationMapper());
+//
+//		return donations;
+//	}
 
-		if (filter.getMaxAmount() != null) {
-			where += "amount <= ? AND ";
-			args.add(filter.getMaxAmount());
-		}
-
-		if (filter.getMinAmount() != null) {
-			where += "amount >= ? AND ";
-			args.add(filter.getMinAmount());
-		}
-
-		if (filter.getMaxDate() != null) {
-			where += "donationdate <= ? AND ";
-			args.add(new Timestamp(filter.getMaxDate().getTime()));
-		}
-
-		if (filter.getMinDate() != null) {
-			where += "donationdate >= ? AND ";
-			args.add(new Timestamp(filter.getMinDate().getTime()));
-		}
-
-		if (filter.getNotePart() != null) {
-			where += "note like ? AND ";
-			args.add("%"+filter.getNotePart()+"%");
-		}
-
-		if (filter.getType() != null) {
-			where += "type = ? AND ";
-			args.add(filter.getType().getName());
-		}
-
-		// remove last "AND "
-		where = where.substring(0, where.length() - 4);
-
-		return new Pair<String, Object[]>(where, args.toArray());
-	}
-
-	@Override
-	public List<Donation> getByFilter(DonationFilter filter)
-			throws PersistenceException {
-
-		if (filter == null || filter.isEmpty()) {
-			return getAll();
-		}
-
-		Pair<String, Object[]> clause = createFilterWhereClause(filter);
-
-		String select = "SELECT * FROM donations WHERE " + clause.a
-				+ " ORDER BY id DESC";
-
-		List<Donation> donations = jdbcTemplate.query(select, clause.b,
-				new DonationMapper());
-
-		return donations;
-	}
-
-	@Override
-	public long sumByFilter(DonationFilter filter) throws PersistenceException {
-		if (filter == null || filter.isEmpty()) {
-			return jdbcTemplate.queryForObject(
-					"SELECT SUM(amount) FROM donations", Long.class);
-		}
-
-		Pair<String, Object[]> clause = createFilterWhereClause(filter);
-
-		String select = "SELECT SUM(amount) FROM donations WHERE " + clause.a;
-
-		return jdbcTemplate.queryForObject(select, clause.b, Long.class);
-	}
+//	@Override
+//	public long sumByFilter(DonationFilter filter) throws PersistenceException {
+//		if (filter == null || filter.isEmpty()) {
+//			return jdbcTemplate.queryForObject(
+//					"SELECT SUM(amount) FROM donations", Long.class);
+//		}
+//
+//		Pair<String, Object[]> clause = createFilterWhereClause(filter);
+//
+//		String select = "SELECT SUM(amount) FROM donations WHERE " + clause.a;
+//
+//		return jdbcTemplate.queryForObject(select, clause.b, Long.class);
+//	}
 
 	private class DonationMapper implements RowMapper<Donation> {
 

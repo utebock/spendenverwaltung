@@ -17,11 +17,13 @@ import org.springframework.jdbc.support.KeyHolder;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IFilterDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
-import at.fraubock.spendenverwaltung.interfaces.domain.filter.cells.FilterCell;
-import at.fraubock.spendenverwaltung.interfaces.domain.filter.cells.LogicalFilter;
-import at.fraubock.spendenverwaltung.interfaces.domain.filter.cells.MountedFilter;
-import at.fraubock.spendenverwaltung.interfaces.domain.filter.cells.PropertyFilter;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.ConnectedCriterion;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
+import at.fraubock.spendenverwaltung.util.FilterProperty;
+import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
@@ -46,39 +48,38 @@ public class FilterDAOImplemented implements IFilterDAO {
 			this.filter = filter;
 		}
 
-		private String createFilter = "insert into filter (type,name,hidden,head) values (?, ?, ?, ?)";
+		private String createFilter = "insert into filter (type,name,anonymous,criterion) values (?, ?, ?, ?)";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
 				throws SQLException {
 			PreparedStatement ps = connection.prepareStatement(createFilter,
 					Statement.RETURN_GENERATED_KEYS);
-			ps.setString(1, filter.getType());
+			ps.setString(1, filter.getType().toString());
 			ps.setString(2, filter.getName());
 			ps.setBoolean(3, filter.isAnonymous());
-			ps.setInt(4, filter.getHead().getCellId());
+			ps.setInt(4, filter.getCriterion().getCriterionId());
 			return ps;
 		}
 	}
 
-	private class CreateFilterCellStatementCreator implements
+	private class CreateFilterCriterionStatementCreator implements
 			PreparedStatementCreator {
 
-		private FilterCell filter;
+		private Criterion filter;
 
-		CreateFilterCellStatementCreator(FilterCell filter) {
+		CreateFilterCriterionStatementCreator(Criterion filter) {
 			this.filter = filter;
 		}
 
-		// TODO insert no values?
-		private String createFilter = "insert into filter_cell (id) values (?)";
+		private String createFilter = "insert into criterion (type) values (?)";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
 				throws SQLException {
 			PreparedStatement ps = connection.prepareStatement(createFilter,
 					Statement.RETURN_GENERATED_KEYS);
-			ps.setInt(1, filter.getCellId());
+			ps.setString(1, filter.getType().toString());
 			return ps;
 		}
 	}
@@ -86,29 +87,29 @@ public class FilterDAOImplemented implements IFilterDAO {
 	private class CreateLogicalFilterStatementCreator implements
 			PreparedStatementCreator {
 
-		private LogicalFilter filter;
+		private ConnectedCriterion filter;
 
-		CreateLogicalFilterStatementCreator(LogicalFilter filter) {
+		CreateLogicalFilterStatementCreator(ConnectedCriterion filter) {
 			this.filter = filter;
 		}
 
-		private String createFilter = "insert into logical_filter (cellid,logical_operator,operand1,operand2) values (?,?,?,?)";
+		private String createFilter = "insert into connected_criterion (criterionid,logical_operator,operand1,operand2) values (?,?,?,?)";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
 				throws SQLException {
 			PreparedStatement ps = connection.prepareStatement(createFilter,
 					Statement.RETURN_GENERATED_KEYS);
-			ps.setInt(1, filter.getCellId());
+			ps.setInt(1, filter.getCriterionId());
 			ps.setString(2, filter.getLogicalOperator().toString());
 			try {
-				insertOrUpdateCell(filter.getOperand1());
-				insertOrUpdateCell(filter.getOperand2());
+				insertOrUpdateCriterion(filter.getOperand1());
+				insertOrUpdateCriterion(filter.getOperand2());
 			} catch (PersistenceException e) {
 				throw new SQLException();
 			}
-			ps.setInt(3, filter.getOperand1().getCellId());
-			ps.setInt(4, filter.getOperand2().getCellId());
+			ps.setInt(3, filter.getOperand1().getCriterionId());
+			ps.setInt(4, filter.getOperand2().getCriterionId());
 			return ps;
 		}
 	}
@@ -116,22 +117,22 @@ public class FilterDAOImplemented implements IFilterDAO {
 	private class CreatePropertyFilterStatementCreator implements
 			PreparedStatementCreator {
 
-		private PropertyFilter filter;
+		private PropertyCriterion filter;
 
-		CreatePropertyFilterStatementCreator(PropertyFilter filter) {
+		CreatePropertyFilterStatementCreator(PropertyCriterion filter) {
 			this.filter = filter;
 		}
 
-		private String createFilter = "insert into property_filter (cellid,relational_operator,property,numValue,strValue,dateValue,daysBack,boolValue) values (?,?,?,?,?,?,?,?)";
+		private String createFilter = "insert into property_criterion (criterionid,relational_operator,property,numValue,strValue,dateValue,daysBack,boolValue) values (?,?,?,?,?,?,?,?)";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
 				throws SQLException {
 			PreparedStatement ps = connection.prepareStatement(createFilter,
 					Statement.RETURN_GENERATED_KEYS);
-			ps.setInt(1, filter.getCellId());
+			ps.setInt(1, filter.getCriterionId());
 			ps.setString(2, filter.getRelationalOperator().toString());
-			ps.setString(3, filter.getProperty());
+			ps.setString(3, filter.getProperty().toString());
 			ps.setDouble(4, filter.getNumValue());
 			ps.setString(5, filter.getStrValue());
 			ps.setDate(6, filter.getDateValue());
@@ -144,20 +145,20 @@ public class FilterDAOImplemented implements IFilterDAO {
 	private class CreateMountedFilterStatementCreator implements
 			PreparedStatementCreator {
 
-		private MountedFilter filter;
+		private MountedFilterCriterion filter;
 
-		CreateMountedFilterStatementCreator(MountedFilter filter) {
+		CreateMountedFilterStatementCreator(MountedFilterCriterion filter) {
 			this.filter = filter;
 		}
 
-		private String createFilter = "insert into mounted_filter (cellid,mount,relational_operator,count,property,sum,avg) values (?,?,?,?,?,?,?)";
+		private String createFilter = "insert into mountedfilter_criterion (criterionid,mount,relational_operator,count,property,sum,avg) values (?,?,?,?,?,?,?)";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
 				throws SQLException {
 			PreparedStatement ps = connection.prepareStatement(createFilter,
 					Statement.RETURN_GENERATED_KEYS);
-			ps.setInt(1, filter.getCellId());
+			ps.setInt(1, filter.getCriterionId());
 			Filter mount = filter.getMount();
 			try {
 				if (mount.getId() == null) {
@@ -169,7 +170,7 @@ public class FilterDAOImplemented implements IFilterDAO {
 			ps.setInt(2, mount.getId());
 			ps.setString(3, filter.getRelationalOperator().toString());
 			ps.setInt(4, filter.getCount());
-			ps.setString(5, filter.getProperty());
+			ps.setString(5, filter.getProperty().toString());
 			ps.setDouble(6, filter.getSum());
 			ps.setDouble(7, filter.getAvg());
 			return ps;
@@ -188,45 +189,46 @@ public class FilterDAOImplemented implements IFilterDAO {
 
 			f.setId(keyHolder.getKey().intValue());
 
-			insertOrUpdateCell(f.getHead());
+			insertOrUpdateCriterion(f.getCriterion());
 		} else {
 			// TODO update
 		}
 	}
 
-	private void insertOrUpdateCell(FilterCell f) throws PersistenceException {
+	private void insertOrUpdateCriterion(Criterion f)
+			throws PersistenceException {
 		// TODO validate
 
-		if (f.getCellId() == null) {
+		if (f.getCriterionId() == null) {
 			// new filter to be inserted
-			KeyHolder cellKeyHolder = new GeneratedKeyHolder();
+			KeyHolder criterionKeyHolder = new GeneratedKeyHolder();
 
-			jdbcTemplate.update(new CreateFilterCellStatementCreator(f),
-					cellKeyHolder);
-			f.setCellId(cellKeyHolder.getKey().intValue());
+			jdbcTemplate.update(new CreateFilterCriterionStatementCreator(f),
+					criterionKeyHolder);
+			f.setCriterionId(criterionKeyHolder.getKey().intValue());
 
-			// now insert the specific cell type
-			if (f instanceof LogicalFilter) {
-				LogicalFilter log = (LogicalFilter) f;
+			// now insert the specific criterion type
+			if (f instanceof ConnectedCriterion) {
+				ConnectedCriterion log = (ConnectedCriterion) f;
 				KeyHolder logicalKeyHolder = new GeneratedKeyHolder();
 
 				jdbcTemplate.update(
 						new CreateLogicalFilterStatementCreator(log),
 						logicalKeyHolder);
-				log.setCellId(logicalKeyHolder.getKey().intValue());
-			} else if (f instanceof PropertyFilter) {
+				log.setCriterionId(logicalKeyHolder.getKey().intValue());
+			} else if (f instanceof PropertyCriterion) {
 				KeyHolder propertyKeyHolder = new GeneratedKeyHolder();
 
 				jdbcTemplate.update(new CreatePropertyFilterStatementCreator(
-						(PropertyFilter) f), propertyKeyHolder);
-				f.setCellId(propertyKeyHolder.getKey().intValue());
-			} else if (f instanceof MountedFilter) {
-				MountedFilter mount = (MountedFilter) f;
+						(PropertyCriterion) f), propertyKeyHolder);
+				f.setCriterionId(propertyKeyHolder.getKey().intValue());
+			} else if (f instanceof MountedFilterCriterion) {
+				MountedFilterCriterion mount = (MountedFilterCriterion) f;
 				KeyHolder mountedKeyHolder = new GeneratedKeyHolder();
 
 				jdbcTemplate.update(new CreateMountedFilterStatementCreator(
 						mount), mountedKeyHolder);
-				mount.setCellId(mountedKeyHolder.getKey().intValue());
+				mount.setCriterionId(mountedKeyHolder.getKey().intValue());
 			}
 
 		} else {
@@ -245,43 +247,43 @@ public class FilterDAOImplemented implements IFilterDAO {
 		int[] types = new int[] { Types.INTEGER };
 
 		jdbcTemplate.update(deleteFilters, params, types);
-		
-		deleteFilterCell(f.getHead());
+
+		deleteFilterCriterion(f.getCriterion());
 	}
 
-	private void deleteFilterCell(FilterCell f) throws PersistenceException {
+	private void deleteFilterCriterion(Criterion f) throws PersistenceException {
 		// TODO validate
-		
-		// delete the specific cell type
-		if (f instanceof LogicalFilter) {
-			LogicalFilter log = (LogicalFilter) f;
 
-			deleteFilterCell(log.getOperand1());
-			deleteFilterCell(log.getOperand2());
-			jdbcTemplate.update("delete from logical_filter where id = ?",
+		// delete the specific criterion type
+		if (f instanceof ConnectedCriterion) {
+			ConnectedCriterion log = (ConnectedCriterion) f;
+
+			deleteFilterCriterion(log.getOperand1());
+			deleteFilterCriterion(log.getOperand2());
+			jdbcTemplate.update("delete from connected_criterion where id = ?",
 					new Object[] { log.getId() }, new int[] { Types.INTEGER });
 
-		} else if (f instanceof PropertyFilter) {
-			PropertyFilter prop = (PropertyFilter) f;
-			jdbcTemplate.update("delete from property_filter where id = ?",
+		} else if (f instanceof PropertyCriterion) {
+			PropertyCriterion prop = (PropertyCriterion) f;
+			jdbcTemplate.update("delete from property_criterion where id = ?",
 					new Object[] { prop.getId() }, new int[] { Types.INTEGER });
-		} else if (f instanceof MountedFilter) {
-			MountedFilter mount = (MountedFilter) f;
+		} else if (f instanceof MountedFilterCriterion) {
+			MountedFilterCriterion mount = (MountedFilterCriterion) f;
 
 			if (mount.getMount().isAnonymous()) { // only delete mount when
 													// anonymous
 				delete(mount.getMount());
 			}
 			jdbcTemplate
-					.update("delete from mounted_filter where id = ?",
+					.update("delete from mountedfilter_criterion where id = ?",
 							new Object[] { mount.getId() },
 							new int[] { Types.INTEGER });
 		}
 
-		
-		// delete the cell
-		jdbcTemplate.update("delete from filter_cell where id = ?",
-				new Object[] { f.getCellId() }, new int[] { Types.INTEGER });
+		// delete the criterion
+		jdbcTemplate.update("delete from criterion where id = ?",
+				new Object[] { f.getCriterionId() },
+				new int[] { Types.INTEGER });
 	}
 
 	@Override
@@ -314,18 +316,19 @@ public class FilterDAOImplemented implements IFilterDAO {
 		}
 	}
 
-	private FilterCell getFilterCellById(int id) throws PersistenceException {
-		PropertyFilter prop = getPropertyFilterByCellId(id);
+	private Criterion getFilterCriterionById(int id)
+			throws PersistenceException {
+		PropertyCriterion prop = getPropertyFilterByCriterionId(id);
 		if (prop != null) {
 			return prop;
 		}
 
-		LogicalFilter logical = getLogicalFilterByCellId(id);
+		ConnectedCriterion logical = getLogicalFilterByCriterionId(id);
 		if (logical != null) {
 			return logical;
 		}
 
-		MountedFilter mount = getMountedFilterByCellId(id);
+		MountedFilterCriterion mount = getMountedFilterByCriterionId(id);
 		if (mount != null) {
 			return mount;
 		}
@@ -334,13 +337,13 @@ public class FilterDAOImplemented implements IFilterDAO {
 
 	}
 
-	private PropertyFilter getPropertyFilterByCellId(int id)
+	private PropertyCriterion getPropertyFilterByCriterionId(int id)
 			throws PersistenceException {
 		if (id < 0) {
 			throw new IllegalArgumentException("Id must not be less than 0");
 		}
 
-		String select = "select * from property_filter where cellid = ?";
+		String select = "select * from property_criterion where criterionid = ?";
 
 		try {
 			return jdbcTemplate.queryForObject(select, new Object[] { id },
@@ -353,13 +356,13 @@ public class FilterDAOImplemented implements IFilterDAO {
 		}
 	}
 
-	private LogicalFilter getLogicalFilterByCellId(int id)
+	private ConnectedCriterion getLogicalFilterByCriterionId(int id)
 			throws PersistenceException {
 		if (id < 0) {
 			throw new IllegalArgumentException("Id must not be less than 0");
 		}
 
-		String select = "select * from logical_filter where cellid = ?";
+		String select = "select * from logical_criterion where criterionid = ?";
 
 		try {
 			return jdbcTemplate.queryForObject(select, new Object[] { id },
@@ -372,13 +375,13 @@ public class FilterDAOImplemented implements IFilterDAO {
 		}
 	}
 
-	private MountedFilter getMountedFilterByCellId(int id)
+	private MountedFilterCriterion getMountedFilterByCriterionId(int id)
 			throws PersistenceException {
 		if (id < 0) {
 			throw new IllegalArgumentException("Id must not be less than 0");
 		}
 
-		String select = "select * from mounted_filter where cellid = ?";
+		String select = "select * from mountedfilter_criterion where criterionid = ?";
 
 		try {
 			return jdbcTemplate.queryForObject(select, new Object[] { id },
@@ -394,30 +397,32 @@ public class FilterDAOImplemented implements IFilterDAO {
 	private class FilterMapper implements RowMapper<Filter> {
 
 		public Filter mapRow(ResultSet rs, int rowNum) throws SQLException {
-			Filter filter = new Filter();
-			filter.setId(rs.getInt("id"));
-			filter.setType(rs.getString("type"));
-			filter.setName(rs.getString("name"));
-			filter.setAnonymous(rs.getBoolean("anonymous"));
+			Criterion head = null;
 			try {
-				filter.setHead(getFilterCellById(rs.getInt("head")));
+				head = getFilterCriterionById(rs.getInt("head"));
 			} catch (PersistenceException e) {
 				throw new SQLException(e);
 			}
+			Filter filter = new Filter(
+					FilterType.valueOf(rs.getString("type")), head);
+			filter.setId(rs.getInt("id"));
+			filter.setName(rs.getString("name"));
+			filter.setAnonymous(rs.getBoolean("anonymous"));
+
 			return filter;
 		}
 	}
 
-	private class PropertyFilterMapper implements RowMapper<PropertyFilter> {
+	private class PropertyFilterMapper implements RowMapper<PropertyCriterion> {
 
-		public PropertyFilter mapRow(ResultSet rs, int rowNum)
+		public PropertyCriterion mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
-			PropertyFilter filter = new PropertyFilter();
-			filter.setCellId(rs.getInt("id"));
-			filter.setType(rs.getString("type"));
-			filter.setProperty(rs.getString("property"));
-			filter.setRelationalOperator(RelationalOperator.valueOf(rs
-					.getString("relational_operator")));
+			PropertyCriterion filter = new PropertyCriterion(
+					FilterType.valueOf(rs.getString("type")),
+					FilterProperty.valueOf(rs.getString("property")),
+					RelationalOperator.valueOf(rs
+							.getString("relational_operator")));
+			filter.setCriterionId(rs.getInt("id"));
 			filter.setNumValue(rs.getDouble("numValue"));
 			filter.setStrValue(rs.getString("strValue"));
 			filter.setDateValue(rs.getDate("dateValue"));
@@ -427,40 +432,46 @@ public class FilterDAOImplemented implements IFilterDAO {
 		}
 	}
 
-	private class LogicalFilterMapper implements RowMapper<LogicalFilter> {
+	private class LogicalFilterMapper implements RowMapper<ConnectedCriterion> {
 
-		public LogicalFilter mapRow(ResultSet rs, int rowNum)
+		public ConnectedCriterion mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
-			LogicalFilter filter = new LogicalFilter();
-			filter.setCellId(rs.getInt("id"));
+			Criterion operand1 = null;
+			Criterion operand2 = null;
 			try {
-				filter.setOperand1(getFilterCellById(rs.getInt("operand1")));
-				filter.setOperand2(getFilterCellById(rs.getInt("operand2")));
+				operand1 = getFilterCriterionById(rs.getInt("operand1"));
+				operand2 = getFilterCriterionById(rs.getInt("operand2"));
 			} catch (PersistenceException e) {
 				throw new SQLException(e);
 			}
-			filter.setLogicalOperator(LogicalOperator.valueOf(rs
-					.getString("logical_operator")));
+			ConnectedCriterion filter = new ConnectedCriterion(
+					FilterType.valueOf(rs.getString("type")),
+					LogicalOperator.valueOf(rs.getString("logical_operator")),
+					operand1);
+			filter.setCriterionId(rs.getInt("id"));
+			filter.setOperand2(operand2);
 			return filter;
 		}
 	}
 
-	private class MountedFilterMapper implements RowMapper<MountedFilter> {
+	private class MountedFilterMapper implements
+			RowMapper<MountedFilterCriterion> {
 
-		public MountedFilter mapRow(ResultSet rs, int rowNum)
+		public MountedFilterCriterion mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
-			MountedFilter filter = new MountedFilter();
-			filter.setCellId(rs.getInt("id"));
-			filter.setType(rs.getString("type"));
+			Filter mount = null;
 			try {
-				filter.setMount(getById(rs.getInt("mount")));
+				mount = getById(rs.getInt("mount"));
 			} catch (PersistenceException e) {
 				throw new SQLException(e);
 			}
-			filter.setRelationalOperator(RelationalOperator.valueOf(rs
-					.getString("relational_operator")));
+			MountedFilterCriterion filter = new MountedFilterCriterion(
+					FilterType.valueOf(rs.getString("type")), mount,
+					RelationalOperator.valueOf(rs
+							.getString("relational_operator")));
+			filter.setCriterionId(rs.getInt("id"));
 			filter.setCount(rs.getInt("count"));
-			filter.setProperty(rs.getString("property"));
+			filter.setProperty(FilterProperty.valueOf(rs.getString("property")));
 			filter.setSum(rs.getDouble("sum"));
 			filter.setAvg(rs.getDouble("avg"));
 
