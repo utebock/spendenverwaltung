@@ -38,18 +38,23 @@
 		<property name="addressDao" ref="addressDao" />
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="personValidator" ref="personValidator" />
+		<property name="filterToSqlBuilder" ref="filterToSqlBuilder" />
 	</bean>
 	<bean id="donationDao" class="at.fraubock.spendenverwaltung.dao.DonationDAOImplemented">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="donationValidator" ref="donationValidator" />
 		<property name="personDao" ref="personDao" />
+		<property name="filterToSqlBuilder" ref="filterToSqlBuilder" />
 	</bean>
 	<bean id="mailingDao" class="at.fraubock.spendenverwaltung.dao.MailingDAOImplemented">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="mailingValidator" ref="mailingValidator" />
+		<property name="filterToSqlBuilder" ref="filterToSqlBuilder" />
 	</bean>
 	<bean id="filterDao" class="at.fraubock.spendenverwaltung.dao.FilterDAOImplemented">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
+	</bean>
+	<bean id="filterToSqlBuilder" class="at.fraubock.spendenverwaltung.util.FilterToSqlBuilder">
 	</bean>
 
 	<!-- BEANS FOR SERVICES -->

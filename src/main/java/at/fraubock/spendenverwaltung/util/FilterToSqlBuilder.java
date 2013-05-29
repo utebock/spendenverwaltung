@@ -8,14 +8,14 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Property
 
 public class FilterToSqlBuilder {
 
-	public static String createSqlStatement(Filter filter) {
+	public String createSqlStatement(Filter filter) {
 		String stmt = "select * from " + filter.getType()
 				+ " as "+filter.getType()+" where " + createConditionalStatement(filter.getCriterion());
 
 		return stmt;
 	}
 
-	private static String createConditionalStatement(Criterion criterion) {
+	private String createConditionalStatement(Criterion criterion) {
 
 		if (criterion instanceof ConnectedCriterion) {
 			ConnectedCriterion log = (ConnectedCriterion) criterion;

@@ -158,15 +158,15 @@ public class Overview extends JPanel{
 		sending.setFont(new Font("Headline", Font.PLAIN, 14));
 		sendPanel.add(sending, "wrap");
 		//importPanel.add(empty, "wrap");
-		eSending = builder.createImageButton("/images/template.jpg", buttonListener, "create_eSending");
+		eSending = builder.createImageButton("/images/eNotification.jpg", buttonListener, "create_eSending");
 		sendPanel.add(eSending, "split 2");
-		postalSending = builder.createImageButton("/images/template.jpg", buttonListener, "obtain_postalSending");
+		postalSending = builder.createImageButton("/images/postalNotification.jpg", buttonListener, "obtain_postalSending");
 		sendPanel.add(postalSending, "gap 35");
-		showSendings = builder.createImageButton("/images/template.jpg", buttonListener, "show_sendings");
+		showSendings = builder.createImageButton("/images/showNotifications.jpg", buttonListener, "show_sendings");
 		sendPanel.add(showSendings, "gap 35");
 		confirmSendings = builder.createImageButton("/images/confirmSendings.jpg", buttonListener, "confirm_sendings");
 		sendPanel.add(confirmSendings, "gap 35");
-		deleteSendings = builder.createImageButton("/images/template.jpg", buttonListener, "delete_sendings");
+		deleteSendings = builder.createImageButton("/images/deleteNotifications.jpg", buttonListener, "delete_sendings");
 		sendPanel.add(deleteSendings, "wrap, gap 35");
 		
 		eSendingLabel = builder.createLabel("<html><center>E-Aussendung<br>erstellen");
@@ -196,11 +196,11 @@ public class Overview extends JPanel{
 		stats.setFont(new Font("Headline", Font.PLAIN, 14));
 		statsPanel.add(stats, "wrap");
 		//importPanel.add(empty, "wrap");
-		progress = builder.createImageButton("/images/template.jpg", buttonListener, "stats_progress");
+		progress = builder.createImageButton("/images/statisticsDonation.jpg", buttonListener, "stats_progress");
 		statsPanel.add(progress);
-		statsSendings = builder.createImageButton("/images/template.jpg", buttonListener, "stats_sendings");
+		statsSendings = builder.createImageButton("/images/statisticsNotification.jpg", buttonListener, "stats_sendings");
 		statsPanel.add(statsSendings, "gap 35");
-		statsPersons = builder.createImageButton("/images/template.jpg", buttonListener, "stats_persons");
+		statsPersons = builder.createImageButton("/images/statisticsPerson.jpg", buttonListener, "stats_persons");
 		statsPanel.add(statsPersons, "wrap, gap 35");
 		
 		progressLabel = builder.createLabel("<html><center>Spenden-<br>entwicklung");
