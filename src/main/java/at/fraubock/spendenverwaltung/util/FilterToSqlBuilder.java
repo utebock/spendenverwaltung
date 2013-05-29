@@ -35,7 +35,7 @@ public class FilterToSqlBuilder {
 			} else if (prop.getStrValue() != null) {
 				expr += "'" + prop.getStrValue() + "'";
 			} else if (prop.getDateValue() != null) {
-				expr += "'" + prop.getDateValue() + "'";
+				expr += "DATE('" + prop.getDateValue() + "')";
 			} else if (prop.getBoolValue() != null) {
 				expr += prop.getBoolValue();
 			} else if (prop.getDaysBack() != null) {
