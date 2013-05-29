@@ -22,6 +22,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.service.DonationValidator;
+import at.fraubock.spendenverwaltung.util.FilterToSqlBuilder;
 
 
 
@@ -35,6 +36,7 @@ public class DonationDAOImplemented implements IDonationDAO {
 	private JdbcTemplate jdbcTemplate;
 	private IPersonDAO personDAO;
 	private DonationValidator donationValidator;
+	private FilterToSqlBuilder filterToSqlBuilder;
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -46,6 +48,10 @@ public class DonationDAOImplemented implements IDonationDAO {
 
 	public void setDonationValidator(DonationValidator donationValidator) {
 		this.donationValidator = donationValidator;
+	}
+	
+	public void setFilterToSqlBuilder(FilterToSqlBuilder filterToSqlBuilder) {
+		this.filterToSqlBuilder = filterToSqlBuilder;
 	}
 
 	private class CreateDonationStatementCreator implements

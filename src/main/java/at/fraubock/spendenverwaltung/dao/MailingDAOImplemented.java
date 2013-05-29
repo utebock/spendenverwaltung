@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.sql.Types;
 import java.util.Date;
 import java.util.List;
 
@@ -17,13 +16,12 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
-import at.fraubock.spendenverwaltung.interfaces.dao.IFilterDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
-import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.service.MailingValidator;
+import at.fraubock.spendenverwaltung.util.FilterToSqlBuilder;
 
 public class MailingDAOImplemented implements IMailingDAO {
 	
@@ -32,8 +30,8 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 	private JdbcTemplate jdbcTemplate;
 	private MailingValidator mailingValidator;
-	private IFilterDAO filterDAO;
-	
+	private FilterToSqlBuilder filterToSqlBuilder;
+
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
@@ -42,8 +40,8 @@ public class MailingDAOImplemented implements IMailingDAO {
 		this.mailingValidator = mailingValidator;
 	}
 	
-	public void setFilterDAO(IFilterDAO filterDAO) {
-		this.filterDAO = filterDAO;
+	public void setFilterToSqlBuilder(FilterToSqlBuilder filterToSqlBuilder) {
+		this.filterToSqlBuilder = filterToSqlBuilder;
 	}
 	
 	private class CreateMailingStatementCreator implements PreparedStatementCreator {
@@ -54,7 +52,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 			this.mailing = mailing;
 		}
 
-		private String createPersons = "insert into mailings (mailingdate, type, medium, filterid) values (?,?,?,?)";
+		private String createPersons = "insert into mailings (mailingdate, type, medium) values (?,?,?)";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
@@ -65,11 +63,6 @@ public class MailingDAOImplemented implements IMailingDAO {
 			ps.setTimestamp(1, new Timestamp(mailing.getDate().getTime()));
 			ps.setString(2, mailing.getType().getName());
 			ps.setString(3, mailing.getMedium().getName());
-			if(mailing.getFilter() == null) {
-				ps.setNull(4, Types.NULL);
-			} else {
-				ps.setInt(4, mailing.getFilter().getId());
-			}
 			
 			return ps;
 		}
@@ -90,6 +83,10 @@ public class MailingDAOImplemented implements IMailingDAO {
 			
 			KeyHolder keyHolder = new GeneratedKeyHolder();
 
+			/**TODO apply correct properties to filter to exclude people who
+			*	-don't want to receive mailings of the mailingtype
+			*	-don't have the relevant mailing address (email or postal)
+			*/
 			jdbcTemplate.update(new CreateMailingStatementCreator(mailing),
 					keyHolder);
 
@@ -97,8 +94,14 @@ public class MailingDAOImplemented implements IMailingDAO {
 			
 			//now apply personfilter and insert relevant entries into sentmailings
 			
+			String filterStmt = filterToSqlBuilder.createSqlStatement(mailing.getFilter());
+			
+			jdbcTemplate.query(filterStmt, new PersonMailingMapper(mailing));
+			
 		} else {
-			//update
+			jdbcTemplate.update("UPDATE mailings SET mailingdate=?, type=?, medium=? WHERE id=?",
+					new Object[] { new Timestamp(mailing.getDate().getTime()), mailing.getType().getName()
+					, mailing.getMedium().getName(), mailing.getId() });
 		}
 		
 		log.debug("Returning from insertOrUpdate");
@@ -167,17 +170,33 @@ public class MailingDAOImplemented implements IMailingDAO {
 			mailing.setDate(new Date(rs.getTimestamp("mailingdate").getTime()));
 			mailing.setType(Mailing.MailingType.getByName(rs.getString("type")));
 			mailing.setMedium(Mailing.Medium.getByName(rs.getString("medium")));
-			if(rs.getInt("filterid") == 0) {
-				mailing.setFilter(null);
-			} else {
-				try {
-					mailing.setFilter(filterDAO.getById(rs.getInt("filterid")));
-				} catch (PersistenceException e) {
-					//TODO
-				}
-			}
 			
 			return mailing;
+		}
+		
+	}
+	
+	/**
+	 * @author Chris
+	 *
+	 * processes resultset of person filter and applies inserts to
+	 * sentmailings table
+	 */
+	private class PersonMailingMapper implements RowMapper<Void> {
+
+		private Mailing mailing;
+		
+		private String query = "INSERT INTO sentmailings (mailingid, personid) VALUES (?, ?)";
+		
+		public PersonMailingMapper(Mailing mailing) {
+			this.mailing = mailing;
+		}
+		
+		@Override
+		public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
+			jdbcTemplate.update(query, new Object[] { mailing.getId(), rs.getInt("id")});
+			
+			return null;
 		}
 		
 	}

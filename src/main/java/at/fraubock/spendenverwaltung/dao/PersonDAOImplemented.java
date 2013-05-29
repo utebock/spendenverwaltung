@@ -30,12 +30,17 @@ public class PersonDAOImplemented implements IPersonDAO {
 	private IAddressDAO addressDAO;
 	private JdbcTemplate jdbcTemplate;
 	private PersonValidator personValidator;
-
+	private FilterToSqlBuilder filterToSqlBuilder;
+	
 	private static final Logger log = Logger
 			.getLogger(PersonDAOImplemented.class);
 
 	public void setPersonValidator(PersonValidator personValidator) {
 		this.personValidator = personValidator;
+	}
+	
+	public void setFilterToSqlBuilder(FilterToSqlBuilder filterToSqlBuilder) {
+		this.filterToSqlBuilder = filterToSqlBuilder;
 	}
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
@@ -98,7 +103,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 			// person to be updated
 
 			String updatePersons = "update persons set givenname = ?, surname = ?, email = ?, sex = ?, title = ?, "
-					+ "company = ?, telephone = ?, emailnotification = ?, postalnotification = ?, note = ? where id = ?;";
+					+ "company = ?, telephone = ?, emailnotification = ?, postalnotification = ?, note = ? where id = ?";
 
 			Object[] params = new Object[] { person.getGivenName(),
 					person.getSurname(), person.getEmail(),
@@ -381,7 +386,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 	
 	@Override
 	public List<Person> getByFilter(Filter filter) throws PersistenceException {
-		String select = FilterToSqlBuilder.createSqlStatement(filter);
+		String select = filterToSqlBuilder.createSqlStatement(filter);
 		List<Person> personList = jdbcTemplate
 				.query(select, new PersonMapper());
 		log.info(personList.size() + " list size");
@@ -393,6 +398,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 
 		return personList;
 	}
+
 
 	private class AddressMapper implements RowMapper<Address> {
 
