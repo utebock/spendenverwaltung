@@ -50,6 +50,7 @@
 	</bean>
 	<bean id="filterDao" class="at.fraubock.spendenverwaltung.dao.FilterDAOImplemented">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<property name="filterValidator" ref="filterValidator" />
 	</bean>
 	<!-- BEANS FOR SERVICES -->
 	<bean id="addressService" class="at.fraubock.spendenverwaltung.service.AddressServiceImplemented">
@@ -60,6 +61,8 @@
 	<bean id="donationValidator" class="at.fraubock.spendenverwaltung.service.DonationValidator">
 	</bean>
 	<bean id="mailingValidator" class="at.fraubock.spendenverwaltung.service.MailingValidator">
+	</bean>
+	<bean id="filterValidator" class="at.fraubock.spendenverwaltung.service.FilterValidator">
 	</bean>
 	<bean id="personService" class="at.fraubock.spendenverwaltung.service.PersonServiceImplemented">
 		<property name="personDAO" ref="personDao" />

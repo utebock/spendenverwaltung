@@ -17,4 +17,17 @@ public enum FilterType {
 	public String toString() {
 		return type;
 	}
+	
+	public static FilterType getTypeForString(String value) {
+		if("persons".equals(value)) {
+			return PERSON;
+		} else if("donations".equals(value)) {
+			return DONATION;
+		} else if("mailings".equals(value)) {
+			return MAILING;
+		} else if("addresses".equals(value)) {
+			return ADDRESS;
+		}
+		return null;
+	}
 }

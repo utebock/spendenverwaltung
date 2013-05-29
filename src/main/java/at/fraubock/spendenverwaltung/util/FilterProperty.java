@@ -19,4 +19,16 @@ public enum FilterProperty {
 	public String toString() {
 		return type;
 	}
+	
+	public static FilterProperty getPropertyForString(String value) {
+		if("givenname".equals(value)) {
+			return PERSON_GIVENNAME;
+		} else if("email".equals(value)) {
+			return PERSON_EMAIL;
+		} else if("company".equals(value)) {
+			return PERSON_COMPANY;
+		}
+		
+		return null;
+	}
 }

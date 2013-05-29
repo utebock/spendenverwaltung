@@ -22,7 +22,7 @@ import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/testspring.xml")
-@TransactionConfiguration(defaultRollback = true)
+//@TransactionConfiguration(defaultRollback = true)
 public class AbstractFilterDAOTest {
 
 	protected static IFilterDAO filterDAO;
@@ -158,9 +158,10 @@ public class AbstractFilterDAOTest {
 
 	public static void init() {
 		testPropCrit = new PropertyCriterion();
+		testPropCrit.setType(FilterType.PERSON);
 		testPropCrit.setProperty(FilterProperty.DONATION_AMOUNT);
 		testPropCrit.setRelationalOperator(RelationalOperator.EQUALS);
-		testPropCrit.setNumValue(100D);
+		testPropCrit.setStrValue("");
 
 		testFilter = new Filter();
 		testFilter.setCriterion(testPropCrit);
@@ -168,12 +169,13 @@ public class AbstractFilterDAOTest {
 		testFilter.setType(FilterType.PERSON);
 
 		testPropCrit2 = new PropertyCriterion();
+		testPropCrit2.setType(FilterType.PERSON);
 		testPropCrit2.setProperty(FilterProperty.DONATION_AMOUNT);
 		testPropCrit2.setRelationalOperator(RelationalOperator.EQUALS);
 		testPropCrit2.setNumValue(100D);
 
 		testFilter2 = new Filter();
-		testFilter2.setCriterion(testPropCrit);
+		testFilter2.setCriterion(testPropCrit2);
 		testFilter2.setName("Testname");
 		testFilter2.setType(FilterType.PERSON);
 	}

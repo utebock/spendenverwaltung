@@ -22,6 +22,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterio
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
+import at.fraubock.spendenverwaltung.service.FilterValidator;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
 import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
@@ -30,6 +31,15 @@ import at.fraubock.spendenverwaltung.util.RelationalOperator;
 public class FilterDAOImplemented implements IFilterDAO {
 
 	private JdbcTemplate jdbcTemplate;
+	private FilterValidator filterValidator;
+	
+	public FilterValidator getFilterValidator() {
+		return filterValidator;
+	}
+
+	public void setFilterValidator(FilterValidator filterValidator) {
+		this.filterValidator = filterValidator;
+	}
 
 	public JdbcTemplate getJdbcTemplate() {
 		return jdbcTemplate;
@@ -109,7 +119,11 @@ public class FilterDAOImplemented implements IFilterDAO {
 				throw new SQLException();
 			}
 			ps.setInt(3, filter.getOperand1().getCriterionId());
-			ps.setInt(4, filter.getOperand2().getCriterionId());
+			if(filter.getOperand2()==null) {
+				ps.setNull(4, java.sql.Types.INTEGER);
+			} else {
+				ps.setInt(4, filter.getOperand2().getCriterionId());
+			}
 			return ps;
 		}
 	}
@@ -133,11 +147,23 @@ public class FilterDAOImplemented implements IFilterDAO {
 			ps.setInt(1, filter.getCriterionId());
 			ps.setString(2, filter.getRelationalOperator().toString());
 			ps.setString(3, filter.getProperty().toString());
-			ps.setDouble(4, filter.getNumValue());
+			if(filter.getNumValue()==null) {
+				ps.setNull(4, java.sql.Types.DOUBLE);
+			} else {
+				ps.setDouble(4, filter.getNumValue());
+			}
 			ps.setString(5, filter.getStrValue());
 			ps.setDate(6, filter.getDateValue());
-			ps.setInt(7, filter.getDaysBack());
-			ps.setBoolean(8, filter.getBoolValue());
+			if(filter.getDaysBack()==null) {
+				ps.setNull(7, java.sql.Types.INTEGER);
+			} else {
+				ps.setInt(7, filter.getDaysBack());
+			}
+			if(filter.getBoolValue()==null) {
+				ps.setNull(8, java.sql.Types.BOOLEAN);
+			} else {
+				ps.setBoolean(8, filter.getBoolValue());
+			};
 			return ps;
 		}
 	}
@@ -169,19 +195,34 @@ public class FilterDAOImplemented implements IFilterDAO {
 			}
 			ps.setInt(2, mount.getId());
 			ps.setString(3, filter.getRelationalOperator().toString());
-			ps.setInt(4, filter.getCount());
+			if(filter.getCount()==null) {
+				ps.setNull(4, java.sql.Types.INTEGER);
+			} else {
+				ps.setInt(4, filter.getCount());
+			}
 			ps.setString(5, filter.getProperty().toString());
-			ps.setDouble(6, filter.getSum());
-			ps.setDouble(7, filter.getAvg());
+			if(filter.getSum()==null) {
+				ps.setNull(6, java.sql.Types.DOUBLE);
+			} else {
+				ps.setDouble(6, filter.getSum());
+			}
+			
+			if(filter.getAvg()==null) {
+				ps.setNull(7, java.sql.Types.DOUBLE);
+			} else {
+				ps.setDouble(7, filter.getAvg());
+			}
 			return ps;
 		}
 	}
 
 	@Override
 	public void insertOrUpdate(Filter f) throws PersistenceException {
-		// TODO validate
+		filterValidator.validate(f);
 
 		if (f.getId() == null) {
+			insertOrUpdateCriterion(f.getCriterion());
+			
 			// new filter to be inserted
 			KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -189,57 +230,61 @@ public class FilterDAOImplemented implements IFilterDAO {
 
 			f.setId(keyHolder.getKey().intValue());
 
-			insertOrUpdateCriterion(f.getCriterion());
+			
 		} else {
-			// TODO update
+
 		}
 	}
 
 	private void insertOrUpdateCriterion(Criterion f)
 			throws PersistenceException {
-		// TODO validate
 
 		if (f.getCriterionId() == null) {
-			// new filter to be inserted
-			KeyHolder criterionKeyHolder = new GeneratedKeyHolder();
-
-			jdbcTemplate.update(new CreateFilterCriterionStatementCreator(f),
-					criterionKeyHolder);
-			f.setCriterionId(criterionKeyHolder.getKey().intValue());
-
-			// now insert the specific criterion type
 			if (f instanceof ConnectedCriterion) {
 				ConnectedCriterion log = (ConnectedCriterion) f;
+				filterValidator.validate(log);
+				insertAbstractCriterion(f);
+				insertOrUpdateCriterion(log.getOperand1());
+				insertOrUpdateCriterion(log.getOperand2());
 				KeyHolder logicalKeyHolder = new GeneratedKeyHolder();
-
+				
 				jdbcTemplate.update(
 						new CreateLogicalFilterStatementCreator(log),
 						logicalKeyHolder);
 				log.setCriterionId(logicalKeyHolder.getKey().intValue());
 			} else if (f instanceof PropertyCriterion) {
+				PropertyCriterion prop = (PropertyCriterion) f;
+				filterValidator.validate(prop);
+				insertAbstractCriterion(f);
 				KeyHolder propertyKeyHolder = new GeneratedKeyHolder();
 
 				jdbcTemplate.update(new CreatePropertyFilterStatementCreator(
-						(PropertyCriterion) f), propertyKeyHolder);
+						prop), propertyKeyHolder);
 				f.setCriterionId(propertyKeyHolder.getKey().intValue());
 			} else if (f instanceof MountedFilterCriterion) {
 				MountedFilterCriterion mount = (MountedFilterCriterion) f;
+				filterValidator.validate(mount);
+				insertAbstractCriterion(f);
 				KeyHolder mountedKeyHolder = new GeneratedKeyHolder();
 
 				jdbcTemplate.update(new CreateMountedFilterStatementCreator(
 						mount), mountedKeyHolder);
 				mount.setCriterionId(mountedKeyHolder.getKey().intValue());
 			}
-
-		} else {
-			// TODO update
 		}
+	}
 
+	private void insertAbstractCriterion(Criterion f) {
+		KeyHolder criterionKeyHolder = new GeneratedKeyHolder();
+
+		jdbcTemplate.update(new CreateFilterCriterionStatementCreator(f),
+				criterionKeyHolder);
+		f.setCriterionId(criterionKeyHolder.getKey().intValue());
 	}
 
 	@Override
 	public void delete(Filter f) throws PersistenceException {
-		// TODO validate
+		filterValidator.validate(f);
 		String deleteFilters = "delete from filter where id = ?";
 
 		Object[] params = new Object[] { f.getId() };
@@ -252,12 +297,10 @@ public class FilterDAOImplemented implements IFilterDAO {
 	}
 
 	private void deleteFilterCriterion(Criterion f) throws PersistenceException {
-		// TODO validate
-
-		// delete the specific criterion type
+		// delete the specific criterion
 		if (f instanceof ConnectedCriterion) {
 			ConnectedCriterion log = (ConnectedCriterion) f;
-
+			filterValidator.validate(log);
 			deleteFilterCriterion(log.getOperand1());
 			deleteFilterCriterion(log.getOperand2());
 			jdbcTemplate.update("delete from connected_criterion where id = ?",
@@ -265,10 +308,12 @@ public class FilterDAOImplemented implements IFilterDAO {
 
 		} else if (f instanceof PropertyCriterion) {
 			PropertyCriterion prop = (PropertyCriterion) f;
+			filterValidator.validate(prop);
 			jdbcTemplate.update("delete from property_criterion where id = ?",
 					new Object[] { prop.getId() }, new int[] { Types.INTEGER });
 		} else if (f instanceof MountedFilterCriterion) {
 			MountedFilterCriterion mount = (MountedFilterCriterion) f;
+			filterValidator.validate(mount);
 
 			if (mount.getMount().isAnonymous()) { // only delete mount when
 													// anonymous
@@ -343,7 +388,7 @@ public class FilterDAOImplemented implements IFilterDAO {
 			throw new IllegalArgumentException("Id must not be less than 0");
 		}
 
-		String select = "select * from property_criterion where criterionid = ?";
+		String select = "select * from property_criterion pc join criterion c on pc.criterionid=c.id where criterionid = ?";
 
 		try {
 			return jdbcTemplate.queryForObject(select, new Object[] { id },
@@ -362,7 +407,7 @@ public class FilterDAOImplemented implements IFilterDAO {
 			throw new IllegalArgumentException("Id must not be less than 0");
 		}
 
-		String select = "select * from logical_criterion where criterionid = ?";
+		String select = "select * from connected_criterion cc join criterion c on cc.criterionid=c.id where criterionid = ?";
 
 		try {
 			return jdbcTemplate.queryForObject(select, new Object[] { id },
@@ -381,7 +426,7 @@ public class FilterDAOImplemented implements IFilterDAO {
 			throw new IllegalArgumentException("Id must not be less than 0");
 		}
 
-		String select = "select * from mountedfilter_criterion where criterionid = ?";
+		String select = "select * from mountedfilter_criterion mc join criterion c on mc.criterionid=c.id where criterionid = ?";
 
 		try {
 			return jdbcTemplate.queryForObject(select, new Object[] { id },
@@ -399,9 +444,9 @@ public class FilterDAOImplemented implements IFilterDAO {
 		public Filter mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Filter filter = new Filter();
 
-			filter.setType(FilterType.valueOf(rs.getString("type")));
+			filter.setType(FilterType.getTypeForString(rs.getString("type")));
 			try {
-				filter.setCriterion(getFilterCriterionById(rs.getInt("head")));
+				filter.setCriterion(getFilterCriterionById(rs.getInt("criterion")));
 			} catch (PersistenceException e) {
 				throw new SQLException(e);
 			}
@@ -419,8 +464,8 @@ public class FilterDAOImplemented implements IFilterDAO {
 				throws SQLException {
 			PropertyCriterion criterion = new PropertyCriterion();
 
-			criterion.setType(FilterType.valueOf(rs.getString("type")));
-			criterion.setProperty(FilterProperty.valueOf(rs
+			criterion.setType(FilterType.getTypeForString(rs.getString("type")));
+			criterion.setProperty(FilterProperty.getPropertyForString(rs
 					.getString("property")));
 			criterion.setRelationalOperator(RelationalOperator.valueOf(rs
 					.getString("relational_operator")));
@@ -440,7 +485,7 @@ public class FilterDAOImplemented implements IFilterDAO {
 				throws SQLException {
 			ConnectedCriterion criterion = new ConnectedCriterion();
 
-			criterion.setType(FilterType.valueOf(rs.getString("type")));
+			criterion.setType(FilterType.getTypeForString(rs.getString("type")));
 			criterion.setLogicalOperator(LogicalOperator.valueOf(rs
 					.getString("logical_operator")));
 			criterion.setCriterionId(rs.getInt("id"));
@@ -473,7 +518,7 @@ public class FilterDAOImplemented implements IFilterDAO {
 					.getString("relational_operator")));
 			criterion.setCriterionId(rs.getInt("id"));
 			criterion.setCount(rs.getInt("count"));
-			criterion.setProperty(FilterProperty.valueOf(rs
+			criterion.setProperty(FilterProperty.getPropertyForString(rs
 					.getString("property")));
 			criterion.setSum(rs.getDouble("sum"));
 			criterion.setAvg(rs.getDouble("avg"));
