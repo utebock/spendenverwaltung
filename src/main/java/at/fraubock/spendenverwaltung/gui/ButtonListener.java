@@ -63,6 +63,18 @@ public class ButtonListener implements ActionListener{
 		if(cmd.equals("cancel_delete_person_from_db")){
 			deletePerson.returnTo();
 		}
+		
+		if(cmd.equals("create_address_in_show_person")){
+			//TODO: isn't implemented in the address dao
+		}
+		
+		if(cmd.equals("create_donation_in_show_person")){
+			showPerson.createDonationInDb();
+		}
+		
+		if(cmd.equals("go_from_show_person_to_person_overview")){
+			showPerson.returnTo();
+		}
 	}
 
 }

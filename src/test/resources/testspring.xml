@@ -44,7 +44,13 @@
 		<property name="donationValidator" ref="donationValidator" />
 		<property name="personDao" ref="personDao" />
 	</bean>
-
+	<bean id="mailingDao" class="at.fraubock.spendenverwaltung.dao.MailingDAOImplemented">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<property name="mailingValidator" ref="mailingValidator" />
+	</bean>
+	<bean id="filterDao" class="at.fraubock.spendenverwaltung.dao.FilterDAOImplemented">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+	</bean>
 	<!-- BEANS FOR SERVICES -->
 	<bean id="addressService" class="at.fraubock.spendenverwaltung.service.AddressServiceImplemented">
 		<property name="addressDAO" ref="addressDao" />
@@ -53,7 +59,8 @@
 	</bean>
 	<bean id="donationValidator" class="at.fraubock.spendenverwaltung.service.DonationValidator">
 	</bean>
-	
+	<bean id="mailingValidator" class="at.fraubock.spendenverwaltung.service.MailingValidator">
+	</bean>
 	<bean id="personService" class="at.fraubock.spendenverwaltung.service.PersonServiceImplemented">
 		<property name="personDAO" ref="personDao" />
 	</bean>

@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -339,7 +341,10 @@ public class CreatePerson extends JPanel{
 		p.setNote(note);
 		
 		try{
-			addressService.create(addr); // will now be created when person is created - pm
+			Address createdAddress = addressService.create(addr); // will now be created when person is created - p
+			List<Address> addresses = new ArrayList<Address>();
+			addresses.add(createdAddress);
+			p.setAddresses(addresses);
 			Person createdPerson = personService.create(p);
 			
 			personModel.addPerson(createdPerson);
