@@ -397,14 +397,14 @@ public class FilterDAOImplemented implements IFilterDAO {
 	private class FilterMapper implements RowMapper<Filter> {
 
 		public Filter mapRow(ResultSet rs, int rowNum) throws SQLException {
-			Criterion head = null;
+			Filter filter = new Filter();
+
+			filter.setType(FilterType.valueOf(rs.getString("type")));
 			try {
-				head = getFilterCriterionById(rs.getInt("head"));
+				filter.setCriterion(getFilterCriterionById(rs.getInt("head")));
 			} catch (PersistenceException e) {
 				throw new SQLException(e);
 			}
-			Filter filter = new Filter(
-					FilterType.valueOf(rs.getString("type")), head);
 			filter.setId(rs.getInt("id"));
 			filter.setName(rs.getString("name"));
 			filter.setAnonymous(rs.getBoolean("anonymous"));
@@ -417,18 +417,20 @@ public class FilterDAOImplemented implements IFilterDAO {
 
 		public PropertyCriterion mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
-			PropertyCriterion filter = new PropertyCriterion(
-					FilterType.valueOf(rs.getString("type")),
-					FilterProperty.valueOf(rs.getString("property")),
-					RelationalOperator.valueOf(rs
-							.getString("relational_operator")));
-			filter.setCriterionId(rs.getInt("id"));
-			filter.setNumValue(rs.getDouble("numValue"));
-			filter.setStrValue(rs.getString("strValue"));
-			filter.setDateValue(rs.getDate("dateValue"));
-			filter.setBoolValue(rs.getBoolean("boolValue"));
-			filter.setDaysBack(rs.getInt("daysBack"));
-			return filter;
+			PropertyCriterion criterion = new PropertyCriterion();
+
+			criterion.setType(FilterType.valueOf(rs.getString("type")));
+			criterion.setProperty(FilterProperty.valueOf(rs
+					.getString("property")));
+			criterion.setRelationalOperator(RelationalOperator.valueOf(rs
+					.getString("relational_operator")));
+			criterion.setCriterionId(rs.getInt("id"));
+			criterion.setNumValue(rs.getDouble("numValue"));
+			criterion.setStrValue(rs.getString("strValue"));
+			criterion.setDateValue(rs.getDate("dateValue"));
+			criterion.setBoolValue(rs.getBoolean("boolValue"));
+			criterion.setDaysBack(rs.getInt("daysBack"));
+			return criterion;
 		}
 	}
 
@@ -436,21 +438,21 @@ public class FilterDAOImplemented implements IFilterDAO {
 
 		public ConnectedCriterion mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
-			Criterion operand1 = null;
-			Criterion operand2 = null;
+			ConnectedCriterion criterion = new ConnectedCriterion();
+
+			criterion.setType(FilterType.valueOf(rs.getString("type")));
+			criterion.setLogicalOperator(LogicalOperator.valueOf(rs
+					.getString("logical_operator")));
+			criterion.setCriterionId(rs.getInt("id"));
 			try {
-				operand1 = getFilterCriterionById(rs.getInt("operand1"));
-				operand2 = getFilterCriterionById(rs.getInt("operand2"));
+				criterion.setOperand1(getFilterCriterionById(rs
+						.getInt("operand1")));
+				criterion.setOperand2(getFilterCriterionById(rs
+						.getInt("operand2")));
 			} catch (PersistenceException e) {
 				throw new SQLException(e);
 			}
-			ConnectedCriterion filter = new ConnectedCriterion(
-					FilterType.valueOf(rs.getString("type")),
-					LogicalOperator.valueOf(rs.getString("logical_operator")),
-					operand1);
-			filter.setCriterionId(rs.getInt("id"));
-			filter.setOperand2(operand2);
-			return filter;
+			return criterion;
 		}
 	}
 
@@ -459,23 +461,24 @@ public class FilterDAOImplemented implements IFilterDAO {
 
 		public MountedFilterCriterion mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
-			Filter mount = null;
+			MountedFilterCriterion criterion = new MountedFilterCriterion();
+
 			try {
-				mount = getById(rs.getInt("mount"));
+				criterion.setMount(getById(rs.getInt("mount")));
 			} catch (PersistenceException e) {
 				throw new SQLException(e);
 			}
-			MountedFilterCriterion filter = new MountedFilterCriterion(
-					FilterType.valueOf(rs.getString("type")), mount,
-					RelationalOperator.valueOf(rs
-							.getString("relational_operator")));
-			filter.setCriterionId(rs.getInt("id"));
-			filter.setCount(rs.getInt("count"));
-			filter.setProperty(FilterProperty.valueOf(rs.getString("property")));
-			filter.setSum(rs.getDouble("sum"));
-			filter.setAvg(rs.getDouble("avg"));
+			;
+			criterion.setRelationalOperator(RelationalOperator.valueOf(rs
+					.getString("relational_operator")));
+			criterion.setCriterionId(rs.getInt("id"));
+			criterion.setCount(rs.getInt("count"));
+			criterion.setProperty(FilterProperty.valueOf(rs
+					.getString("property")));
+			criterion.setSum(rs.getDouble("sum"));
+			criterion.setAvg(rs.getDouble("avg"));
 
-			return filter;
+			return criterion;
 		}
 	}
 }

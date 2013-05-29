@@ -1,22 +1,27 @@
 package at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion;
 
-import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
 
 public class ConnectedCriterion extends Criterion {
-	
+
 	private Integer id;
 	private Criterion operand1, operand2;
-	private LogicalOperator logical_operator;
-	
-	public ConnectedCriterion(FilterType type, LogicalOperator logical_operator, Criterion operand1) {
-		this.type = type;
-		this.operand1 = operand1;
-		this.logical_operator = logical_operator;
+	private LogicalOperator logicalOperator;
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	public Criterion getOperand1() {
 		return operand1;
+	}
+
+	public void setOperand1(Criterion operand1) {
+		this.operand1 = operand1;
 	}
 
 	public Criterion getOperand2() {
@@ -28,15 +33,11 @@ public class ConnectedCriterion extends Criterion {
 	}
 
 	public LogicalOperator getLogicalOperator() {
-		return logical_operator;
+		return logicalOperator;
 	}
 
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
+	public void setLogicalOperator(LogicalOperator logical_operator) {
+		this.logicalOperator = logical_operator;
 	}
 
 }

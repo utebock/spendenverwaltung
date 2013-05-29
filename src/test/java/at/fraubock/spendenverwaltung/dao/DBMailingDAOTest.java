@@ -14,11 +14,11 @@ import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
-import at.fraubock.spendenverwaltung.interfaces.domain.filter.cells.LogicalFilter;
-import at.fraubock.spendenverwaltung.interfaces.domain.filter.cells.PropertyFilter;
-import at.fraubock.spendenverwaltung.util.LogicalOperator;
-
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.ConnectedCriterion;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
+import at.fraubock.spendenverwaltung.util.FilterProperty;
+import at.fraubock.spendenverwaltung.util.LogicalOperator;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
 public class DBMailingDAOTest extends AbstractMailingDAOTest {
@@ -89,37 +89,37 @@ public class DBMailingDAOTest extends AbstractMailingDAOTest {
 		
 		// initialize filters
 		
-		PropertyFilter prop1 = new PropertyFilter();
-		prop1.setProperty("givenname");
+		PropertyCriterion prop1 = new PropertyCriterion();
+		prop1.setProperty(FilterProperty.PERSON_GIVENNAME);
 		prop1.setRelationalOperator(RelationalOperator.EQUALS);
 		prop1.setStrValue("Ralf");
 		
-		filterOnePerson.setHead(prop1);
+		filterOnePerson.setCriterion(prop1);
 		
-		PropertyFilter prop2 = new PropertyFilter();
-		prop2.setProperty("givenname");
+		PropertyCriterion prop2 = new PropertyCriterion();
+		prop2.setProperty(FilterProperty.PERSON_GIVENNAME);
 		prop2.setRelationalOperator(RelationalOperator.EQUALS);
 		prop2.setStrValue("Daisy");
 		
-		PropertyFilter prop3 = new PropertyFilter();
-		prop3.setProperty("givenname");
+		PropertyCriterion prop3 = new PropertyCriterion();
+		prop3.setProperty(FilterProperty.PERSON_GIVENNAME);
 		prop3.setRelationalOperator(RelationalOperator.EQUALS);
 		prop3.setStrValue("Ralf");
 		
-		LogicalFilter log1 = new LogicalFilter();
+		ConnectedCriterion log1 = new ConnectedCriterion();
 		log1.setLogicalOperator(LogicalOperator.OR);
 		log1.setOperand1(prop2);
 		log1.setOperand2(prop3);
 		
 		//this filter should return daisy and ralf
-		filterTwoPeople.setHead(log1);
+		filterTwoPeople.setCriterion(log1);
 		
-		PropertyFilter prop4 = new PropertyFilter();
-		prop4.setProperty("givenname");
+		PropertyCriterion prop4 = new PropertyCriterion();
+		prop4.setProperty(FilterProperty.PERSON_GIVENNAME);
 		prop4.setRelationalOperator(RelationalOperator.EQUALS);
 		prop4.setStrValue("doesntexist");
 		
-		filterNoPeople.setHead(prop4);
+		filterNoPeople.setCriterion(prop4);
 		
 		filterDAO.insertOrUpdate(filterOnePerson);
 		filterDAO.insertOrUpdate(filterTwoPeople);

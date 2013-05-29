@@ -3,7 +3,7 @@ package at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion;
 import at.fraubock.spendenverwaltung.util.FilterType;
 
 public abstract class Criterion {
-	
+
 	private Integer id;
 	protected FilterType type;
 
@@ -18,5 +18,8 @@ public abstract class Criterion {
 	public FilterType getType() {
 		return type;
 	}
-	
+
+	public void setType(FilterType type) {
+		this.type = type;
+	}
 }

@@ -2,7 +2,6 @@ package at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
-import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
 public class MountedFilterCriterion extends Criterion {
@@ -14,26 +13,36 @@ public class MountedFilterCriterion extends Criterion {
 	private FilterProperty property;
 	private Double sum;
 	private Double avg;
-	
-	public MountedFilterCriterion(FilterType type, Filter mount, RelationalOperator relationalOperator) {
-		this.type = type;
-		this.mount = mount;
-		this.relationalOperator = relationalOperator;
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	public Filter getMount() {
 		return mount;
 	}
-	
+
+	public void setMount(Filter mount) {
+		this.mount = mount;
+	}
+
 	public RelationalOperator getRelationalOperator() {
 		return relationalOperator;
+	}
+
+	public void setRelationalOperator(RelationalOperator relationalOperator) {
+		this.relationalOperator = relationalOperator;
 	}
 
 	public Integer getCount() {
 		return count;
 	}
 
-	public void setCount(int count) {
+	public void setCount(Integer count) {
 		this.count = count;
 	}
 
@@ -49,7 +58,7 @@ public class MountedFilterCriterion extends Criterion {
 		return sum;
 	}
 
-	public void setSum(double sum) {
+	public void setSum(Double sum) {
 		this.sum = sum;
 	}
 
@@ -57,16 +66,8 @@ public class MountedFilterCriterion extends Criterion {
 		return avg;
 	}
 
-	public void setAvg(double avg) {
+	public void setAvg(Double avg) {
 		this.avg = avg;
-	}
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
 	}
 
 }
