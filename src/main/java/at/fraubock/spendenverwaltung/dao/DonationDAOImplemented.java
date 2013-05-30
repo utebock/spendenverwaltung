@@ -59,7 +59,7 @@ public class DonationDAOImplemented implements IDonationDAO {
 			this.donation = donation;
 		}
 
-		private String createDonations = "insert into donations (personid, amount, donationdate, dedication, type, note) values (?,?,?,?,?,?)";
+		private String createDonations = "insert into donations (personid, amount, date, dedication, type, note) values (?,?,?,?,?,?)";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
@@ -92,7 +92,7 @@ public class DonationDAOImplemented implements IDonationDAO {
 
 		} else {
 			// update
-			String updateStatement = "update donations set personid = ?, amount = ?, donationdate = ?, dedication = ?, type = ?, note = ? where id = ?";
+			String updateStatement = "update donations set personid = ?, amount = ?, date = ?, dedication = ?, type = ?, note = ? where id = ?";
 
 			Object[] params = new Object[] { d.getDonator().getId(),
 					d.getAmount(), d.getDate(), d.getDedication(),
@@ -199,12 +199,12 @@ public class DonationDAOImplemented implements IDonationDAO {
 //		}
 //
 //		if (filter.getMaxDate() != null) {
-//			where += "donationdate <= ? AND ";
+//			where += "date <= ? AND ";
 //			args.add(new Timestamp(filter.getMaxDate().getTime()));
 //		}
 //
 //		if (filter.getMinDate() != null) {
-//			where += "donationdate >= ? AND ";
+//			where += "date >= ? AND ";
 //			args.add(new Timestamp(filter.getMinDate().getTime()));
 //		}
 //
@@ -268,7 +268,7 @@ public class DonationDAOImplemented implements IDonationDAO {
 				throw new SQLException(e);
 			}
 			donation.setAmount(rs.getLong("amount"));
-			donation.setDate(rs.getDate("donationdate"));
+			donation.setDate(rs.getDate("date"));
 			donation.setDedication(rs.getString("dedication"));
 			donation.setNote(rs.getString("note"));
 			donation.setType(Donation.DonationType.getByName(rs
