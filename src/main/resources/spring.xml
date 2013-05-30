@@ -50,6 +50,7 @@
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="mailingValidator" ref="mailingValidator" />
 		<property name="filterToSqlBuilder" ref="filterToSqlBuilder" />
+		<property name="personValidator" ref="personValidator" />
 	</bean>
 	<bean id="filterDao" class="at.fraubock.spendenverwaltung.dao.FilterDAOImplemented">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />

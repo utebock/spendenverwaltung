@@ -9,7 +9,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
-import at.fraubock.spendenverwaltung.interfaces.dao.IFilterDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
@@ -18,6 +17,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Connecte
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
+import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
@@ -32,10 +32,9 @@ public class DBMailingDAOTest extends AbstractMailingDAOTest {
 	public static void initialize() throws PersistenceException {
 		DBMailingDAOTest.context = new ClassPathXmlApplicationContext("testspring.xml");
 
-		AbstractMailingDAOTest.setAddressDAO(context.getBean("addressDAO", IAddressDAO.class));
-		AbstractMailingDAOTest.setMailingDAO(context.getBean("mailingDAO", IMailingDAO.class));
-		AbstractMailingDAOTest.setPersonDAO(context.getBean("personDAO", IPersonDAO.class));
-		AbstractMailingDAOTest.setFilterDAO(context.getBean("filterDAO", IFilterDAO.class));
+		AbstractMailingDAOTest.setAddressDAO(context.getBean("addressDao", IAddressDAO.class));
+		AbstractMailingDAOTest.setMailingDAO(context.getBean("mailingDao", IMailingDAO.class));
+		AbstractMailingDAOTest.setPersonDAO(context.getBean("personDao", IPersonDAO.class));
 		
 		// initialize addresses
 		
@@ -87,43 +86,29 @@ public class DBMailingDAOTest extends AbstractMailingDAOTest {
 		personDAO.insertOrUpdate(personTwo);
 		personDAO.insertOrUpdate(personThree);
 		
-		// initialize filters
+		//initialize filters
 		
-		PropertyCriterion prop1 = new PropertyCriterion();
-		prop1.setProperty(FilterProperty.PERSON_GIVENNAME);
-		prop1.setRelationalOperator(RelationalOperator.EQUALS);
-		prop1.setStrValue("Ralf");
+		PropertyCriterion onlyRalf = new PropertyCriterion();
+		onlyRalf.compare(FilterProperty.PERSON_GIVENNAME, RelationalOperator.EQUALS, "Ralf");
 		
-		filterOnePerson.setCriterion(prop1);
+		filterOnePerson.setType(FilterType.PERSON);
+		filterOnePerson.setCriterion(onlyRalf);
 		
-		PropertyCriterion prop2 = new PropertyCriterion();
-		prop2.setProperty(FilterProperty.PERSON_GIVENNAME);
-		prop2.setRelationalOperator(RelationalOperator.EQUALS);
-		prop2.setStrValue("Daisy");
+		PropertyCriterion onlyDaisy = new PropertyCriterion();
+		onlyDaisy.compare(FilterProperty.PERSON_GIVENNAME, RelationalOperator.EQUALS, "Daisy");
 		
-		PropertyCriterion prop3 = new PropertyCriterion();
-		prop3.setProperty(FilterProperty.PERSON_GIVENNAME);
-		prop3.setRelationalOperator(RelationalOperator.EQUALS);
-		prop3.setStrValue("Ralf");
+		ConnectedCriterion ralfAndDaisy = new ConnectedCriterion();
+		ralfAndDaisy.connect(onlyDaisy, LogicalOperator.OR, onlyRalf);
 		
-		ConnectedCriterion log1 = new ConnectedCriterion();
-		log1.setLogicalOperator(LogicalOperator.OR);
-		log1.setOperand1(prop2);
-		log1.setOperand2(prop3);
+
+		filterTwoPeople.setType(FilterType.PERSON);
+		filterTwoPeople.setCriterion(ralfAndDaisy);
 		
-		//this filter should return daisy and ralf
-		filterTwoPeople.setCriterion(log1);
+		PropertyCriterion noPeople = new PropertyCriterion();
+		noPeople.compare(FilterProperty.PERSON_GIVENNAME,  RelationalOperator.EQUALS, "doesntexist");
 		
-		PropertyCriterion prop4 = new PropertyCriterion();
-		prop4.setProperty(FilterProperty.PERSON_GIVENNAME);
-		prop4.setRelationalOperator(RelationalOperator.EQUALS);
-		prop4.setStrValue("doesntexist");
-		
-		filterNoPeople.setCriterion(prop4);
-		
-		filterDAO.insertOrUpdate(filterOnePerson);
-		filterDAO.insertOrUpdate(filterTwoPeople);
-		filterDAO.insertOrUpdate(filterNoPeople);
+		filterNoPeople.setType(FilterType.PERSON);
+		filterNoPeople.setCriterion(noPeople);
 	}
 	
 	/**
@@ -139,9 +124,5 @@ public class DBMailingDAOTest extends AbstractMailingDAOTest {
 		addressDAO.delete(addressOne);
 		addressDAO.delete(addressTwo);
 		addressDAO.delete(addressThree);
-		
-		filterDAO.delete(filterOnePerson);
-		filterDAO.delete(filterTwoPeople);
-		filterDAO.delete(filterNoPeople);
 	}
 }
