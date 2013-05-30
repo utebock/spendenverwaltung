@@ -14,7 +14,7 @@ public enum FilterProperty {
 	MAILING_DATE("date"),
 	
 	/* filter properties of an address */
-	ADDRESS_IS_MAIN("isMain");
+	ADDRESS_IS_MAIN("ismain");
 	
 	private String type;
 	
