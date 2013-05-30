@@ -20,6 +20,11 @@ public class PropertyCriterion extends Criterion {
 		this.setRelationalOperator(RelationalOperator.NOT_NULL);
 	}
 	
+	public void compareIsNull(FilterProperty property) {
+		this.setProperty(property);
+		this.setRelationalOperator(RelationalOperator.IS_NULL);
+	}
+	
 	public void compare(FilterProperty property, RelationalOperator relationalOperator, Double numValue) {
 		this.setProperty(property);
 		this.setRelationalOperator(relationalOperator);

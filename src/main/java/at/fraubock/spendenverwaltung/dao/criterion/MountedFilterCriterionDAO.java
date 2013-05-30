@@ -20,6 +20,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedF
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.service.FilterValidator;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
+import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
 public class MountedFilterCriterionDAO {
@@ -134,15 +135,16 @@ public class MountedFilterCriterionDAO {
 			} catch (PersistenceException e) {
 				throw new SQLException(e);
 			}
-			;
+			criterion
+			.setType(FilterType.getTypeForString(rs.getString("type")));
+			
 			criterion.setRelationalOperator(RelationalOperator.valueOf(rs
 					.getString("relational_operator")));
 			criterion.setId(rs.getInt("id"));
 			criterion.setCount(rs.getInt("count"));
 			
-			//TODO
-//			criterion.setProperty(FilterProperty.getPropertyForString(rs
-//					.getString("property")));
+			criterion.setProperty(FilterProperty.getPropertyForString(rs
+					.getString("property"),FilterType.getTypeForString(rs.getString("type"))));
 			criterion.setSum(rs.getDouble("sum"));
 			criterion.setAvg(rs.getDouble("avg"));
 

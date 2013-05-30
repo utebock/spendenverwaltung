@@ -126,9 +126,9 @@ public class PropertyCriterionDAO {
 
 			criterion
 					.setType(FilterType.getTypeForString(rs.getString("type")));
-			//TODO
-//			criterion.setProperty(FilterProperty.getPropertyForString(rs
-//					.getString("property")));
+			
+			criterion.setProperty(FilterProperty.getPropertyForString(rs
+					.getString("property"),FilterType.getTypeForString(rs.getString("type"))));
 			criterion.setRelationalOperator(RelationalOperator.valueOf(rs
 					.getString("relational_operator")));
 			criterion.setId(rs.getInt("id"));
