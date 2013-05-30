@@ -7,7 +7,10 @@ public enum FilterProperty {
 	PERSON_COMPANY("company"),
 	
 	/* properties of a donation to be filtered */
-	DONATION_AMOUNT("amount");
+	DONATION_AMOUNT("amount"),
+	
+	/* properties of an address to be filtered */
+	IS_MAIN_ADDRESS("ismain");
 	
 	private String type;
 	
