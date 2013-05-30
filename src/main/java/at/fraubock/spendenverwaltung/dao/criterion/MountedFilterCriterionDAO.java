@@ -139,8 +139,10 @@ public class MountedFilterCriterionDAO {
 					.getString("relational_operator")));
 			criterion.setId(rs.getInt("id"));
 			criterion.setCount(rs.getInt("count"));
-			criterion.setProperty(FilterProperty.getPropertyForString(rs
-					.getString("property")));
+			
+			//TODO
+//			criterion.setProperty(FilterProperty.getPropertyForString(rs
+//					.getString("property")));
 			criterion.setSum(rs.getDouble("sum"));
 			criterion.setAvg(rs.getDouble("avg"));
 
