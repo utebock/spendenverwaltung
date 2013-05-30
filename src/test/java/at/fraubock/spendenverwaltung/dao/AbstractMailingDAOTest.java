@@ -114,9 +114,11 @@ public class AbstractMailingDAOTest {
 		try {
 			Mailing result = mailingDAO.getById(mailing.getId());
 			
-			System.out.println("mailing: id: "+mailing.getId()+" type: "+mailing.getType().getName()+" medium: "+mailing.getMedium().getName()+" date: "+mailing.getDate().getTime());
-			System.out.println("result: id: "+result.getId()+" type: "+result.getType().getName()+" medium: "+result.getMedium().getName()+" date: "+result.getDate().getTime());
-			
+			assertEquals(mailing.getType(), result.getType());
+			assertEquals(mailing.getMedium(), result.getMedium());
+			assertTrue(mailing.getDate().getTime() == result.getDate().getTime());
+			assertTrue(mailing.getId() == result.getId());
+
 			assertEquals(result, mailing);
 		
 			//TODO getMailingByPerson call to check if the right
