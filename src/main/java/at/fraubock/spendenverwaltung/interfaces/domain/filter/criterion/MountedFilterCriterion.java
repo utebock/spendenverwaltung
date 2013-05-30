@@ -12,6 +12,26 @@ public class MountedFilterCriterion extends Criterion {
 	private FilterProperty property;
 	private Double sum;
 	private Double avg;
+	
+	public void mountAndCompareCount(Filter mount, RelationalOperator relationalOperator, int count) {
+		this.setMount(mount);
+		this.setRelationalOperator(relationalOperator);
+		this.setCount(count);
+	}
+	
+	public void mountAndCompareSum(Filter mount, RelationalOperator relationalOperator, FilterProperty property, double sum) {
+		this.setMount(mount);
+		this.setRelationalOperator(relationalOperator);
+		this.setProperty(property);
+		this.setSum(sum);
+	}
+	
+	public void mountAndCompareAverage(Filter mount, RelationalOperator relationalOperator, FilterProperty property, double avg) {
+		this.setMount(mount);
+		this.setRelationalOperator(relationalOperator);
+		this.setProperty(property);
+		this.setAvg(avg);
+	}
 
 	public Filter getMount() {
 		return mount;

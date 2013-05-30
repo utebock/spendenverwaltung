@@ -1,45 +1,57 @@
 package at.fraubock.spendenverwaltung.util;
 
+import java.text.SimpleDateFormat;
+
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
-import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.ConnectedCriterion;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
+import at.fraubock.spendenverwaltung.service.FilterValidator;
 
 public class FilterToSqlBuilder {
+	
+	private FilterValidator validator;
 
 	public String createSqlStatement(Filter filter) {
-		String stmt = "select * from " + filter.getType()
-				+ " as "+filter.getType()+" where " + createConditionalStatement(filter.getCriterion());
-
+		validator.validate(filter);
+		
+		String stmt = "select * from " + filter.getType();
+		if(filter.getCriterion()!=null) {
+			stmt += " where " + createConditionalStatement(filter.getCriterion());
+		}
+				
+		System.out.println(stmt);
 		return stmt;
 	}
 
 	private String createConditionalStatement(Criterion criterion) {
-
+		
 		if (criterion instanceof ConnectedCriterion) {
-			ConnectedCriterion log = (ConnectedCriterion) criterion;
-			return "(" + createConditionalStatement(log.getOperand1()) + " "
-					+ log.getLogicalOperator() + " "
-					+ createConditionalStatement(log.getOperand2()) + ")";
+			ConnectedCriterion con = (ConnectedCriterion) criterion;
+			validator.validate(con);
+			return "(" + createConditionalStatement(con.getOperand1()) + " "
+					+ con.getLogicalOperator() + " "
+					+ createConditionalStatement(con.getOperand2()) + ")";
 
 		}
 		
 		if (criterion instanceof PropertyCriterion) {
 			PropertyCriterion prop = (PropertyCriterion) criterion;
-			String expr = prop.getType() + "." + prop.getProperty()
-					+ " " + prop.getRelationalOperator().getMath();
+			validator.validate(prop);
+			String expr = prop.getProperty()
+					+ " " + prop.getRelationalOperator().getExpression();
 
 			if (prop.getNumValue() != null) {
 				expr += prop.getNumValue();
 			} else if (prop.getStrValue() != null) {
 				expr += "'" + prop.getStrValue() + "'";
 			} else if (prop.getDateValue() != null) {
-				expr += "DATE('" + prop.getDateValue() + "')";
+				expr += "DATE('" + new SimpleDateFormat("yyyy-MM-dd").format(prop.getDateValue()) + "')";
 			} else if (prop.getBoolValue() != null) {
 				expr += prop.getBoolValue();
 			} else if (prop.getDaysBack() != null) {
-				expr += prop.getDaysBack();
+				expr += "DATE_SUB(DATE(NOW()),INTERVAL "+prop.getDaysBack()+" DAY)";
 			}
 
 			return expr;
@@ -47,20 +59,24 @@ public class FilterToSqlBuilder {
 		
 		if (criterion instanceof MountedFilterCriterion) {
 			MountedFilterCriterion mounted = (MountedFilterCriterion) criterion;
-			
+			validator.validate(mounted);
 			String statement = "("+createSqlStatement(mounted.getMount());
-			
+			if(statement.contains("where")) {
+				statement = statement.replace("where","as mount where");
+			} else {
+				statement += " as mount";
+			}
 			FilterType mountedType = mounted.getMount().getType();
 			FilterType thisType = mounted.getType();
 			if(mounted.getType()==mountedType) {
-				statement += " and "+mountedType+".id="+thisType+".id)";
+				statement += " and mount.id=id)";
 			} else if(thisType==FilterType.PERSON) {
-				statement += " and "+thisType+".id="+mountedType+".personid)";
+				statement += " and id=mount.personid)";
 			} else {
-				statement += " and "+mountedType+".id="+thisType+".personid)";
-			}
+				statement += " and mount.id=personid)";
+			} //TODO address
 			
-			statement+=mounted.getRelationalOperator().getMath();
+			statement+=mounted.getRelationalOperator().getExpression();
 			
 			if(mounted.getCount()!=null) {
 				statement = statement.replace("select * from", "select count(*) from");
@@ -78,6 +94,14 @@ public class FilterToSqlBuilder {
 		}
 
 		return null;
+	}
+
+	public FilterValidator getValidator() {
+		return validator;
+	}
+
+	public void setValidator(FilterValidator validator) {
+		this.validator = validator;
 	}
 
 }

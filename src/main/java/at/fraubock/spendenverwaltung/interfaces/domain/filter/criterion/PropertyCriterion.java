@@ -1,6 +1,6 @@
 package at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion;
 
-import java.sql.Date;
+import java.util.Date;
 
 import at.fraubock.spendenverwaltung.util.FilterProperty;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
@@ -14,6 +14,41 @@ public class PropertyCriterion extends Criterion {
 	private Date dateValue;
 	private Boolean boolValue;
 	private Integer daysBack;
+	
+	public void compareNotNull(FilterProperty property) {
+		this.setProperty(property);
+		this.setRelationalOperator(RelationalOperator.NOT_NULL);
+	}
+	
+	public void compare(FilterProperty property, RelationalOperator relationalOperator, Double numValue) {
+		this.setProperty(property);
+		this.setRelationalOperator(relationalOperator);
+		this.setNumValue(numValue);
+	}
+	
+	public void compare(FilterProperty property, RelationalOperator relationalOperator, String strValue) {
+		this.setProperty(property);
+		this.setRelationalOperator(relationalOperator);
+		this.setStrValue(strValue);
+	}
+	
+	public void compare(FilterProperty property, RelationalOperator relationalOperator, Date dateValue) {
+		this.setProperty(property);
+		this.setRelationalOperator(relationalOperator);
+		this.setDateValue(dateValue);
+	}
+	
+	public void compare(FilterProperty property, boolean boolValue) {
+		this.setProperty(property);
+		this.setRelationalOperator(RelationalOperator.EQUALS);
+		this.setBoolValue(boolValue);
+	}
+	
+	public void compareDaysBack(FilterProperty property, RelationalOperator relationalOperator, int daysBack) {
+		this.setProperty(property);
+		this.setRelationalOperator(relationalOperator);
+		this.setDaysBack(daysBack);
+	}
 
 	public FilterProperty getProperty() {
 		return property;

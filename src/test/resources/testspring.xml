@@ -80,10 +80,11 @@
 	
 	<bean id="filterDao" class="at.fraubock.spendenverwaltung.dao.FilterDAOImplemented">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
-		<property name="filterValidator" ref="filterValidator" />
+		<property name="validator" ref="filterValidator" />
 		<property name="abstractCritDAO" ref="abstractCritDao" />
 	</bean>
 	<bean id="filterToSqlBuilder" class="at.fraubock.spendenverwaltung.util.FilterToSqlBuilder">
+		<property name="validator" ref="filterValidator" />
 	</bean>
 	
 	

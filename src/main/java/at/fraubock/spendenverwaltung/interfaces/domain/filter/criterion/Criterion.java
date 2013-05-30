@@ -5,7 +5,7 @@ import at.fraubock.spendenverwaltung.util.FilterType;
 public abstract class Criterion {
 
 	private Integer id;
-	private FilterType type;
+	protected FilterType type;
 
 	public Integer getId() {
 		return id;

@@ -1,6 +1,7 @@
 package at.fraubock.spendenverwaltung.dao.criterion;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -69,10 +70,10 @@ public class PropertyCriterionDAO {
 	private class CreatePropertyFilterStatementCreator implements
 			PreparedStatementCreator {
 
-		private PropertyCriterion filter;
+		private PropertyCriterion prop;
 
 		CreatePropertyFilterStatementCreator(PropertyCriterion filter) {
-			this.filter = filter;
+			this.prop = filter;
 		}
 
 		private String createFilter = "insert into property_criterion (relational_operator,property,numValue,strValue,dateValue,daysBack,boolValue) values (?,?,?,?,?,?,?)";
@@ -83,24 +84,34 @@ public class PropertyCriterionDAO {
 			PreparedStatement ps = connection.prepareStatement(createFilter,
 					Statement.RETURN_GENERATED_KEYS);
 			int c = 1;
-			ps.setString(c++, filter.getRelationalOperator().toString());
-			ps.setString(c++, filter.getProperty().toString());
-			if (filter.getNumValue() == null) {
+			
+			ps.setString(c++, prop.getRelationalOperator().toString());
+			ps.setString(c++, prop.getProperty().toString());
+			
+			if (prop.getNumValue() == null) {
 				ps.setNull(c++, java.sql.Types.DOUBLE);
 			} else {
-				ps.setDouble(c++, filter.getNumValue());
+				ps.setDouble(c++, prop.getNumValue());
 			}
-			ps.setString(c++, filter.getStrValue());
-			ps.setDate(c++, filter.getDateValue());
-			if (filter.getDaysBack() == null) {
+			
+			ps.setString(c++, prop.getStrValue());
+			
+			if (prop.getDateValue() == null) {
+				ps.setNull(c++, java.sql.Types.DATE);
+			} else {
+				ps.setDate(c++, new Date(prop.getDateValue().getTime()));
+			}
+			
+			if (prop.getDaysBack() == null) {
 				ps.setNull(c++, java.sql.Types.INTEGER);
 			} else {
-				ps.setInt(c++, filter.getDaysBack());
+				ps.setInt(c++, prop.getDaysBack());
 			}
-			if (filter.getBoolValue() == null) {
+			
+			if (prop.getBoolValue() == null) {
 				ps.setNull(c++, java.sql.Types.BOOLEAN);
 			} else {
-				ps.setBoolean(c++, filter.getBoolValue());
+				ps.setBoolean(c++, prop.getBoolValue());
 			}
 			;
 			return ps;

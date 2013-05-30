@@ -11,6 +11,24 @@ public class Filter {
 	private String name;
 	private boolean anonymous = false;
 	
+	public Filter() {
+		
+	}
+	
+	public Filter(FilterType type) {
+		this(type, null);
+	}
+	
+	public Filter(FilterType type, Criterion criterion) {
+		this(type, criterion, null);
+	}
+	
+	public Filter(FilterType type, Criterion criterion, String name) {
+		this.setType(type);
+		this.setCriterion(criterion);
+		this.setName(name);
+	}
+	
 	public Integer getId() {
 		return id;
 	}
@@ -22,12 +40,18 @@ public class Filter {
 	}
 	public void setType(FilterType type) {
 		this.type = type;
+		if(criterion!=null) {
+			criterion.setType(type);
+		}
 	}
 	public Criterion getCriterion() {
 		return criterion;
 	}
 	public void setCriterion(Criterion criterion) {
 		this.criterion = criterion;
+		if(criterion!=null) {
+			criterion.setType(type);
+		}
 	}
 	public String getName() {
 		return name;

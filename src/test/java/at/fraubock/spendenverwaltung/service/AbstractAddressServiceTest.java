@@ -1,11 +1,14 @@
 package at.fraubock.spendenverwaltung.service;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -239,7 +242,8 @@ public abstract class AbstractAddressServiceTest {
 		}
 	}
 
-	protected static void init() {
+	@Before
+	public void init() {
 		newAddress = new Address();
 		newAddress.setStreet("Teststreet 1/1");
 		newAddress.setPostalCode("00000");

@@ -26,11 +26,11 @@ public class FilterDAOImplemented implements IFilterDAO {
 
 	private JdbcTemplate jdbcTemplate;
 	private AbstractCriterionDAO abstractCritDAO;
-	private FilterValidator filterValidator;
+	private FilterValidator validator;
 
 	@Override
 	public void insertOrUpdate(Filter f) throws PersistenceException {
-		filterValidator.validate(f);
+		validator.validate(f);
 
 		if (f.getId() == null) {
 			abstractCritDAO.insert(f.getCriterion());
@@ -49,7 +49,7 @@ public class FilterDAOImplemented implements IFilterDAO {
 
 	@Override
 	public void delete(Filter f) throws PersistenceException {
-		filterValidator.validate(f);
+		validator.validate(f);
 		String deleteFilters = "delete from filter where id = ?";
 
 		Object[] params = new Object[] { f.getId() };
@@ -137,12 +137,12 @@ public class FilterDAOImplemented implements IFilterDAO {
 		}
 	}
 
-	public FilterValidator getFilterValidator() {
-		return filterValidator;
+	public FilterValidator getValidator() {
+		return validator;
 	}
 
-	public void setFilterValidator(FilterValidator filterValidator) {
-		this.filterValidator = filterValidator;
+	public void setValidator(FilterValidator filterValidator) {
+		this.validator = filterValidator;
 	}
 
 	public JdbcTemplate getJdbcTemplate() {

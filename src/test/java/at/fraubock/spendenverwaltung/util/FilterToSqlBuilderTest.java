@@ -1,15 +1,12 @@
-package at.fraubock.spendenverwaltung.dao;
+package at.fraubock.spendenverwaltung.util;
 
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import at.fraubock.spendenverwaltung.interfaces.dao.IFilterDAO;
-
-public class DBFilterDAOTest extends AbstractFilterDAOTest {
+public class FilterToSqlBuilderTest extends AbstractFilterToSqlBuilderTest {
 	private static ApplicationContext context;
 
 	/**
@@ -19,12 +16,7 @@ public class DBFilterDAOTest extends AbstractFilterDAOTest {
 	public static void setup() {
 		context = new ClassPathXmlApplicationContext("testspring.xml");
 
-		setFilterDao(context.getBean("filterDao", IFilterDAO.class));
-	}
-
-	@Before
-	public void refreshInit() {
-		init();
+		setBuilder(context.getBean("filterToSqlBuilder", FilterToSqlBuilder.class));
 	}
 
 	/**

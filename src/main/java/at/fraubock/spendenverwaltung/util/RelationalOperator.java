@@ -1,7 +1,7 @@
 package at.fraubock.spendenverwaltung.util;
 
 public enum RelationalOperator {
-	GREATER(">"), LESS("<"), EQUALS("="), LIKE("~"), 
+	GREATER(">"), LESS("<"), EQUALS("="), LIKE("LIKE"), 
 	GREATER_EQ(">="), LESS_EQ("<="), NOT_NULL("NOT NULL");
 	
 	private String math;
@@ -10,7 +10,7 @@ public enum RelationalOperator {
 		this.math = math;
 	}
 	
-	public String getMath() {
+	public String getExpression() {
 		return math;
 	}
 }

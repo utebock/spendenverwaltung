@@ -1,13 +1,20 @@
 package at.fraubock.spendenverwaltung.util;
 
 public enum FilterProperty {
-	/* properties of a person to be filtered */
+	/* filter properties of a person */
 	PERSON_GIVENNAME("givenname"),
 	PERSON_EMAIL("email"),
 	PERSON_COMPANY("company"),
 	
-	/* properties of a donation to be filtered */
-	DONATION_AMOUNT("amount");
+	/* filter properties of a donation */
+	DONATION_AMOUNT("amount"),
+	DONATION_DATE("donationdate"),
+	
+	/* filter properties of a mailing */
+	MAILING_DATE("date"),
+	
+	/* filter properties of an address */
+	ADDRESS_IS_MAIN("isMain");
 	
 	private String type;
 	
