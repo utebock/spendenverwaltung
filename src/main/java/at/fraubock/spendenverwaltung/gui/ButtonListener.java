@@ -7,11 +7,11 @@ public class ButtonListener implements ActionListener{
 
 	private Overview overview;
 	private CreatePerson createPerson;
-	private DeletePerson deletePerson;
-	private AddDonation showPerson;
+	private AddAttributes showPerson;
 	private FilterPersons filterPersons;
 	private FilterOverview filterOverview;
 	private CreateFilter createFilter;
+	private EditPerson editPerson;
 	
 	public ButtonListener(Overview overview){
 		this.overview = overview;
@@ -21,11 +21,7 @@ public class ButtonListener implements ActionListener{
 		this.createPerson = createPerson;
 	}
 	
-	public ButtonListener(DeletePerson deletePerson) {
-		this.deletePerson = deletePerson;
-	}
-	
-	public ButtonListener(AddDonation showPerson) {
+	public ButtonListener(AddAttributes showPerson) {
 		this.showPerson = showPerson;
 	}
 	
@@ -40,6 +36,10 @@ public class ButtonListener implements ActionListener{
 	public ButtonListener(CreateFilter createFilter) {
 		this.createFilter = createFilter;
 	}
+	public ButtonListener(EditPerson editPerson) {
+		this.editPerson = editPerson;
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
@@ -71,14 +71,21 @@ public class ButtonListener implements ActionListener{
 		}
 		
 		if(cmd.equals("delete_person_from_db")){
-			deletePerson.deletePersonFromDb();
+			filterPersons.deletePerson();
 		}
 		
-		if(cmd.equals("cancel_delete_person_from_db")){
-			deletePerson.returnTo();
+		if(cmd.equals("edit_person")){
+			filterPersons.editPerson();
 		}
+		if(cmd.equals("edit_person_in_db")){
+			editPerson.editPerson();
+		}
+		if(cmd.equals("cancel_edit")){
+			editPerson.returnTo();
+		}
+		
 		if(cmd.equals("add_donation_address")){
-			filterPersons.goToShow();
+			filterPersons.addAttributes();
 		}
 		if(cmd.equals("return_to_personOverview")){
 			filterPersons.returnTo();

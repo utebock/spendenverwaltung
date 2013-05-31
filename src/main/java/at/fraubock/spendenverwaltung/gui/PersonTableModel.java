@@ -35,9 +35,10 @@ public class PersonTableModel extends AbstractTableModel{
 		Person person = (Person)persons.get(rowIndex);
 		
 		switch(columnIndex){
-			case 0: return person.getSurname();
-			case 1: return person.getGivenName();
-			case 2: return "";
+			case 0: return person.getId();
+			case 1: return person.getSurname();
+			case 2: return person.getGivenName();
+			case 3: return "";
 			default: return null;
 		}
 	}

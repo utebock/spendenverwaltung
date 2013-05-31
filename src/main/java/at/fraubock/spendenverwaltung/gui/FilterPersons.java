@@ -1,15 +1,10 @@
 package at.fraubock.spendenverwaltung.gui;
 
 import java.awt.Dimension;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
-
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -47,6 +42,7 @@ public class FilterPersons extends JPanel{
 	private JButton deleteButton;
 	private JButton addAttribute;
 	private ActionHandler handler;
+	@SuppressWarnings("rawtypes")
 	private JComboBox filterCombo;
 	private JButton backButton;
 	
@@ -86,11 +82,11 @@ public class FilterPersons extends JPanel{
 	}
 	
 	private void addComponentsToToolbar(JToolBar toolbar) {
-		String[] combo = new String[]{"Filter 1", "Filter 2"};
+		String[] combo = new String[]{"Platzhalter", "Platzhalter"};
 		filterCombo = builder.createComboBox(combo, handler);
 		addAttribute = builder.createButton("Attribute hinzuf\u00FCgen", buttonListener, "add_donation_address");
 		editButton = builder.createButton("Bearbeiten", buttonListener, "edit_person");
-		deleteButton = builder.createButton("L\u00F6schen", buttonListener, "delete_person");
+		deleteButton = builder.createButton("L\u00F6schen", buttonListener, "delete_person_from_db");
 		backButton = builder.createButton("Zur\u00FCck", buttonListener, "return_to_personOverview");
 		toolbar.add(filterCombo);
 		toolbar.add(addAttribute);
@@ -124,15 +120,81 @@ public class FilterPersons extends JPanel{
 		}	
 	}
 	
-	public void goToShow(){
+	public void addAttributes(){
 		Person p = personModel.getPersonRow(showTable.getSelectedRow());
-		AddDonation sp = new AddDonation(p, personService, addressService, donationService, this);
+		AddAttributes sp = new AddAttributes(p, personService, addressService, donationService, this);
 		removeAll();
 		revalidate();
 		repaint();
 		add(sp);
 	}
 	
+	public void deletePerson(){
+		Person p;
+		int row = showTable.getSelectedRow();
+		if(row == -1){
+			JOptionPane.showMessageDialog(this, "Bitte Person zum Loeschen auswaehlen.");
+			return;
+		}
+		
+		int id = (Integer) personModel.getValueAt(row, 0);
+		
+		try{
+			p = personService.getById(id);
+		}
+		catch(ServiceException e){
+            JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+			return;
+		}
+		
+		Object[] options = {"Abbrechen","Loeschen"};
+		int ok = JOptionPane.showOptionDialog(this, "Diese Person sicher loeschen?", "Loeschen", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[1]);
+		
+		if(ok == 1){
+			try {
+				personService.delete(p);       
+			} 
+			catch (ServiceException e) {
+				JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+	            e.printStackTrace();
+				return;
+			}
+				
+			personModel.removePerson(row);
+			JOptionPane.showMessageDialog(this, "Person wurde geloescht", "Information", JOptionPane.INFORMATION_MESSAGE);
+			
+		}
+		else{
+			return;
+		}
+	}
+	
+	public void editPerson(){
+		Person p;
+		int row = showTable.getSelectedRow();
+		if(row == -1){
+			JOptionPane.showMessageDialog(this, "Bitte Person zum Bearbeiten auswaehlen.");
+			return;
+		}
+		
+		int id = (Integer) personModel.getValueAt(row, 0);
+		
+		try{
+			p = personService.getById(id);
+		}
+		catch(ServiceException e){
+            JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+			return;
+		}
+		
+		EditPerson ep = new EditPerson(p, personService, addressService, this, overview);
+		removeAll();
+		revalidate();
+		repaint();
+		add(ep);
+	}
 	public void returnTo(){
 		this.removeAll();
 		this.revalidate();

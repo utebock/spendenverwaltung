@@ -29,7 +29,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 import net.miginfocom.swing.MigLayout;
 
-public class AddDonation extends JPanel{
+public class AddAttributes extends JPanel{
 	
 	private static final long serialVersionUID = 1L;
 	private IPersonService personService;
@@ -122,7 +122,7 @@ public class AddDonation extends JPanel{
 	private JTextArea donationNote;
 	private FilterPersons filterPersons;
 
-	public AddDonation(Person person, IPersonService personService, IAddressService addressService, IDonationService donationService, FilterPersons filterPersons) {
+	public AddAttributes(Person person, IPersonService personService, IAddressService addressService, IDonationService donationService, FilterPersons filterPersons) {
 		super(new MigLayout());
 		
 		this.person = person;

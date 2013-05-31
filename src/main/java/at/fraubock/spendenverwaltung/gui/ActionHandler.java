@@ -8,7 +8,7 @@ public class ActionHandler implements ActionListener{
 	public ActionHandler(CreatePerson createPerson) {
 		// TODO Auto-generated constructor stub
 	}
-	public ActionHandler(AddDonation showPerson) {
+	public ActionHandler(AddAttributes showPerson) {
 		// TODO Auto-generated constructor stub
 	}
 
@@ -19,6 +19,9 @@ public class ActionHandler implements ActionListener{
 		// TODO Auto-generated constructor stub
 	}
 	public ActionHandler(CreateFilter createFilter) {
+		// TODO Auto-generated constructor stub
+	}
+	public ActionHandler(EditPerson editPerson) {
 		// TODO Auto-generated constructor stub
 	}
 	@Override
