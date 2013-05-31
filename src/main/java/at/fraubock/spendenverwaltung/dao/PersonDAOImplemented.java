@@ -209,14 +209,17 @@ public class PersonDAOImplemented implements IPersonDAO {
 		/*
 		 * inserting relevant livesat entries
 		 */
-		for (Address address : addresses) {
-			boolean isMain = false;
-			if (address.equals(person.getMainAddress())) {
-				isMain = true;
+		
+		if(addresses != null) {
+			for (Address address : addresses) {
+				boolean isMain = false;
+				if (address.equals(person.getMainAddress())) {
+					isMain = true;
+				}
+				jdbcTemplate.update(insertLivesAt, new Object[] { person.getId(),
+						address.getId(), isMain }, new int[] { Types.INTEGER,
+						Types.INTEGER, Types.BOOLEAN });
 			}
-			jdbcTemplate.update(insertLivesAt, new Object[] { person.getId(),
-					address.getId(), isMain }, new int[] { Types.INTEGER,
-					Types.INTEGER, Types.BOOLEAN });
 		}
 	}
 

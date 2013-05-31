@@ -1,6 +1,7 @@
 package at.fraubock.spendenverwaltung.service;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
+import at.fraubock.spendenverwaltung.util.FilterType;
 
 /**
  * 
@@ -43,7 +44,7 @@ public class MailingValidator {
 			if(mailing.getFilter().getType() == null) {
 				throw new IllegalArgumentException("Type of filter was null");
 			} else {
-				if(!mailing.getFilter().getType().equals("Person")) {
+				if(!mailing.getFilter().getType().equals(FilterType.PERSON)) {
 					throw new IllegalArgumentException("Type of filter was not equal to Person"); 
 				}
 			}

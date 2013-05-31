@@ -17,7 +17,7 @@ public class DonationTableModel extends AbstractTableModel{
 
 	private static final long serialVersionUID = 1L;
 	
-	private String[] columnNames = new String[]{"Id", "Betrag", "Datum", "Widmung", "Typ", "Notiz"};
+	private String[] columnNames = new String[]{"Betrag", "Datum", "Widmung", "Typ", "Notiz"};
 	private Vector<Donation> donations = new Vector<Donation>();
 	private IDonationService donationService;
 	private JPanel parent;
@@ -50,12 +50,11 @@ public class DonationTableModel extends AbstractTableModel{
 		Donation donation = (Donation)donations.get(rowIndex);
 		
 		switch(columnIndex){
-			case 0: return donation.getId();
-			case 1: return donation.getAmount();
-			case 2: return donation.getDate();
-			case 3: return donation.getDedication();
-			case 4: return donation.getType();
-			case 5: return donation.getNote();
+			case 0: return donation.getAmount();
+			case 1: return donation.getDate();
+			case 2: return donation.getDedication();
+			case 3: return donation.getType();
+			case 4: return donation.getNote();
 			default: return null;
 		}
 	}
@@ -64,16 +63,15 @@ public class DonationTableModel extends AbstractTableModel{
         Donation updateDonation = donations.get(rowIndex);
         
         switch(columnIndex){
-        	case 0: return;
-        	case 1: updateDonation.setAmount((Long) value);
+        	case 0: updateDonation.setAmount((Long) value);
         			break;
-        	case 2: updateDonation.setDate((Date) value);
+        	case 1: updateDonation.setDate((Date) value);
 					break;
-        	case 3: updateDonation.setDedication((String) value);
+        	case 2: updateDonation.setDedication((String) value);
 					break;
-        	case 4: updateDonation.setType((Donation.DonationType) value);
+        	case 3: updateDonation.setType((Donation.DonationType) value);
 					break;
-        	case 5: updateDonation.setNote((String) value);
+        	case 4: updateDonation.setNote((String) value);
 					break;
         }
         
@@ -95,16 +93,14 @@ public class DonationTableModel extends AbstractTableModel{
 		
 		switch (col) {
 		case 0:
-			return Integer.class;
-		case 1:
 			return Long.class;
-		case 2:
+		case 1:
 			return Date.class;
-		case 3: 
+		case 2: 
 			return String.class;
-		case 4: 
+		case 3: 
 			return Donation.DonationType.class;
-		case 5: 
+		case 4: 
 			return String.class;
 		}
 		return null;

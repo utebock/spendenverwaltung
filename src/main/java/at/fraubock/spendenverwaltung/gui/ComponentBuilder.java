@@ -9,9 +9,13 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JToolBar;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
 import net.miginfocom.swing.MigLayout;
@@ -59,11 +63,10 @@ public class ComponentBuilder {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public JComboBox createComboBox(String[] s, ActionListener listener, String actionCommand){
+	public JComboBox createComboBox(String[] s, ActionListener listener){
 		@SuppressWarnings("unchecked")
 		JComboBox combo = new JComboBox(s);
 		combo.addActionListener(listener);
-		combo.setActionCommand(actionCommand);
 		return combo;
 	}
 	
@@ -81,6 +84,10 @@ public class ComponentBuilder {
 		button.setActionCommand(actionCommand);
 		return button;
 	}
-	
+
+	public JToolBar createToolbar() {
+		return new JToolBar();
+	}
+
 	
 }

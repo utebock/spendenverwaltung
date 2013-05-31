@@ -6,16 +6,15 @@ import java.awt.event.ActionListener;
 public class ButtonListener implements ActionListener{
 
 	private Overview overview;
-	private PersonOverview personOverview;
 	private CreatePerson createPerson;
 	private DeletePerson deletePerson;
-	private ShowPerson showPerson;
+	private AddDonation showPerson;
+	private FilterPersons filterPersons;
+	private FilterOverview filterOverview;
+	private CreateFilter createFilter;
 	
 	public ButtonListener(Overview overview){
 		this.overview = overview;
-	}
-	public ButtonListener(PersonOverview personOverview){
-		this.personOverview = personOverview;
 	}
 	
 	public ButtonListener(CreatePerson createPerson) {
@@ -26,22 +25,37 @@ public class ButtonListener implements ActionListener{
 		this.deletePerson = deletePerson;
 	}
 	
-	public ButtonListener(ShowPerson showPerson) {
+	public ButtonListener(AddDonation showPerson) {
 		this.showPerson = showPerson;
 	}
 	
+	public ButtonListener(FilterPersons filterPersons) {
+		this.filterPersons = filterPersons;
+	}
 	
+	public ButtonListener(FilterOverview filterOverview) {
+		this.filterOverview = filterOverview;
+		
+	}
+	public ButtonListener(CreateFilter createFilter) {
+		this.createFilter = createFilter;
+	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
 		String cmd = e.getActionCommand();
 		
-		if(cmd.equals("person_overview")){
-			overview.goToPersons();
+		if(cmd.equals("plusButton_create_filter")){
+			createFilter.gainMore();
+			createFilter.showButtons();
+		}
+		
+		if(cmd.equals("cancel_filter_in_db")){
+			createFilter.returnTo();
 		}
 		
 		if(cmd.equals("create_person")){
-			personOverview.goToCreate();
+			overview.goToCreate();
 		}
 		
 		if(cmd.equals("create_person_in_db")){
@@ -52,8 +66,8 @@ public class ButtonListener implements ActionListener{
 			createPerson.returnTo();
 		}
 		
-		if(cmd.equals("delete_person")){
-			personOverview.goToDelete();
+		if(cmd.equals("search_person")){
+			overview.goToShow();
 		}
 		
 		if(cmd.equals("delete_person_from_db")){
@@ -63,17 +77,28 @@ public class ButtonListener implements ActionListener{
 		if(cmd.equals("cancel_delete_person_from_db")){
 			deletePerson.returnTo();
 		}
-		
-		if(cmd.equals("create_address_in_show_person")){
-			//TODO: isn't implemented in the address dao
+		if(cmd.equals("add_donation_address")){
+			filterPersons.goToShow();
 		}
-		
+		if(cmd.equals("return_to_personOverview")){
+			filterPersons.returnTo();
+		}
+		if(cmd.equals("return_to_overview")){
+			filterOverview.returnTo();
+		}
+		if(cmd.equals("create_filter")){
+			filterOverview.createFilter();
+		}
 		if(cmd.equals("create_donation_in_show_person")){
 			showPerson.createDonationInDb();
 		}
 		
 		if(cmd.equals("go_from_show_person_to_person_overview")){
 			showPerson.returnTo();
+		}
+		
+		if(cmd.equals("filter_overview")){
+			overview.goToFilter();
 		}
 	}
 

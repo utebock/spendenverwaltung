@@ -15,7 +15,6 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
-import at.fraubock.spendenverwaltung.interfaces.dao.IFilterDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
@@ -39,7 +38,6 @@ public class AbstractMailingDAOTest {
 	protected static IPersonDAO personDAO;
 	protected static IAddressDAO addressDAO;
 	protected static IMailingDAO mailingDAO;
-	protected static IFilterDAO filterDAO;
 	
 	/**
 	 * defining some valid and invalid entities
@@ -53,7 +51,7 @@ public class AbstractMailingDAOTest {
 	protected static Person personThree = new Person();
 	
 	//mailing instance used by tests
-	protected static Mailing mailing = new Mailing();
+	protected static Mailing mailing;
 	
 	protected static Filter filterOnePerson = new Filter();
 	protected static Filter filterTwoPeople = new Filter();
@@ -69,10 +67,6 @@ public class AbstractMailingDAOTest {
 	
 	public static void setMailingDAO(IMailingDAO MailingDAO) {
 		AbstractMailingDAOTest.mailingDAO = MailingDAO;
-	}
-	
-	public static void setFilterDAO(IFilterDAO bean) {
-		AbstractMailingDAOTest.filterDAO = filterDAO;
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
@@ -120,6 +114,11 @@ public class AbstractMailingDAOTest {
 		try {
 			Mailing result = mailingDAO.getById(mailing.getId());
 			
+			assertEquals(mailing.getType(), result.getType());
+			assertEquals(mailing.getMedium(), result.getMedium());
+			assertTrue(mailing.getDate().getTime() == result.getDate().getTime());
+			assertTrue(mailing.getId() == result.getId());
+
 			assertEquals(result, mailing);
 		
 			//TODO getMailingByPerson call to check if the right

@@ -29,13 +29,12 @@ import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 import net.miginfocom.swing.MigLayout;
 
-public class ShowPerson extends JPanel{
+public class AddDonation extends JPanel{
 	
 	private static final long serialVersionUID = 1L;
 	private IPersonService personService;
 	private IAddressService addressService;
 	private IDonationService donationService;
-	private PersonOverview personOverview;
 	private Person person;
 	private Donation donation;
 	private ComponentBuilder builder;
@@ -121,15 +120,16 @@ public class ShowPerson extends JPanel{
 
 	private JLabel donationNoteLabel;
 	private JTextArea donationNote;
-	
-	public ShowPerson(Person person, IPersonService personService, IAddressService addressService, IDonationService donationService, PersonOverview personOverview){
+	private FilterPersons filterPersons;
+
+	public AddDonation(Person person, IPersonService personService, IAddressService addressService, IDonationService donationService, FilterPersons filterPersons) {
 		super(new MigLayout());
 		
 		this.person = person;
 		this.personService = personService;
 		this.addressService = addressService;
 		this.donationService = donationService;
-		this.personOverview = personOverview;
+		this.filterPersons = filterPersons;
 		buttonListener = new ButtonListener(this);
 		actionHandler = new ActionHandler(this);
 		builder = new ComponentBuilder();
@@ -139,10 +139,10 @@ public class ShowPerson extends JPanel{
 		setUpDonations();
 		setUpAddresses();
 	}
-	
+
 	public void setUpPerson(){
 
-		panel = builder.createPanel(700, 700);
+		panel = builder.createPanel(800, 800);
 		this.add(panel);
 		
 		
@@ -176,7 +176,7 @@ public class ShowPerson extends JPanel{
 		panel.add(mailLabel, "gapright 150");
 		panel.add(mail, "wrap");
 		
-		streetLabel = builder.createLabel("Straße: ");
+		streetLabel = builder.createLabel("Stra\u00DFe: ");
 		street = builder.createLabel(person.getMainAddress().getStreet());
 		panel.add(streetLabel, "gapright 150");
 		panel.add(street, "wrap");
@@ -214,7 +214,7 @@ public class ShowPerson extends JPanel{
 
 		addressPanel.add(addressPane, "dock north");
 		
-		addressStreetLabel = builder.createLabel("Straße: ");
+		addressStreetLabel = builder.createLabel("Stra\u00DFe: ");
 		streetField = builder.createTextField(150);
 		addressPanel.add(addressStreetLabel, "");
 		addressPanel.add(streetField, "wrap 0px");
@@ -234,7 +234,7 @@ public class ShowPerson extends JPanel{
 		addressPanel.add(addressCountryLabel, "");
 		addressPanel.add(countryField, "wrap 0px");
 		
-		createAddressBtn = builder.createButton("Adresse hinzufügen", buttonListener, "create_address_in_show_person");
+		createAddressBtn = builder.createButton("Adresse hinzuf\u00FCgen", buttonListener, "create_address_in_show_person");
 		addressPanel.add(createAddressBtn, "span 2");
 		
 		panel.add(addressPanel, "dock east, wrap");
@@ -270,7 +270,7 @@ public class ShowPerson extends JPanel{
 		donationPanel.add(dedication, "wrap 0px");
 		
 		typeLabel = builder.createLabel("Typ: ");
-		type = builder.createComboBox(donationService.getDonationTypes(), actionHandler, "show_person_donation_type");
+		type = builder.createComboBox(donationService.getDonationTypes(), actionHandler);
 		donationPanel.add(typeLabel, "");
 		donationPanel.add(type, "wrap 0px");
 		
@@ -279,10 +279,10 @@ public class ShowPerson extends JPanel{
 		donationPanel.add(donationNoteLabel, "");
 		donationPanel.add(donationNote, "wrap 0px");
 		
-		createDonationBtn = builder.createButton("Spende hinzufügen", buttonListener, "create_donation_in_show_person");
+		createDonationBtn = builder.createButton("Spende hinzuf\u00FCgen", buttonListener, "create_donation_in_show_person");
 		donationPanel.add(createDonationBtn, "");
 		
-		backBtn = builder.createButton("zurück", buttonListener, "go_from_show_person_to_person_overview");
+		backBtn = builder.createButton("Abbrechen", buttonListener, "go_from_show_person_to_person_overview");
 		donationPanel.add(backBtn, "");
 		
 		panel.add(donationPanel, "dock south, wrap");
@@ -358,10 +358,10 @@ public class ShowPerson extends JPanel{
 		this.removeAll();
 		this.revalidate();
 		this.repaint();
-		personOverview.removeAll();
-		personOverview.revalidate();
-		personOverview.repaint();
-		personOverview.setUp();
+		filterPersons.removeAll();
+		filterPersons.revalidate();
+		filterPersons.repaint();
+		filterPersons.setUp();
 	}
 	
 	public void showErrorDialog(String message){
