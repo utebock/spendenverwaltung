@@ -135,7 +135,6 @@ public class Mailing {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((date == null) ? 0 : date.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((medium == null) ? 0 : medium.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
@@ -151,11 +150,6 @@ public class Mailing {
 		if (getClass() != obj.getClass())
 			return false;
 		Mailing other = (Mailing) obj;
-		if (date == null) {
-			if (other.date != null)
-				return false;
-		} else if (!date.equals(other.date))
-			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;

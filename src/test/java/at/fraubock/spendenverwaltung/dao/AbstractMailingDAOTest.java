@@ -106,6 +106,7 @@ public class AbstractMailingDAOTest {
 		mailing.setDate(currentDate);
 				
 		try {
+			assertTrue(mailingDAO != null);
 			mailingDAO.insertOrUpdate(mailing);
 		} catch (PersistenceException e) {
 			fail();
@@ -113,11 +114,6 @@ public class AbstractMailingDAOTest {
 		
 		try {
 			Mailing result = mailingDAO.getById(mailing.getId());
-			
-			assertEquals(mailing.getType(), result.getType());
-			assertEquals(mailing.getMedium(), result.getMedium());
-			assertTrue(mailing.getDate().getTime() == result.getDate().getTime());
-			assertTrue(mailing.getId() == result.getId());
 
 			assertEquals(result, mailing);
 		
@@ -159,8 +155,7 @@ public class AbstractMailingDAOTest {
 		mailing = new Mailing();
 		mailing.setMedium(Mailing.Medium.EMAIL);
 		mailing.setType(Mailing.MailingType.DANKESBRIEF);
-		//TODO: mailing.setPersonFilter
-
+		mailing.setFilter(filterTwoPeople);
 		
 		Date currentDate = new Date(System.currentTimeMillis());
 		
@@ -329,6 +324,7 @@ public class AbstractMailingDAOTest {
 	@Transactional	
 	public void getMailingsByInvalidPerson_throwsException() {
 		try {
+			//fails because PersonValidator is not implemented!
 			mailingDAO.getMailingsByPerson(new Person());
 		} catch (PersistenceException e) {
 			fail();

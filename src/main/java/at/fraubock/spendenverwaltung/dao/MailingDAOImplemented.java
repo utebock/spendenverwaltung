@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -66,7 +65,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 			this.mailing = mailing;
 		}
 
-		private String createMailings = "insert into mailings (mailingdate, type, medium) values (?,?,?)";
+		private String createMailings = "insert into mailings (mailing_date, mailing_type, mailing_medium) values (?,?,?)";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
@@ -74,7 +73,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 			PreparedStatement ps = connection.prepareStatement(createMailings,
 					Statement.RETURN_GENERATED_KEYS);
 			
-			ps.setTimestamp(1, new Timestamp(mailing.getDate().getTime()));
+			ps.setDate(1, new java.sql.Date(mailing.getDate().getTime()));
 			ps.setString(2, mailing.getType().getName());
 			ps.setString(3, mailing.getMedium().getName());
 			
@@ -139,7 +138,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 			jdbcTemplate.query(filterStmt, new PersonMailingMapper(mailing));
 			
 		} else {
-			jdbcTemplate.update("UPDATE mailings SET mailingdate=?, type=?, medium=? WHERE id=?",
+			jdbcTemplate.update("UPDATE mailings SET mailing_date=?, mailing_type=?, mailing_medium=? WHERE mailing_id=?",
 					new Object[] { new Timestamp(mailing.getDate().getTime()), mailing.getType().getName()
 					, mailing.getMedium().getName(), mailing.getId() });
 		}
@@ -157,7 +156,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 			throw new IllegalArgumentException("Mailing's id was null in delete");
 		}
 			
-		jdbcTemplate.update("DELETE FROM mailings where id=?", 
+		jdbcTemplate.update("DELETE FROM mailings where mailing_id=?", 
 				new Object[] { mailing.getId() });
 		
 		log.debug("Returning from delete");
@@ -179,7 +178,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 		log.debug("Entering getById with param "+id);
 		
 		Mailing mailing = jdbcTemplate.queryForObject(
-				"SELECT * FROM mailings WHERE id=?", new Object[] {
+				"SELECT * FROM mailings WHERE mailing_id=?", new Object[] {
 				id }, new MailingMapper());
 		
 		
@@ -195,11 +194,16 @@ public class MailingDAOImplemented implements IMailingDAO {
 		personValidator.validate(person);
 		
 		List<Mailing> mailings = jdbcTemplate.query(
-				"SELECT ma FROM mailings ma, sentmailings se AS mailings " +
-				"WHERE ma.id=se.mailingid AND se.personid = ?", 
+				"SELECT ma.* FROM mailings ma, sent_mailings se " +
+				"WHERE ma.mailing_id=se.mailing_id AND se.person_id=?", 
 				new Object[] { person.getId() }, new MailingMapper());
 
 		log.debug("Returning from getMailingsByPerson");
+		
+		if(mailings.isEmpty()) {
+			return null;
+		}
+		
 		return mailings;
 	}
 
@@ -209,9 +213,10 @@ public class MailingDAOImplemented implements IMailingDAO {
 		public Mailing mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Mailing mailing = new Mailing();
 			
-			mailing.setDate(new Date(rs.getTimestamp("mailingdate").getTime()));
-			mailing.setType(Mailing.MailingType.getByName(rs.getString("type")));
-			mailing.setMedium(Mailing.Medium.getByName(rs.getString("medium")));
+			mailing.setId(rs.getInt("mailing_id"));
+			mailing.setDate(new java.util.Date(rs.getDate("mailing_date").getTime()));
+			mailing.setType(Mailing.MailingType.getByName(rs.getString("mailing_type")));
+			mailing.setMedium(Mailing.Medium.getByName(rs.getString("mailing_medium")));
 			
 			return mailing;
 		}
@@ -228,7 +233,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 		private Mailing mailing;
 		
-		private String query = "INSERT INTO sentmailings (mailingid, personid) VALUES (?, ?)";
+		private String query = "INSERT INTO sent_mailings (mailing_id, person_id) VALUES (?, ?)";
 		
 		public PersonMailingMapper(Mailing mailing) {
 			this.mailing = mailing;
@@ -236,7 +241,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 		
 		@Override
 		public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
-			jdbcTemplate.update(query, new Object[] { mailing.getId(), rs.getInt("id")});
+			jdbcTemplate.update(query, new Object[] { mailing.getId(), rs.getInt("person_id")});
 			
 			return null;
 		}

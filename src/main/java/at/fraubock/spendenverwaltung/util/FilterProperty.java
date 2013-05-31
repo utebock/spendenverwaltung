@@ -19,9 +19,9 @@ public enum FilterProperty {
 	//TODO search in note yes or no?
 	
 	/* filter properties of a mailing */
-	MAILING_DATE("mailingdate"),
-	MAILING_TYPE("type"),
-	MAILING_MEDIUM("medium"),
+	MAILING_DATE("mailing_date"),
+	MAILING_TYPE("mailing_type"),
+	MAILING_MEDIUM("mailing_medium"),
 	
 	/* filter properties of an address */
 	ADDRESS_IS_MAIN("ismain"),
