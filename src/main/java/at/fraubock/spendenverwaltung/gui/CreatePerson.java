@@ -17,7 +17,6 @@ import javax.swing.JTextField;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
-import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
@@ -125,14 +124,14 @@ public class CreatePerson extends JPanel{
 		panel.add(empty, "wrap");
 		
 		String[] salutCombo = new String[]{"Herr", "Frau", "Fam.", "Firma"};
-		salutation = builder.createComboBox(salutCombo, actionHandler, "salutCombo");
+		salutation = builder.createComboBox(salutCombo, actionHandler);
 		salutLabel = builder.createLabel("Anrede: ");
 		panel.add(salutLabel);
 		panel.add(salutation, "wrap");
 		
 		title = builder.createLabel("Titel: ");
 		String[] titleCombo = new String[]{"-", "BA", "BSc", "DI", "Dr.", "Ing.", "MA", "Mag.", "MSc.", "Prof."};
-		titleBox = builder.createComboBox(titleCombo, actionHandler, "titleCombo");
+		titleBox = builder.createComboBox(titleCombo, actionHandler);
 		panel.add(title);
 		panel.add(titleBox, "wrap");
 		
@@ -151,7 +150,7 @@ public class CreatePerson extends JPanel{
 		panel.add(surname);
 		panel.add(surnameField, "wrap, growx");
 		
-		telephone = builder.createLabel("Telephon: ");
+		telephone = builder.createLabel("Telefon: ");
 		telephoneField = builder.createTextField(150);
 		panel.add(telephone);
 		panel.add(telephoneField, "wrap, growx");
@@ -210,7 +209,7 @@ public class CreatePerson extends JPanel{
 		donationPanel.add(addDonation, "wrap");
 		
 		String[] donationString = new String[]{"\u00DCberweisung", "Merchandise", "Online-Shop", "Bar", "SMS"};
-		donationCombo = builder.createComboBox(donationString, actionHandler, "donationCombo");
+		donationCombo = builder.createComboBox(donationString, actionHandler);
 		donationLabel = builder.createLabel("Spende durch: ");
 		donationPanel.add(donationLabel);
 		donationPanel.add(donationCombo, "split 2");
@@ -366,7 +365,7 @@ public class CreatePerson extends JPanel{
 		if(donationCombo.getSelectedItem().equals("SMS")){
 			donationInput = "SMS";
 		}
-		if(donationCombo.getSelectedItem().equals("BAR")){
+		if(donationCombo.getSelectedItem().equals("Bar")){
 			donationInput = "BAR";
 		}
 		/**

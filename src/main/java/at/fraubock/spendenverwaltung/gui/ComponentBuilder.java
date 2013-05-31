@@ -63,11 +63,10 @@ public class ComponentBuilder {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public JComboBox createComboBox(String[] s, ActionListener listener, String actionCommand){
+	public JComboBox createComboBox(String[] s, ActionListener listener){
 		@SuppressWarnings("unchecked")
 		JComboBox combo = new JComboBox(s);
 		combo.addActionListener(listener);
-		combo.setActionCommand(actionCommand);
 		return combo;
 	}
 	

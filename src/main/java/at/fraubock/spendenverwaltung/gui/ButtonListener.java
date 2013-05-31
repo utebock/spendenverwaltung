@@ -11,6 +11,8 @@ public class ButtonListener implements ActionListener{
 	private DeletePerson deletePerson;
 	private AddDonation showPerson;
 	private FilterPersons filterPersons;
+	private FilterOverview filterOverview;
+	private CreateFilter createFilter;
 	
 	public ButtonListener(Overview overview){
 		this.overview = overview;
@@ -35,10 +37,26 @@ public class ButtonListener implements ActionListener{
 		this.filterPersons = filterPersons;
 	}
 	
+	public ButtonListener(FilterOverview filterOverview) {
+		this.filterOverview = filterOverview;
+		
+	}
+	public ButtonListener(CreateFilter createFilter) {
+		this.createFilter = createFilter;
+	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
 		String cmd = e.getActionCommand();
+		
+		if(cmd.equals("plusButton_create_filter")){
+			createFilter.gainMore();
+			createFilter.showButtons();
+		}
+		
+		if(cmd.equals("cancel_filter_in_db")){
+			createFilter.returnTo();
+		}
 		
 		if(cmd.equals("person_overview")){
 			overview.goToPersons();
@@ -73,12 +91,22 @@ public class ButtonListener implements ActionListener{
 		if(cmd.equals("return_to_personOverview")){
 			filterPersons.returnTo();
 		}
+		if(cmd.equals("return_to_overview")){
+			filterOverview.returnTo();
+		}
+		if(cmd.equals("create_filter")){
+			filterOverview.createFilter();
+		}
 		if(cmd.equals("create_donation_in_show_person")){
 			showPerson.createDonationInDb();
 		}
 		
 		if(cmd.equals("go_from_show_person_to_person_overview")){
 			showPerson.returnTo();
+		}
+		
+		if(cmd.equals("filter_overview")){
+			overview.goToFilter();
 		}
 	}
 

@@ -1,43 +1,41 @@
 package at.fraubock.spendenverwaltung.gui;
 
 import java.util.Vector;
-
 import javax.swing.table.AbstractTableModel;
-import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 
-public class PersonTableModel extends AbstractTableModel{
+public class FilterTableModel extends AbstractTableModel{
 
 	private static final long serialVersionUID = 1L;
 	
-	private String[] columnNames = new String[]{"Vorname", "Nachname", "Adresse"};
-	private Vector<Person> persons = new Vector<Person>();
+	private String[] columnNames = new String[]{"Name", "Typ"};
+	private Vector<Filter> filters = new Vector<Filter>();
 
-	public void addPerson (Person person){
-		persons.add(person);
+	public void addFilter (Filter filter){
+		filters.add(filter);
 	}
 	
-	public void removePerson (int row){
-		persons.remove(row);
+	public void removeFilter (int row){
+		filters.remove(row);
 		fireTableDataChanged();
 	}
 	
-	public Person getPersonRow(int rowIndex){
-		return persons.get(rowIndex);
+	public Filter getFilterRow(int rowIndex){
+		return filters.get(rowIndex);
 	}
 
 	@Override
 	public int getRowCount() {
-		return persons.size();
+		return filters.size();
 	}
 	
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		Person person = (Person)persons.get(rowIndex);
+		Filter filter = (Filter)filters.get(rowIndex);
 		
 		switch(columnIndex){
-			case 0: return person.getSurname();
-			case 1: return person.getGivenName();
-			case 2: return "";
+			case 0: return filter.getName();
+			case 1: return filter.getType();
 			default: return null;
 		}
 	}
@@ -46,11 +44,9 @@ public class PersonTableModel extends AbstractTableModel{
 		
 		switch (col) {
 		case 0:
-			return Integer.class;
+			return String.class;
 		case 1:
-			return String.class;
-		case 2:
-			return String.class;
+			return Enum.class;
 		}
 		return null;
 	}

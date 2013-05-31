@@ -9,6 +9,7 @@ import javax.swing.JSeparator;
 
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
+import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 import net.miginfocom.swing.MigLayout;
@@ -62,20 +63,22 @@ public class Overview extends JPanel{
 	private JLabel progressLabel;
 	private JLabel statsSendingsLabel;
 	private JLabel statsPersonsLabel;
-	public Overview(IPersonService personService, IAddressService addressService, IDonationService donationService){
+	private IFilterService filterService;
+	public Overview(IFilterService filterService, IPersonService personService, IAddressService addressService, IDonationService donationService){
 		/**
 		 * good to know: basic font is 13pt
 		 */
 		super(new MigLayout());
+		this.filterService = filterService;
 		this.personService = personService;
 		this.addressService = addressService;
 		this.donationService = donationService;
 		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
-		setUpPersons();
+		setUp();
 	}
 
-	private void setUpPersons() {
+	public void setUp() {
 		/**
 		 * "Allgemein"-panel contains persons and filter
 		 */
@@ -219,6 +222,15 @@ public class Overview extends JPanel{
 		add(po);
 		
 
+	}
+
+	public void goToFilter() {
+		FilterOverview fo = new FilterOverview(filterService, personService, addressService, donationService, this);
+		removeAll();
+		revalidate();
+		repaint();
+		add(fo);
+		
 	}
 	
 

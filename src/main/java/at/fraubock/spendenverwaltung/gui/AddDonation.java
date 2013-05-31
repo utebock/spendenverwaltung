@@ -271,7 +271,7 @@ public class AddDonation extends JPanel{
 		donationPanel.add(dedication, "wrap 0px");
 		
 		typeLabel = builder.createLabel("Typ: ");
-		type = builder.createComboBox(donationService.getDonationTypes(), actionHandler, "show_person_donation_type");
+		type = builder.createComboBox(donationService.getDonationTypes(), actionHandler);
 		donationPanel.add(typeLabel, "");
 		donationPanel.add(type, "wrap 0px");
 		
