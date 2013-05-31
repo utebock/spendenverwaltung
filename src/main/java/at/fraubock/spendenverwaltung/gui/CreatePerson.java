@@ -1,14 +1,9 @@
 package at.fraubock.spendenverwaltung.gui;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridLayout;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -20,9 +15,12 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
+import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
+import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 import net.miginfocom.swing.MigLayout;
@@ -33,6 +31,7 @@ public class CreatePerson extends JPanel{
 	private IPersonService personService;
 	private IAddressService addressService;
 	private PersonOverview personOverview;
+	private IDonationService donationService;
 	private ComponentBuilder builder;
 	private ButtonListener buttonListener;
 	private ActionHandler actionHandler;
@@ -81,7 +80,7 @@ public class CreatePerson extends JPanel{
 	private JLabel note;
 	private JTextArea noteArea; 
 	
-	private JLabel donation;
+	private JLabel donationLabel;
 	@SuppressWarnings("rawtypes")
 	private JComboBox donationCombo;
 	private JTextField amount;
@@ -90,14 +89,20 @@ public class CreatePerson extends JPanel{
 	
 	private Person p = new Person();
 	private Address addr = new Address();
+	private Donation donation = new Donation();
 	private JSeparator separator;
 	private JPanel donationPanel;
-	
-	public CreatePerson(IPersonService personService, IAddressService addressService, PersonOverview personOverview){
+	private JLabel dedicationLabel;
+	private JTextField dedicationField;
+	private JLabel dedicationNoteLabel;
+	private JTextField dedicationNoteField;
+
+	public CreatePerson(IPersonService personService, IAddressService addressService, IDonationService donationService, PersonOverview personOverview){
 		super(new MigLayout());
 		
 		this.personService = personService;
 		this.addressService = addressService;
+		this.donationService = donationService;
 		this.personOverview = personOverview;
 		this.personModel = this.personOverview.getPersonModel();
 		buttonListener = new ButtonListener(this);
@@ -109,7 +114,6 @@ public class CreatePerson extends JPanel{
 		
 		setUpCreate();
 	}
-
 
 	@SuppressWarnings("unchecked")
 	private void setUpCreate() {
@@ -205,13 +209,22 @@ public class CreatePerson extends JPanel{
 		addDonation.setFont(new Font("Headline", Font.PLAIN, 14));
 		donationPanel.add(addDonation, "wrap");
 		
-		String[] donationString = new String[]{"\u00DCberweisung", "Veranstaltung", "Online-Shop"};
+		String[] donationString = new String[]{"\u00DCberweisung", "Merchandise", "Online-Shop", "Bar", "SMS"};
 		donationCombo = builder.createComboBox(donationString, actionHandler, "donationCombo");
-		donation = builder.createLabel("Spende durch: ");
-		donationPanel.add(donation);
+		donationLabel = builder.createLabel("Spende durch: ");
+		donationPanel.add(donationLabel);
 		donationPanel.add(donationCombo, "split 2");
 		amount = builder.createTextField(30);
 		donationPanel.add(amount, "wrap, growx");
+		dedicationLabel = builder.createLabel("Widmung: ");
+		dedicationField = builder.createTextField(150);
+		dedicationNoteLabel = builder.createLabel("Notiz: ");
+		dedicationNoteField = builder.createTextField(150);
+
+		donationPanel.add(dedicationLabel);
+		donationPanel.add(dedicationField, "wrap, growx");
+		donationPanel.add(dedicationNoteLabel);
+		donationPanel.add(dedicationNoteField, "wrap, growx");
 		
 		donationPanel.add(empty, "wrap");
 		
@@ -340,13 +353,52 @@ public class CreatePerson extends JPanel{
 		String note = noteArea.getText();
 		p.setNote(note);
 		
+		String donationInput = "\u00DCberweisung";
+		if(donationCombo.getSelectedItem().equals(donationInput)){
+			donationInput = "BANK_TRANSFER";
+		}
+		if(donationCombo.getSelectedItem().equals("Merchandise")){
+			donationInput = "MERCHANDISE";
+		}
+		if(donationCombo.getSelectedItem().equals("Online-Shop")){
+			donationInput = "ONLINE";
+		}
+		if(donationCombo.getSelectedItem().equals("SMS")){
+			donationInput = "SMS";
+		}
+		if(donationCombo.getSelectedItem().equals("BAR")){
+			donationInput = "BAR";
+		}
+		/**
+		 * Donation Type
+		 */
+		donation.setType(Donation.DonationType.valueOf(donationInput));
+		/**
+		 * Donation Amount
+		 */
+		donation.setAmount(Long.parseLong(amount.getText()));
+		/**
+		 * Donation Date
+		 */
+		Date date = new Date(new Date().getTime());
+		donation.setDate(date);
+		/**
+		 * Donation Dedication
+		 */
+		donation.setDedication(dedicationField.getText());
+		/**
+		 * Donation Note
+		 */
+		donation.setNote(dedicationNoteField.getText());
+		
 		try{
 			Address createdAddress = addressService.create(addr); // will now be created when person is created - p
 			List<Address> addresses = new ArrayList<Address>();
 			addresses.add(createdAddress);
 			p.setAddresses(addresses);
 			Person createdPerson = personService.create(p);
-			
+			donation.setDonator(createdPerson);
+			donationService.create(donation);
 			personModel.addPerson(createdPerson);
 		}
 		catch(ServiceException e){

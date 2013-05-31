@@ -3,8 +3,6 @@ package at.fraubock.spendenverwaltung.gui;
 import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
-
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 
 public class PersonTableModel extends AbstractTableModel{

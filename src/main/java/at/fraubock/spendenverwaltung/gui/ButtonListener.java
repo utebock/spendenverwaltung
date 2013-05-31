@@ -9,7 +9,8 @@ public class ButtonListener implements ActionListener{
 	private PersonOverview personOverview;
 	private CreatePerson createPerson;
 	private DeletePerson deletePerson;
-	private ShowPerson showPerson;
+	private AddDonation showPerson;
+	private FilterPersons filterPersons;
 	
 	public ButtonListener(Overview overview){
 		this.overview = overview;
@@ -26,10 +27,13 @@ public class ButtonListener implements ActionListener{
 		this.deletePerson = deletePerson;
 	}
 	
-	public ButtonListener(ShowPerson showPerson) {
+	public ButtonListener(AddDonation showPerson) {
 		this.showPerson = showPerson;
 	}
 	
+	public ButtonListener(FilterPersons filterPersons) {
+		this.filterPersons = filterPersons;
+	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -52,8 +56,8 @@ public class ButtonListener implements ActionListener{
 			createPerson.returnTo();
 		}
 		
-		if(cmd.equals("delete_person")){
-			personOverview.goToDelete();
+		if(cmd.equals("search_person")){
+			personOverview.goToShow();
 		}
 		
 		if(cmd.equals("delete_person_from_db")){
@@ -63,11 +67,12 @@ public class ButtonListener implements ActionListener{
 		if(cmd.equals("cancel_delete_person_from_db")){
 			deletePerson.returnTo();
 		}
-		
-		if(cmd.equals("create_address_in_show_person")){
-			//TODO: isn't implemented in the address dao
+		if(cmd.equals("add_donation_address")){
+			filterPersons.goToShow();
 		}
-		
+		if(cmd.equals("return_to_personOverview")){
+			filterPersons.returnTo();
+		}
 		if(cmd.equals("create_donation_in_show_person")){
 			showPerson.createDonationInDb();
 		}
