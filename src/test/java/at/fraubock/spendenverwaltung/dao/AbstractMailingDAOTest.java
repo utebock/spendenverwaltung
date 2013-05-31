@@ -183,13 +183,39 @@ public class AbstractMailingDAOTest {
 		
 	@Test
 	@Transactional
-	public void getAll_shouldReturnList() {
+	public void getAll_shouldReturnList() throws PersistenceException {
 		
 		//TODO initialize mailings with valid data
 		
 		List<Mailing> createdMailings = new ArrayList<Mailing>();
-		List<Mailing> results;
 		
+		Mailing mailingOne = new Mailing();
+		mailingOne.setDate(new Date(System.currentTimeMillis()));
+		mailingOne.setMedium(Mailing.Medium.EMAIL);
+		mailingOne.setType(Mailing.MailingType.EINZELSPENDEN_DANKESBRIEF);
+		mailingOne.setFilter(filterOnePerson);
+		
+		Mailing mailingTwo = new Mailing();
+		mailingTwo.setDate(new Date(System.currentTimeMillis()));
+		mailingTwo.setMedium(Mailing.Medium.EMAIL);
+		mailingTwo.setType(Mailing.MailingType.EINZELSPENDEN_DANKESBRIEF);
+		mailingTwo.setFilter(filterOnePerson);
+		
+		Mailing mailingThree = new Mailing();
+		mailingThree.setDate(new Date(System.currentTimeMillis()));
+		mailingThree.setMedium(Mailing.Medium.EMAIL);
+		mailingThree.setType(Mailing.MailingType.EINZELSPENDEN_DANKESBRIEF);
+		mailingThree.setFilter(filterOnePerson);
+		
+		mailingDAO.insertOrUpdate(mailingOne);
+		mailingDAO.insertOrUpdate(mailingTwo);
+		mailingDAO.insertOrUpdate(mailingThree);
+		
+		createdMailings.add(mailingOne);
+		createdMailings.add(mailingTwo);
+		createdMailings.add(mailingThree);
+		
+		List<Mailing> results;
 		
 		try {
 			results = mailingDAO.getAll();
@@ -286,17 +312,24 @@ public class AbstractMailingDAOTest {
 		
 		Mailing mailingOne = new Mailing();
 		Mailing mailingTwo = new Mailing();
-		Mailing mailingThree = new Mailing();
+		
+		mailingOne.setMedium(Mailing.Medium.EMAIL);
+		mailingOne.setType(Mailing.MailingType.DANKESBRIEF);
+		mailingOne.setDate(new Date(System.currentTimeMillis()));
+		mailingOne.setFilter(filterOnePerson);
+		
+		mailingTwo.setMedium(Mailing.Medium.POSTAL);
+		mailingTwo.setType(Mailing.MailingType.DANKESBRIEF);
+		mailingTwo.setDate(new Date(System.currentTimeMillis()));
+		mailingTwo.setFilter(filterOnePerson);
 		
 		List<Mailing> mailingList = new ArrayList<Mailing>();
 		mailingList.add(mailingOne);
 		mailingList.add(mailingTwo);
-		mailingList.add(mailingThree);
 		
 		try {
 			mailingDAO.insertOrUpdate(mailingOne);
 			mailingDAO.insertOrUpdate(mailingTwo);
-			mailingDAO.insertOrUpdate(mailingThree);
 		} catch (PersistenceException e1) {
 			fail();
 		}
