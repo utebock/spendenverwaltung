@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 public class ButtonListener implements ActionListener{
 
 	private Overview overview;
-	private PersonOverview personOverview;
 	private CreatePerson createPerson;
 	private DeletePerson deletePerson;
 	private AddDonation showPerson;
@@ -16,9 +15,6 @@ public class ButtonListener implements ActionListener{
 	
 	public ButtonListener(Overview overview){
 		this.overview = overview;
-	}
-	public ButtonListener(PersonOverview personOverview){
-		this.personOverview = personOverview;
 	}
 	
 	public ButtonListener(CreatePerson createPerson) {
@@ -58,12 +54,8 @@ public class ButtonListener implements ActionListener{
 			createFilter.returnTo();
 		}
 		
-		if(cmd.equals("person_overview")){
-			overview.goToPersons();
-		}
-		
 		if(cmd.equals("create_person")){
-			personOverview.goToCreate();
+			overview.goToCreate();
 		}
 		
 		if(cmd.equals("create_person_in_db")){
@@ -75,7 +67,7 @@ public class ButtonListener implements ActionListener{
 		}
 		
 		if(cmd.equals("search_person")){
-			personOverview.goToShow();
+			overview.goToShow();
 		}
 		
 		if(cmd.equals("delete_person_from_db")){

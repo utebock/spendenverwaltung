@@ -1,12 +1,23 @@
 package at.fraubock.spendenverwaltung.gui;
 
+import java.awt.Dimension;
 import java.awt.Font;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 
+import org.apache.log4j.Logger;
+
+import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
@@ -15,7 +26,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import net.miginfocom.swing.MigLayout;
 
 public class Overview extends JPanel{
-
+	private static final Logger log = Logger.getLogger(Overview.class);
 	private static final long serialVersionUID = 1L;
 	private IPersonService personService;
 	private IAddressService addressService;
@@ -64,6 +75,12 @@ public class Overview extends JPanel{
 	private JLabel statsSendingsLabel;
 	private JLabel statsPersonsLabel;
 	private IFilterService filterService;
+	private JButton search;
+	private JLabel searchLabel;
+	private PersonTableModel personModel;
+	private List<Person> personList;
+	private JTable showTable;
+	private JScrollPane scrollPane;
 	public Overview(IFilterService filterService, IPersonService personService, IAddressService addressService, IDonationService donationService){
 		/**
 		 * good to know: basic font is 13pt
@@ -75,6 +92,7 @@ public class Overview extends JPanel{
 		this.donationService = donationService;
 		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
+		initTable();
 		setUp();
 	}
 
@@ -88,14 +106,21 @@ public class Overview extends JPanel{
 		general.setFont(new Font("Headline", Font.PLAIN, 14));
 		personsPanel.add(general, "wrap");
 		//personsPanel.add(empty, "wrap");
-		person = builder.createImageButton("/images/persons.jpeg", buttonListener, "person_overview");
+		person = builder.createImageButton("/images/createPerson.jpg", buttonListener, "create_person");
 		personsPanel.add(person);
+		
+		search = builder.createImageButton("/images/getPersons.jpg", buttonListener, "search_person");
+		personsPanel.add(search, "gap 35");
 		
 		filter = builder.createImageButton("/images/filter.jpg", buttonListener, "filter_overview");
 		personsPanel.add(filter, "wrap, gap 35");
 		//button labels
-		persons = builder.createLabel("Personen");
-		personsPanel.add(persons, "gap 22");
+		persons = builder.createLabel("Person anlegen");
+		personsPanel.add(persons);
+		
+		searchLabel = builder.createLabel("Personen suchen");
+		personsPanel.add(searchLabel, "gap 28");
+		
 		filterLabel = builder.createLabel("Filter");
 		personsPanel.add(filterLabel, "wrap, gap 58");
 		
@@ -214,14 +239,12 @@ public class Overview extends JPanel{
 		statsPanel.add(statsPersonsLabel, "gap 45");
 	}
 	
-	public void goToPersons(){
-		PersonOverview po = new PersonOverview(personService, addressService, donationService, this);
+	public void goToCreate(){
+		CreatePerson cp = new CreatePerson(personService, addressService, donationService, this);
 		removeAll();
 		revalidate();
 		repaint();
-		add(po);
-		
-
+		add(cp);
 	}
 
 	public void goToFilter() {
@@ -231,6 +254,51 @@ public class Overview extends JPanel{
 		repaint();
 		add(fo);
 		
+	}
+	
+	public void initTable(){
+		personModel = new PersonTableModel();
+		getPersons();
+		showTable = new JTable(personModel);
+		
+		showTable.setFillsViewportHeight(true);
+		showTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+		scrollPane = new JScrollPane(showTable);
+		scrollPane.setPreferredSize(new Dimension(650,700));
+	}
+	
+	public PersonTableModel getPersonModel(){
+		return this.personModel;
+	}
+	
+	private void getPersons(){
+		personList = new ArrayList<Person>();
+		
+		try{
+			personList = personService.getAll();
+			log.info("List " + personList.size() + " persons");
+		}
+		catch(ServiceException e){
+			JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+		    e.printStackTrace();
+		    return;
+		}
+		if(personList == null){
+			JOptionPane.showMessageDialog(this, "GetAll() returns null.", "Error", JOptionPane.ERROR_MESSAGE);
+		    return;
+		}
+		for(Person p : personList){
+			personModel.addPerson(p);
+		}	
+	}
+	
+	public void goToShow(){
+		FilterPersons filter = new FilterPersons(personService, addressService, donationService, this);
+		removeAll();
+		revalidate();
+		repaint();
+		add(filter);
 	}
 	
 

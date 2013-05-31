@@ -29,7 +29,6 @@ public class CreatePerson extends JPanel{
 	private static final long serialVersionUID = 1L;
 	private IPersonService personService;
 	private IAddressService addressService;
-	private PersonOverview personOverview;
 	private IDonationService donationService;
 	private ComponentBuilder builder;
 	private ButtonListener buttonListener;
@@ -95,15 +94,16 @@ public class CreatePerson extends JPanel{
 	private JTextField dedicationField;
 	private JLabel dedicationNoteLabel;
 	private JTextField dedicationNoteField;
-
-	public CreatePerson(IPersonService personService, IAddressService addressService, IDonationService donationService, PersonOverview personOverview){
+	private Overview overview;
+	
+	public CreatePerson(IPersonService personService, IAddressService addressService, IDonationService donationService, Overview overview){
 		super(new MigLayout());
 		
 		this.personService = personService;
 		this.addressService = addressService;
 		this.donationService = donationService;
-		this.personOverview = personOverview;
-		this.personModel = this.personOverview.getPersonModel();
+		this.overview = overview;
+		this.personModel = this.overview.getPersonModel();
 		buttonListener = new ButtonListener(this);
 		actionHandler = new ActionHandler(this);
 		builder = new ComponentBuilder();
@@ -413,9 +413,9 @@ public class CreatePerson extends JPanel{
 		this.removeAll();
 		this.revalidate();
 		this.repaint();
-		personOverview.removeAll();
-		personOverview.revalidate();
-		personOverview.repaint();
-		personOverview.setUp();
+		overview.removeAll();
+		overview.revalidate();
+		overview.repaint();
+		overview.setUp();
 	}
 }

@@ -24,7 +24,6 @@ public class DeletePerson extends JPanel{
 	private static final long serialVersionUID = 1L;
 	private IPersonService personService;
 	private IAddressService addressService;
-	private PersonOverview personOverview;
 	private ComponentBuilder builder;
 	private ButtonListener buttonListener;
 	private JPanel panel;
@@ -35,12 +34,11 @@ public class DeletePerson extends JPanel{
 	private JButton ok;
 	private JButton cancel;
 	
-	public DeletePerson(IPersonService personService, IAddressService addressService, PersonOverview personOverview){
+	public DeletePerson(IPersonService personService, IAddressService addressService){
 		super(new MigLayout());
 		
 		this.personService = personService;
 		this.addressService = addressService;
-		this.personOverview = personOverview;
 		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
 		deleteModel = new PersonTableModel();
@@ -149,9 +147,6 @@ public class DeletePerson extends JPanel{
 		this.removeAll();
 		this.revalidate();
 		this.repaint();
-		personOverview.removeAll();
-		personOverview.revalidate();
-		personOverview.repaint();
-		personOverview.setUp();
+	
 	}
 }

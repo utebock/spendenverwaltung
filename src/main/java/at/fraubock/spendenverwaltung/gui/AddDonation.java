@@ -35,7 +35,6 @@ public class AddDonation extends JPanel{
 	private IPersonService personService;
 	private IAddressService addressService;
 	private IDonationService donationService;
-	private PersonOverview personOverview;
 	private Person person;
 	private Donation donation;
 	private ComponentBuilder builder;

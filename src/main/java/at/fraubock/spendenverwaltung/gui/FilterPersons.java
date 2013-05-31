@@ -34,7 +34,7 @@ public class FilterPersons extends JPanel{
 	private IPersonService personService;
 	private IAddressService addressService;
 	private IDonationService donationService;
-	private PersonOverview overview;
+	private Overview overview;
 	private ComponentBuilder builder;
 	private ButtonListener buttonListener;
 	private PersonTableModel personModel;
@@ -50,7 +50,7 @@ public class FilterPersons extends JPanel{
 	private JComboBox filterCombo;
 	private JButton backButton;
 	
-	public FilterPersons(IPersonService personService, IAddressService addressService, IDonationService donationService, PersonOverview overview){
+	public FilterPersons(IPersonService personService, IAddressService addressService, IDonationService donationService, Overview overview){
 		super(new MigLayout());
 	
 		this.personService = personService;
