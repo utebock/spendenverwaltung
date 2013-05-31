@@ -1,5 +1,5 @@
 package at.fraubock.spendenverwaltung.util;
 
 public enum LogicalOperator {
-	AND, OR, NOT, XOR;
+	AND, OR, AND_NOT,OR_NOT, XOR;
 }

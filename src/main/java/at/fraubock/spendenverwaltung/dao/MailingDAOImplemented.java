@@ -66,7 +66,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 			this.mailing = mailing;
 		}
 
-		private String createMailings = "insert into mailings (date, type, medium) values (?,?,?)";
+		private String createMailings = "insert into mailings (mailingdate, type, medium) values (?,?,?)";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
@@ -139,7 +139,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 			jdbcTemplate.query(filterStmt, new PersonMailingMapper(mailing));
 			
 		} else {
-			jdbcTemplate.update("UPDATE mailings SET date=?, type=?, medium=? WHERE id=?",
+			jdbcTemplate.update("UPDATE mailings SET mailingdate=?, type=?, medium=? WHERE id=?",
 					new Object[] { new Timestamp(mailing.getDate().getTime()), mailing.getType().getName()
 					, mailing.getMedium().getName(), mailing.getId() });
 		}
@@ -209,7 +209,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 		public Mailing mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Mailing mailing = new Mailing();
 			
-			mailing.setDate(new Date(rs.getTimestamp("date").getTime()));
+			mailing.setDate(new Date(rs.getTimestamp("mailingdate").getTime()));
 			mailing.setType(Mailing.MailingType.getByName(rs.getString("type")));
 			mailing.setMedium(Mailing.Medium.getByName(rs.getString("medium")));
 			
