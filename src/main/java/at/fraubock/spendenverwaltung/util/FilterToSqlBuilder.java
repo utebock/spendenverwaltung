@@ -10,7 +10,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Property
 import at.fraubock.spendenverwaltung.service.FilterValidator;
 
 /**
- * creates the SQL statement for a {@link Filter}. processing this statement
+ * creates the SQL statement for a {@link Filter}. executing this statement
  * will return all entries from the filter type's table that fulfill the
  * criterias of the {@link Criterion} provided by the filter.
  * 
@@ -41,7 +41,7 @@ public class FilterToSqlBuilder {
 
 	private String createConditionalStatement(Criterion criterion,
 			int mountLevel) {
-		// determine the criterion to build the statment
+		// determine the criterion to build the statement
 		if (criterion instanceof ConnectedCriterion) {
 			return createConnectedCritSqlStmt((ConnectedCriterion) criterion,
 					mountLevel);
@@ -189,7 +189,8 @@ public class FilterToSqlBuilder {
 				// from this join we have to keep only the addresses where pid
 				// is the id of the top select's id
 				// (since top select is type person)
-				// TODO: address join livesat on id=aid where pid=mount0.id
+				statement = statement.replaceAll("as mount.+",
+						"join livesat on id=aid where pid=mount0.id");
 			} else {
 				// donation or mailing. only consider those where their personid
 				// is the same as the top selects' id
@@ -216,11 +217,11 @@ public class FilterToSqlBuilder {
 		if (filter.getCriterion() != null) {
 			statement += " and "
 					+ createConditionalStatement(filter.getCriterion(),
-							mountLevel + 1) + ") ";
+							mountLevel + 1);
 		}
 
 		// add the constraint to the result set of this sub select
-		statement += constraint;
+		statement += ") " + constraint;
 
 		return statement;
 	}
