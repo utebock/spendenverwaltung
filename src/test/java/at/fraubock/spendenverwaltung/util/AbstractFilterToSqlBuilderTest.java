@@ -9,6 +9,7 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.ConnectedCriterion;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -152,6 +153,43 @@ public class AbstractFilterToSqlBuilderTest {
 	}
 
 	/* TODO testing mounted criterion statements */
+	
+	/* TODO testing complex statements */
+	@Test
+	public void complex() {
+		// person has donated 100euro for each donation or lives in 1070
+		
+		// filter address = 1070
+		PropertyCriterion plz1070 = new PropertyCriterion();
+		plz1070.compare(FilterProperty.ADDRESS_POSTCODE, RelationalOperator.EQUALS, "1070");
+		Filter addressFilter = new Filter(FilterType.ADDRESS,plz1070);
+		MountedFilterCriterion addressMount = new MountedFilterCriterion();
+		addressMount.mountAndCompareCount(addressFilter, RelationalOperator.GREATER_EQ, 1);
+		
+		
+		// filter (donation != 100) = 0 AND donations exist
+		PropertyCriterion amount100 = new PropertyCriterion();
+		amount100.compare(FilterProperty.DONATION_AMOUNT, RelationalOperator.UNEQUAL, 100D);
+		Filter donationUnequals100Filter = new Filter(FilterType.DONATION,amount100);
+		MountedFilterCriterion donationUneq100Mount = new MountedFilterCriterion();
+		donationUneq100Mount.mountAndCompareCount(donationUnequals100Filter, RelationalOperator.EQUALS, 0);
+		
+		Filter emptyDonationFilter = new Filter(FilterType.DONATION);
+		MountedFilterCriterion emptyDonMount = new MountedFilterCriterion();
+		emptyDonMount.mountAndCompareCount(emptyDonationFilter, RelationalOperator.GREATER_EQ, 1);
+		
+		ConnectedCriterion andCrit = new ConnectedCriterion();
+		andCrit.connect(donationUneq100Mount, LogicalOperator.AND, emptyDonMount);
+		
+		// connect with or
+		ConnectedCriterion orNotCrit = new ConnectedCriterion();
+		orNotCrit.connect(andCrit, LogicalOperator.OR, addressMount);
+		
+		Filter mainFilter = new Filter(FilterType.PERSON, orNotCrit);
+		
+		System.out.println(builder.createSqlStatement(mainFilter));
+		int a = 1;
+	}
 	
 	
 	@Before
