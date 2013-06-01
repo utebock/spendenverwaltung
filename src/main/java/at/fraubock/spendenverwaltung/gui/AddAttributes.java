@@ -337,7 +337,6 @@ public class AddAttributes extends JPanel{
 		addressList = new ArrayList<Address>();
 
 		addressList = person.getAddresses();
-		System.out.println(addressList.size()+ " addresslist");
 		if(addressList == null){
 			JOptionPane.showMessageDialog(this, "Addresslist returns null.", "Error", JOptionPane.ERROR_MESSAGE);
 		    return;
