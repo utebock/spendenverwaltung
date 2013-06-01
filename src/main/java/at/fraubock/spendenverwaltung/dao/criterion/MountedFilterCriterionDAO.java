@@ -32,16 +32,14 @@ public class MountedFilterCriterionDAO {
 
 	public void insert(MountedFilterCriterion f) throws PersistenceException {
 
-		if (f.getId() == null) {
+//		if (f.getId() == null) {
 			MountedFilterCriterion mount = (MountedFilterCriterion) f;
 			validator.validate(mount);
-			abstractCritDAO.insert(f);
 			KeyHolder mountedKeyHolder = new GeneratedKeyHolder();
 
 			jdbcTemplate.update(new CreateMountedFilterStatementCreator(mount),
 					mountedKeyHolder);
-			mount.setId(mountedKeyHolder.getKey().intValue());
-		}
+//		}
 	}
 
 	public MountedFilterCriterion getById(int id) throws PersistenceException {
@@ -84,7 +82,7 @@ public class MountedFilterCriterionDAO {
 			this.filter = filter;
 		}
 
-		private String createFilter = "insert into mountedfilter_criterion (mount,relational_operator,count,property,sum,avg) values (?,?,?,?,?,?)";
+		private String createFilter = "insert into mountedfilter_criterion (id,mount,relational_operator,count,property,sum,avg) values (?,?,?,?,?,?,?)";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
@@ -100,6 +98,7 @@ public class MountedFilterCriterionDAO {
 				throw new SQLException();
 			}
 			int c = 1;
+			ps.setInt(c++,filter.getId());
 			ps.setInt(c++, mount.getId());
 			ps.setString(c++, filter.getRelationalOperator().toString());
 			if (filter.getCount() == null) {

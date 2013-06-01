@@ -30,15 +30,14 @@ public class PropertyCriterionDAO {
 
 	public void insert(PropertyCriterion f) throws PersistenceException {
 
-		if (f.getId() == null) {
+//		if (f.getId() == null) {
 			PropertyCriterion prop = (PropertyCriterion) f;
 			validator.validate(prop);
 			KeyHolder propertyKeyHolder = new GeneratedKeyHolder();
 
 			jdbcTemplate.update(new CreatePropertyFilterStatementCreator(prop),
 					propertyKeyHolder);
-			f.setId(propertyKeyHolder.getKey().intValue());
-		}
+//		}
 	}
 
 	public PropertyCriterion getById(int id) throws PersistenceException {
@@ -76,7 +75,7 @@ public class PropertyCriterionDAO {
 			this.prop = filter;
 		}
 
-		private String createFilter = "insert into property_criterion (relational_operator,property,numValue,strValue,dateValue,daysBack,boolValue) values (?,?,?,?,?,?,?)";
+		private String createFilter = "insert into property_criterion (id,relational_operator,property,numValue,strValue,dateValue,daysBack,boolValue) values (?,?,?,?,?,?,?,?)";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
@@ -84,7 +83,8 @@ public class PropertyCriterionDAO {
 			PreparedStatement ps = connection.prepareStatement(createFilter,
 					Statement.RETURN_GENERATED_KEYS);
 			int c = 1;
-			
+
+			ps.setInt(c++, prop.getId());
 			ps.setString(c++, prop.getRelationalOperator().toString());
 			ps.setString(c++, prop.getProperty().toString());
 			

@@ -1,15 +1,11 @@
 package at.fraubock.spendenverwaltung.gui;
 
 import java.awt.Dimension;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -17,17 +13,20 @@ import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 
+import net.miginfocom.swing.MigLayout;
+
 import org.apache.log4j.Logger;
 
-import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.gui.filter.ISelectorModelReceiver;
+import at.fraubock.spendenverwaltung.gui.filter.PropertyCriterionComponent;
+import at.fraubock.spendenverwaltung.gui.filter.SelectorModels;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
-
-import net.miginfocom.swing.MigLayout;
+import at.fraubock.spendenverwaltung.util.FilterType;
 
 public class FilterOverview extends JPanel{
 
@@ -96,7 +95,7 @@ public class FilterOverview extends JPanel{
 	}
 	
 	private void addComponentsToToolbar(JToolBar toolbar) {
-		create = builder.createButton("Filter anlegen", buttonListener, "create_filter");
+		create = builder.createButton("Personenfilter anlegen", buttonListener, "create_filter");
 		edit = builder.createButton("Filter bearbeiten", buttonListener, "edit_filter");
 		delete = builder.createButton("Filter l\u00F6schen", buttonListener, "delete_filter");
 		share = builder.createButton("Filter freigeben", buttonListener, "share_filter");
@@ -136,7 +135,16 @@ public class FilterOverview extends JPanel{
 	}
 	
 	public void createFilter(){
-		CreateFilter cf = new CreateFilter(filterService, personService, addressService, donationService, this);
+		ISelectorModelReceiver personModelReceiver = new ISelectorModelReceiver() {
+
+			@Override
+			public List<PropertyCriterionComponent> receiveModels() {
+				return SelectorModels.getPersonSelectorModels();
+			}
+			
+		};
+		
+		CreateFilter cf = new CreateFilter(FilterType.PERSON,"Personen", personModelReceiver,filterService, personService, addressService, donationService, this);
 		removeAll();
 		revalidate();
 		repaint();

@@ -10,9 +10,9 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Property
 import at.fraubock.spendenverwaltung.service.FilterValidator;
 
 /**
- * creates the SQL statement for a {@link Filter}. executing this statement
- * will return all entries from the filter type's table that fulfill the
- * criterias of the {@link Criterion} provided by the filter.
+ * creates the SQL statement for a {@link Filter}. executing this statement will
+ * return all entries from the filter type's table that fulfill the criterias of
+ * the {@link Criterion} provided by the filter.
  * 
  * @author philipp muhoray
  * 
@@ -23,14 +23,15 @@ public class FilterToSqlBuilder {
 
 	/**
 	 * creates the SQL statement to this filter.
+	 * 
 	 * @param filter
 	 * @return sql statement
 	 */
 	public String createSqlStatement(Filter filter) {
 		validator.validate(filter);
-		
+
 		String stmt = "select * from " + filter.getType() + " as mount0";
-		
+
 		if (filter.getCriterion() != null) {
 			stmt += " where "
 					+ createConditionalStatement(filter.getCriterion(), 1);
@@ -97,20 +98,24 @@ public class FilterToSqlBuilder {
 		validator.validate(con);
 		LogicalOperator op = con.getLogicalOperator();
 
+		/*
+		 * NOTE: to fulfill the specification of the filters, brackets should be
+		 * placed around the created statement (for priorisation of the
+		 * operators). this is NOT done here for now. we don't need it so far,
+		 * because the GUI provides no possibility for priorisation anyway.
+		 */
 		if (op == LogicalOperator.AND_NOT || op == LogicalOperator.OR_NOT) {
 			// operator involves NOT, therefore some modifications are needed
-			return "("
-					+ createConditionalStatement(con.getOperand1(), mountLevel)
+			return createConditionalStatement(con.getOperand1(), mountLevel)
 					+ " " + (op == LogicalOperator.AND_NOT ? "AND" : "OR")
 					+ " NOT ("
 					+ createConditionalStatement(con.getOperand2(), mountLevel)
-					+ "))";
+					+ ")";
 		}
 
-		return "(" + createConditionalStatement(con.getOperand1(), mountLevel)
-				+ " " + op + " "
-				+ createConditionalStatement(con.getOperand2(), mountLevel)
-				+ ")";
+		return createConditionalStatement(con.getOperand1(), mountLevel) + " "
+				+ op + " "
+				+ createConditionalStatement(con.getOperand2(), mountLevel);
 	}
 
 	private String createMountedCritSqlStmt(MountedFilterCriterion criterion,
@@ -159,12 +164,13 @@ public class FilterToSqlBuilder {
 		FilterType addressType = FilterType.ADDRESS;
 
 		if (thisType == mountedType) {
-			// types are the same. only consider entries with same id as top select
+			// types are the same. only consider entries with same id as top
+			// select
 			statement += " where mount" + (mountLevel) + ".id=mount"
 					+ (mountLevel - 1) + ".id";
 
 		}
-		
+
 		else if (thisType != personType && thisType != addressType) {
 			// this type is donation or mailing
 			if (mountedType != personType) {
@@ -210,7 +216,7 @@ public class FilterToSqlBuilder {
 			// same way as person mounts address, only with switched ids.
 			// TODO: persons join livesat on id=pid where aid=mount0.id
 		}
-		
+
 		/* all necessary default constraints are set now */
 
 		// add the mounted filters criterions to the where clause

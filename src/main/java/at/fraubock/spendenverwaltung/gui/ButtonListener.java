@@ -46,12 +46,16 @@ public class ButtonListener implements ActionListener{
 		String cmd = e.getActionCommand();
 		
 		if(cmd.equals("plusButton_create_filter")){
-			createFilter.gainMore();
+			createFilter.gainMore(true);
 			createFilter.showButtons();
 		}
 		
 		if(cmd.equals("cancel_filter_in_db")){
 			createFilter.returnTo();
+		}
+		
+		if(cmd.equals("create_filter_in_db")){
+			createFilter.createFilter();
 		}
 		
 		if(cmd.equals("create_person")){

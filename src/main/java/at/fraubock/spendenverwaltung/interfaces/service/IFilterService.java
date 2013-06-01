@@ -4,6 +4,7 @@ import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
+import at.fraubock.spendenverwaltung.service.to.FilterTO;
 
 
 /**
@@ -21,7 +22,7 @@ public interface IFilterService {
 	 *            Filter to be created
 	 * @return Fully defined filter
 	 */
-	public Filter create(Filter f) throws ServiceException;
+	public FilterTO create(FilterTO f) throws ServiceException;
 
 	/**
 	 * Updates an existing filter

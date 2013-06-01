@@ -35,6 +35,11 @@ public class AbstractCriterionDAO {
 			throw new IllegalArgumentException("Criterion must not be null");
 		}
 
+		KeyHolder criterionKeyHolder = new GeneratedKeyHolder();
+		jdbcTemplate.update(new CreateFilterCriterionStatementCreator(f),
+				criterionKeyHolder);
+		f.setId(criterionKeyHolder.getKey().intValue());
+
 		if (f instanceof ConnectedCriterion) {
 			connectedCritDAO.insert((ConnectedCriterion) f);
 		} else if (f instanceof PropertyCriterion) {
@@ -42,12 +47,6 @@ public class AbstractCriterionDAO {
 		} else if (f instanceof MountedFilterCriterion) {
 			mountedCritDAO.insert((MountedFilterCriterion) f);
 		}
-
-		KeyHolder criterionKeyHolder = new GeneratedKeyHolder();
-
-		jdbcTemplate.update(new CreateFilterCriterionStatementCreator(f),
-				criterionKeyHolder);
-		f.setId(criterionKeyHolder.getKey().intValue());
 	}
 
 	public Criterion getById(int id) throws PersistenceException {
@@ -97,15 +96,14 @@ public class AbstractCriterionDAO {
 			this.filter = filter;
 		}
 
-		private String createFilter = "insert into criterion (id,type) values (?,?)";
+		private String createFilter = "insert into criterion (type) values (?)";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
 				throws SQLException {
 			PreparedStatement ps = connection.prepareStatement(createFilter,
 					Statement.RETURN_GENERATED_KEYS);
-			ps.setInt(1, filter.getId());
-			ps.setString(2, filter.getType().toString());
+			ps.setString(1, filter.getType().toString());
 			return ps;
 		}
 	}

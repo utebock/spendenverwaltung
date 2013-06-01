@@ -29,18 +29,14 @@ public class ConnectedCriterionDAO {
 	public void insert(ConnectedCriterion f)
 			throws PersistenceException {
 
-		if (f.getId() == null) {
+//		if (f.getId() == null) {
 			ConnectedCriterion log = (ConnectedCriterion) f;
 			validator.validate(log);
-			abstractCritDAO.insert(f);
-			abstractCritDAO.insert(log.getOperand1());
-			abstractCritDAO.insert(log.getOperand2());
 			KeyHolder logicalKeyHolder = new GeneratedKeyHolder();
 
 			jdbcTemplate.update(new CreateConnectedCriterionStatementCreator(
 					log), logicalKeyHolder);
-			log.setId(logicalKeyHolder.getKey().intValue());
-		}
+//		}
 	}
 
 	public ConnectedCriterion getById(int id) throws PersistenceException {
@@ -60,7 +56,7 @@ public class ConnectedCriterionDAO {
 				throw new PersistenceException(e);
 		}
 	}
-	
+
 	public void delete(ConnectedCriterion f) throws PersistenceException {
 		validator.validate(f);
 		abstractCritDAO.delete(f.getOperand1());
@@ -80,7 +76,7 @@ public class ConnectedCriterionDAO {
 			this.filter = filter;
 		}
 
-		private String createFilter = "insert into connected_criterion (logical_operator,operand1,operand2) values (?,?,?)";
+		private String createFilter = "insert into connected_criterion (id,logical_operator,operand1,operand2) values (?,?,?,?)";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
@@ -88,6 +84,7 @@ public class ConnectedCriterionDAO {
 			PreparedStatement ps = connection.prepareStatement(createFilter,
 					Statement.RETURN_GENERATED_KEYS);
 			int c = 1;
+			ps.setInt(c++, filter.getId());
 			ps.setString(c++, filter.getLogicalOperator().toString());
 			try {
 				abstractCritDAO.insert(filter.getOperand1());
