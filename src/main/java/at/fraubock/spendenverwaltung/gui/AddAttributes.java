@@ -109,6 +109,7 @@ public class AddAttributes extends JPanel{
 	private JLabel mainLabelDonation;
 	private JPanel addAddressPanel;
 	private JPanel addDonationPanel;
+	private JPanel overviewPanel;
 
 	public AddAttributes(Person person, IPersonService personService, IAddressService addressService, IDonationService donationService, FilterPersons filterPersons) {
 		super(new MigLayout());
@@ -130,9 +131,12 @@ public class AddAttributes extends JPanel{
 	}
 
 	public void setUpPerson(){
-
+		overviewPanel = builder.createPanel(800, 1000);
+		JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		this.add(pane);
+		
 		panel = builder.createPanel(800, 150);
-		this.add(panel, "wrap");
+		overviewPanel.add(panel, "wrap");
 		
 		mainLabel = builder.createLabel("Personendaten: ");
 		mainLabel.setFont(new Font("Headline", Font.PLAIN, 14));
@@ -176,13 +180,13 @@ public class AddAttributes extends JPanel{
 		panel.add(note, "wrap");
 		
 		JSeparator separator = builder.createSeparator();
-		this.add(separator, "growx, wrap");
+		overviewPanel.add(separator, "growx, wrap");
 	}
 	
 	private void setUpAddressTable(){
 		addr = new Address();
 		addressPanel = builder.createPanel(800, 250);
-		this.add(addressPanel, "wrap");
+		overviewPanel.add(addressPanel, "wrap");
 		
 		mainLabelAddress = builder.createLabel("Adressdaten: ");
 		mainLabelAddress.setFont(new Font("Headline", Font.PLAIN, 14));
@@ -201,7 +205,7 @@ public class AddAttributes extends JPanel{
 		createAddressBtn = builder.createButton("Adresse hinzuf\u00FCgen", buttonListener, "open_create_address_in_show_person");
 		addressPanel.add(createAddressBtn, "span 2");
 		JSeparator separator = builder.createSeparator();
-		this.add(separator, "growx, wrap");
+		overviewPanel.add(separator, "growx, wrap");
 		
 		getAddresses();	
 	}
@@ -295,7 +299,7 @@ public class AddAttributes extends JPanel{
 	private void setUpDonationTable(){
 		
 		donationPanel = builder.createPanel(800,250);
-		this.add(donationPanel);
+		overviewPanel.add(donationPanel);
 		
 		mainLabelDonation = builder.createLabel("Spendendaten: ");
 		mainLabelDonation.setFont(new Font("Headline", Font.PLAIN, 14));

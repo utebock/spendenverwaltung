@@ -44,6 +44,7 @@ public class FilterPersons extends JPanel{
 	private ActionHandler handler;
 	private JComboBox<String[]> filterCombo;
 	private JButton backButton;
+	private JPanel overviewPanel;
 	
 	public FilterPersons(IPersonService personService, IAddressService addressService, IDonationService donationService, Overview overview){
 		super(new MigLayout());
@@ -71,8 +72,13 @@ public class FilterPersons extends JPanel{
 		handler = new ActionHandler(this);
 		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
+		
+		overviewPanel = builder.createPanel(800, 1000);
+		JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		this.add(pane);
+		
 		panel = builder.createPanel(800, 800);
-		this.add(panel);
+		overviewPanel.add(panel);
 		
 		toolbar = builder.createToolbar();
 		addComponentsToToolbar(toolbar);

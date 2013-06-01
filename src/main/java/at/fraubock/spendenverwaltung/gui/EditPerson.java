@@ -84,6 +84,7 @@ public class EditPerson extends JPanel{
 	private JTable addressTable;
 	private JScrollPane addressPane;
 	private JPanel tablePanel;
+	private JPanel overviewPanel;
 
 	public EditPerson(Person person, IPersonService personService, IAddressService addressService, FilterPersons filterPersons, Overview overview) {
 		super(new MigLayout());
@@ -103,8 +104,13 @@ public class EditPerson extends JPanel{
 
 	@SuppressWarnings("unchecked")
 	public void setUpPerson(){
+		
+		overviewPanel = builder.createPanel(800, 1000);
+		JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		this.add(pane);
+		
 		panel = builder.createPanel(800, 400);
-		this.add(panel, "wrap");
+		overviewPanel.add(panel, "wrap");
 		editPerson = builder.createLabel("Personendaten aendern");
 		editPerson.setFont(new Font("Headline", Font.PLAIN, 14));
 		panel.add(editPerson, "wrap");
@@ -237,7 +243,7 @@ public class EditPerson extends JPanel{
 		panel.add(noteArea, "wrap, growx");
 		
 		tablePanel = builder.createPanel(800, 200);
-		this.add(tablePanel);
+		overviewPanel.add(tablePanel);
 		addressTable = new JTable(addressModel);
 		addressTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 

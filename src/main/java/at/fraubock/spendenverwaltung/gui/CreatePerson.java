@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -103,6 +104,7 @@ public class CreatePerson extends JPanel{
 	private JLabel starProperty1;
 	private JLabel dateInstruction;
 	private JLabel instructionLabel;
+	private JPanel overviewPanel;
 	
 	public CreatePerson(IPersonService personService, IAddressService addressService, IDonationService donationService, Overview overview){
 		super(new MigLayout());
@@ -116,14 +118,19 @@ public class CreatePerson extends JPanel{
 		actionHandler = new ActionHandler(this);
 		builder = new ComponentBuilder();
 		
-		panel = builder.createPanel(800,500);
-		this.add(panel);
 		
 		setUpCreate();
 	}
 
 	@SuppressWarnings("unchecked")
 	private void setUpCreate() {
+		
+		overviewPanel = builder.createPanel(800, 1000);
+		JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		this.add(pane);
+
+		panel = builder.createPanel(800,500);
+		overviewPanel.add(panel);
 		
 		addPerson = builder.createLabel("Personendaten eintragen");
 		addPerson.setFont(new Font("Headline", Font.PLAIN, 14));
@@ -207,10 +214,10 @@ public class CreatePerson extends JPanel{
 */
 		
 		separator = builder.createSeparator();
-		this.add(separator, "wrap, growx");
+		overviewPanel.add(separator, "wrap, growx");
 		
 		donationPanel = builder.createPanel(800, 450);
-		this.add(donationPanel);
+		overviewPanel.add(donationPanel);
 		
 		addDonation = builder.createLabel("Neue Spende anlegen");
 		addDonation.setFont(new Font("Headline", Font.PLAIN, 14));
