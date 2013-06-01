@@ -9,6 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
@@ -81,6 +82,7 @@ public class Overview extends JPanel{
 	private List<Person> personList;
 	private JTable showTable;
 	private JScrollPane scrollPane;
+	private JPanel overviewPanel;
 	public Overview(IFilterService filterService, IPersonService personService, IAddressService addressService, IDonationService donationService){
 		/**
 		 * good to know: basic font is 13pt
@@ -90,6 +92,7 @@ public class Overview extends JPanel{
 		this.personService = personService;
 		this.addressService = addressService;
 		this.donationService = donationService;
+
 		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
 		initTable();
@@ -97,11 +100,17 @@ public class Overview extends JPanel{
 	}
 
 	public void setUp() {
+		
+		overviewPanel = builder.createPanel(800, 1000);
+		JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		this.add(pane);
 		/**
 		 * "Allgemein"-panel contains persons and filter
 		 */
+		
 		JPanel personsPanel = builder.createPanel(800,160);
-		this.add(personsPanel, "wrap");
+		
+		overviewPanel.add(personsPanel, "wrap");
 		general = builder.createLabel("Allgemein");
 		general.setFont(new Font("Headline", Font.PLAIN, 14));
 		personsPanel.add(general, "wrap");
@@ -126,14 +135,14 @@ public class Overview extends JPanel{
 		
 		//separator for next section
 		personSeparator = builder.createSeparator();
-		this.add(personSeparator, "wrap, growx");
+		overviewPanel.add(personSeparator, "wrap, growx");
 		
 		/**
 		 * "Spendenimport"-panel contains donationimport and validation
 		 */
 		
 		importPanel = builder.createPanel(800,160);
-		this.add(importPanel, "wrap");
+		overviewPanel.add(importPanel, "wrap");
 		donationImport = builder.createLabel("Spendenimport");
 		donationImport.setFont(new Font("Headline", Font.PLAIN, 14));
 		importPanel.add(donationImport, "wrap");
@@ -149,7 +158,7 @@ public class Overview extends JPanel{
 		importPanel.add(validationLabel, "wrap, gap 65");
 		
 		importSeparator = builder.createSeparator();
-		this.add(importSeparator, "wrap, growx");
+		overviewPanel.add(importSeparator, "wrap, growx");
 		
 
 		/**
@@ -157,7 +166,7 @@ public class Overview extends JPanel{
 		 */
 		
 		confirmPanel = builder.createPanel(800,160);
-		this.add(confirmPanel, "wrap");
+		overviewPanel.add(confirmPanel, "wrap");
 		confirm = builder.createLabel("Spendenbest\u00E4tigung");
 		confirm.setFont(new Font("Headline", Font.PLAIN, 14));
 		confirmPanel.add(confirm, "wrap");
@@ -173,7 +182,7 @@ public class Overview extends JPanel{
 		confirmPanel.add(obtainConfirmLabel, "wrap, gap 65");
 		
 		confirmSeparator = builder.createSeparator();
-		this.add(confirmSeparator, "wrap, growx");
+		overviewPanel.add(confirmSeparator, "wrap, growx");
 		
 		/**
 		 * "Aussendungen"-panel contains e-aussendung erstellen, briefaussendung erstellen, aussendungen anzeigen, 
@@ -181,7 +190,7 @@ public class Overview extends JPanel{
 		 */
 		
 		sendPanel = builder.createPanel(800,160);
-		this.add(sendPanel, "wrap");
+		overviewPanel.add(sendPanel, "wrap");
 		sending = builder.createLabel("Aussendungen");
 		sending.setFont(new Font("Headline", Font.PLAIN, 14));
 		sendPanel.add(sending, "wrap");
@@ -212,14 +221,14 @@ public class Overview extends JPanel{
 		sendPanel.add(deleteSendingsLabel, "wrap, gap 35");
 
 		sendSeparator = builder.createSeparator();
-		this.add(sendSeparator, "wrap, growx");
+		overviewPanel.add(sendSeparator, "wrap, growx");
 		
 		/**
 		 * "Statistiken"-panel contains spendenentwicklung, aussendungen, personen
 		 */
 		
 		statsPanel = builder.createPanel(800,160);
-		this.add(statsPanel, "wrap");
+		overviewPanel.add(statsPanel, "wrap");
 		stats = builder.createLabel("Statistiken");
 		stats.setFont(new Font("Headline", Font.PLAIN, 14));
 		statsPanel.add(stats, "wrap");

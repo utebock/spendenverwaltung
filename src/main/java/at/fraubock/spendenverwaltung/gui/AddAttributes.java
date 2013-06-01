@@ -6,15 +6,12 @@ import java.awt.Font;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
-
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
@@ -38,7 +35,6 @@ public class AddAttributes extends JPanel{
 	private IDonationService donationService;
 	private IAddressService addressService;
 	private IPersonService personService;
-	private PersonTableModel personModel;
 	private Person person;
 	private Donation donation;
 	private Address addr;
@@ -78,24 +74,16 @@ public class AddAttributes extends JPanel{
 	private JLabel mailLabel;
 	private JLabel mail;
 	
-	private JLabel streetLabel;
 	private JLabel addressStreetLabel;
-	private JLabel street;
 	private JTextField streetField;
 	
-	private JLabel postalLabel;
 	private JLabel addressPostalLabel;
-	private JLabel postal;
 	private JTextField postalField;
 
-	private JLabel cityLabel;
 	private JLabel addressCityLabel;
-	private JLabel city;
 	private JTextField cityField;
 	
-	private JLabel countryLabel;
 	private JLabel addressCountryLabel;
-	private JLabel country;
 	private JTextField countryField;
 	
 	private JLabel noteLabel;
