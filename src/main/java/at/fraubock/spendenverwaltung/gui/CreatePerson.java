@@ -1,7 +1,9 @@
 package at.fraubock.spendenverwaltung.gui;
 
 import java.awt.Font;
-import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
@@ -95,6 +97,12 @@ public class CreatePerson extends JPanel{
 	private JLabel dedicationNoteLabel;
 	private JTextField dedicationNoteField;
 	private Overview overview;
+	private JLabel dateLabel;
+	private JTextField dateField;
+	private JLabel starProperty0;
+	private JLabel starProperty1;
+	private JLabel dateInstruction;
+	private JLabel instructionLabel;
 	
 	public CreatePerson(IPersonService personService, IAddressService addressService, IDonationService donationService, Overview overview){
 		super(new MigLayout());
@@ -163,7 +171,7 @@ public class CreatePerson extends JPanel{
 		street = builder.createLabel("Stra\u00DFe: ");
 		streetField = builder.createTextField(150);
 		panel.add(street);
-		panel.add(streetField, "wrap, growx");
+		panel.add(streetField, "growx, wrap");
 		
 		postal = builder.createLabel("PLZ: ");
 		postalField = builder.createTextField(10);
@@ -214,7 +222,20 @@ public class CreatePerson extends JPanel{
 		donationPanel.add(donationLabel);
 		donationPanel.add(donationCombo, "split 2");
 		amount = builder.createTextField(30);
-		donationPanel.add(amount, "wrap, growx");
+		donationPanel.add(amount, "growx");
+		starProperty0 = builder.createLabel("<html><font color=red>*</font></html>");
+		donationPanel.add(starProperty0, "wrap");
+		
+		dateLabel = builder.createLabel("Spendendatum: ");
+		dateInstruction = builder.createLabel("(YYYY-MM-DD)");
+		dateInstruction.setFont(new Font("Instruction", Font.PLAIN, 9));
+		dateField = builder.createTextField(30);
+		donationPanel.add(dateLabel, "split 2");
+		donationPanel.add(dateInstruction);
+		donationPanel.add(dateField, "growx");
+		starProperty1 = builder.createLabel("<html><font color=red>*</font></html>");
+		donationPanel.add(starProperty1, "wrap");
+		
 		dedicationLabel = builder.createLabel("Widmung: ");
 		dedicationField = builder.createTextField(150);
 		dedicationNoteLabel = builder.createLabel("Notiz: ");
@@ -224,13 +245,19 @@ public class CreatePerson extends JPanel{
 		donationPanel.add(dedicationField, "wrap, growx");
 		donationPanel.add(dedicationNoteLabel);
 		donationPanel.add(dedicationNoteField, "wrap, growx");
-		
+		instructionLabel = builder.createLabel("<html><font color=red>Felder, die mit * gekennzeichnet sind, m\u00FCssen ausgef\u00FCllt werden.</font></html>");
+		instructionLabel.setFont(new Font("Instruction", Font.PLAIN, 9));
+		instructionLabel.setSize(800, instructionLabel.getHeight());
+		donationPanel.add(instructionLabel, "wrap");
 		donationPanel.add(empty, "wrap");
 		
 		ok = builder.createButton("Anlegen", buttonListener, "create_person_in_db");
 		donationPanel.add(ok, "split 2");
 		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_person_in_db");
 		donationPanel.add(cancel, "wrap");
+		
+		
+		
 	}
 	
 	public void createPersonInDb(){
@@ -375,12 +402,36 @@ public class CreatePerson extends JPanel{
 		/**
 		 * Donation Amount
 		 */
-		donation.setAmount(Long.parseLong(amount.getText()));
+		long d_amount = 0;
+		if(amount.getText().isEmpty() || amount.getText().equals(null)){
+			JOptionPane.showMessageDialog(this, "Bitte Spendenbetrag eingeben.", "Warn", JOptionPane.WARNING_MESSAGE);
+			amount.requestFocus();
+			return;
+		}
+		else{
+			try{
+				d_amount = Long.parseLong(amount.getText());
+			}
+			catch(NumberFormatException e){
+				JOptionPane.showMessageDialog(this, "Bitte nur Zahlen eingeben.", "Warn", JOptionPane.WARNING_MESSAGE);
+				amount.requestFocus();
+				return;
+			}
+		}
+		
+		donation.setAmount(d_amount);
+		
 		/**
 		 * Donation Date
 		 */
-		Date date = new Date(new Date().getTime());
-		donation.setDate(date);
+		if(dateField.getText().isEmpty() || dateField.getText().equals(null)){
+			JOptionPane.showMessageDialog(this, "Bitte Datum eingeben.", "Warn", JOptionPane.WARNING_MESSAGE);
+			dateField.requestFocus();
+			return;
+		}
+		
+		donation.setDate(Date.valueOf(dateField.getText()));
+		
 		/**
 		 * Donation Dedication
 		 */

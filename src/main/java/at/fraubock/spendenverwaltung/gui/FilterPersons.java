@@ -42,8 +42,7 @@ public class FilterPersons extends JPanel{
 	private JButton deleteButton;
 	private JButton addAttribute;
 	private ActionHandler handler;
-	@SuppressWarnings("rawtypes")
-	private JComboBox filterCombo;
+	private JComboBox<String[]> filterCombo;
 	private JButton backButton;
 	
 	public FilterPersons(IPersonService personService, IAddressService addressService, IDonationService donationService, Overview overview){
@@ -81,6 +80,7 @@ public class FilterPersons extends JPanel{
 		panel.add(scrollPane, "span 5, gaptop 25");
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void addComponentsToToolbar(JToolBar toolbar) {
 		String[] combo = new String[]{"Platzhalter", "Platzhalter"};
 		filterCombo = builder.createComboBox(combo, handler);

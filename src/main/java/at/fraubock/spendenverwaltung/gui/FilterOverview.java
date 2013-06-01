@@ -1,15 +1,11 @@
 package at.fraubock.spendenverwaltung.gui;
 
 import java.awt.Dimension;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -18,8 +14,6 @@ import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 
 import org.apache.log4j.Logger;
-
-import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
@@ -47,11 +41,9 @@ public class FilterOverview extends JPanel{
 	private List<Filter> filterList;
 	private JPanel panel;
 	private JToolBar toolbar;
-	private JButton editButton;
-	private JButton deleteButton;
-	private JButton addAttribute;
-	private ActionHandler handler;
-	private JComboBox filterCombo;
+	
+	@SuppressWarnings("unused")
+	private JComboBox<String[]> filterCombo;
 	private JButton backButton;
 	private JButton create;
 	private JButton edit;
@@ -83,7 +75,7 @@ public class FilterOverview extends JPanel{
 	}
 	
 	public void setUp(){
-		handler = new ActionHandler(this);
+		new ActionHandler(this);
 		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
 		panel = builder.createPanel(800, 800);

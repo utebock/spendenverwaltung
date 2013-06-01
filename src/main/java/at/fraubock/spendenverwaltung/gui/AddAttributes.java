@@ -32,8 +32,6 @@ import net.miginfocom.swing.MigLayout;
 public class AddAttributes extends JPanel{
 	
 	private static final long serialVersionUID = 1L;
-	private IPersonService personService;
-	private IAddressService addressService;
 	private IDonationService donationService;
 	private Person person;
 	private Donation donation;
@@ -54,9 +52,6 @@ public class AddAttributes extends JPanel{
 	private JButton createAddressBtn;
 	private JButton createDonationBtn;
 	private JButton backBtn;
-	
-	private JLabel salutLabel;
-	private JLabel salut;
 	
 	private JLabel titleLabel;
 	private JLabel title;
@@ -96,15 +91,8 @@ public class AddAttributes extends JPanel{
 	private JLabel country;
 	private JTextField countryField;
 	
-	private JLabel notifyTypeLabel;
-	private JLabel notifyType;
-	
 	private JLabel noteLabel;
 	private JLabel note;
-	
-	private JLabel donationsLabel;
-	
-	private JLabel addressesLabel;
 	
 	private JLabel amountLabel;
 	private JTextField amount;
@@ -116,7 +104,7 @@ public class AddAttributes extends JPanel{
 	private JTextField dedication;
 	
 	private JLabel typeLabel;
-	private JComboBox type;
+	private JComboBox<String[]> type;
 
 	private JLabel donationNoteLabel;
 	private JTextArea donationNote;
@@ -126,8 +114,6 @@ public class AddAttributes extends JPanel{
 		super(new MigLayout());
 		
 		this.person = person;
-		this.personService = personService;
-		this.addressService = addressService;
 		this.donationService = donationService;
 		this.filterPersons = filterPersons;
 		buttonListener = new ButtonListener(this);
@@ -242,6 +228,7 @@ public class AddAttributes extends JPanel{
 		getAddresses();	
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void setUpDonations(){
 		donation = new Donation();
 		donationPanel = builder.createPanel(400, 400);
