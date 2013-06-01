@@ -281,7 +281,7 @@ public class AddAttributes extends JPanel{
 			try{
 				Address createdAddress = addressService.create(addr);
 				addressModel.addAddress(createdAddress);
-				addressList = new ArrayList<Address>();
+				addressList = person.getAddresses();
 				addressList.add(createdAddress);
 				person.setAddresses(addressList);
 				personService.update(person);
@@ -291,8 +291,9 @@ public class AddAttributes extends JPanel{
 		            e.printStackTrace();
 		    		return;
 			}
+			
 			JOptionPane.showMessageDialog(this, "Adresse erfolgreich angelegt.", "Information", JOptionPane.INFORMATION_MESSAGE);
-			getAddresses();
+			addressTable.revalidate();
 		}
 	}
 	
