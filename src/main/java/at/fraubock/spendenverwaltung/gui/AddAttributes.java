@@ -301,8 +301,6 @@ public class AddAttributes extends JPanel{
 			}
 			JOptionPane.showMessageDialog(this, "Adresse erfolgreich angelegt.", "Information", JOptionPane.INFORMATION_MESSAGE);
 			getAddresses();
-			returnTo();
-			
 		}
 	}
 	
