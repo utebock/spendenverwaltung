@@ -121,7 +121,23 @@ public class FilterPersons extends JPanel{
 	}
 	
 	public void addAttributes(){
-		Person p = personModel.getPersonRow(showTable.getSelectedRow());
+		Person p;
+		int row = showTable.getSelectedRow();
+		if(row == -1){
+			JOptionPane.showMessageDialog(this, "Bitte Person auswaehlen.");
+			return;
+		}
+		
+		int id = (Integer) personModel.getValueAt(row, 0);
+		
+		try{
+			p = personService.getById(id);
+		}
+		catch(ServiceException e){
+            JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+			return;
+		}
 		AddAttributes sp = new AddAttributes(p, personService, addressService, donationService, this);
 		removeAll();
 		revalidate();

@@ -38,7 +38,7 @@ public class PersonTableModel extends AbstractTableModel{
 			case 0: return person.getId();
 			case 1: return person.getGivenName();
 			case 2: return person.getSurname();
-			case 3: return person.getMainAddress().getStreet();
+			case 3: return person.getAddresses().get(0).getStreet();
 			default: return null;
 		}
 	}
