@@ -445,7 +445,4 @@ public class AddAttributes extends JPanel{
 		filterPersons.setUp();
 	}
 	
-	public void showErrorDialog(String message){
-		
-	}
 }

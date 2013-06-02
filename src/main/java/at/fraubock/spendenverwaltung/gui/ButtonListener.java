@@ -86,6 +86,11 @@ public class ButtonListener implements ActionListener{
 		if(cmd.equals("edit_person_in_db")){
 			editPerson.editPerson();
 		}
+		if(cmd.equals("edit_address_in_db")){
+			editPerson.editAddress();
+		}
+		
+		
 		if(cmd.equals("cancel_edit")){
 			editPerson.returnTo();
 		}
