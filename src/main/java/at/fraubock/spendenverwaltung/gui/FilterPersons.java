@@ -42,9 +42,9 @@ public class FilterPersons extends JPanel{
 	private JButton deleteButton;
 	private JButton addAttribute;
 	private ActionHandler handler;
-	@SuppressWarnings("rawtypes")
-	private JComboBox filterCombo;
+	private JComboBox<String[]> filterCombo;
 	private JButton backButton;
+	private JPanel overviewPanel;
 	
 	public FilterPersons(IPersonService personService, IAddressService addressService, IDonationService donationService, Overview overview){
 		super(new MigLayout());
@@ -72,8 +72,13 @@ public class FilterPersons extends JPanel{
 		handler = new ActionHandler(this);
 		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
+		
+		overviewPanel = builder.createPanel(800, 1000);
+		JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		this.add(pane);
+		
 		panel = builder.createPanel(800, 800);
-		this.add(panel);
+		overviewPanel.add(panel);
 		
 		toolbar = builder.createToolbar();
 		addComponentsToToolbar(toolbar);
@@ -81,6 +86,7 @@ public class FilterPersons extends JPanel{
 		panel.add(scrollPane, "span 5, gaptop 25");
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void addComponentsToToolbar(JToolBar toolbar) {
 		String[] combo = new String[]{"Platzhalter", "Platzhalter"};
 		filterCombo = builder.createComboBox(combo, handler);
@@ -121,7 +127,23 @@ public class FilterPersons extends JPanel{
 	}
 	
 	public void addAttributes(){
-		Person p = personModel.getPersonRow(showTable.getSelectedRow());
+		Person p;
+		int row = showTable.getSelectedRow();
+		if(row == -1){
+			JOptionPane.showMessageDialog(this, "Bitte Person auswaehlen.");
+			return;
+		}
+		
+		int id = (Integer) personModel.getValueAt(row, 0);
+		
+		try{
+			p = personService.getById(id);
+		}
+		catch(ServiceException e){
+            JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+			return;
+		}
 		AddAttributes sp = new AddAttributes(p, personService, addressService, donationService, this);
 		removeAll();
 		revalidate();

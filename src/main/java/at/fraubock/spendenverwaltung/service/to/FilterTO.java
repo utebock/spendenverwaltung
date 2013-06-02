@@ -7,6 +7,9 @@ import at.fraubock.spendenverwaltung.util.LogicalOperator;
 
 public class FilterTO {
 
+	private String name;
+	private boolean anonymous;
+	private FilterType type;
 	private List<CriterionTO> criterions;
 	private List<LogicalOperator> operators;
 
@@ -17,8 +20,6 @@ public class FilterTO {
 	public void setType(FilterType type) {
 		this.type = type;
 	}
-
-	private FilterType type;
 
 	public List<CriterionTO> getCriterions() {
 		return criterions;
@@ -34,6 +35,22 @@ public class FilterTO {
 
 	public void setOperators(List<LogicalOperator> operators) {
 		this.operators = operators;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public boolean isAnonymous() {
+		return anonymous;
+	}
+
+	public void setAnonymous(boolean anonymous) {
+		this.anonymous = anonymous;
 	}
 
 }

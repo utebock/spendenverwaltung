@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.swing.JComboBox;
 
-import at.fraubock.spendenverwaltung.gui.CreateFilter;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
@@ -43,6 +42,7 @@ public class RelationalOperatorPicker extends JComboBox<RelationalOperator> {
 				List<RelationalOperator> ops = Arrays.asList(RelationalOperator
 						.values());
 				ops.remove(RelationalOperator.LIKE);
+				//TODO make this work
 				ops.remove(RelationalOperator.NOT_NULL);
 				ops.remove(RelationalOperator.IS_NULL);
 				return ops;

@@ -2,16 +2,27 @@ package at.fraubock.spendenverwaltung.util;
 
 public enum RelationalOperator {
 
-	GREATER(">"), LESS("<"), EQUALS("="), UNEQUAL("<>"), LIKE("LIKE"), 
-	GREATER_EQ(">="), LESS_EQ("<="), NOT_NULL("IS NOT NULL"), IS_NULL("IS NULL");
-	
-	private String math;
-	
-	private RelationalOperator(String math) {
-		this.math = math;
+	GREATER(">", "gr\u00F6\u00DFer als"), LESS("<", "kleiner als"), EQUALS("=",
+			"gleich"), UNEQUAL("<>", "ungleich"), LIKE("LIKE",
+			"\u00E4hnlich wie"), GREATER_EQ(">=",
+			"gr\u00F6\u00DFer oder gleich als"), LESS_EQ("<=",
+			"kleiner oder gleich als"), NOT_NULL("IS NOT NULL", "ist gesetzt"), IS_NULL(
+			"IS NULL", "ist nicht gesetzt");
+
+	private String expr;
+	private String text;
+
+	private RelationalOperator(String expr, String text) {
+		this.expr = expr;
+		this.text = text;
 	}
-	
-	public String getExpression() {
-		return math;
+
+	public String toExpression() {
+		return expr;
 	}
+
+//	@Override
+//	public String toString() {
+//		return text;
+//	}
 }

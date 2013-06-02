@@ -61,7 +61,7 @@ public class FilterToSqlBuilder {
 		validator.validate(prop);
 		RelationalOperator operator = prop.getRelationalOperator();
 
-		String stmt = prop.getProperty() + " " + operator.getExpression() + " ";
+		String stmt = prop.getProperty() + " " + operator.toExpression() + " ";
 
 		if (operator == RelationalOperator.IS_NULL
 				|| operator == RelationalOperator.NOT_NULL) {
@@ -125,7 +125,7 @@ public class FilterToSqlBuilder {
 
 		String select = "(select ";
 		// will be needed at the end, but easier to set it know
-		String constraint = criterion.getRelationalOperator().getExpression();
+		String constraint = criterion.getRelationalOperator().toExpression();
 
 		// set wanted result for comparison
 		if (criterion.getCount() != null) {

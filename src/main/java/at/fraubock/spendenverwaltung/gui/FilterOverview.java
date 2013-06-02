@@ -17,9 +17,10 @@ import net.miginfocom.swing.MigLayout;
 
 import org.apache.log4j.Logger;
 
-import at.fraubock.spendenverwaltung.gui.filter.ISelectorModelReceiver;
-import at.fraubock.spendenverwaltung.gui.filter.PropertyCriterionComponent;
-import at.fraubock.spendenverwaltung.gui.filter.SelectorModels;
+import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
+import at.fraubock.spendenverwaltung.gui.filter.IPropertySelectorProvider;
+import at.fraubock.spendenverwaltung.gui.filter.PropertyComponent;
+import at.fraubock.spendenverwaltung.gui.filter.SelectorFactory;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
@@ -46,11 +47,9 @@ public class FilterOverview extends JPanel{
 	private List<Filter> filterList;
 	private JPanel panel;
 	private JToolBar toolbar;
-	private JButton editButton;
-	private JButton deleteButton;
-	private JButton addAttribute;
-	private ActionHandler handler;
-	private JComboBox filterCombo;
+	
+	@SuppressWarnings("unused")
+	private JComboBox<String[]> filterCombo;
 	private JButton backButton;
 	private JButton create;
 	private JButton edit;
@@ -82,7 +81,7 @@ public class FilterOverview extends JPanel{
 	}
 	
 	public void setUp(){
-		handler = new ActionHandler(this);
+		new ActionHandler(this);
 		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
 		panel = builder.createPanel(800, 800);
@@ -135,11 +134,11 @@ public class FilterOverview extends JPanel{
 	}
 	
 	public void createFilter(){
-		ISelectorModelReceiver personModelReceiver = new ISelectorModelReceiver() {
+		IPropertySelectorProvider personModelReceiver = new IPropertySelectorProvider() {
 
 			@Override
-			public List<PropertyCriterionComponent> receiveModels() {
-				return SelectorModels.getPersonSelectorModels();
+			public List<PropertyComponent> receiveModels() {
+				return SelectorFactory.propertySelectorForPerson();
 			}
 			
 		};

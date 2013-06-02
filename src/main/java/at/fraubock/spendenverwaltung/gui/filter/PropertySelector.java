@@ -16,29 +16,28 @@ public class PropertySelector extends JPanel {
 	private static final long serialVersionUID = 1564048026876101371L;
 
 	private JPanel comparator;
-	private ComboBoxModel<PropertyCriterionComponent> cbModel;
+	private ComboBoxModel<PropertyComponent> cbModel;
 
-	public PropertySelector(List<PropertyCriterionComponent> models) {
+	public PropertySelector(List<PropertyComponent> models) {
 		super(new MigLayout());
 		comparator = new JPanel();
-		comparator.add(models.get(0).getComparatorComponent());
+		comparator.add(models.get(0));
 
-		final JComboBox<PropertyCriterionComponent> propertyCB = new JComboBox<PropertyCriterionComponent>(
-				cbModel = new SimpleComboBoxModel<PropertyCriterionComponent>(
+		final JComboBox<PropertyComponent> propertyCB = new JComboBox<PropertyComponent>(
+				cbModel = new SimpleComboBoxModel<PropertyComponent>(
 						models));
 
 		propertyCB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				PropertyCriterionComponent model = (PropertyCriterionComponent) propertyCB
+				PropertyComponent model = (PropertyComponent) propertyCB
 						.getModel().getSelectedItem();
 				comparator.removeAll();
-				comparator.add(model.getComparatorComponent());
+				comparator.add(model);
 				comparator.repaint();
 				comparator.revalidate();
 			}
 		});
-
-//		add(opPicker = new LogicalOperatorPicker(), "wrap");
+		
 		add(propertyCB);
 		add(comparator);
 	}
@@ -49,6 +48,6 @@ public class PropertySelector extends JPanel {
 	 * @return
 	 */
 	 public CriterionTO toCriterionTO() {
-		 return ((PropertyCriterionComponent) cbModel.getSelectedItem()).toPropertyCriterionTO();
+		 return ((PropertyComponent) cbModel.getSelectedItem()).toPropertyCriterionTO();
 	 }
 }

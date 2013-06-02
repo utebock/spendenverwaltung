@@ -2,6 +2,7 @@ package at.fraubock.spendenverwaltung.service;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,9 @@ import at.fraubock.spendenverwaltung.service.to.FilterTO;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
 
 public class FilterServiceImplemented implements IFilterService {
+
+	private static final Logger log = Logger
+			.getLogger(FilterServiceImplemented.class);
 
 	private IFilterDAO filterDAO;
 
@@ -88,57 +92,62 @@ public class FilterServiceImplemented implements IFilterService {
 
 	private Filter createFilterFromTransferObject(FilterTO filterTO)
 			throws ServiceException {
+		Filter filter = new Filter();
+		filter.setType(filterTO.getType());
+		filter.setName(filterTO.getName());
+		filter.setAnonymous(filterTO.isAnonymous());
+
 		List<CriterionTO> crits = filterTO.getCriterions();
 		List<LogicalOperator> ops = filterTO.getOperators();
-
-		// if no or only one criterion was provided
-		if (ops.isEmpty()) {
-			if (crits.size() > 1) {
-				// TODO log
-				throw new ServiceException(
-						"Illegal state of FilterTO: No logical oprator given "
-								+ "but more than one criterion");
-			}
-			Criterion crit = null;
-			if (crits.size() == 1) {
-				crit = crits.get(0).createCriterion();
-			}
-
-			return new Filter(filterTO.getType(), crit);
-		}
-
-		// if more than one criterion was provided
-		if (ops.size() != crits.size() - 1) {
-			// TODO log
+		
+		// check if criterions and operators match in number
+		if (ops.size() != crits.size() - 1 || crits.isEmpty() && !ops.isEmpty()) {
+			log.error("Error building query from filterTO: n criterions"
+					+ "must be connected with n-1 operators");
 			throw new ServiceException(
 					"Illegal state of FilterTO: Too many or few operators "
 							+ "for the given amount of criterions");
 		}
+		
+		if (ops.isEmpty()) {
+			// one or no criterion was provided
+			Criterion crit = null;
+			if (crits.size() == 1) {
+				crit = crits.get(0).createCriterion();
+			}
+			filter.setCriterion(crit);
+			return filter;
+		}
 
 		/*
-		 * iterate through all operators and build the filter tree NOTE: this
-		 * will create a linear tree. so far, we don't provide prioritisation of
+		 * iterate through all operators and build the filter tree. NOTE: this
+		 * will create a linear tree. so far, we don't provide priorisation of
 		 * operators ((a or b) and c) WITHOUT using mounted filters. therefore i
-		 * don't care at this point how the tree is created, since it will end
-		 * up in the same sql query anyway. (though this is not the exact
+		 * don't care how the tree is created at this point, since it will end
+		 * up in the same sql query anyway. though this is not the exact
 		 * interpretation of the filter tree, it is the fastest and most stable
-		 * solution for now).
+		 * solution for now. if this will be fixed, FilterToSqlBuilder needs to
+		 * be fixed too (see comments in ConnectedCriterion part).
 		 */
 		ConnectedCriterion current = null;
+		int index = 0;
 		for (LogicalOperator op : ops) {
-			int index = ops.indexOf(op);
 			Criterion operand1 = null;
 			if (current == null) {
+				// starting point, set first criterion as left child
 				operand1 = crits.get(index).createCriterion();
 			} else {
+				// set the prior ConnectedCriterion to this one's left child
 				operand1 = current;
 			}
 			ConnectedCriterion con = new ConnectedCriterion();
+			// set the next criterion to this one's right child
 			con.connect(operand1, op, crits.get(index + 1).createCriterion());
 			current = con;
+			index++;
 		}
-
-		return new Filter(filterTO.getType(), current);
+		filter.setCriterion(current);
+		return filter;
 	}
 
 }

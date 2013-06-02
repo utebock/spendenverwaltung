@@ -3,6 +3,8 @@ package at.fraubock.spendenverwaltung.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
+
 public class ActionHandler implements ActionListener{
 
 	public ActionHandler(CreatePerson createPerson) {

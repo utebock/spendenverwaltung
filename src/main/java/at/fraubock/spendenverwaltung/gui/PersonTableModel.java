@@ -9,7 +9,7 @@ public class PersonTableModel extends AbstractTableModel{
 
 	private static final long serialVersionUID = 1L;
 	
-	private String[] columnNames = new String[]{"Vorname", "Nachname", "Adresse"};
+	private String[] columnNames = new String[]{"Personenzahl", "Vorname", "Nachname", "Adresse"};
 	private Vector<Person> persons = new Vector<Person>();
 
 	public void addPerson (Person person){
@@ -36,9 +36,9 @@ public class PersonTableModel extends AbstractTableModel{
 		
 		switch(columnIndex){
 			case 0: return person.getId();
-			case 1: return person.getSurname();
-			case 2: return person.getGivenName();
-			case 3: return "";
+			case 1: return person.getGivenName();
+			case 2: return person.getSurname();
+			case 3: return person.getAddresses().get(0).getStreet();
 			default: return null;
 		}
 	}
@@ -51,6 +51,8 @@ public class PersonTableModel extends AbstractTableModel{
 		case 1:
 			return String.class;
 		case 2:
+			return String.class;
+		case 3:
 			return String.class;
 		}
 		return null;

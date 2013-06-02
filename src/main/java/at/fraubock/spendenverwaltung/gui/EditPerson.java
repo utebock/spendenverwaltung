@@ -2,10 +2,9 @@ package at.fraubock.spendenverwaltung.gui;
 
 import java.awt.Dimension;
 import java.awt.Font;
-import java.sql.Date;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -14,18 +13,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
-import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
-import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 import net.miginfocom.swing.MigLayout;
@@ -39,9 +35,9 @@ public class EditPerson extends JPanel{
 	private ButtonListener buttonListener;
 	private ActionHandler actionHandler;
 	private JPanel panel;
-	private JComboBox<String> salutation;
+	private JComboBox<String[]> salutation;
 	private JLabel salutLabel;
-	
+	private AddressTableModel addressModel;
 	private JLabel title;
 	private JComboBox<String> titleBox;
 	
@@ -85,6 +81,10 @@ public class EditPerson extends JPanel{
 	private JTextField telephoneField;
 	private JTextField mailField;
 	private JLabel country;
+	private JTable addressTable;
+	private JScrollPane addressPane;
+	private JPanel tablePanel;
+	private JPanel overviewPanel;
 
 	public EditPerson(Person person, IPersonService personService, IAddressService addressService, FilterPersons filterPersons, Overview overview) {
 		super(new MigLayout());
@@ -98,13 +98,19 @@ public class EditPerson extends JPanel{
 		buttonListener = new ButtonListener(this);
 		actionHandler = new ActionHandler(this);
 		builder = new ComponentBuilder();
+		addressModel = new AddressTableModel();
 		setUpPerson();
 	}
 
 	@SuppressWarnings("unchecked")
 	public void setUpPerson(){
-		panel = builder.createPanel(800, 800);
-		this.add(panel);
+		
+		overviewPanel = builder.createPanel(800, 1000);
+		JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		this.add(pane);
+		
+		panel = builder.createPanel(800, 400);
+		overviewPanel.add(panel, "wrap");
 		editPerson = builder.createLabel("Personendaten aendern");
 		editPerson.setFont(new Font("Headline", Font.PLAIN, 14));
 		panel.add(editPerson, "wrap");
@@ -236,10 +242,21 @@ public class EditPerson extends JPanel{
 		panel.add(note);
 		panel.add(noteArea, "wrap, growx");
 		
+		tablePanel = builder.createPanel(800, 200);
+		overviewPanel.add(tablePanel);
+		addressTable = new JTable(addressModel);
+		addressTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+		addressPane = new JScrollPane(addressTable);
+		addressPane.setPreferredSize(new Dimension(800, 250));
+		tablePanel.add(addressPane, "wrap, growx");
+		
 		ok = builder.createButton("Bearbeiten", buttonListener, "edit_person_in_db");
-		panel.add(ok, "split 2");
+		tablePanel.add(ok, "split 2");
 		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_edit");
-		panel.add(cancel, "wrap");
+		tablePanel.add(cancel, "wrap");
+		
+		
 	}
 
 	public void returnTo(){
@@ -257,9 +274,7 @@ public class EditPerson extends JPanel{
 	}
 
 	public void editPerson() {
-		/**
-		 * Sex
-		 */
+		
 		String sex = "Herr";
 		
 		if(salutation.getSelectedItem().equals(sex)){
@@ -276,10 +291,7 @@ public class EditPerson extends JPanel{
 		}
 		
 		person.setSex(Person.Sex.valueOf(sex));
-		
-		/**
-		 * Title
-		 */
+	
 		String title = "-";
 		
 		if(titleBox.getSelectedItem().equals("BA")){
@@ -311,67 +323,33 @@ public class EditPerson extends JPanel{
 		}
 		
 		person.setTitle(title);
-		
-		/**
-		 * Company
-		 */
+	
 		person.setCompany(companyField.getText());
 		
-		/**
-		 * Given name
-		 */
 		person.setGivenName(givenField.getText());
 		
-		/**
-		 * Surname
-		 */
 		person.setSurname(surnameField.getText());
 		
-		/**
-		 * Telephone
-		 */
 		person.setTelephone(telephoneField.getText());
 		
-		/**
-		 * Mail
-		 */
 		person.setEmail(mailField.getText());
 		
-		/**
-		 * Address: Street
-		 */
 		addr.setStreet(streetField.getText());
 		
-		/**
-		 * Address: Postal code
-		 */
 		addr.setPostalCode(postalField.getText());
 		
-		/**
-		 * Address: City
-		 */
 		addr.setCity(cityField.getText());
 		
-		/**
-		 * Address: Country
-		 */
 		addr.setCountry(countryField.getText());
 
 		person.setMainAddress(addr);
 		
-		/**
-		 * Notification type
-		 */
 		if(notifyMail.isSelected()){
 			person.setEmailNotification(true);
 		}
 		if(notifyPost.isSelected()){
 			person.setPostalNotification(true);
 		}
-		
-		/**
-		 * Note
-		 */
 		String note = noteArea.getText();
 		person.setNote(note);
 		

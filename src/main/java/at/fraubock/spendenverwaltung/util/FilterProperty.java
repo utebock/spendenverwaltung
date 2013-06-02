@@ -9,7 +9,11 @@ public enum FilterProperty {
 	PERSON_COMPANY("company"),
 	PERSON_WANTS_EMAIL("emailnotification"),
 	PERSON_WANTS_MAIL("postalnotification"),
+	PERSON_TITLE("title"),
+	PERSON_NOTE("note"),
+	PERSON_TELEPHONE("telephone"),
 	//TODO search in note yes or no?
+	// why not offering it if its possible? - pm
 	
 	/* filter properties of a donation */
 	DONATION_AMOUNT("amount"),
