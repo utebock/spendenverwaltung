@@ -457,10 +457,19 @@ public class EditPerson extends JPanel{
 			}
 			try{
 				Address updatedAddress = addressService.update(addr);
-				List<Address> addresses = new ArrayList<Address>();
+				Address removeAddress = new Address();
+				List<Address> addresses = person.getAddresses();
+				
+				for(Address a : addresses){
+					if(a.getId() == addr.getId())
+						removeAddress = a;
+				}
+				addresses.remove(removeAddress);
 				addresses.add(updatedAddress);
 				person.setAddresses(addresses);
 				personService.update(person);
+				addressModel.removeAll();
+				addressModel.insertList(addresses);
 			}
 			catch(ServiceException e){
 				 JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
