@@ -29,7 +29,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.FilterType;
 
-public class FilterOverview extends JPanel{
+public class FilterOverview extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = Logger.getLogger(FilterOverview.class);
@@ -40,14 +40,14 @@ public class FilterOverview extends JPanel{
 	private Overview overview;
 	private ComponentBuilder builder;
 	private ButtonListener buttonListener;
-	
+
 	private FilterTableModel filterModel;
 	private JTable showTable;
 	private JScrollPane scrollPane;
 	private List<Filter> filterList;
 	private JPanel panel;
 	private JToolBar toolbar;
-	
+
 	@SuppressWarnings("unused")
 	private JComboBox<String[]> filterCombo;
 	private JButton backButton;
@@ -56,20 +56,22 @@ public class FilterOverview extends JPanel{
 	private JButton delete;
 	private JButton share;
 	private JButton join;
-	
-	public FilterOverview(IFilterService filterService, IPersonService personService, IAddressService addressService, IDonationService donationService, Overview overview){
+
+	public FilterOverview(IFilterService filterService,
+			IPersonService personService, IAddressService addressService,
+			IDonationService donationService, Overview overview) {
 		super(new MigLayout());
-		
+
 		this.filterService = filterService;
 		this.personService = personService;
 		this.addressService = addressService;
 		this.donationService = donationService;
 		this.overview = overview;
-		//initTable();
+		// initTable();
 		setUp();
 	}
-	
-	public void initTable(){
+
+	public void initTable() {
 		filterModel = new FilterTableModel();
 		getFilter();
 		showTable = new JTable(filterModel);
@@ -77,29 +79,35 @@ public class FilterOverview extends JPanel{
 		showTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		scrollPane = new JScrollPane(showTable);
 		scrollPane.setPreferredSize(new Dimension(800, 800));
-		
+
 	}
-	
-	public void setUp(){
+
+	public void setUp() {
 		new ActionHandler(this);
 		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
 		panel = builder.createPanel(800, 800);
 		this.add(panel);
-		
+
 		toolbar = builder.createToolbar();
 		addComponentsToToolbar(toolbar);
 		panel.add(toolbar, "wrap");
-		//panel.add(scrollPane, "span 5, gaptop 25");
+		// panel.add(scrollPane, "span 5, gaptop 25");
 	}
-	
+
 	private void addComponentsToToolbar(JToolBar toolbar) {
-		create = builder.createButton("Personenfilter anlegen", buttonListener, "create_filter");
-		edit = builder.createButton("Filter bearbeiten", buttonListener, "edit_filter");
-		delete = builder.createButton("Filter l\u00F6schen", buttonListener, "delete_filter");
-		share = builder.createButton("Filter freigeben", buttonListener, "share_filter");
-		join = builder.createButton("Filter verkn\u00FCpfen", buttonListener, "join_filter");
-		backButton = builder.createButton("Zur\u00FCck", buttonListener, "return_to_overview");
+		create = builder.createButton("Personenfilter anlegen", buttonListener,
+				"create_filter");
+		edit = builder.createButton("Filter bearbeiten", buttonListener,
+				"edit_filter");
+		delete = builder.createButton("Filter l\u00F6schen", buttonListener,
+				"delete_filter");
+		share = builder.createButton("Filter freigeben", buttonListener,
+				"share_filter");
+		join = builder.createButton("Filter verkn\u00FCpfen", buttonListener,
+				"join_filter");
+		backButton = builder.createButton("Zur\u00FCck", buttonListener,
+				"return_to_overview");
 		toolbar.add(create);
 		toolbar.add(edit);
 		toolbar.add(delete);
@@ -108,49 +116,54 @@ public class FilterOverview extends JPanel{
 		toolbar.add(backButton);
 	}
 
-	public FilterTableModel getFilterModel(){
+	public FilterTableModel getFilterModel() {
 		return this.filterModel;
 	}
-	
-	private void getFilter(){
+
+	private void getFilter() {
 		filterList = new ArrayList<Filter>();
-		
-		try{
+
+		try {
 			filterList = filterService.getAll();
 			log.info("List " + filterList.size() + " filter");
+		} catch (ServiceException e) {
+			JOptionPane
+					.showMessageDialog(
+							this,
+							"An error occured. Please see console for further information",
+							"Error", JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+			return;
 		}
-		catch(ServiceException e){
-			JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
-		    e.printStackTrace();
-		    return;
+		if (filterList == null) {
+			JOptionPane.showMessageDialog(this, "GetAll() returns null.",
+					"Error", JOptionPane.ERROR_MESSAGE);
+			return;
 		}
-		if(filterList == null){
-			JOptionPane.showMessageDialog(this, "GetAll() returns null.", "Error", JOptionPane.ERROR_MESSAGE);
-		    return;
-		}
-		for(Filter f : filterList){
+		for (Filter f : filterList) {
 			filterModel.addFilter(f);
-		}	
+		}
 	}
-	
-	public void createFilter(){
+
+	public void createFilter() {
 		IPropertySelectorProvider personModelReceiver = new IPropertySelectorProvider() {
 
 			@Override
 			public List<PropertyComponent> receiveModels() {
 				return SelectorFactory.propertySelectorForPerson();
 			}
-			
+
 		};
-		
-		CreateFilter cf = new CreateFilter(FilterType.PERSON,"Personen", personModelReceiver,filterService, personService, addressService, donationService, this);
+
+		CreateFilter cf = new CreateFilter(FilterType.PERSON, "Personen",
+				personModelReceiver, filterService, this);
 		removeAll();
 		revalidate();
 		repaint();
 		add(cf);
 	}
-	
-	public void returnTo(){
+
+	public void returnTo() {
 		this.removeAll();
 		this.revalidate();
 		this.repaint();
@@ -160,5 +173,4 @@ public class FilterOverview extends JPanel{
 		overview.setUp();
 	}
 
-	
 }
