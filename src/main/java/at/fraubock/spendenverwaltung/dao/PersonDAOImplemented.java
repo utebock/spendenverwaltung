@@ -132,7 +132,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 
 			// first, check changes to all addresses:
 			for (Address oldAddress : oldAddresses) {
-				if (!person.getAddresses().contains(oldAddress)) {
+				if (!person.getAddresses().contains(oldAddress) && !person.getMainAddress().equals(oldAddress)) {
 					jdbcTemplate
 							.update("DELETE FROM livesat WHERE pid = ? AND aid = ?",
 									new Object[] { person.getId(),
