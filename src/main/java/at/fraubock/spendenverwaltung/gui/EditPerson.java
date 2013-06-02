@@ -93,6 +93,7 @@ public class EditPerson extends JPanel{
 	private JLabel addressCountryLabel;
 	private JButton ok_addr;
 	private JButton delete_addr;
+	private JSeparator separator2;
 
 	public EditPerson(Person person, IPersonService personService, IAddressService addressService, FilterPersons filterPersons, Overview overview) {
 		super(new MigLayout());
@@ -113,11 +114,11 @@ public class EditPerson extends JPanel{
 	@SuppressWarnings("unchecked")
 	public void setUp(){
 		
-		overviewPanel = builder.createPanel(800, 1000);
+		overviewPanel = builder.createPanel(800, 800);
 		JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		this.add(pane);
 		
-		panel = builder.createPanel(800, 400);
+		panel = builder.createPanel(800, 300);
 		overviewPanel.add(panel, "wrap");
 		editPerson = builder.createLabel("Personendaten \u00E4ndern: ");
 		editPerson.setFont(new Font("Headline", Font.PLAIN, 14));
@@ -240,7 +241,7 @@ public class EditPerson extends JPanel{
 		overviewPanel.add(separator, "growx, wrap");
 		
 		tablePanel = builder.createPanel(800, 200);
-		overviewPanel.add(tablePanel);
+		overviewPanel.add(tablePanel, "wrap");
 		
 		editAdress = builder.createLabel("Adressdaten \u00E4ndern: ");
 		editAdress.setFont(new Font("Headline", Font.PLAIN, 14));
@@ -256,17 +257,12 @@ public class EditPerson extends JPanel{
 		tablePanel.add(addressPane, "wrap, growx");
 		
 		ok_addr = builder.createButton("Bearbeiten", buttonListener, "edit_address_in_db");
-		tablePanel.add(ok_addr, "split 2");
+		tablePanel.add(ok_addr, "split 3");
 		delete_addr = builder.createButton("L\u00F6schen", buttonListener, "delete_address_in_db");
-		tablePanel.add(delete_addr, "wrap");
-//		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_edit");
-//		tablePanel.add(cancel, "wrap");
-		
-		separator = builder.createSeparator();
-		overviewPanel.add(separator, "growx, wrap");
-		
+		tablePanel.add(delete_addr);
 		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_edit");
-		overviewPanel.add(cancel, "wrap");
+		tablePanel.add(cancel, "wrap");
+		
 		
 		getAddresses();	
 		

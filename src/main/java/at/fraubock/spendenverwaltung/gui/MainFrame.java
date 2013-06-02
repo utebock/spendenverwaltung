@@ -61,7 +61,7 @@ public class MainFrame extends JFrame{
 		JPanel panel = new JPanel();
 		frame.add(new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 		frame.add(new Overview(filterService, personService, addressService, donationService));
-		frame.setSize(800, 1000);
+		frame.setSize(800, 800);
 		frame.setLocation(100,100);
 		frame.setResizable(true);
 		frame.setVisible(true);
