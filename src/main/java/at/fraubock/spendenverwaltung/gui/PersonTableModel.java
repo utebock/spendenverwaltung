@@ -5,23 +5,24 @@ import java.util.Vector;
 import javax.swing.table.AbstractTableModel;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 
-public class PersonTableModel extends AbstractTableModel{
+public class PersonTableModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 1L;
-	
-	private String[] columnNames = new String[]{"Personenzahl", "Vorname", "Nachname", "Adresse"};
+
+	private String[] columnNames = new String[] { "Personenzahl", "Vorname",
+			"Nachname", "Adresse" };
 	private Vector<Person> persons = new Vector<Person>();
 
-	public void addPerson (Person person){
+	public void addPerson(Person person) {
 		persons.add(person);
 	}
-	
-	public void removePerson (int row){
+
+	public void removePerson(int row) {
 		persons.remove(row);
 		fireTableDataChanged();
 	}
-	
-	public Person getPersonRow(int rowIndex){
+
+	public Person getPersonRow(int rowIndex) {
 		return persons.get(rowIndex);
 	}
 
@@ -29,7 +30,7 @@ public class PersonTableModel extends AbstractTableModel{
 	public int getRowCount() {
 		return persons.size();
 	}
-	
+
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		Person person = (Person)persons.get(rowIndex);
@@ -38,13 +39,14 @@ public class PersonTableModel extends AbstractTableModel{
 			case 0: return person.getId();
 			case 1: return person.getGivenName();
 			case 2: return person.getSurname();
-			case 3: return person.getAddresses().get(0).getStreet();
+			case 3: return person.getAddresses().isEmpty()?"keine Adresse vorhanden":
+				person.getAddresses().get(0).getStreet();
 			default: return null;
 		}
 	}
-	
+
 	public Class<?> getColumnClass(int col) {
-		
+
 		switch (col) {
 		case 0:
 			return Integer.class;
@@ -62,7 +64,7 @@ public class PersonTableModel extends AbstractTableModel{
 	public int getColumnCount() {
 		return columnNames.length;
 	}
-	
+
 	@Override
 	public String getColumnName(int col) {
 		return columnNames[col];
@@ -73,4 +75,3 @@ public class PersonTableModel extends AbstractTableModel{
 		return false;
 	}
 }
-

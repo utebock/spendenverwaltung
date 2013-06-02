@@ -96,6 +96,7 @@
 	
 	<bean id="personService" class="at.fraubock.spendenverwaltung.service.PersonServiceImplemented">
 		<property name="personDAO" ref="personDao" />
+		<property name="addressDAO" ref="addressDao" />
 	</bean>
 	<bean id="donationValidator" class="at.fraubock.spendenverwaltung.service.DonationValidator">
 	</bean>

@@ -37,7 +37,6 @@ public class AddAttributes extends JPanel{
 	private IPersonService personService;
 	private Person person;
 	private Donation donation;
-	private Address addr;
 	private ComponentBuilder builder;
 	private ButtonListener buttonListener;
 	private ActionHandler actionHandler;
@@ -184,7 +183,6 @@ public class AddAttributes extends JPanel{
 	}
 	
 	private void setUpAddressTable(){
-		addr = new Address();
 		addressPanel = builder.createPanel(800, 250);
 		overviewPanel.add(addressPanel, "wrap");
 		
@@ -238,7 +236,11 @@ public class AddAttributes extends JPanel{
 		Object[] options = {"Abbrechen", "Anlegen"};
 		int go = JOptionPane.showOptionDialog(this, addAddress, "Adresse anlegen", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[1]);
 		
+		
 		if(go == 1){
+			// create new address
+			Address addr = new Address();
+			
 			if(streetField.getText().isEmpty() || streetField.getText().equals(null)){
 				JOptionPane.showMessageDialog(this, "Bitte Stra\u00DFe eingeben.", "Warn", JOptionPane.WARNING_MESSAGE);
 				addAddress();
