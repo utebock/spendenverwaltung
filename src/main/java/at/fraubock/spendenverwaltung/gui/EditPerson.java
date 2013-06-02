@@ -483,7 +483,7 @@ public class EditPerson extends JPanel{
 		
 		if(ok == 1){
 			try {
-				addressService.delete(addr);   
+				addressService.delete(addr);
 			} 
 			catch (ServiceException e) {
 				JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
