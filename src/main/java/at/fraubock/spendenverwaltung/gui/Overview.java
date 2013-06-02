@@ -210,7 +210,7 @@ public class Overview extends JPanel{
 		sendPanel.add(postalSendingLabel, "gap 33");
 		
 		showSendingsLabel = builder.createLabel("<html><center>Aussendungen<br>anzeigen");
-		sendPanel.add(showSendingsLabel, "gap 40");
+		sendPanel.add(showSendingsLabel, "gap 37");
 		
 		confirmSendingsLabel = builder.createLabel("<html><center>Aussendungen<br>best\u00E4tigen</html>");
 		sendPanel.add(confirmSendingsLabel, "gap 33");

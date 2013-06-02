@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -44,6 +45,8 @@ public class ShowPersons extends JPanel{
 	private JComboBox<String[]> filterCombo;
 	private JButton backButton;
 	private JPanel overviewPanel;
+	private JLabel label;
+	private JLabel empty;
 	
 	public ShowPersons(IPersonService personService, IAddressService addressService, IDonationService donationService, Overview overview){
 		super(new MigLayout());
@@ -67,6 +70,7 @@ public class ShowPersons extends JPanel{
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void setUp(){
 		handler = new ActionHandler(this);
 		buttonListener = new ButtonListener(this);
@@ -80,27 +84,32 @@ public class ShowPersons extends JPanel{
 		toolbar.setFloatable(false);
 		toolbar.setRollover(true);
 		addComponentsToToolbar(toolbar);
-		overviewPanel.add(toolbar, "growx, wrap");
+		
+		overviewPanel.add(toolbar, "growx, span, wrap");
+
+		label = builder.createLabel("Filter ausw\u00E4hlen: ");
+		overviewPanel.add(label, "split2");
+		String[] combo = new String[]{"", "Platzhalter"};
+		filterCombo = builder.createComboBox(combo, handler);
+		overviewPanel.add(filterCombo, "growx, wrap");
+		empty = builder.createLabel("			");
+		overviewPanel.add(empty, "wrap");
 		overviewPanel.add(scrollPane);
 	}
-	
-	@SuppressWarnings("unchecked")
 	private void addComponentsToToolbar(JToolBar toolbar) {
-		String[] combo = new String[]{"Filter ausw\u00E4hlen", "Platzhalter"};
-		filterCombo = builder.createComboBox(combo, handler);
-		addAttribute = builder.createButton("Attribute hinzuf\u00FCgen", buttonListener, "add_donation_address");
+		
+		addAttribute = builder.createButton("<html>&nbsp;Attribute hinzuf\u00FCgen&nbsp;</html>", buttonListener, "add_donation_address");
 		addAttribute.setFont(new Font("Bigger", Font.PLAIN, 13));
-		editButton = builder.createButton("Person bearbeiten", buttonListener, "edit_person");
+		editButton = builder.createButton("<html>&nbsp;Person bearbeiten</html>", buttonListener, "edit_person");
 		editButton.setFont(new Font("Bigger", Font.PLAIN, 13));
-		deleteButton = builder.createButton("Person l\u00F6schen", buttonListener, "delete_person_from_db");
+		deleteButton = builder.createButton("<html>&nbsp;Person l\u00F6schen</html>", buttonListener, "delete_person_from_db");
 		deleteButton.setFont(new Font("Bigger", Font.PLAIN, 13));
-		backButton = builder.createButton("Zur\u00FCck", buttonListener, "return_to_personOverview");
+		backButton = builder.createButton("<html>&nbsp;Zur\u00FCck</html>", buttonListener, "return_to_personOverview");
 		backButton.setFont(new Font("Bigger", Font.PLAIN, 13));
-		toolbar.add(filterCombo);
-		toolbar.add(addAttribute);
-		toolbar.add(editButton);
-		toolbar.add(deleteButton);
-		toolbar.add(backButton);
+		toolbar.add(addAttribute, "split 4, growx");
+		toolbar.add(editButton, "growx");
+		toolbar.add(deleteButton, "growx");
+		toolbar.add(backButton, "growx");
 	}
 
 	public PersonTableModel getPersonModel(){
