@@ -14,6 +14,7 @@ public class ButtonListener implements ActionListener{
 	private FilterOverview filterOverview;
 	private CreateFilter createFilter;
 	private EditPerson editPerson;
+	private ImportValidation importValidation;
 	
 	public ButtonListener(Overview overview){
 		this.overview = overview;
@@ -40,6 +41,9 @@ public class ButtonListener implements ActionListener{
 	}
 	public ButtonListener(EditPerson editPerson) {
 		this.editPerson = editPerson;
+	}
+	public ButtonListener(ImportValidation importValidation){
+		this.importValidation = importValidation;
 	}
 
 	@Override
@@ -127,6 +131,9 @@ public class ButtonListener implements ActionListener{
 		
 		if(cmd.equals("filter_overview")){
 			overview.goToFilter();
+		}
+		if(cmd.equals("return_from_import_validation_to_overview")){
+			importValidation.returnTo();
 		}
 	}
 

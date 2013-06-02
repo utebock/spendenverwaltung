@@ -57,6 +57,13 @@ public interface IDonationService {
 	 * @return List of all donations
 	 */
 	public List<Donation> getByPerson(Person p) throws ServiceException;
+
+	/**
+	 * Retrieves all unconfirmed donations
+	 * 
+	 * @return List of all unconfirmed donations
+	 */
+	public List<Donation> getUnconfirmed() throws ServiceException;
 	
 	/**
 	 * Puts all Donation Types in a String Array

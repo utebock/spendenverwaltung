@@ -43,14 +43,24 @@ public interface IDonationDAO {
 	public void delete(Donation d) throws PersistenceException;
 
 	/**
-	 * Retrieves all donations stored in the underlying persistence layer
+	 * Retrieves all donations stored in the underlying persistence layer which already confirmed by a user
 	 * 
 	 * @return List of all donations, sorted by id descending, including their
 	 *         donators.
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
-	public List<Donation> getAll() throws PersistenceException;
+	public List<Donation> getAllConfirmed() throws PersistenceException;
+
+	/**
+	 * Retrieves all unconfirmed donations stored in the underlying persistence layer
+	 * 
+	 * @return List of all donations, sorted by id descending, including their
+	 *         donators.
+	 * @throws PersistenceException
+	 *             if communication to the underlying persistence system failed
+	 */
+	public List<Donation> getAllUnconfirmed() throws PersistenceException;
 
 	/**
 	 * Retrieves donation by ID

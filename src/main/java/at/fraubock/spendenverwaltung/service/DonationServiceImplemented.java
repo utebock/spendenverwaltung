@@ -86,6 +86,16 @@ public class DonationServiceImplemented implements IDonationService {
 	}
 
 	@Override
+	@Transactional(readOnly=true)
+	public List<Donation> getUnconfirmed() throws ServiceException {
+		try {
+			return donationDAO.getAllUnconfirmed();
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
+
+	@Override
 	public String[] getDonationTypes() {
 		DonationType[] donationTypes = Donation.DonationType.values();
 		String[] stringDonationTypes = new String[donationTypes.length];
