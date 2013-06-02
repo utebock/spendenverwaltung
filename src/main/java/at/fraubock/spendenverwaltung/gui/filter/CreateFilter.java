@@ -80,8 +80,8 @@ public class CreateFilter extends JPanel {
 	}
 
 	private void setUpCreate() {
-		headline = builder.createLabel("Neuen Filter für " + pluralName
-				+ " anlegen");
+		headline = builder.createLabel("Neuen Filter f\u00FCr " + pluralName
+				+ " anlegen:");
 		headline.setFont(new Font("Headline", Font.PLAIN, 14));
 		panel.add(headline, "wrap");
 		empty = builder.createLabel("		");

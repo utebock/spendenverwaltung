@@ -8,6 +8,9 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
@@ -95,6 +98,21 @@ public class ComponentBuilder {
 
 	public JCheckBox createCheckbox() {
 		return new JCheckBox();
+	}
+
+	public JMenuBar createMenuBar() {
+		return new JMenuBar();
+	}
+
+	public JMenu createMenu(String text) {
+		return new JMenu(text);
+	}
+
+	public JMenuItem createMenuItem(String string, ActionListener buttonListener,String actionCommand){
+		JMenuItem item = new JMenuItem(string);
+		item.addActionListener(buttonListener);
+		item.setActionCommand(actionCommand);
+		return item;
 	}
 
 	

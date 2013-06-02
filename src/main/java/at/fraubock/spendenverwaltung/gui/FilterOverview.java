@@ -1,11 +1,16 @@
 package at.fraubock.spendenverwaltung.gui;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -46,16 +51,12 @@ public class FilterOverview extends JPanel {
 	private JScrollPane scrollPane;
 	private List<Filter> filterList;
 	private JPanel panel;
-	private JToolBar toolbar;
-
-	@SuppressWarnings("unused")
-	private JComboBox<String[]> filterCombo;
-	private JButton backButton;
-	private JButton create;
-	private JButton edit;
-	private JButton delete;
-	private JButton share;
-	private JButton join;
+	private JMenuBar menubar;
+	private Container chooseFilter;
+	private JMenu editFilter;
+	private Component chooseMenuItem;
+	private JMenuItem editItem;
+	private JMenuItem deleteItem;
 
 	public FilterOverview(IFilterService filterService,
 			IPersonService personService, IAddressService addressService,
@@ -89,31 +90,25 @@ public class FilterOverview extends JPanel {
 		panel = builder.createPanel(800, 800);
 		this.add(panel);
 
-		toolbar = builder.createToolbar();
-		addComponentsToToolbar(toolbar);
-		panel.add(toolbar, "wrap");
-		// panel.add(scrollPane, "span 5, gaptop 25");
+		menubar = builder.createMenuBar();
+		addComponentsToMenuBar(menubar);
+		panel.add(menubar, ", growx, wrap");
 	}
 
-	private void addComponentsToToolbar(JToolBar toolbar) {
-		create = builder.createButton("Personenfilter anlegen", buttonListener,
-				"create_filter");
-		edit = builder.createButton("Filter bearbeiten", buttonListener,
-				"edit_filter");
-		delete = builder.createButton("Filter l\u00F6schen", buttonListener,
-				"delete_filter");
-		share = builder.createButton("Filter freigeben", buttonListener,
-				"share_filter");
-		join = builder.createButton("Filter verkn\u00FCpfen", buttonListener,
-				"join_filter");
-		backButton = builder.createButton("Zur\u00FCck", buttonListener,
-				"return_to_overview");
-		toolbar.add(create);
-		toolbar.add(edit);
-		toolbar.add(delete);
-		toolbar.add(share);
-		toolbar.add(join);
-		toolbar.add(backButton);
+	private void addComponentsToMenuBar(JMenuBar menubar) {
+		chooseFilter = builder.createMenu("Neuen Filter anlegen");
+		chooseMenuItem = builder.createMenuItem("Personenfilter", buttonListener, "personFilter_clicked");
+		chooseFilter.add(chooseMenuItem);
+		
+		editFilter = builder.createMenu("Filter bearbeiten");
+		editItem = builder.createMenuItem("Bearbeiten", buttonListener, "edit_filter");
+		deleteItem = builder.createMenuItem("L\u00F6schen", buttonListener, "delete_filter");
+		//editFilter.add(editItem);
+		editFilter.add(deleteItem);
+		
+		menubar.add(chooseFilter);
+		menubar.add(editFilter);
+		
 	}
 
 	public FilterTableModel getFilterModel() {
