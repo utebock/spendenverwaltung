@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -90,6 +91,10 @@ public class ComponentBuilder {
 
 	public JTextArea createTextArea(String note) {
 		return new JTextArea(note);
+	}
+
+	public JCheckBox createCheckbox() {
+		return new JCheckBox();
 	}
 
 	

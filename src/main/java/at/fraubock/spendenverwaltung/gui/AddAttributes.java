@@ -109,6 +109,8 @@ public class AddAttributes extends JPanel{
 	private JPanel addAddressPanel;
 	private JPanel addDonationPanel;
 	private JPanel overviewPanel;
+	private JLabel salutationLabel;
+	private JLabel salutation;
 
 	public AddAttributes(Person person, IPersonService personService, IAddressService addressService, IDonationService donationService, FilterPersons filterPersons) {
 		super(new MigLayout());
@@ -130,8 +132,8 @@ public class AddAttributes extends JPanel{
 	}
 
 	public void setUpPerson(){
-		overviewPanel = builder.createPanel(800, 1000);
-		JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		overviewPanel = builder.createPanel(800, 850);
+		JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		this.add(pane);
 		
 		panel = builder.createPanel(800, 150);
@@ -143,6 +145,10 @@ public class AddAttributes extends JPanel{
 		JLabel empty = builder.createLabel("		");
 		panel.add(empty, "wrap");
 		
+		salutationLabel = builder.createLabel("Anrede: ");
+		salutation = builder.createLabel(person.getSex().toString());
+		panel.add(salutationLabel, "gapright 150");
+		panel.add(salutation, "wrap");
 		titleLabel = builder.createLabel("Titel: ");
 		title = builder.createLabel(person.getTitle());
 		panel.add(titleLabel, "gapright 150");
@@ -197,11 +203,13 @@ public class AddAttributes extends JPanel{
 		addressTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		addressPane = new JScrollPane(addressTable);
-		addressPane.setPreferredSize(new Dimension(800, 250));
+		addressPane.setPreferredSize(new Dimension(650, 200));
 		addressPanel.add(addressPane, "wrap, growx");
 	
 		createAddressBtn = builder.createButton("Adresse hinzuf\u00FCgen", buttonListener, "open_create_address_in_show_person");
-		addressPanel.add(createAddressBtn, "span 2");
+		addressPanel.add(createAddressBtn, "split 2");
+		backBtn = builder.createButton("Abbrechen", buttonListener, "go_from_show_person_to_person_overview");
+		addressPanel.add(backBtn, "wrap");
 		JSeparator separator = builder.createSeparator();
 		overviewPanel.add(separator, "growx, wrap");
 		
@@ -315,7 +323,7 @@ public class AddAttributes extends JPanel{
 		donationTable.setFillsViewportHeight(true);
 		donationTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		donationPane = new JScrollPane(donationTable);
-		donationPane.setPreferredSize(new Dimension(800, 250));
+		donationPane.setPreferredSize(new Dimension(650, 200));
 		donationPanel.add(donationPane, "wrap, growx");
 		createDonationBtn = builder.createButton("Spende hinzuf\u00FCgen", buttonListener, "open_create_donation_in_show_person");
 		donationPanel.add(createDonationBtn, "split 2");

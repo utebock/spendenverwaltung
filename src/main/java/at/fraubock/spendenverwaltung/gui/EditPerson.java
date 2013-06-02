@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -93,7 +94,8 @@ public class EditPerson extends JPanel{
 	private JLabel addressCountryLabel;
 	private JButton ok_addr;
 	private JButton delete_addr;
-	private JSeparator separator2;
+	private JLabel setAsMainAddress;
+	private JCheckBox mainAddress;
 
 	public EditPerson(Person person, IPersonService personService, IAddressService addressService, FilterPersons filterPersons, Overview overview) {
 		super(new MigLayout());
@@ -115,8 +117,8 @@ public class EditPerson extends JPanel{
 	public void setUp(){
 		
 		overviewPanel = builder.createPanel(800, 800);
-		JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		this.add(pane);
+		//JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		this.add(overviewPanel);
 		
 		panel = builder.createPanel(800, 300);
 		overviewPanel.add(panel, "wrap");
@@ -231,11 +233,10 @@ public class EditPerson extends JPanel{
 		panel.add(note);
 		panel.add(noteArea, "wrap, growx");
 		
-//		panel.add(new JLabel("			"), "wrap");
 		ok = builder.createButton("Bearbeiten", buttonListener, "edit_person_in_db");
 		panel.add(ok, "split 2");
-//		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_edit");
-//		panel.add(cancel, "wrap");
+		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_edit");
+		panel.add(cancel, "wrap");
 		
 		separator = builder.createSeparator();
 		overviewPanel.add(separator, "growx, wrap");
@@ -379,31 +380,42 @@ public class EditPerson extends JPanel{
 			return;
         }
 		
-		editAddressPanel = builder.createPanel(250, 200);
+		editAddressPanel = builder.createPanel(500, 200);
 		
 		addressStreetLabel = builder.createLabel("Stra\u00DFe: ");
 		streetField = builder.createTextField(150);
 		streetField.setText(addr.getStreet());
 		editAddressPanel.add(addressStreetLabel, "");
-		editAddressPanel.add(streetField, "wrap 0px");
+		editAddressPanel.add(streetField, "wrap 0px, growx");
 
 		addressPostalLabel = builder.createLabel("PLZ: ");
 		postalField = builder.createTextField(30);
 		postalField.setText(addr.getPostalCode());
 		editAddressPanel.add(addressPostalLabel, "");
-		editAddressPanel.add(postalField, "wrap 0px");
+		editAddressPanel.add(postalField, "wrap 0px, growx");
 
 		addressCityLabel = builder.createLabel("Ort: ");
 		cityField = builder.createTextField(150);
 		cityField.setText(addr.getCity());
 		editAddressPanel.add(addressCityLabel, "");
-		editAddressPanel.add(cityField, "wrap 0px");
+		editAddressPanel.add(cityField, "wrap 0px, growx");
 
 		addressCountryLabel = builder.createLabel("Land: ");
 		countryField = builder.createTextField(150);
 		countryField.setText(addr.getCountry());
 		editAddressPanel.add(addressCountryLabel, "");
-		editAddressPanel.add(countryField, "wrap 0px");
+		editAddressPanel.add(countryField, "wrap 0px, growx");
+		
+		setAsMainAddress = builder.createLabel("Erstwohnsitz: ");
+		mainAddress = builder.createCheckbox();
+		if(person.getMainAddress().equals(addr)){
+			mainAddress.setSelected(true);
+		}
+		else{
+			mainAddress.setSelected(false);
+		}
+		editAddressPanel.add(setAsMainAddress);
+		editAddressPanel.add(mainAddress, "wrap 0px");
 		
 		final JComponent[] editAddress = new JComponent[]{editAddressPanel};
 		Object[] options = {"Abbrechen", "Bearbeiten"};
@@ -435,6 +447,13 @@ public class EditPerson extends JPanel{
 			}
 			else{
 				addr.setCountry(countryField.getText());
+			}
+			
+			if(mainAddress.isSelected() == false){
+				person.setMainAddress(person.getMainAddress());
+			}
+			else{
+				person.setMainAddress(addr);
 			}
 			try{
 				Address updatedAddress = addressService.update(addr);
