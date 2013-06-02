@@ -1,0 +1,123 @@
+package at.fraubock.spendenverwaltung.interfaces.domain.csvimport;
+
+public class ImportRow {
+	//Person
+	private String givenName;
+	private String surname;
+	private String email;
+	private String title;
+	private String company;
+	private String telephone;
+	private String personNote;
+	
+	//Donation
+	private String date;
+	private String amount;
+	private String Dedication;
+	private String donationNote;
+	
+	//Address
+	private String street;
+	private String postcode;
+	private String city;
+	private String country;
+	
+	public ImportRow(){
+		
+	}
+	
+	
+	public String getGivenName() {
+		return givenName;
+	}
+	public String getSurname() {
+		return surname;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public String getCompany() {
+		return company;
+	}
+	public String getTelephone() {
+		return telephone;
+	}
+	public String getPersonNote() {
+		return personNote;
+	}
+	public String getDate() {
+		return date;
+	}
+	public String getAmount() {
+		return amount;
+	}
+	public String getDedication() {
+		return Dedication;
+	}
+	public String getDonationNote() {
+		return donationNote;
+	}
+	public String getStreet() {
+		return street;
+	}
+	public String getPostcode() {
+		return postcode;
+	}
+	public String getCity() {
+		return city;
+	}
+	public String getCountry() {
+		return country;
+	}
+	public void setGivenName(String givenName) {
+		this.givenName = givenName;
+	}
+	public void setSurname(String surname) {
+		this.surname = surname;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public void setCompany(String company) {
+		this.company = company;
+	}
+	public void setTelephone(String telephone) {
+		this.telephone = telephone;
+	}
+	public void setPersonNote(String personNote) {
+		this.personNote = personNote;
+	}
+	public void setDate(String date) {
+		this.date = date;
+	}
+	public void setAmount(String amount) {
+		this.amount = amount;
+	}
+	public void setDedication(String dedication) {
+		Dedication = dedication;
+	}
+	public void setDonationNote(String donationNote) {
+		this.donationNote = donationNote;
+	}
+	public void setStreet(String street) {
+		this.street = street;
+	}
+	public void setPostcode(String postcode) {
+		this.postcode = postcode;
+	}
+	public void setCity(String city) {
+		this.city = city;
+	}
+	public void setCountry(String country) {
+		this.country = country;
+	}
+	
+	
+	
+}
