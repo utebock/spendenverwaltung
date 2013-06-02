@@ -2,6 +2,7 @@ package at.fraubock.spendenverwaltung.interfaces.service;
 
 import java.util.List;
 
+import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 
@@ -28,6 +29,13 @@ public interface IPersonService {
 	 */
 	public void delete(Person p) throws ServiceException;
 
+	/**
+	 * Deletes an existing address
+	 * @param a
+	 * @throws ServiceException
+	 */
+	public void deleteAddressAndUpdatePerson(Address a, Person p) throws ServiceException;
+	
 	/**
 	 * Retrieves entire Person table
 	 * @return List of all persons

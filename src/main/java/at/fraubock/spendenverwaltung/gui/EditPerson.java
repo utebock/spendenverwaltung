@@ -483,7 +483,10 @@ public class EditPerson extends JPanel{
 		
 		if(ok == 1){
 			try {
-				addressService.delete(addr);
+				List<Address> updatedAddresses = person.getAddresses();
+				updatedAddresses.remove(addr);
+				person.setAddresses(updatedAddresses);
+				personService.deleteAddressAndUpdatePerson(addr, person);
 			} 
 			catch (ServiceException e) {
 				JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);

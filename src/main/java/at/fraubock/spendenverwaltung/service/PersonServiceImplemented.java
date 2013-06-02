@@ -5,7 +5,9 @@ import java.util.List;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
+import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
@@ -15,6 +17,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 public class PersonServiceImplemented implements IPersonService {
 
 	private IPersonDAO personDAO;
+	private IAddressDAO addressDAO;
 
 	public IPersonDAO getPersonDAO() {
 
@@ -23,6 +26,15 @@ public class PersonServiceImplemented implements IPersonService {
 
 	public void setPersonDAO(IPersonDAO personDAO) {
 		this.personDAO = personDAO;
+	}
+
+	public IAddressDAO getAddressDAO() {
+
+		return addressDAO;
+	}
+
+	public void setAddressDAO(IAddressDAO addressDAO) {
+		this.addressDAO = addressDAO;
 	}
 
 	@Override
@@ -56,6 +68,17 @@ public class PersonServiceImplemented implements IPersonService {
 			throw new ServiceException(e);
 		}
 
+	}
+
+	@Override
+	@Transactional(isolation = Isolation.SERIALIZABLE)
+	public void deleteAddressAndUpdatePerson(Address a, Person p) throws ServiceException {
+		update(p);
+		try {
+			addressDAO.delete(a);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
 	}
 
 	@Override
