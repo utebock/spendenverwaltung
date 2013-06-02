@@ -108,7 +108,7 @@ public class ButtonListener implements ActionListener{
 		if(cmd.equals("return_to_overview")){
 			filterOverview.returnTo();
 		}
-		if(cmd.equals("personFilter_clicked")){
+		if(cmd.equals("add_person_filter")){
 			filterOverview.createFilter();
 		}
 		if(cmd.equals("open_create_donation_in_show_person")){

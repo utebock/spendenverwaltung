@@ -3,6 +3,7 @@ package at.fraubock.spendenverwaltung.gui;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +58,12 @@ public class FilterOverview extends JPanel {
 	private Component chooseMenuItem;
 	private JMenuItem editItem;
 	private JMenuItem deleteItem;
+	private JToolBar toolbar;
+	private JButton personFilter;
+	private JButton sendingsFilter;
+	private JButton donationFilter;
+	private JButton backButton;
+	private JButton delete;
 
 	public FilterOverview(IFilterService filterService,
 			IPersonService personService, IAddressService addressService,
@@ -87,27 +94,33 @@ public class FilterOverview extends JPanel {
 		new ActionHandler(this);
 		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
-		panel = builder.createPanel(800, 800);
+		panel = builder.createPanel(800, 850);
 		this.add(panel);
 
-		menubar = builder.createMenuBar();
-		addComponentsToMenuBar(menubar);
-		panel.add(menubar, ", growx, wrap");
+		toolbar = builder.createToolbar();
+		toolbar.setFloatable(false);
+		toolbar.setRollover(true);
+		addComponentsToToolbar(toolbar);
+		panel.add(toolbar, "growx, wrap");
+		//panel.add(scrollPane);
 	}
 
-	private void addComponentsToMenuBar(JMenuBar menubar) {
-		chooseFilter = builder.createMenu("Neuen Filter anlegen");
-		chooseMenuItem = builder.createMenuItem("Personenfilter", buttonListener, "personFilter_clicked");
-		chooseFilter.add(chooseMenuItem);
-		
-		editFilter = builder.createMenu("Filter bearbeiten");
-		editItem = builder.createMenuItem("Bearbeiten", buttonListener, "edit_filter");
-		deleteItem = builder.createMenuItem("L\u00F6schen", buttonListener, "delete_filter");
-		//editFilter.add(editItem);
-		editFilter.add(deleteItem);
-		
-		menubar.add(chooseFilter);
-		menubar.add(editFilter);
+	private void addComponentsToToolbar(JToolBar toolbar) {
+		personFilter = builder.createButton("Personenfilter erstellen", buttonListener, "add_person_filter");
+		personFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
+		sendingsFilter = builder.createButton("Aussendungsfilter erstellen", buttonListener, "add_sendings_filter");
+		sendingsFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
+		donationFilter = builder.createButton("Spendenfilter erstellen", buttonListener, "add_donation_filter");
+		donationFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
+		delete = builder.createButton("Filter l\u00F6schen", buttonListener, "delete_filter");
+		delete.setFont(new Font("Bigger", Font.PLAIN, 13));
+		backButton = builder.createButton("Zur\u00FCck", buttonListener, "return_to_overview");
+		backButton.setFont(new Font("Bigger", Font.PLAIN, 13));
+		toolbar.add(sendingsFilter);
+		toolbar.add(personFilter);
+		toolbar.add(donationFilter);
+		toolbar.add(delete);
+		toolbar.add(backButton);
 		
 	}
 
