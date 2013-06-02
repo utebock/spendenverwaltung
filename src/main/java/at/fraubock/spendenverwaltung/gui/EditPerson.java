@@ -92,6 +92,7 @@ public class EditPerson extends JPanel{
 	private JLabel addressCityLabel;
 	private JLabel addressCountryLabel;
 	private JButton ok_addr;
+	private JButton delete_addr;
 
 	public EditPerson(Person person, IPersonService personService, IAddressService addressService, FilterPersons filterPersons, Overview overview) {
 		super(new MigLayout());
@@ -106,11 +107,11 @@ public class EditPerson extends JPanel{
 		actionHandler = new ActionHandler(this);
 		builder = new ComponentBuilder();
 		addressModel = new AddressTableModel();
-		setUpPerson();
+		setUp();
 	}
 
 	@SuppressWarnings("unchecked")
-	public void setUpPerson(){
+	public void setUp(){
 		
 		overviewPanel = builder.createPanel(800, 1000);
 		JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -232,8 +233,8 @@ public class EditPerson extends JPanel{
 //		panel.add(new JLabel("			"), "wrap");
 		ok = builder.createButton("Bearbeiten", buttonListener, "edit_person_in_db");
 		panel.add(ok, "split 2");
-		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_edit");
-		panel.add(cancel, "wrap");
+//		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_edit");
+//		panel.add(cancel, "wrap");
 		
 		separator = builder.createSeparator();
 		overviewPanel.add(separator, "growx, wrap");
@@ -256,8 +257,16 @@ public class EditPerson extends JPanel{
 		
 		ok_addr = builder.createButton("Bearbeiten", buttonListener, "edit_address_in_db");
 		tablePanel.add(ok_addr, "split 2");
+		delete_addr = builder.createButton("L\u00F6schen", buttonListener, "delete_address_in_db");
+		tablePanel.add(delete_addr, "wrap");
+//		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_edit");
+//		tablePanel.add(cancel, "wrap");
+		
+		separator = builder.createSeparator();
+		overviewPanel.add(separator, "growx, wrap");
+		
 		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_edit");
-		tablePanel.add(cancel, "wrap");
+		overviewPanel.add(cancel, "wrap");
 		
 		getAddresses();	
 		
@@ -450,5 +459,44 @@ public class EditPerson extends JPanel{
 		}
 	}
 	
-	
+	public void deleteAddress(){
+		
+		int row = addressTable.getSelectedRow();
+		if(row == -1){
+			JOptionPane.showMessageDialog(this, "Bitte Adresse ausw\u00E4hlen.");
+			return;
+		}
+		int id = (Integer) addressModel.getValueAt(row, 0);
+		
+		try{
+			addr = addressService.getByID(id);
+		}
+		catch(ServiceException e){
+            JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Fehler", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+			return;
+        }
+		
+
+		Object[] options = {"Abbrechen","L\u00F6schen"};
+		int ok = JOptionPane.showOptionDialog(this, "Diese Adresse sicher l\u00F6schen?", "Loeschen", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[1]);
+		
+		if(ok == 1){
+			try {
+				addressService.delete(addr);   
+			} 
+			catch (ServiceException e) {
+				JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+	            e.printStackTrace();
+				return;
+			}
+				
+			addressModel.removeAddress(row);
+			JOptionPane.showMessageDialog(this, "Adresse wurde gel\u00F6scht.", "Information", JOptionPane.INFORMATION_MESSAGE);
+			
+		}
+		else{
+			return;
+		}
+	}
 }

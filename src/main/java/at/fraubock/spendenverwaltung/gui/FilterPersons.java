@@ -170,8 +170,8 @@ public class FilterPersons extends JPanel{
 			return;
 		}
 		
-		Object[] options = {"Abbrechen","Loeschen"};
-		int ok = JOptionPane.showOptionDialog(this, "Diese Person sicher loeschen?", "Loeschen", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[1]);
+		Object[] options = {"Abbrechen","L\u00F6schen"};
+		int ok = JOptionPane.showOptionDialog(this, "Diese Person sicher l\u00F6schen?", "Loeschen", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[1]);
 		
 		if(ok == 1){
 			try {
@@ -184,7 +184,7 @@ public class FilterPersons extends JPanel{
 			}
 				
 			personModel.removePerson(row);
-			JOptionPane.showMessageDialog(this, "Person wurde geloescht", "Information", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Person wurde gel\u00F6scht.", "Information", JOptionPane.INFORMATION_MESSAGE);
 			
 		}
 		else{
