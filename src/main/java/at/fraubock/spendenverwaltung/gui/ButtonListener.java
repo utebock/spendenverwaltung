@@ -10,7 +10,7 @@ public class ButtonListener implements ActionListener{
 	private Overview overview;
 	private CreatePerson createPerson;
 	private AddAttributes showPerson;
-	private FilterPersons filterPersons;
+	private ShowPersons filterPersons;
 	private FilterOverview filterOverview;
 	private CreateFilter createFilter;
 	private EditPerson editPerson;
@@ -27,7 +27,7 @@ public class ButtonListener implements ActionListener{
 		this.showPerson = showPerson;
 	}
 	
-	public ButtonListener(FilterPersons filterPersons) {
+	public ButtonListener(ShowPersons filterPersons) {
 		this.filterPersons = filterPersons;
 	}
 	

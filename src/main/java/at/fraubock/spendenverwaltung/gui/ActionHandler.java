@@ -14,7 +14,7 @@ public class ActionHandler implements ActionListener{
 		// TODO Auto-generated constructor stub
 	}
 
-	public ActionHandler(FilterPersons filterPersons) {
+	public ActionHandler(ShowPersons filterPersons) {
 		// TODO Auto-generated constructor stub
 	}
 	public ActionHandler(FilterOverview filterOverview) {

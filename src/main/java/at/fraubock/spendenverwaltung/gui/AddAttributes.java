@@ -102,7 +102,7 @@ public class AddAttributes extends JPanel{
 
 	private JLabel donationNoteLabel;
 	private JTextArea donationNote;
-	private FilterPersons filterPersons;
+	private ShowPersons filterPersons;
 	private Component mainLabel;
 	private JLabel mainLabelAddress;
 	private JLabel mainLabelDonation;
@@ -112,7 +112,7 @@ public class AddAttributes extends JPanel{
 	private JLabel salutationLabel;
 	private JLabel salutation;
 
-	public AddAttributes(Person person, IPersonService personService, IAddressService addressService, IDonationService donationService, FilterPersons filterPersons) {
+	public AddAttributes(Person person, IPersonService personService, IAddressService addressService, IDonationService donationService, ShowPersons filterPersons) {
 		super(new MigLayout());
 		
 		this.person = person;

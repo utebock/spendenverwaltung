@@ -1,6 +1,6 @@
 package at.fraubock.spendenverwaltung.gui;
-
 import java.awt.Dimension;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
@@ -22,10 +22,10 @@ import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 import net.miginfocom.swing.MigLayout;
 
-public class FilterPersons extends JPanel{
+public class ShowPersons extends JPanel{
 
 	private static final long serialVersionUID = 1L;
-	private static final Logger log = Logger.getLogger(FilterPersons.class);
+	private static final Logger log = Logger.getLogger(ShowPersons.class);
 	private IPersonService personService;
 	private IAddressService addressService;
 	private IDonationService donationService;
@@ -36,7 +36,6 @@ public class FilterPersons extends JPanel{
 	private JTable showTable;
 	private JScrollPane scrollPane;
 	private List<Person> personList;
-	private JPanel panel;
 	private JToolBar toolbar;
 	private JButton editButton;
 	private JButton deleteButton;
@@ -46,7 +45,7 @@ public class FilterPersons extends JPanel{
 	private JButton backButton;
 	private JPanel overviewPanel;
 	
-	public FilterPersons(IPersonService personService, IAddressService addressService, IDonationService donationService, Overview overview){
+	public ShowPersons(IPersonService personService, IAddressService addressService, IDonationService donationService, Overview overview){
 		super(new MigLayout());
 	
 		this.personService = personService;
@@ -77,23 +76,26 @@ public class FilterPersons extends JPanel{
 		//JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		this.add(overviewPanel);
 		
-		panel = builder.createPanel(800, 800);
-		overviewPanel.add(panel);
-		
 		toolbar = builder.createToolbar();
+		toolbar.setFloatable(false);
+		toolbar.setRollover(true);
 		addComponentsToToolbar(toolbar);
-		panel.add(toolbar, "wrap");
-		panel.add(scrollPane, "span 5, gaptop 25");
+		overviewPanel.add(toolbar, "growx, wrap");
+		overviewPanel.add(scrollPane);
 	}
 	
 	@SuppressWarnings("unchecked")
 	private void addComponentsToToolbar(JToolBar toolbar) {
-		String[] combo = new String[]{"Platzhalter", "Platzhalter"};
+		String[] combo = new String[]{"Filter ausw\u00E4hlen", "Platzhalter"};
 		filterCombo = builder.createComboBox(combo, handler);
 		addAttribute = builder.createButton("Attribute hinzuf\u00FCgen", buttonListener, "add_donation_address");
-		editButton = builder.createButton("Bearbeiten", buttonListener, "edit_person");
-		deleteButton = builder.createButton("L\u00F6schen", buttonListener, "delete_person_from_db");
+		addAttribute.setFont(new Font("Bigger", Font.PLAIN, 13));
+		editButton = builder.createButton("Person bearbeiten", buttonListener, "edit_person");
+		editButton.setFont(new Font("Bigger", Font.PLAIN, 13));
+		deleteButton = builder.createButton("Person l\u00F6schen", buttonListener, "delete_person_from_db");
+		deleteButton.setFont(new Font("Bigger", Font.PLAIN, 13));
 		backButton = builder.createButton("Zur\u00FCck", buttonListener, "return_to_personOverview");
+		backButton.setFont(new Font("Bigger", Font.PLAIN, 13));
 		toolbar.add(filterCombo);
 		toolbar.add(addAttribute);
 		toolbar.add(editButton);
@@ -130,7 +132,7 @@ public class FilterPersons extends JPanel{
 		Person p;
 		int row = showTable.getSelectedRow();
 		if(row == -1){
-			JOptionPane.showMessageDialog(this, "Bitte Person auswaehlen.");
+			JOptionPane.showMessageDialog(this, "Bitte Person ausw\u00E4hlen.");
 			return;
 		}
 		
@@ -155,7 +157,7 @@ public class FilterPersons extends JPanel{
 		Person p;
 		int row = showTable.getSelectedRow();
 		if(row == -1){
-			JOptionPane.showMessageDialog(this, "Bitte Person zum Loeschen auswaehlen.");
+			JOptionPane.showMessageDialog(this, "Bitte Person zum L\u00F6schen ausw\u00E4hlen.");
 			return;
 		}
 		
@@ -196,7 +198,7 @@ public class FilterPersons extends JPanel{
 		Person p;
 		int row = showTable.getSelectedRow();
 		if(row == -1){
-			JOptionPane.showMessageDialog(this, "Bitte Person zum Bearbeiten auswaehlen.");
+			JOptionPane.showMessageDialog(this, "Bitte Person zum Bearbeiten ausw\u00E4hlen.");
 			return;
 		}
 		
@@ -217,6 +219,7 @@ public class FilterPersons extends JPanel{
 		repaint();
 		add(ep);
 	}
+
 	public void returnTo(){
 		this.removeAll();
 		this.revalidate();

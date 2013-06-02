@@ -125,10 +125,10 @@ public class Overview extends JPanel{
 		personsPanel.add(persons);
 		
 		searchLabel = builder.createLabel("Personen suchen");
-		personsPanel.add(searchLabel, "gap 28");
+		personsPanel.add(searchLabel, "gap 25");
 		
 		filterLabel = builder.createLabel("Filter");
-		personsPanel.add(filterLabel, "gap 45");
+		personsPanel.add(filterLabel, "gap 48");
 		
 		//separator for next section
 		personSeparator = builder.createSeparator();
@@ -151,7 +151,7 @@ public class Overview extends JPanel{
 		importLabel = builder.createLabel("Importe");
 		importPanel.add(importLabel, "split 2, gap 18");
 		validationLabel = builder.createLabel("Validierung");
-		importPanel.add(validationLabel, "gap 65");
+		importPanel.add(validationLabel, "gap 73");
 		
 		importSeparator = builder.createSeparator();
 		overviewPanel.add(importSeparator, "wrap 0px, growx");
@@ -300,7 +300,7 @@ public class Overview extends JPanel{
 	}
 	
 	public void goToShow(){
-		FilterPersons filter = new FilterPersons(personService, addressService, donationService, this);
+		ShowPersons filter = new ShowPersons(personService, addressService, donationService, this);
 		removeAll();
 		revalidate();
 		repaint();

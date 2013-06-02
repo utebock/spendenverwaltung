@@ -73,7 +73,7 @@ public class EditPerson extends JPanel{
 	private Person person = new Person();
 	private Address addr = new Address();
 	private Overview overview;
-	private FilterPersons filterPersons;
+	private ShowPersons filterPersons;
 	private JLabel editPerson;
 	private JTextField companyField;
 	private JTextField givenField;
@@ -97,7 +97,7 @@ public class EditPerson extends JPanel{
 	private JLabel setAsMainAddress;
 	private JCheckBox mainAddress;
 
-	public EditPerson(Person person, IPersonService personService, IAddressService addressService, FilterPersons filterPersons, Overview overview) {
+	public EditPerson(Person person, IPersonService personService, IAddressService addressService, ShowPersons filterPersons, Overview overview) {
 		super(new MigLayout());
 		
 		this.person = person;
