@@ -73,9 +73,9 @@ public class FilterPersons extends JPanel{
 		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
 		
-		overviewPanel = builder.createPanel(800, 1000);
-		JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		this.add(pane);
+		overviewPanel = builder.createPanel(800, 850);
+		//JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		this.add(overviewPanel);
 		
 		panel = builder.createPanel(800, 800);
 		overviewPanel.add(panel);

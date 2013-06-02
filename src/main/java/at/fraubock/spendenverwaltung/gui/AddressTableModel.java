@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.gui;
 
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
@@ -13,12 +14,24 @@ public class AddressTableModel extends AbstractTableModel{
 	private String[] columnNames = new String[]{"Adressnummer", "Stra\u00DFe", "PLZ", "Stadt", "Land"};
 	private Vector<Address> addresses = new Vector<Address>();
 
-	public void addAddress (Address donation){
-		addresses.add(donation);
+	public void addAddress (Address address){
+		addresses.add(address);
 	}
 	
 	public void removeAddress (int row){
 		addresses.remove(row);
+		fireTableDataChanged();
+	}
+	
+	public void removeAll(){
+		addresses = new Vector<Address>();
+		fireTableDataChanged();
+	}
+	
+	public void insertList(List<Address> insertAddresses){
+		for(Address a : insertAddresses){
+			addresses.add(a);
+		}
 		fireTableDataChanged();
 	}
 	

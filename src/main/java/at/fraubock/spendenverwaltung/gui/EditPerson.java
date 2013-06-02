@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -93,6 +94,8 @@ public class EditPerson extends JPanel{
 	private JLabel addressCountryLabel;
 	private JButton ok_addr;
 	private JButton delete_addr;
+	private JLabel setAsMainAddress;
+	private JCheckBox mainAddress;
 
 	public EditPerson(Person person, IPersonService personService, IAddressService addressService, FilterPersons filterPersons, Overview overview) {
 		super(new MigLayout());
@@ -113,11 +116,11 @@ public class EditPerson extends JPanel{
 	@SuppressWarnings("unchecked")
 	public void setUp(){
 		
-		overviewPanel = builder.createPanel(800, 1000);
-		JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		this.add(pane);
+		overviewPanel = builder.createPanel(800, 800);
+		//JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		this.add(overviewPanel);
 		
-		panel = builder.createPanel(800, 400);
+		panel = builder.createPanel(800, 300);
 		overviewPanel.add(panel, "wrap");
 		editPerson = builder.createLabel("Personendaten \u00E4ndern: ");
 		editPerson.setFont(new Font("Headline", Font.PLAIN, 14));
@@ -230,17 +233,16 @@ public class EditPerson extends JPanel{
 		panel.add(note);
 		panel.add(noteArea, "wrap, growx");
 		
-//		panel.add(new JLabel("			"), "wrap");
 		ok = builder.createButton("Bearbeiten", buttonListener, "edit_person_in_db");
 		panel.add(ok, "split 2");
-//		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_edit");
-//		panel.add(cancel, "wrap");
+		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_edit");
+		panel.add(cancel, "wrap");
 		
 		separator = builder.createSeparator();
 		overviewPanel.add(separator, "growx, wrap");
 		
 		tablePanel = builder.createPanel(800, 200);
-		overviewPanel.add(tablePanel);
+		overviewPanel.add(tablePanel, "wrap");
 		
 		editAdress = builder.createLabel("Adressdaten \u00E4ndern: ");
 		editAdress.setFont(new Font("Headline", Font.PLAIN, 14));
@@ -256,17 +258,12 @@ public class EditPerson extends JPanel{
 		tablePanel.add(addressPane, "wrap, growx");
 		
 		ok_addr = builder.createButton("Bearbeiten", buttonListener, "edit_address_in_db");
-		tablePanel.add(ok_addr, "split 2");
+		tablePanel.add(ok_addr, "split 3");
 		delete_addr = builder.createButton("L\u00F6schen", buttonListener, "delete_address_in_db");
-		tablePanel.add(delete_addr, "wrap");
-//		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_edit");
-//		tablePanel.add(cancel, "wrap");
-		
-		separator = builder.createSeparator();
-		overviewPanel.add(separator, "growx, wrap");
-		
+		tablePanel.add(delete_addr);
 		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_edit");
-		overviewPanel.add(cancel, "wrap");
+		tablePanel.add(cancel, "wrap");
+		
 		
 		getAddresses();	
 		
@@ -383,31 +380,42 @@ public class EditPerson extends JPanel{
 			return;
         }
 		
-		editAddressPanel = builder.createPanel(250, 200);
+		editAddressPanel = builder.createPanel(500, 200);
 		
 		addressStreetLabel = builder.createLabel("Stra\u00DFe: ");
 		streetField = builder.createTextField(150);
 		streetField.setText(addr.getStreet());
 		editAddressPanel.add(addressStreetLabel, "");
-		editAddressPanel.add(streetField, "wrap 0px");
+		editAddressPanel.add(streetField, "wrap 0px, growx");
 
 		addressPostalLabel = builder.createLabel("PLZ: ");
 		postalField = builder.createTextField(30);
 		postalField.setText(addr.getPostalCode());
 		editAddressPanel.add(addressPostalLabel, "");
-		editAddressPanel.add(postalField, "wrap 0px");
+		editAddressPanel.add(postalField, "wrap 0px, growx");
 
 		addressCityLabel = builder.createLabel("Ort: ");
 		cityField = builder.createTextField(150);
 		cityField.setText(addr.getCity());
 		editAddressPanel.add(addressCityLabel, "");
-		editAddressPanel.add(cityField, "wrap 0px");
+		editAddressPanel.add(cityField, "wrap 0px, growx");
 
 		addressCountryLabel = builder.createLabel("Land: ");
 		countryField = builder.createTextField(150);
 		countryField.setText(addr.getCountry());
 		editAddressPanel.add(addressCountryLabel, "");
-		editAddressPanel.add(countryField, "wrap 0px");
+		editAddressPanel.add(countryField, "wrap 0px, growx");
+		
+		setAsMainAddress = builder.createLabel("Erstwohnsitz: ");
+		mainAddress = builder.createCheckbox();
+		if(person.getMainAddress().equals(addr)){
+			mainAddress.setSelected(true);
+		}
+		else{
+			mainAddress.setSelected(false);
+		}
+		editAddressPanel.add(setAsMainAddress);
+		editAddressPanel.add(mainAddress, "wrap 0px");
 		
 		final JComponent[] editAddress = new JComponent[]{editAddressPanel};
 		Object[] options = {"Abbrechen", "Bearbeiten"};
@@ -440,12 +448,28 @@ public class EditPerson extends JPanel{
 			else{
 				addr.setCountry(countryField.getText());
 			}
+			
+			if(mainAddress.isSelected() == false){
+				person.setMainAddress(person.getMainAddress());
+			}
+			else{
+				person.setMainAddress(addr);
+			}
 			try{
 				Address updatedAddress = addressService.update(addr);
-				List<Address> addresses = new ArrayList<Address>();
+				Address removeAddress = new Address();
+				List<Address> addresses = person.getAddresses();
+				
+				for(Address a : addresses){
+					if(a.getId() == addr.getId())
+						removeAddress = a;
+				}
+				addresses.remove(removeAddress);
 				addresses.add(updatedAddress);
 				person.setAddresses(addresses);
 				personService.update(person);
+				addressModel.removeAll();
+				addressModel.insertList(addresses);
 			}
 			catch(ServiceException e){
 				 JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
@@ -483,7 +507,10 @@ public class EditPerson extends JPanel{
 		
 		if(ok == 1){
 			try {
-				addressService.delete(addr);
+				List<Address> updatedAddresses = person.getAddresses();
+				updatedAddresses.remove(addr);
+				person.setAddresses(updatedAddresses);
+				personService.deleteAddressAndUpdatePerson(addr, person);
 			} 
 			catch (ServiceException e) {
 				JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
