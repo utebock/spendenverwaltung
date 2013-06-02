@@ -8,11 +8,13 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -49,13 +51,10 @@ public class EditPerson extends JPanel{
 	private JLabel telephone;
 	
 	private JLabel mail;
-	private JLabel street;
 	private JTextField streetField;
 	
-	private JLabel postal;
 	private JTextField postalField;
 	
-	private JLabel city;
 	private JTextField cityField;
 	
 	private JTextField countryField;
@@ -80,11 +79,20 @@ public class EditPerson extends JPanel{
 	private JTextField surnameField;
 	private JTextField telephoneField;
 	private JTextField mailField;
-	private JLabel country;
 	private JTable addressTable;
 	private JScrollPane addressPane;
 	private JPanel tablePanel;
 	private JPanel overviewPanel;
+	private JSeparator separator;
+	private JLabel editAdress;
+	private List<Address> addressList;
+	private JPanel editAddressPanel;
+	private JLabel addressStreetLabel;
+	private JLabel addressPostalLabel;
+	private JLabel addressCityLabel;
+	private JLabel addressCountryLabel;
+	private JButton ok_addr;
+	private JButton delete_addr;
 
 	public EditPerson(Person person, IPersonService personService, IAddressService addressService, FilterPersons filterPersons, Overview overview) {
 		super(new MigLayout());
@@ -99,11 +107,11 @@ public class EditPerson extends JPanel{
 		actionHandler = new ActionHandler(this);
 		builder = new ComponentBuilder();
 		addressModel = new AddressTableModel();
-		setUpPerson();
+		setUp();
 	}
 
 	@SuppressWarnings("unchecked")
-	public void setUpPerson(){
+	public void setUp(){
 		
 		overviewPanel = builder.createPanel(800, 1000);
 		JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -111,7 +119,7 @@ public class EditPerson extends JPanel{
 		
 		panel = builder.createPanel(800, 400);
 		overviewPanel.add(panel, "wrap");
-		editPerson = builder.createLabel("Personendaten aendern");
+		editPerson = builder.createLabel("Personendaten \u00E4ndern: ");
 		editPerson.setFont(new Font("Headline", Font.PLAIN, 14));
 		panel.add(editPerson, "wrap");
 		JLabel empty = builder.createLabel("		");
@@ -121,16 +129,16 @@ public class EditPerson extends JPanel{
 		salutation = builder.createComboBox(salutCombo, actionHandler);
 		salutLabel = builder.createLabel("Anrede: ");
 		
-		if (person.getSex().equals("MALE")){
+		if (person.getSex().equals(Person.Sex.MALE)){
 			salutation.setSelectedItem("Herr");
 		}
-		if (person.getSex().equals("FEMALE")){
+		if (person.getSex().equals(Person.Sex.FEMALE)){
 			salutation.setSelectedItem("Frau");
 		}
-		if (person.getSex().equals("FAMILIY")){
+		if (person.getSex().equals(Person.Sex.FAMILY)){
 			salutation.setSelectedItem("Fam.");
 		}
-		if (person.getSex().equals("COMPANY")){
+		if (person.getSex().equals(Person.Sex.COMPANY)){
 			salutation.setSelectedItem("Firma");
 		}
 		
@@ -202,26 +210,6 @@ public class EditPerson extends JPanel{
 		panel.add(mail);
 		panel.add(mailField, "wrap, growx");
 		
-		street = builder.createLabel("Stra\u00DFe: ");
-		streetField = builder.createTextField(person.getMainAddress().getStreet());
-		panel.add(street);
-		panel.add(streetField, "wrap, growx");
-		
-		postal = builder.createLabel("PLZ: ");
-		postalField = builder.createTextField(person.getMainAddress().getPostalCode());
-		panel.add(postal);
-		panel.add(postalField, "wrap, growx");
-		
-		city = builder.createLabel("Ort: ");
-		cityField = builder.createTextField(person.getMainAddress().getCity());
-		panel.add(city);
-		panel.add(cityField, "wrap, growx");
-		
-		country = builder.createLabel("Land: ");
-		countryField = builder.createTextField(person.getMainAddress().getCountry());
-		panel.add(country);
-		panel.add(countryField, "wrap, growx");
-		
 		notifyType = builder.createLabel("Notification Type: ");
 		notifyMail = builder.createRadioButton("E-Mail", actionHandler, "notifyMail");
 		notifyPost = builder.createRadioButton("Post", actionHandler, "notifyPost");
@@ -242,8 +230,24 @@ public class EditPerson extends JPanel{
 		panel.add(note);
 		panel.add(noteArea, "wrap, growx");
 		
+//		panel.add(new JLabel("			"), "wrap");
+		ok = builder.createButton("Bearbeiten", buttonListener, "edit_person_in_db");
+		panel.add(ok, "split 2");
+//		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_edit");
+//		panel.add(cancel, "wrap");
+		
+		separator = builder.createSeparator();
+		overviewPanel.add(separator, "growx, wrap");
+		
 		tablePanel = builder.createPanel(800, 200);
 		overviewPanel.add(tablePanel);
+		
+		editAdress = builder.createLabel("Adressdaten \u00E4ndern: ");
+		editAdress.setFont(new Font("Headline", Font.PLAIN, 14));
+		tablePanel.add(editAdress, "wrap");
+		empty = builder.createLabel("		");
+		tablePanel.add(empty, "wrap");
+		
 		addressTable = new JTable(addressModel);
 		addressTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -251,14 +255,38 @@ public class EditPerson extends JPanel{
 		addressPane.setPreferredSize(new Dimension(800, 250));
 		tablePanel.add(addressPane, "wrap, growx");
 		
-		ok = builder.createButton("Bearbeiten", buttonListener, "edit_person_in_db");
-		tablePanel.add(ok, "split 2");
-		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_edit");
-		tablePanel.add(cancel, "wrap");
+		ok_addr = builder.createButton("Bearbeiten", buttonListener, "edit_address_in_db");
+		tablePanel.add(ok_addr, "split 2");
+		delete_addr = builder.createButton("L\u00F6schen", buttonListener, "delete_address_in_db");
+		tablePanel.add(delete_addr, "wrap");
+//		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_edit");
+//		tablePanel.add(cancel, "wrap");
 		
+		separator = builder.createSeparator();
+		overviewPanel.add(separator, "growx, wrap");
+		
+		cancel = builder.createButton("Abbrechen", buttonListener, "cancel_edit");
+		overviewPanel.add(cancel, "wrap");
+		
+		getAddresses();	
 		
 	}
+	
+	private void getAddresses(){
+		addressList = new ArrayList<Address>();
 
+		addressList = person.getAddresses();
+		if(addressList == null){
+			JOptionPane.showMessageDialog(this, "Addresslist returns null.", "Error", JOptionPane.ERROR_MESSAGE);
+		    return;
+		}
+		for(Address a : addressList){
+			addressModel.addAddress(a);
+			addressTable.revalidate();
+			addressTable.repaint();
+		}	
+	}
+	
 	public void returnTo(){
 		this.removeAll();
 		this.revalidate();
@@ -269,28 +297,10 @@ public class EditPerson extends JPanel{
 		filterPersons.setUp();
 	}
 	
-	public void showErrorDialog(String message){
-		
-	}
-
 	public void editPerson() {
 		
-		String sex = "Herr";
 		
-		if(salutation.getSelectedItem().equals(sex)){
-			sex = "MALE";
-		}
-		if(salutation.getSelectedItem().equals("Frau")){
-			sex = "FEMALE";
-		}
-		if(salutation.getSelectedItem().equals("Fam.")){
-			sex = "FAMILY";
-		}
-		if(salutation.getSelectedItem().equals("Firma")){
-			sex = "COMPANY";
-		}
-		
-		person.setSex(Person.Sex.valueOf(sex));
+		person.setSex(Person.Sex.values()[salutation.getSelectedIndex()]);
 	
 		String title = "-";
 		
@@ -321,7 +331,6 @@ public class EditPerson extends JPanel{
 		if(titleBox.getSelectedItem().equals("Prof.")){
 			title = "Prof.";
 		}
-		
 		person.setTitle(title);
 	
 		person.setCompany(companyField.getText());
@@ -334,16 +343,6 @@ public class EditPerson extends JPanel{
 		
 		person.setEmail(mailField.getText());
 		
-		addr.setStreet(streetField.getText());
-		
-		addr.setPostalCode(postalField.getText());
-		
-		addr.setCity(cityField.getText());
-		
-		addr.setCountry(countryField.getText());
-
-		person.setMainAddress(addr);
-		
 		if(notifyMail.isSelected()){
 			person.setEmailNotification(true);
 		}
@@ -354,10 +353,6 @@ public class EditPerson extends JPanel{
 		person.setNote(note);
 		
 		try{
-			Address updatedAddress = addressService.update(addr); // will now be created when person is created - p
-			List<Address> addresses = new ArrayList<Address>();
-			addresses.add(updatedAddress);
-			person.setAddresses(addresses);
 			Person updatedPerson = personService.update(person);
 			personModel.addPerson(updatedPerson);
 		}
@@ -369,5 +364,139 @@ public class EditPerson extends JPanel{
 		JOptionPane.showMessageDialog(this, "Person erfolgreich bearbeitet", "Information", JOptionPane.INFORMATION_MESSAGE);
 		returnTo();
 	}
+
+	public void editAddress() {
+		
+		int row = addressTable.getSelectedRow();
+		if(row == -1){
+			JOptionPane.showMessageDialog(this, "Bitte Adresse ausw\u00E4hlen.");
+			return;
+		}
+		int id = (Integer) addressModel.getValueAt(row, 0);
+		
+		try{
+			addr = addressService.getByID(id);
+		}
+		catch(ServiceException e){
+            JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Fehler", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+			return;
+        }
+		
+		editAddressPanel = builder.createPanel(250, 200);
+		
+		addressStreetLabel = builder.createLabel("Stra\u00DFe: ");
+		streetField = builder.createTextField(150);
+		streetField.setText(addr.getStreet());
+		editAddressPanel.add(addressStreetLabel, "");
+		editAddressPanel.add(streetField, "wrap 0px");
+
+		addressPostalLabel = builder.createLabel("PLZ: ");
+		postalField = builder.createTextField(30);
+		postalField.setText(addr.getPostalCode());
+		editAddressPanel.add(addressPostalLabel, "");
+		editAddressPanel.add(postalField, "wrap 0px");
+
+		addressCityLabel = builder.createLabel("Ort: ");
+		cityField = builder.createTextField(150);
+		cityField.setText(addr.getCity());
+		editAddressPanel.add(addressCityLabel, "");
+		editAddressPanel.add(cityField, "wrap 0px");
+
+		addressCountryLabel = builder.createLabel("Land: ");
+		countryField = builder.createTextField(150);
+		countryField.setText(addr.getCountry());
+		editAddressPanel.add(addressCountryLabel, "");
+		editAddressPanel.add(countryField, "wrap 0px");
+		
+		final JComponent[] editAddress = new JComponent[]{editAddressPanel};
+		Object[] options = {"Abbrechen", "Bearbeiten"};
+		int go = JOptionPane.showOptionDialog(this, editAddress, "Adresse bearbeiten", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[1]);
+		
+		if(go == 1){
+			if(streetField.getText().isEmpty() || streetField.getText().equals(null)){
+				addr.setStreet(addr.getStreet());
+			}
+			else{
+				addr.setStreet(streetField.getText());
+			}
+			if(postalField.getText().isEmpty() || postalField.getText().equals(null)){
+				addr.setPostalCode(addr.getPostalCode());
+			}
+			else{
+				addr.setPostalCode(postalField.getText());
+			}
+			
+			if(cityField.getText().isEmpty() || cityField.getText().equals(null)){
+				addr.setCity(addr.getCity());
+			}
+			else{
+				addr.setCity(cityField.getText());
+			}
+			
+			if(countryField.getText().isEmpty() || countryField.getText().equals(null)){
+				addr.setCountry(addr.getCountry());
+			}
+			else{
+				addr.setCountry(countryField.getText());
+			}
+			try{
+				Address updatedAddress = addressService.update(addr);
+				List<Address> addresses = new ArrayList<Address>();
+				addresses.add(updatedAddress);
+				person.setAddresses(addresses);
+				personService.update(person);
+			}
+			catch(ServiceException e){
+				 JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+		            e.printStackTrace();
+		    		return;
+			}
+			
+			JOptionPane.showMessageDialog(this, "Adresse erfolgreich bearbeitet.", "Information", JOptionPane.INFORMATION_MESSAGE);
+			addressTable.revalidate();
+			addressTable.repaint();
+		}
+	}
 	
+	public void deleteAddress(){
+		
+		int row = addressTable.getSelectedRow();
+		if(row == -1){
+			JOptionPane.showMessageDialog(this, "Bitte Adresse ausw\u00E4hlen.");
+			return;
+		}
+		int id = (Integer) addressModel.getValueAt(row, 0);
+		
+		try{
+			addr = addressService.getByID(id);
+		}
+		catch(ServiceException e){
+            JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Fehler", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+			return;
+        }
+		
+
+		Object[] options = {"Abbrechen","L\u00F6schen"};
+		int ok = JOptionPane.showOptionDialog(this, "Diese Adresse sicher l\u00F6schen?", "Loeschen", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[1]);
+		
+		if(ok == 1){
+			try {
+				addressService.delete(addr);   
+			} 
+			catch (ServiceException e) {
+				JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+	            e.printStackTrace();
+				return;
+			}
+				
+			addressModel.removeAddress(row);
+			JOptionPane.showMessageDialog(this, "Adresse wurde gel\u00F6scht.", "Information", JOptionPane.INFORMATION_MESSAGE);
+			
+		}
+		else{
+			return;
+		}
+	}
 }

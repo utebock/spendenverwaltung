@@ -1,8 +1,6 @@
 package at.fraubock.spendenverwaltung.gui;
 
 import java.awt.Font;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,10 +98,7 @@ public class CreatePerson extends JPanel{
 	private Overview overview;
 	private JLabel dateLabel;
 	private JTextField dateField;
-	private JLabel starProperty0;
-	private JLabel starProperty1;
 	private JLabel dateInstruction;
-	private JLabel instructionLabel;
 	private JPanel overviewPanel;
 	
 	public CreatePerson(IPersonService personService, IAddressService addressService, IDonationService donationService, Overview overview){
@@ -117,8 +112,6 @@ public class CreatePerson extends JPanel{
 		buttonListener = new ButtonListener(this);
 		actionHandler = new ActionHandler(this);
 		builder = new ComponentBuilder();
-		
-		
 		setUpCreate();
 	}
 
@@ -229,9 +222,7 @@ public class CreatePerson extends JPanel{
 		donationPanel.add(donationLabel);
 		donationPanel.add(donationCombo, "split 2");
 		amount = builder.createTextField(30);
-		donationPanel.add(amount, "growx");
-		starProperty0 = builder.createLabel("<html><font color=red>*</font></html>");
-		donationPanel.add(starProperty0, "wrap");
+		donationPanel.add(amount, "wrap, growx");
 		
 		dateLabel = builder.createLabel("Spendendatum: ");
 		dateInstruction = builder.createLabel("(YYYY-MM-DD)");
@@ -239,9 +230,7 @@ public class CreatePerson extends JPanel{
 		dateField = builder.createTextField(30);
 		donationPanel.add(dateLabel, "split 2");
 		donationPanel.add(dateInstruction);
-		donationPanel.add(dateField, "growx");
-		starProperty1 = builder.createLabel("<html><font color=red>*</font></html>");
-		donationPanel.add(starProperty1, "wrap");
+		donationPanel.add(dateField, "wrap, growx");
 		
 		dedicationLabel = builder.createLabel("Widmung: ");
 		dedicationField = builder.createTextField(150);
@@ -252,10 +241,7 @@ public class CreatePerson extends JPanel{
 		donationPanel.add(dedicationField, "wrap, growx");
 		donationPanel.add(dedicationNoteLabel);
 		donationPanel.add(dedicationNoteField, "wrap, growx");
-		instructionLabel = builder.createLabel("<html><font color=red>Felder, die mit * gekennzeichnet sind, m\u00FCssen ausgef\u00FCllt werden.</font></html>");
-		instructionLabel.setFont(new Font("Instruction", Font.PLAIN, 9));
-		instructionLabel.setSize(800, instructionLabel.getHeight());
-		donationPanel.add(instructionLabel, "wrap");
+		
 		donationPanel.add(empty, "wrap");
 		
 		ok = builder.createButton("Anlegen", buttonListener, "create_person_in_db");
@@ -268,29 +254,9 @@ public class CreatePerson extends JPanel{
 	}
 	
 	public void createPersonInDb(){
-		/**
-		 * Sex
-		 */
-		String sex = "Herr";
 		
-		if(salutation.getSelectedItem().equals(sex)){
-			sex = "MALE";
-		}
-		if(salutation.getSelectedItem().equals("Frau")){
-			sex = "FEMALE";
-		}
-		if(salutation.getSelectedItem().equals("Fam.")){
-			sex = "FAMILY";
-		}
-		if(salutation.getSelectedItem().equals("Firma")){
-			sex = "COMPANY";
-		}
+		p.setSex(Person.Sex.values()[salutation.getSelectedIndex()]);
 		
-		p.setSex(Person.Sex.valueOf(sex));
-		
-		/**
-		 * Title
-		 */
 		String title = "-";
 		
 		if(titleBox.getSelectedItem().equals("BA")){
@@ -320,59 +286,28 @@ public class CreatePerson extends JPanel{
 		if(titleBox.getSelectedItem().equals("Prof.")){
 			title = "Prof.";
 		}
-		
 		p.setTitle(title);
 		
-		/**
-		 * Company
-		 */
 		p.setCompany(companyField.getText());
 		
-		/**
-		 * Given name
-		 */
 		p.setGivenName(givenField.getText());
 		
-		/**
-		 * Surname
-		 */
 		p.setSurname(surnameField.getText());
-		
-		/**
-		 * Telephone
-		 */
+
 		p.setTelephone(telephoneField.getText());
 		
-		/**
-		 * Mail
-		 */
 		p.setEmail(mailField.getText());
 		
-		/**
-		 * Address: Street
-		 */
 		addr.setStreet(streetField.getText());
 		
-		/**
-		 * Address: Postal code
-		 */
 		addr.setPostalCode(postalField.getText());
 		
-		/**
-		 * Address: City
-		 */
 		addr.setCity(cityField.getText());
 		
-		/**
-		 * Address: Country
-		 */
 		addr.setCountry(countryField.getText());
 
 		p.setMainAddress(addr);
 		
-		/**
-		 * Notification type
-		 */
 		if(notifyMail.isSelected()){
 			p.setEmailNotification(true);
 		}
@@ -380,40 +315,14 @@ public class CreatePerson extends JPanel{
 			p.setPostalNotification(true);
 		}
 		
-		/**
-		 * Note
-		 */
 		String note = noteArea.getText();
 		p.setNote(note);
 		
-		String donationInput = "\u00DCberweisung";
-		if(donationCombo.getSelectedItem().equals(donationInput)){
-			donationInput = "BANK_TRANSFER";
-		}
-		if(donationCombo.getSelectedItem().equals("Merchandise")){
-			donationInput = "MERCHANDISE";
-		}
-		if(donationCombo.getSelectedItem().equals("Online-Shop")){
-			donationInput = "ONLINE";
-		}
-		if(donationCombo.getSelectedItem().equals("SMS")){
-			donationInput = "SMS";
-		}
-		if(donationCombo.getSelectedItem().equals("Bar")){
-			donationInput = "BAR";
-		}
-		/**
-		 * Donation Type
-		 */
-		donation.setType(Donation.DonationType.valueOf(donationInput));
-		/**
-		 * Donation Amount
-		 */
-		long d_amount = 0;
+		donation.setType(Donation.DonationType.values()[donationCombo.getSelectedIndex()]);
+		
+		long d_amount;
 		if(amount.getText().isEmpty() || amount.getText().equals(null)){
-			JOptionPane.showMessageDialog(this, "Bitte Spendenbetrag eingeben.", "Warn", JOptionPane.WARNING_MESSAGE);
-			amount.requestFocus();
-			return;
+			d_amount = 0;
 		}
 		else{
 			try{
@@ -428,24 +337,17 @@ public class CreatePerson extends JPanel{
 		
 		donation.setAmount(d_amount);
 		
-		/**
-		 * Donation Date
-		 */
 		if(dateField.getText().isEmpty() || dateField.getText().equals(null)){
-			JOptionPane.showMessageDialog(this, "Bitte Datum eingeben.", "Warn", JOptionPane.WARNING_MESSAGE);
-			dateField.requestFocus();
-			return;
+			dateField.setText("2000-01-01");
+//			JOptionPane.showMessageDialog(this, "Bitte Datum eingeben.", "Warn", JOptionPane.WARNING_MESSAGE);
+//			dateField.requestFocus();
+//			return;
 		}
 		
 		donation.setDate(Date.valueOf(dateField.getText()));
 		
-		/**
-		 * Donation Dedication
-		 */
 		donation.setDedication(dedicationField.getText());
-		/**
-		 * Donation Note
-		 */
+		
 		donation.setNote(dedicationNoteField.getText());
 		
 		try{
