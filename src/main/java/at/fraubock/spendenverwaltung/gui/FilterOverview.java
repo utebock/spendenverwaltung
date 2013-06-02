@@ -106,15 +106,15 @@ public class FilterOverview extends JPanel {
 	}
 
 	private void addComponentsToToolbar(JToolBar toolbar) {
-		personFilter = builder.createButton("Personenfilter erstellen", buttonListener, "add_person_filter");
+		personFilter = builder.createButton("<html>&nbsp;Personenfilter erstellen</html>", buttonListener, "add_person_filter");
 		personFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
-		sendingsFilter = builder.createButton("Aussendungsfilter erstellen", buttonListener, "add_sendings_filter");
+		sendingsFilter = builder.createButton("<html>&nbsp;Aussendungsfilter erstellen</html>", buttonListener, "add_sendings_filter");
 		sendingsFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
-		donationFilter = builder.createButton("Spendenfilter erstellen", buttonListener, "add_donation_filter");
+		donationFilter = builder.createButton("<html>&nbsp;Spendenfilter erstellen</html>", buttonListener, "add_donation_filter");
 		donationFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
-		delete = builder.createButton("Filter l\u00F6schen", buttonListener, "delete_filter");
+		delete = builder.createButton("<html>&nbsp;Filter l\u00F6schen</html>", buttonListener, "delete_filter");
 		delete.setFont(new Font("Bigger", Font.PLAIN, 13));
-		backButton = builder.createButton("Zur\u00FCck", buttonListener, "return_to_overview");
+		backButton = builder.createButton("<html>&nbsp;Zur\u00FCck</html>", buttonListener, "return_to_overview");
 		backButton.setFont(new Font("Bigger", Font.PLAIN, 13));
 		toolbar.add(sendingsFilter);
 		toolbar.add(personFilter);
