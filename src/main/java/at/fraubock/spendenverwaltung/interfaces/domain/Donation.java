@@ -2,9 +2,6 @@ package at.fraubock.spendenverwaltung.interfaces.domain;
 
 import java.util.Date;
 
-import at.fraubock.spendenverwaltung.util.DateComparer;
-
-
 /**
  * Domain model representing Donation
  * 
@@ -39,7 +36,8 @@ public class Donation {
 			case "online":
 				return ONLINE;
 			default:
-				throw new IllegalArgumentException("No donation type for name: " + name);
+				throw new IllegalArgumentException(
+						"No donation type for name: " + name);
 			}
 		}
 	};
@@ -116,34 +114,62 @@ public class Donation {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-
-		if (obj == null) {
-			return false;
-		}
-
-		if (this == obj) {
-			return true;
-		}
-
-		if (this.getClass() != obj.getClass()) {
-			return false;
-		}
-
-		Donation other = (Donation) obj;
-
-		if (this.getId().equals(other.getId())
-				&& this.getAmount() == other.getAmount()
-				&& DateComparer.isSameDay(this.date, other.date)
-				&& this.getDedication().equals(other.getDedication())
-				&& this.getDonator().getId().equals(other.getDonator().getId())
-				&& this.getType().equals(other.getType())
-				&& this.getNote().equals(other.getNote())) {
-			return true;
-		}
-
-		return false;
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((amount == null) ? 0 : amount.hashCode());
+		result = prime * result + ((date == null) ? 0 : date.hashCode());
+		result = prime * result
+				+ ((dedication == null) ? 0 : dedication.hashCode());
+		result = prime * result + ((donator == null) ? 0 : donator.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((note == null) ? 0 : note.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
 	}
 
-	// TODO: implement hashCode
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Donation other = (Donation) obj;
+		if (amount == null) {
+			if (other.amount != null)
+				return false;
+		} else if (!amount.equals(other.amount))
+			return false;
+		if (date == null) {
+			if (other.date != null)
+				return false;
+		} else if (!date.equals(other.date))
+			return false;
+		if (dedication == null) {
+			if (other.dedication != null)
+				return false;
+		} else if (!dedication.equals(other.dedication))
+			return false;
+		if (donator == null) {
+			if (other.donator != null)
+				return false;
+		} else if (!donator.equals(other.donator))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (note == null) {
+			if (other.note != null)
+				return false;
+		} else if (!note.equals(other.note))
+			return false;
+		if (type != other.type)
+			return false;
+		return true;
+	}
+
 }
