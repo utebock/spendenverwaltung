@@ -141,7 +141,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 				}
 			}
 			for (Address newAddress : person.getAddresses()) {
-				if (!oldAddresses.contains(newAddress)) {
+				if (oldAddresses != null && !oldAddresses.contains(newAddress)) {
 					jdbcTemplate
 							.update("INSERT INTO livesat(pid, aid, ismain) VALUES (?,?,?) ",
 									new Object[] {

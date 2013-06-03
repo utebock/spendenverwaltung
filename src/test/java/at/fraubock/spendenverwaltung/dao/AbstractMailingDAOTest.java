@@ -69,6 +69,25 @@ public class AbstractMailingDAOTest {
 		AbstractMailingDAOTest.mailingDAO = MailingDAO;
 	}
 	
+	public void initData() throws PersistenceException {
+		
+		addressOne.setId(null);
+		addressTwo.setId(null);
+		addressThree.setId(null);
+		
+		addressDAO.insertOrUpdate(addressOne);
+		addressDAO.insertOrUpdate(addressTwo);
+		addressDAO.insertOrUpdate(addressThree);
+		
+		personOne.setId(null);
+		personTwo.setId(null);
+		personThree.setId(null);
+		
+		personDAO.insertOrUpdate(personOne);
+		personDAO.insertOrUpdate(personTwo);
+		personDAO.insertOrUpdate(personThree);
+	}
+	
 	@Test(expected = IllegalArgumentException.class)
 	@Transactional
 	public void createWithNullParameter_ThrowsException() {
@@ -94,8 +113,10 @@ public class AbstractMailingDAOTest {
 	
 	@Test
 	@Transactional
-	public void createWithValidParameters() {
-
+	public void createWithValidParameters() throws PersistenceException {
+		
+		initData();
+		
 		mailing = new Mailing();
 		mailing.setMedium(Mailing.Medium.EMAIL);
 		mailing.setType(Mailing.MailingType.DANKESBRIEF);
@@ -151,7 +172,9 @@ public class AbstractMailingDAOTest {
 	
 	@Test
 	@Transactional
-	public void updateWithValidParameters() {
+	public void updateWithValidParameters() throws PersistenceException {
+		initData();
+		
 		mailing = new Mailing();
 		mailing.setMedium(Mailing.Medium.EMAIL);
 		mailing.setType(Mailing.MailingType.DANKESBRIEF);
@@ -184,8 +207,7 @@ public class AbstractMailingDAOTest {
 	@Test
 	@Transactional
 	public void getAll_shouldReturnList() throws PersistenceException {
-		
-		//TODO initialize mailings with valid data
+		initData();		
 		
 		List<Mailing> createdMailings = new ArrayList<Mailing>();
 		
@@ -239,13 +261,17 @@ public class AbstractMailingDAOTest {
 	
 	@Test
 	@Transactional
-	public void findByValidId() {
-		//TODO create mailing
+	public void findByValidId() throws PersistenceException {
+		initData();
 		
-		Mailing initial = new Mailing();
+		Mailing mailing = new Mailing();
+		mailing.setDate(new Date(System.currentTimeMillis()));
+		mailing.setFilter(filterTwoPeople);
+		mailing.setMedium(Mailing.Medium.EMAIL);
+		mailing.setType(Mailing.MailingType.ERLAGSCHEINVERSAND);
 		
 		try {
-			mailingDAO.insertOrUpdate(initial);
+			mailingDAO.insertOrUpdate(mailing);
 		} catch (PersistenceException e1) {
 			fail();
 		}
@@ -269,11 +295,15 @@ public class AbstractMailingDAOTest {
 	
 	@Test
 	@Transactional
-	public void deleteWithCreatedMailing() {
-		
-		//todo create valid mailing
+	public void deleteWithCreatedMailing() throws PersistenceException {
+		initData();
 		
 		Mailing mailing = new Mailing();
+		mailing.setDate(new Date(System.currentTimeMillis()));
+		mailing.setFilter(filterOnePerson);
+		mailing.setMedium(Mailing.Medium.POSTAL);
+		mailing.setType(Mailing.MailingType.DAUERSPENDER_DANKESBRIEF);
+		
 		Integer oldId = null;
 		
 		try {
@@ -299,16 +329,10 @@ public class AbstractMailingDAOTest {
 		}
 	}
 	
-	@Transactional
-	public void deleteWithInvalidId_shouldReturnNull() {
-		
-		
-	}
-	
 	@Test
 	@Transactional	
-	public void getMailingsByValidPerson() {
-		//TODO insertAndUpdate mailings with filter that would return personOne
+	public void getMailingsByValidPerson() throws PersistenceException {
+		initData();
 		
 		Mailing mailingOne = new Mailing();
 		Mailing mailingTwo = new Mailing();
@@ -324,20 +348,17 @@ public class AbstractMailingDAOTest {
 		mailingTwo.setFilter(filterOnePerson);
 		
 		List<Mailing> mailingList = new ArrayList<Mailing>();
+
 		mailingList.add(mailingOne);
 		mailingList.add(mailingTwo);
 		
 		try {
 			mailingDAO.insertOrUpdate(mailingOne);
 			mailingDAO.insertOrUpdate(mailingTwo);
-		} catch (PersistenceException e1) {
-			fail();
-		}
-		
-		try {
+			
 			List<Mailing> results = mailingDAO.getMailingsByPerson(personOne);
 			
-			assertEquals(results, mailingList);
+			assertEquals(mailingList, results);
 		} catch (PersistenceException e) {
 			fail();
 		}	
@@ -347,6 +368,7 @@ public class AbstractMailingDAOTest {
 	@Transactional	
 	public void getMailingsByValidPersonWithNoMailings_shouldReturnNull() {
 		try {
+			initData();
 			assertNull(mailingDAO.getMailingsByPerson(personOne));
 		} catch (PersistenceException e) {
 			fail();
@@ -357,7 +379,6 @@ public class AbstractMailingDAOTest {
 	@Transactional	
 	public void getMailingsByInvalidPerson_throwsException() {
 		try {
-			//fails because PersonValidator is not implemented!
 			mailingDAO.getMailingsByPerson(new Person());
 		} catch (PersistenceException e) {
 			fail();

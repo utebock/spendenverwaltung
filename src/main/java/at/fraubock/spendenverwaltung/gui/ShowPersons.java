@@ -73,7 +73,7 @@ public class ShowPersons extends JPanel {
 
 	public void initTable() {
 		personModel = new PersonTableModel();
-		showAllFilter = new Filter(FilterType.PERSON,null,"Alle anzeigen");
+		showAllFilter = new Filter(FilterType.PERSON, null, "Alle anzeigen");
 		getPersons(showAllFilter);
 		showTable = new JTable(personModel);
 		showTable.setFillsViewportHeight(true);
@@ -114,12 +114,12 @@ public class ShowPersons extends JPanel {
 		filterCombo = builder.createComboBox(new SimpleComboBoxModel<Filter>(
 				personFilters), new ActionListener() {
 
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-						getPersons((Filter)filterCombo.getModel().getSelectedItem());
-						
-					}
-			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				getPersons((Filter) filterCombo.getModel().getSelectedItem());
+
+			}
+
 		});
 
 		overviewPanel.add(filterCombo, "growx, wrap");
@@ -159,7 +159,7 @@ public class ShowPersons extends JPanel {
 		personList = new ArrayList<Person>();
 
 		try {
-			if(filter==null) {
+			if (filter == null) {
 				personList = personService.getAll();
 			} else {
 				personList = personService.getByFilter(filter);
@@ -193,7 +193,7 @@ public class ShowPersons extends JPanel {
 			return;
 		}
 
-		int id = (Integer) personModel.getValueAt(row, 0);
+		int id = (Integer) personModel.getValueAt(row, 3);
 
 		try {
 			p = personService.getById(id);
@@ -223,7 +223,7 @@ public class ShowPersons extends JPanel {
 			return;
 		}
 
-		int id = (Integer) personModel.getValueAt(row, 0);
+		int id = (Integer) personModel.getValueAt(row, 3);
 
 		try {
 			p = personService.getById(id);
@@ -274,7 +274,7 @@ public class ShowPersons extends JPanel {
 			return;
 		}
 
-		int id = (Integer) personModel.getValueAt(row, 0);
+		int id = (Integer) personModel.getValueAt(row, 3);
 
 		try {
 			p = personService.getById(id);

@@ -13,7 +13,7 @@ public class ImportRow {
 	//Donation
 	private String date;
 	private String amount;
-	private String Dedication;
+	private String dedication;
 	private String donationNote;
 	
 	//Address
@@ -55,7 +55,7 @@ public class ImportRow {
 		return amount;
 	}
 	public String getDedication() {
-		return Dedication;
+		return dedication;
 	}
 	public String getDonationNote() {
 		return donationNote;
@@ -100,7 +100,7 @@ public class ImportRow {
 		this.amount = amount;
 	}
 	public void setDedication(String dedication) {
-		Dedication = dedication;
+		this.dedication = dedication;
 	}
 	public void setDonationNote(String donationNote) {
 		this.donationNote = donationNote;

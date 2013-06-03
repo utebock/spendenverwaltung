@@ -12,6 +12,9 @@ public class PersonValidator {
 		if (person.getId() != null && person.getId() < 0) {
 			throw new IllegalArgumentException("Id must not be less than 0");
 		}
+		if(person.getSex() == null) {
+			throw new IllegalArgumentException("Sex was null");
+		}
 		/**
 		 * TODO: define all constraints
 		 * 
