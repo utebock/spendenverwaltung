@@ -67,6 +67,17 @@ public interface IPersonDAO {
 	public Person getById(int id) throws PersistenceException;
 
 	/**
+	 * Retrieves Person by Person Attributes
+	 * 
+	 * @param p
+	 * 				person with it's attributes
+	 * @return List of persons where the attributes are equal to Person p
+	 * @throws PersistenceException
+	 *             if communication to the underlying persistence system failed
+	 */
+	public List<Person> getByAttributes(Person p) throws PersistenceException;
+	
+	/**
 	 * Retrieves all persons having the given address
 	 * 
 	 * @param address

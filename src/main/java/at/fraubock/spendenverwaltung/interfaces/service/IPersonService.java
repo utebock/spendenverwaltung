@@ -48,5 +48,12 @@ public interface IPersonService {
 	 * @return Person based on retrieved id
 	 */
 	public Person getById(int id) throws ServiceException;
+
+	/**
+	 * Retrieves Person by it's attributes
+	 * @param person with parameters
+	 * @return List of persons where the persons attributes matches
+	 */
+	public List<Person> getByAttributes(Person p) throws ServiceException;
 	
 }

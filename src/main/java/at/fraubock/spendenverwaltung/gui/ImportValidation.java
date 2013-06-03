@@ -57,7 +57,7 @@ public class ImportValidation extends JPanel {
 		
 		this.builder = new ComponentBuilder();
 		this.buttonListener = new ButtonListener(this);
-		this.importValidator = new ImportValidator();
+		this.importValidator = new ImportValidator(personService);
 		this.validatedData = validatedData;
 		this.personService = personService;
 		this.addressService = addressService;
@@ -129,7 +129,13 @@ public class ImportValidation extends JPanel {
 		for(Donation d : donationList)
 			personList.add(d.getDonator());
 
-		validatedData = importValidator.validate(personList, donationList);
+		try {
+			validatedData = importValidator.validate(personList, donationList);
+		} catch (ServiceException e) {
+			JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+		    e.printStackTrace();
+		    return;
+		}
 		
 		conflictModel.addList(validatedData.getDonationListConflict(), validatedData.getPersonListConflict());
 		newModel.addList(validatedData.getDonationListNew(), validatedData.getPersonListNew());

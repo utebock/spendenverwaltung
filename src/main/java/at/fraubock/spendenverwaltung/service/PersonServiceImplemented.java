@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Isolation;
@@ -103,6 +104,18 @@ public class PersonServiceImplemented implements IPersonService {
 			throw new ServiceException(e);
 		}
 		return person;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Person> getByAttributes(Person p) throws ServiceException {
+		List<Person> persons = new ArrayList<Person>();
+		try {
+			persons = personDAO.getByAttributes(p);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+		return persons;
 	}
 
 }

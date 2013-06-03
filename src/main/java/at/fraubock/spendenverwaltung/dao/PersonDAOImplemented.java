@@ -300,6 +300,29 @@ public class PersonDAOImplemented implements IPersonDAO {
 		return person;
 	}
 
+
+	@Override
+	public List<Person> getByAttributes(Person p) throws PersistenceException {
+		if (p == null) {
+			throw new IllegalArgumentException("Person must not be null");
+		}
+		
+		List<Person> selectedPersons;
+		
+		String select = "select * from persons p, addresses a, livesat l WHERE (l.pid = p.id AND l.aid = a.id) AND ((p.surname LIKE ? AND p.givenname LIKE ?) AND (p.email LIKE ? OR p.telephone LIKE ? OR (a.street LIKE ? AND a.postcode LIKE ? AND a.city LIKE ?)))";
+		selectedPersons = jdbcTemplate.query(select,
+				new Object[] { p.getSurname(), p.getGivenName(), p.getEmail(), p.getTelephone(), p.getMainAddress().getStreet(), p.getMainAddress().getPostalCode(), p.getMainAddress().getCity() }, new PersonMapper());
+		
+		log.info("found " + selectedPersons.size() + " persons by given attributes");
+
+		// now, load their addresses
+		for (Person entry : selectedPersons) {
+			fetchAddresses(entry);
+		}
+		
+		return selectedPersons;
+	}
+	
 	@Override
 	public List<Person> getByAddress(Address address)
 			throws PersistenceException {
