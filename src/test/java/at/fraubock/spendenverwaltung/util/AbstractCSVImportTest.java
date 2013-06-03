@@ -43,7 +43,7 @@ public abstract class AbstractCSVImportTest {
 		columnMapping.put("Umsatztext", "surname");
 		
 		List<ImportRow> importRows = CSVImport.ReadCSVWithMapping("src/test/resources/hypo_export.csv", columnMapping);
-
+		
 		assertTrue(importRows.size() == 3);
 		assertEquals(importRows.get(0).getAmount(),"10");
 		assertEquals(importRows.get(1).getDate(), "16.04.2013");
@@ -69,6 +69,30 @@ public abstract class AbstractCSVImportTest {
 		assertEquals(importRows.get(0).getAmount(),"10");
 		assertEquals(importRows.get(1).getDate(), "16.04.2013");
 		assertEquals(importRows.get(2).getSurname(),"Dipl.-Ing. Michael Milch");
+	}
+	
+	@Test
+	public void importSMSSpendenWithConfig() throws IOException{
+		Map<String, String> columnMapping = new HashMap<String, String>();
+		
+		Properties config = new Properties();
+		config.load(new FileInputStream("src/main/resources/sms_import_config.properties"));
+		
+		for(Entry<Object, Object> entry : config.entrySet()){
+			if(String.valueOf(entry.getValue()).length()>0){
+				columnMapping.put(String.valueOf(entry.getValue()), String.valueOf(entry.getKey()));
+			}
+		}
+		
+		List<ImportRow> importRows = CSVImport.ReadCSVWithMapping("src/test/resources/sms_spenden_export.csv", columnMapping);
+		
+		assertTrue(importRows.size() == 7);
+		assertEquals(importRows.get(0).getTelephone(), "436761234567");
+		assertEquals(importRows.get(1).getDate(), "06.02.2013 15:38");
+		assertEquals(importRows.get(2).getAmount(), "10.00");
+		assertEquals(importRows.get(3).getDedication(), "keine Antwort");
+		assertEquals(importRows.get(4).getDonationNote(), "FACEBOOK");
+		assertEquals(importRows.get(5).getPersonNote(), "NEIN");
 	}
 
 }
