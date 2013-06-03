@@ -145,7 +145,7 @@ public class ShowPersons extends JPanel{
 			return;
 		}
 		
-		int id = (Integer) personModel.getValueAt(row, 0);
+		int id = (Integer) personModel.getValueAt(row, 3);
 		
 		try{
 			p = personService.getById(id);
@@ -170,7 +170,7 @@ public class ShowPersons extends JPanel{
 			return;
 		}
 		
-		int id = (Integer) personModel.getValueAt(row, 0);
+		int id = (Integer) personModel.getValueAt(row, 3);
 		
 		try{
 			p = personService.getById(id);
@@ -211,7 +211,7 @@ public class ShowPersons extends JPanel{
 			return;
 		}
 		
-		int id = (Integer) personModel.getValueAt(row, 0);
+		int id = (Integer) personModel.getValueAt(row, 3);
 		
 		try{
 			p = personService.getById(id);
