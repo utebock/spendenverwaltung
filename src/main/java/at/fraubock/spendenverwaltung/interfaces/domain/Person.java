@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.interfaces.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Person {
@@ -39,7 +40,7 @@ public class Person {
 	private String company;
 	private String givenName;
 	private String surname;
-	private List<Address> addresses;
+	private List<Address> addresses = new ArrayList<Address>();
 	private Address mainAddress;
 	private String email;
 	private String telephone;
