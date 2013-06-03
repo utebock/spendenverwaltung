@@ -22,6 +22,8 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
+import at.fraubock.spendenverwaltung.util.ImportValidator;
+import at.fraubock.spendenverwaltung.util.ValidatedData;
 
 public class ImportValidation extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -30,45 +32,81 @@ public class ImportValidation extends JPanel {
 	private IAddressService addressService;
 	private IDonationService donationService;
 	private Overview overview;
-	private ValidationTableModel validationModel;
-	private JScrollPane validationPane;
-	private JTable validationTable;
-	private JPanel validationPanel;
+	private ValidationTableModel conflictModel;
+	private ValidationTableModel newModel;
+	private ValidationTableModel matchModel;
+	private JScrollPane conflictPane;
+	private JScrollPane newPane;
+	private JScrollPane matchPane;
+	private JTable conflictTable;
+	private JPanel conflictPanel;
+	private JTable newTable;
+	private JPanel newPanel;
+	private JTable matchTable;
+	private JPanel matchPanel;
 	private ComponentBuilder builder;
 	private JButton backBtn;
 	private ButtonListener buttonListener;
 	private List<Donation> donationList;
 	private List<Person> personList;
+	private ImportValidator importValidator;
+	private ValidatedData validatedData;
 
 	public ImportValidation(IPersonService personService, IAddressService addressService, IDonationService donationService, Overview overview){
 		super(new MigLayout());
 		
 		this.builder = new ComponentBuilder();
 		this.buttonListener = new ButtonListener(this);
+		this.importValidator = new ImportValidator();
+		this.validatedData = validatedData;
 		this.personService = personService;
 		this.addressService = addressService;
 		this.donationService = donationService;
 		this.overview = overview;
-		this.validationModel = new ValidationTableModel(this, this.donationService, this.personService);
-		//initTable();
+		this.conflictModel = new ValidationTableModel(this, this.donationService, this.personService);
+		this.newModel = new ValidationTableModel(this, this.donationService, this.personService);
+		this.matchModel = new ValidationTableModel(this, this.donationService, this.personService);
+		
 		setUp();
 	}
 	
 	private void setUp(){
 		
-		validationPanel = builder.createPanel(800,250);
+		conflictPanel = builder.createPanel(1200,250);
+		newPanel = builder.createPanel(1200,250);
+		matchPanel = builder.createPanel(1200,250);
 		
-		validationTable = new JTable(validationModel);
-		validationTable.setFillsViewportHeight(true);
-		validationTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		validationPane = new JScrollPane(validationTable);
-		validationPane.setPreferredSize(new Dimension(800, 200));
-		validationPanel.add(validationPane, "wrap, growx");
+		conflictTable = new JTable(conflictModel);
+		newTable = new JTable(newModel);
+		matchTable = new JTable(matchModel);
+		
+		conflictTable.setFillsViewportHeight(true);
+		newTable.setFillsViewportHeight(true);
+		matchTable.setFillsViewportHeight(true);
+		
+		conflictTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		newTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		matchTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+		conflictPane = new JScrollPane(conflictTable);
+		newPane = new JScrollPane(newTable);
+		matchPane = new JScrollPane(matchTable);
+		
+		conflictPane.setPreferredSize(new Dimension(1200, 200));
+		newPane.setPreferredSize(new Dimension(1200, 200));
+		matchPane.setPreferredSize(new Dimension(1200, 200));
+		
+		conflictPanel.add(conflictPane, "wrap, growx");
+		newPanel.add(newPane, "wrap, growx");
+		matchPanel.add(matchPane, "wrap, growx");
 
 		backBtn = builder.createButton("Abbrechen", buttonListener, "return_from_import_validation_to_overview");
-		validationPanel.add(backBtn, "");
+		matchPanel.add(backBtn, "");
 
-		this.add(validationPanel);
+		this.add(conflictPanel, "wrap, growx");
+		this.add(newPanel, "wrap, growx");
+		this.add(matchPanel, "wrap, growx");
+		
 		getData();
 	}
 	
@@ -90,9 +128,16 @@ public class ImportValidation extends JPanel {
 		
 		for(Donation d : donationList)
 			personList.add(d.getDonator());
+
+		validatedData = importValidator.validate(personList, donationList);
 		
-		validationModel.addList(donationList, personList);
-		validationTable.revalidate();
+		conflictModel.addList(validatedData.getDonationListConflict(), validatedData.getPersonListConflict());
+		newModel.addList(validatedData.getDonationListNew(), validatedData.getPersonListNew());
+		matchModel.addList(validatedData.getDonationListMatch(), validatedData.getPersonListMatch());
+		
+		conflictTable.revalidate();
+		newTable.revalidate();
+		matchTable.revalidate();
 	}
 
 	public void returnTo() {
