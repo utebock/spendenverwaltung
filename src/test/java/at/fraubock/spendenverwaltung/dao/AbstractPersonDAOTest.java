@@ -1,9 +1,15 @@
 package at.fraubock.spendenverwaltung.dao;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 
-//import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -16,11 +22,10 @@ import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.Person.Sex;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
-
+//import org.apache.log4j.Logger;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/testspring.xml")
@@ -29,10 +34,6 @@ public abstract class AbstractPersonDAOTest {
 
 	protected static IPersonDAO personDAO;
 	protected static IAddressDAO addressDAO;
-
-	// private static final Logger log =
-	// Logger.getLogger(AbstractPersonDAOTest.class);
-	// TODO use logger?
 
 	public static void setAddressDao(IAddressDAO addressDAO) {
 		AbstractPersonDAOTest.addressDAO = addressDAO;
@@ -135,6 +136,186 @@ public abstract class AbstractPersonDAOTest {
 		personDAO.insertOrUpdate(person);
 	}
 
+	/**
+	 * Sets up a person (Manuel Bichler), with two addresses, one of which is
+	 * his main address, into the database.
+	 * 
+	 * @return Manuel Bichler
+	 * @throws PersistenceException
+	 */
+	private Person setupManuelBichler() throws PersistenceException {
+		Person person = new Person();
+		Address address1 = new Address();
+		address1.setStreet("Neustiftgasse 68/9");
+		address1.setPostalCode("1070");
+		address1.setCity("Wien");
+		address1.setCountry("Österreich");
+		Address address2 = new Address();
+		address2.setStreet("Heldenstraße 27");
+		address2.setPostalCode("4452");
+		address2.setCity("Ternberg");
+		address2.setCountry("Österreich");
+
+		addressDAO.insertOrUpdate(address1);
+		addressDAO.insertOrUpdate(address2);
+
+		person.setSex(Person.Sex.MALE);
+		person.setGivenName("Manuel");
+		person.setSurname("Bichler");
+		person.setEmail("manuelbichler@aim.com");
+		person.setTelephone("+43 (650) 3006/99-1");
+		person.getAddresses().add(address1);
+		person.getAddresses().add(address2);
+		person.setMainAddress(address1);
+
+		personDAO.insertOrUpdate(person);
+
+		return person;
+	}
+
+	/**
+	 * @param addresses1
+	 *            a list of addresses
+	 * @param addresses2
+	 *            a list of addresses
+	 * @return true if the first list contains all of the addresses in the
+	 *         second list and vice versa, false else.
+	 */
+	private boolean addressesEqual(List<Address> addresses1,
+			List<Address> addresses2) {
+		if (addresses1.size() != addresses2.size())
+			return false;
+		for (Address a : addresses1) {
+			if (!addresses2.contains(a))
+				return false;
+		}
+		for (Address a : addresses2) {
+			if (!addresses1.contains(a))
+				return false;
+		}
+		return true;
+	}
+
+	@Test
+	@Transactional
+	public void updateDeleteSecondaryAddress() throws PersistenceException {
+		Person manuel = setupManuelBichler();
+		Address secAddress = null;
+		for (Address a : manuel.getAddresses()) {
+			if (a.getPostalCode().equals("4452"))
+				secAddress = a;
+		}
+		assertNotNull(secAddress);
+		manuel.getAddresses().remove(secAddress);
+
+		personDAO.insertOrUpdate(manuel);
+
+		assertTrue(addressesEqual(manuel.getAddresses(),
+				personDAO.getById(manuel.getId()).getAddresses()));
+	}
+
+	@Test
+	@Transactional
+	public void updateDeleteMainAddress() throws PersistenceException {
+		Person manuel = setupManuelBichler();
+		manuel.getAddresses().remove(manuel.getMainAddress());
+		manuel.setMainAddress(null);
+
+		personDAO.insertOrUpdate(manuel);
+
+		assertTrue(addressesEqual(manuel.getAddresses(),
+				personDAO.getById(manuel.getId()).getAddresses()));
+		assertNull(personDAO.getById(manuel.getId()).getMainAddress());
+	}
+
+	@Test
+	@Transactional
+	public void updateDeleteMainAddressWithoutDeletingFromAddresses()
+			throws PersistenceException {
+		Person manuel = setupManuelBichler();
+		manuel.setMainAddress(null);
+
+		personDAO.insertOrUpdate(manuel);
+		assertTrue(addressesEqual(manuel.getAddresses(),
+				personDAO.getById(manuel.getId()).getAddresses()));
+		assertNull(personDAO.getById(manuel.getId()).getMainAddress());
+	}
+
+	@Test
+	@Transactional
+	public void updateSetMainAddress() throws PersistenceException {
+		Person manuel = setupManuelBichler();
+		manuel.setMainAddress(null);
+		personDAO.insertOrUpdate(manuel);
+
+		manuel.setMainAddress(manuel.getAddresses().get(0));
+		personDAO.insertOrUpdate(manuel);
+		assertTrue(addressesEqual(manuel.getAddresses(),
+				personDAO.getById(manuel.getId()).getAddresses()));
+		assertEquals(personDAO.getById(manuel.getId()).getMainAddress(),
+				manuel.getMainAddress());
+	}
+
+	@Test
+	@Transactional
+	public void updateSwitchMainAddress() throws PersistenceException {
+		Person manuel = setupManuelBichler();
+		Address secAddress = null;
+		for (Address a : manuel.getAddresses()) {
+			if (a.getPostalCode().equals("4452"))
+				secAddress = a;
+		}
+		assertNotNull(secAddress);
+		manuel.setMainAddress(secAddress);
+		personDAO.insertOrUpdate(manuel);
+
+		assertTrue(addressesEqual(manuel.getAddresses(),
+				personDAO.getById(manuel.getId()).getAddresses()));
+		assertEquals(personDAO.getById(manuel.getId()).getMainAddress(),
+				manuel.getMainAddress());
+	}
+
+	@Test
+	@Transactional
+	public void updateAddAddress() throws PersistenceException {
+		Person manuel = setupManuelBichler();
+		Address a = new Address();
+		a.setCity("Linz");
+		a.setCountry("Österreich");
+		a.setPostalCode("4020");
+		a.setStreet("Hauptplatz 13");
+		addressDAO.insertOrUpdate(a);
+		manuel.getAddresses().add(a);
+
+		personDAO.insertOrUpdate(manuel);
+
+		assertTrue(addressesEqual(manuel.getAddresses(),
+				personDAO.getById(manuel.getId()).getAddresses()));
+	}
+
+	@Test
+	@Transactional
+	public void getByAddress() throws PersistenceException {
+		Person manuel = setupManuelBichler();
+		Person julia = new Person();
+		julia.setSex(Sex.FEMALE);
+		julia.setGivenName("Julia");
+		julia.setSurname("Zeilermayr");
+		julia.setMainAddress(manuel.getMainAddress());
+		julia.getAddresses().add(julia.getMainAddress());
+		personDAO.insertOrUpdate(julia);
+		Person max = new Person();
+		max.setSex(Sex.MALE);
+		max.setGivenName("Max");
+		max.setSurname("Mustemann");
+		personDAO.insertOrUpdate(max);
+
+		List<Person> wg = personDAO.getByAddress(manuel.getMainAddress());
+		assertTrue(wg.contains(manuel));
+		assertTrue(wg.contains(julia));
+		assertEquals(2, wg.size());
+	}
+
 	@Test
 	@Transactional
 	public void getByIdShouldGetPersonById() throws PersistenceException {
@@ -172,8 +353,13 @@ public abstract class AbstractPersonDAOTest {
 	@Transactional(readOnly = true)
 	public void getByIdOfNonExistentPersonShouldThrowException()
 			throws PersistenceException {
-		@SuppressWarnings("unused")
-		Person person = personDAO.getById(10000);
+		personDAO.getById(10000);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	@Transactional(readOnly = true)
+	public void getByIdLessThanNull_shouldThrow() throws PersistenceException {
+		personDAO.getById(-6);
 	}
 
 	@Test(expected = EmptyResultDataAccessException.class)
@@ -318,5 +504,11 @@ public abstract class AbstractPersonDAOTest {
 		Person person2 = personDAO.getById(100000);
 		List<Person> list = personDAO.getAll();
 		assertThat(list.contains(person2), is(false));
+	}
+
+	@Test
+	@Transactional
+	public void getByFilter() throws PersistenceException {
+		// TODO Filter already ready for testing?
 	}
 }
