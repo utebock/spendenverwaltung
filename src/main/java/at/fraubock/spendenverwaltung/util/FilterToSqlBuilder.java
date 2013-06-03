@@ -73,7 +73,8 @@ public class FilterToSqlBuilder {
 		if (prop.getNumValue() != null) {
 			stmt += prop.getNumValue();
 		} else if (prop.getStrValue() != null) {
-			stmt += "'" + prop.getStrValue() + "'";
+			String percent = prop.getRelationalOperator()==RelationalOperator.LIKE?"%":"";
+			stmt += "'" + percent + prop.getStrValue() + percent + "'";
 		} else if (prop.getDateValue() != null) {
 			stmt += "DATE('"
 					+ new SimpleDateFormat("yyyy-MM-dd").format(prop

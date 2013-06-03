@@ -59,8 +59,8 @@ public class ConfiguratorFactory {
 					FilterProperty.PERSON_COMPANY, "Firma"));
 			configurators.add(new StringComparator(FilterProperty.PERSON_NOTE,
 					"Notiz"));
-			configurators.add(new MountedFilterConfigurator(FilterType.DONATION,
-					"Spendenfilter hinzufügen"));
+//			configurators.add(new MountedFilterConfigurator(FilterType.DONATION,
+//					"Spendenfilter hinzufügen"));
 
 		} else if (type == FilterType.DONATION) {
 

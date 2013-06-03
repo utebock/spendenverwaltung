@@ -48,7 +48,7 @@ public class MountedFilterConfigurator extends JPanel implements
 		}
 
 		add(filterBox = new JComboBox<Filter>(new SimpleComboBoxModel<Filter>(
-				filters)));
+				filters)),"wrap");
 
 		add(comp = new DonationToPersonComp());
 	}

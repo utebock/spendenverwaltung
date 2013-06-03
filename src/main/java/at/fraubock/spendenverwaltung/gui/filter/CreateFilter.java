@@ -18,6 +18,7 @@ import net.miginfocom.swing.MigLayout;
 import at.fraubock.spendenverwaltung.gui.ActionHandler;
 import at.fraubock.spendenverwaltung.gui.ButtonListener;
 import at.fraubock.spendenverwaltung.gui.ComponentBuilder;
+import at.fraubock.spendenverwaltung.gui.CustomTextField;
 import at.fraubock.spendenverwaltung.gui.FilterOverview;
 import at.fraubock.spendenverwaltung.gui.FilterTableModel;
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
@@ -42,10 +43,10 @@ public class CreateFilter extends JPanel {
 	private JLabel headline;
 	private JLabel empty;
 	private JLabel nameLabel;
-	private JTextField nameField;
+	private CustomTextField nameField;
 	private JButton ok;
 	private JButton cancel;
-	private JPanel panel2;
+//	private JPanel panel2;
 	private String pluralName;
 	private ConfiguratorFactory factory;
 	private List<SelectorGuiComponent> selectorComponents;
@@ -72,11 +73,11 @@ public class CreateFilter extends JPanel {
 		builder = new ComponentBuilder();
 
 		panel = builder.createPanel(800, 300);
-		panel2 = builder.createPanel(800, 300);
+//		panel2 = builder.createPanel(800, 300);
 
-		this.add(panel, "wrap, span 2");
 		setUpCreate();
 
+		this.add(panel, "wrap, span 2");
 		ok = builder.createButton("Anlegen", buttonListener,
 				"create_filter_in_db");
 		add(ok);
@@ -90,15 +91,19 @@ public class CreateFilter extends JPanel {
 		headline = builder.createLabel("Neuen Filter f\u00FCr " + pluralName
 				+ " anlegen:");
 		headline.setFont(new Font("Headline", Font.PLAIN, 14));
-		panel.add(headline, "wrap");
+//		panel.
+		add(headline, "wrap");
 		empty = builder.createLabel("		");
-		panel.add(empty, "wrap");
+//		panel.
+		add(empty, "wrap");
 
 		nameLabel = builder.createLabel("Filtername: ");
-		nameField = builder.createTextField(150);
-		panel.add(nameLabel, "split 2");
-		panel.add(nameField, "growx, wrap");
-		panel.add(panel2);
+		nameField = new CustomTextField(150);
+//		panel.
+		add(nameLabel, "split 2");
+//		panel.
+		add(nameField, "growx, wrap");
+//		panel.add(panel2);
 
 		addPropertySelector(0);
 
@@ -132,7 +137,7 @@ public class CreateFilter extends JPanel {
 			selectorComponents.get(index + 1).setPicker(null);
 		}
 		selectorComponents.remove(index);
-		panel2.remove(index);
+		panel.remove(index);
 
 		repaint();
 		revalidate();
@@ -151,11 +156,19 @@ public class CreateFilter extends JPanel {
 						"minusButton_create_filter"));
 
 		selectorComponents.add(index, selectorComp);
-		panel2.add(selectorComp, "wrap", index);
+		panel.add(selectorComp, "wrap", index);
 		return selectorComp;
 	}
 
 	public void createFilter() {
+		String name = nameField.getText();
+		if(name.equals("") || name==null) {
+			JOptionPane.showMessageDialog(this, "Bitte geben Sie einen Namen für den Filter an.", "Warn",
+					JOptionPane.WARNING_MESSAGE);
+			nameField.invalidateInput();
+			return;
+		}
+		
 		try {
 			List<CriterionTO> crits = new ArrayList<CriterionTO>();
 			List<LogicalOperator> ops = new ArrayList<LogicalOperator>();
