@@ -42,7 +42,7 @@ public abstract class AbstractCSVImportTest {
 		columnMapping.put("Betrag", "amount");
 		columnMapping.put("Umsatztext", "surname");
 		
-		List<ImportRow> importRows = CSVImport.ReadCSVWithMapping("src/test/resources/hypo_export.csv", columnMapping);
+		List<ImportRow> importRows = CSVImport.readCSVWithMapping("src/test/resources/hypo_export.csv", columnMapping);
 		
 		assertTrue(importRows.size() == 3);
 		assertEquals(importRows.get(0).getAmount(),"10");
@@ -63,7 +63,7 @@ public abstract class AbstractCSVImportTest {
 			}
 		}
 		
-		List<ImportRow> importRows = CSVImport.ReadCSVWithMapping("src/test/resources/hypo_export.csv", columnMapping);
+		List<ImportRow> importRows = CSVImport.readCSVWithMapping("src/test/resources/hypo_export.csv", columnMapping);
 	
 		assertTrue(importRows.size() == 3);
 		assertEquals(importRows.get(0).getAmount(),"10");
@@ -84,7 +84,7 @@ public abstract class AbstractCSVImportTest {
 			}
 		}
 		
-		List<ImportRow> importRows = CSVImport.ReadCSVWithMapping("src/test/resources/sms_spenden_export.csv", columnMapping);
+		List<ImportRow> importRows = CSVImport.readCSVWithMapping("src/test/resources/sms_spenden_export.csv", columnMapping);
 		
 		assertTrue(importRows.size() == 7);
 		assertEquals(importRows.get(0).getTelephone(), "436761234567");

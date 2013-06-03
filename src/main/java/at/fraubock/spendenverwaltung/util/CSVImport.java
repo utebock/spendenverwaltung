@@ -28,7 +28,7 @@ public class CSVImport {
 	 * @return
 	 */
 	public static List<String[]> ReadCSV(String file) throws IOException{
-		return ReadCSV(file, ';', '"', '\\');
+		return readCSV(file, ';', '"', '\\');
 	}
 	
 	/**
@@ -42,7 +42,7 @@ public class CSVImport {
 	 * @return
 	 * 			List of string arrays 
 	 */
-	public static List<String[]> ReadCSV(String file, char seperator, char quotechar, char escape) throws IOException{
+	public static List<String[]> readCSV(String file, char seperator, char quotechar, char escape) throws IOException{
 		CSVReader reader;
 		List<String[]> data = null;
 		
@@ -69,8 +69,8 @@ public class CSVImport {
 	 * 			returns a List of {@link ImportRow} 
 	 * @throws IOException
 	 */
-	public static List<ImportRow> ReadCSVWithMapping(String file, Map<String, String> columnMapping) throws IOException{
-		return ReadCSVWithMapping(file, ';', '"', '\\', columnMapping);
+	public static List<ImportRow> readCSVWithMapping(String file, Map<String, String> columnMapping) throws IOException{
+		return readCSVWithMapping(file, ';', '"', '\\', columnMapping);
 	}
 	
 	/**
@@ -89,7 +89,7 @@ public class CSVImport {
 	 * 			returns a List of {@link ImportRow} 
 	 * @throws IOException
 	 */
-	public static List<ImportRow> ReadCSVWithMapping(String file, char seperator, 
+	public static List<ImportRow> readCSVWithMapping(String file, char seperator, 
 			char quotechar, char escape, Map<String, String> columnMapping) throws IOException{
 		List<ImportRow> importRows;
 		
