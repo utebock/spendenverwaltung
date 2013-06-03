@@ -16,6 +16,7 @@ public class ButtonListener implements ActionListener{
 	private FilterOverview filterOverview;
 	private CreateFilter createFilter;
 	private EditPerson editPerson;
+	private ImportValidation importValidation;
 	
 	public ButtonListener(Overview overview){
 		this.overview = overview;
@@ -42,6 +43,9 @@ public class ButtonListener implements ActionListener{
 	}
 	public ButtonListener(EditPerson editPerson) {
 		this.editPerson = editPerson;
+	}
+	public ButtonListener(ImportValidation importValidation){
+		this.importValidation = importValidation;
 	}
 
 	@Override
@@ -83,6 +87,9 @@ public class ButtonListener implements ActionListener{
 		
 		if(cmd.equals("delete_person_from_db")){
 			filterPersons.deletePerson();
+		}
+		if(cmd.equals("donation_validation")){
+			overview.goToValidation();
 		}
 		
 		if(cmd.equals("edit_person")){
@@ -126,6 +133,9 @@ public class ButtonListener implements ActionListener{
 		
 		if(cmd.equals("filter_overview")){
 			overview.goToFilter();
+		}
+		if(cmd.equals("return_from_import_validation_to_overview")){
+			importValidation.returnTo();
 		}
 	}
 

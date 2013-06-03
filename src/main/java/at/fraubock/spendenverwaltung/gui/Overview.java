@@ -307,5 +307,13 @@ public class Overview extends JPanel{
 		add(filter);
 	}
 	
+	public void goToValidation(){
+		ImportValidation validation = new ImportValidation(personService, addressService, donationService, this);
+		removeAll();
+		revalidate();
+		repaint();
+		add(validation);
+	}
+	
 
 }

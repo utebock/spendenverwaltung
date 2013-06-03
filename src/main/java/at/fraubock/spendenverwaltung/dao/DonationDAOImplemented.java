@@ -120,9 +120,20 @@ public class DonationDAOImplemented implements IDonationDAO {
 	}
 
 	@Override
-	public List<Donation> getAll() throws PersistenceException {
+	public List<Donation> getAllConfirmed() throws PersistenceException {
 
-		String select = "SELECT * FROM donations ORDER BY id DESC";
+		String select = "SELECT * FROM donations WHERE confirmed=1 ORDER BY id DESC";
+
+		List<Donation> donations = jdbcTemplate.query(select,
+				new DonationMapper());
+
+		return donations;
+	}
+
+	@Override
+	public List<Donation> getAllUnconfirmed() throws PersistenceException {
+
+		String select = "SELECT * FROM donations WHERE confirmed=0 ORDER BY id DESC";
 
 		List<Donation> donations = jdbcTemplate.query(select,
 				new DonationMapper());
@@ -137,7 +148,7 @@ public class DonationDAOImplemented implements IDonationDAO {
 			throw new IllegalArgumentException("Id must not be less than 0");
 		}
 
-		String select = "select * from donations where id = ?";
+		String select = "select * from donations where id = ? and confirmed=1";
 
 		try {
 			return jdbcTemplate.queryForObject(select, new Object[] { id },
@@ -156,7 +167,7 @@ public class DonationDAOImplemented implements IDonationDAO {
 			throw new IllegalArgumentException("person must not be null");
 		}
 
-		String select = "select * from donations where personid = ? ORDER BY id DESC";
+		String select = "select * from donations where personid = ? and confirmed=1 ORDER BY id DESC";
 
 		List<Donation> donations = jdbcTemplate.query(select,
 				new Object[] { p.getId() }, new DonationMapper());
