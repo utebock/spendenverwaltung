@@ -3,6 +3,8 @@ package at.fraubock.spendenverwaltung.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
+
 import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
 
 public class ButtonListener implements ActionListener{
@@ -108,8 +110,8 @@ public class ButtonListener implements ActionListener{
 		if(cmd.equals("return_to_overview")){
 			filterOverview.returnTo();
 		}
-		if(cmd.equals("add_person_filter")){
-			filterOverview.createFilter();
+		if(cmd.equals("add_filter")){
+			filterOverview.createFilter((JButton)e.getSource());
 		}
 		if(cmd.equals("open_create_donation_in_show_person")){
 			showPerson.addDonation();

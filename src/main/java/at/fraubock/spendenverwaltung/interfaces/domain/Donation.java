@@ -39,7 +39,7 @@ public class Donation {
 			case "online":
 				return ONLINE;
 			default:
-				throw new IllegalArgumentException("No such donation type");
+				throw new IllegalArgumentException("No donation type for name: " + name);
 			}
 		}
 	};

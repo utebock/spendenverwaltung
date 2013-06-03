@@ -1,29 +1,52 @@
 package at.fraubock.spendenverwaltung.gui.filter.comparators;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
+import at.fraubock.spendenverwaltung.gui.CustomTextField;
+import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationType;
-import at.fraubock.spendenverwaltung.util.RelationalOperator;
+import at.fraubock.spendenverwaltung.service.to.PropertyCriterionTO;
+import at.fraubock.spendenverwaltung.util.FilterProperty;
 
-public class NumberComparator extends JPanel {
+public class NumberComparator extends JPanel implements IComparator {
 	private static final long serialVersionUID = 5674883209607705490L;
-	
+
 	private RelationalOperatorPicker picker;
-	private JTextField textField;
-	
+	private CustomTextField textField;
+
 	public NumberComparator() {
-		add(picker = new RelationalOperatorPicker(RelationType.FOR_NUMBER_AND_DATE));
-		add(textField = new JTextField(5));
+		add(picker = new RelationalOperatorPicker(
+				RelationType.FOR_NUMBER_AND_DATE));
+		add(textField = new CustomTextField(5));
 	}
-	
-	public Double getNumber() {
-		//TODO checking
-		return Double.valueOf(textField.getText());
+
+	private Double getNumber() throws InvalidInputException {
+		try {
+			return Double.valueOf(textField.getText());
+		} catch (NumberFormatException e) {
+			textField.invalidateInput();
+			throw new InvalidInputException(
+					"Bitte geben Sie eine gültige Zahl ein!");
+		}
 	}
-	
-	public RelationalOperator getOperator() {
-		return picker.getPickedOperator();
+
+	@Override
+	public PropertyCriterionTO getPropertyCriterionTOForProperty(
+			FilterProperty property) throws InvalidInputException {
+		PropertyCriterionTO crit = new PropertyCriterionTO();
+		crit.setProperty(property);
+		crit.setRelationalOperator(picker.getPickedOperator());
+		crit.setNumValue(getNumber());
+		return crit;
+	}
+
+	@Override
+	public JComponent getPanel() {
+		JPanel panel = new JPanel();
+		panel.add(picker);
+		panel.add(textField);
+		return panel;
 	}
 }

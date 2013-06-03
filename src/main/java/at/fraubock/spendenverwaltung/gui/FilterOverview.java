@@ -102,26 +102,34 @@ public class FilterOverview extends JPanel {
 		toolbar.setRollover(true);
 		addComponentsToToolbar(toolbar);
 		panel.add(toolbar, "growx, wrap");
-		//panel.add(scrollPane);
+		// panel.add(scrollPane);
 	}
 
 	private void addComponentsToToolbar(JToolBar toolbar) {
-		personFilter = builder.createButton("<html>&nbsp;Personenfilter erstellen</html>", buttonListener, "add_person_filter");
+		personFilter = builder.createButton(
+				"<html>&nbsp;Personenfilter erstellen</html>", buttonListener,
+				"add_filter");
 		personFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
-		sendingsFilter = builder.createButton("<html>&nbsp;Aussendungsfilter erstellen</html>", buttonListener, "add_sendings_filter");
+		sendingsFilter = builder.createButton(
+				"<html>&nbsp;Aussendungsfilter erstellen</html>",
+				buttonListener, "add_filter");
 		sendingsFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
-		donationFilter = builder.createButton("<html>&nbsp;Spendenfilter erstellen</html>", buttonListener, "add_donation_filter");
+		donationFilter = builder.createButton(
+				"<html>&nbsp;Spendenfilter erstellen</html>", buttonListener,
+				"add_filter");
 		donationFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
-		delete = builder.createButton("<html>&nbsp;Filter l\u00F6schen</html>", buttonListener, "delete_filter");
+		delete = builder.createButton("<html>&nbsp;Filter l\u00F6schen</html>",
+				buttonListener, "delete_filter");
 		delete.setFont(new Font("Bigger", Font.PLAIN, 13));
-		backButton = builder.createButton("<html>&nbsp;Zur\u00FCck</html>", buttonListener, "return_to_overview");
+		backButton = builder.createButton("<html>&nbsp;Zur\u00FCck</html>",
+				buttonListener, "return_to_overview");
 		backButton.setFont(new Font("Bigger", Font.PLAIN, 13));
-		toolbar.add(sendingsFilter);
 		toolbar.add(personFilter);
 		toolbar.add(donationFilter);
+		toolbar.add(sendingsFilter);
 		toolbar.add(delete);
 		toolbar.add(backButton);
-		
+
 	}
 
 	public FilterTableModel getFilterModel() {
@@ -153,18 +161,45 @@ public class FilterOverview extends JPanel {
 		}
 	}
 
-	public void createFilter() {
-		IPropertySelectorProvider personModelReceiver = new IPropertySelectorProvider() {
+	public void createFilter(JButton button) {
+		FilterType type = null;
+		String plural = null;
+		IPropertySelectorProvider provider = null;
 
-			@Override
-			public List<PropertyComponent> receiveModels() {
-				return SelectorFactory.propertySelectorForPerson();
-			}
+		if (button == personFilter) {
+			type = FilterType.PERSON;
+			plural = "Personen";
+			provider = new IPropertySelectorProvider() {
 
-		};
+				@Override
+				public List<PropertyComponent> receiveModels() {
+					return SelectorFactory.propertySelectorForPerson();
+				}
+			};
+		} else if(button == donationFilter) {
+			type = FilterType.DONATION;
+			plural = "Spenden";
+			provider = new IPropertySelectorProvider() {
 
-		CreateFilter cf = new CreateFilter(FilterType.PERSON, "Personen",
-				personModelReceiver, filterService, this);
+				@Override
+				public List<PropertyComponent> receiveModels() {
+					return SelectorFactory.propertySelectorForDonation();
+				}
+			};
+		} else if(button == sendingsFilter) {
+			type = FilterType.MAILING;
+			plural = "Aussendungen";
+			provider = new IPropertySelectorProvider() {
+
+				@Override
+				public List<PropertyComponent> receiveModels() {
+					return SelectorFactory.propertySelectorForMailing();
+				}
+			};
+		}
+
+		CreateFilter cf = new CreateFilter(type, plural, provider,
+				filterService, this);
 		removeAll();
 		revalidate();
 		repaint();

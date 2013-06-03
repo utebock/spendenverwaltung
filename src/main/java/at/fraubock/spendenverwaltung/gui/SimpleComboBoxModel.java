@@ -7,11 +7,13 @@ import javax.swing.JComboBox;
 import javax.swing.event.ListDataListener;
 
 /**
- * implementation of {@link ComboBoxModel}. takes a {@link List} in the
- * constructor which holds the model objects to be represented in a
- * {@link JComboBox}. the methods of the interface mostly delegates to the given
- * list.
- * @NOTE the first element of the list (index 0) will be set as the default value of this model.
+ * implementation of {@link ComboBoxModel}. takes a {@link List} which holds the
+ * objects to be represented in a {@link JComboBox} via their #toString()
+ * method. the selected item can then be retrieved by calling
+ * #getSelectedItem().
+ * 
+ * @NOTE the first element of the list (index 0) will be set as the default
+ *       value of this model.
  * 
  * @author philipp muhoray
  * 

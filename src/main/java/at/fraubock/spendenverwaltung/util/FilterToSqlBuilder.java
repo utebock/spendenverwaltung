@@ -69,7 +69,7 @@ public class FilterToSqlBuilder {
 			return stmt;
 		}
 
-		// determine the value the property will be compared with
+		// determine the value the property will be compared to
 		if (prop.getNumValue() != null) {
 			stmt += prop.getNumValue();
 		} else if (prop.getStrValue() != null) {

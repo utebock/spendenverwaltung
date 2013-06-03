@@ -9,9 +9,16 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
+import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.service.to.CriterionTO;
 
+/**
+ * filter gui component for selecting a criterion and comparing it with a value
+ * 
+ * @author philipp muhoray
+ * 
+ */
 public class PropertySelector extends JPanel {
 	private static final long serialVersionUID = 1564048026876101371L;
 
@@ -24,8 +31,7 @@ public class PropertySelector extends JPanel {
 		comparator.add(models.get(0));
 
 		final JComboBox<PropertyComponent> propertyCB = new JComboBox<PropertyComponent>(
-				cbModel = new SimpleComboBoxModel<PropertyComponent>(
-						models));
+				cbModel = new SimpleComboBoxModel<PropertyComponent>(models));
 
 		propertyCB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -37,7 +43,7 @@ public class PropertySelector extends JPanel {
 				comparator.revalidate();
 			}
 		});
-		
+
 		add(propertyCB);
 		add(comparator);
 	}
@@ -47,7 +53,8 @@ public class PropertySelector extends JPanel {
 	 * 
 	 * @return
 	 */
-	 public CriterionTO toCriterionTO() {
-		 return ((PropertyComponent) cbModel.getSelectedItem()).toPropertyCriterionTO();
-	 }
+	public CriterionTO toCriterionTO()  throws InvalidInputException {
+		return ((PropertyComponent) cbModel.getSelectedItem())
+				.toPropertyCriterionTO();
+	}
 }

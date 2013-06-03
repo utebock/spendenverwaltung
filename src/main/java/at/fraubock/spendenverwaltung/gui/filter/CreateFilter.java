@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -15,6 +16,7 @@ import at.fraubock.spendenverwaltung.gui.ButtonListener;
 import at.fraubock.spendenverwaltung.gui.ComponentBuilder;
 import at.fraubock.spendenverwaltung.gui.FilterOverview;
 import at.fraubock.spendenverwaltung.gui.FilterTableModel;
+import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.service.to.CriterionTO;
@@ -148,25 +150,34 @@ public class CreateFilter extends JPanel {
 	}
 
 	public void createFilter() {
-		List<CriterionTO> crits = new ArrayList<CriterionTO>();
-		List<LogicalOperator> ops = new ArrayList<LogicalOperator>();
-
-		for (SelectorGuiComponent sel : selectorComponents) {
-			crits.add(sel.getSelector().toCriterionTO());
-			ops.add(sel.getPicker().getPickedOperator());
-		}
-
-		FilterTO filter = new FilterTO();
-		filter.setType(type);
-		filter.setCriterions(crits);
-		filter.setOperators(ops);
-		filter.setName(nameField.getText());
-
 		try {
+			List<CriterionTO> crits = new ArrayList<CriterionTO>();
+			List<LogicalOperator> ops = new ArrayList<LogicalOperator>();
+
+			for (SelectorGuiComponent sel : selectorComponents) {
+				crits.add(sel.getSelector().toCriterionTO());
+				if(sel.getPicker()!=null) {
+					ops.add(sel.getPicker().getPickedOperator());
+				}
+			}
+
+			FilterTO filter = new FilterTO();
+			filter.setType(type);
+			filter.setCriterions(crits);
+			filter.setOperators(ops);
+			filter.setName(nameField.getText());
 			filterService.create(filter);
+			JOptionPane.showMessageDialog(this, "Filter erfolgreich angelegt!",
+					"Info", JOptionPane.INFORMATION_MESSAGE);
+			returnTo();
 		} catch (ServiceException e) {
-			// TODO Auto-generated catch block
+			JOptionPane.showMessageDialog(this, "Ein unerwarteter Fehler ist aufgetreten.",
+					"Error", JOptionPane.ERROR_MESSAGE);
+			//TODO log
 			e.printStackTrace();
+		} catch (InvalidInputException e) {
+			JOptionPane.showMessageDialog(this, e.getMessage(),
+					"Warn", JOptionPane.WARNING_MESSAGE);
 		}
 	}
 
