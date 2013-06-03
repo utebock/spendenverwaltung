@@ -132,11 +132,22 @@ public class PropertyCriterionDAO {
 			criterion.setRelationalOperator(RelationalOperator.valueOf(rs
 					.getString("relational_operator")));
 			criterion.setId(rs.getInt("id"));
-			criterion.setNumValue(rs.getDouble("numValue"));
-			criterion.setStrValue(rs.getString("strValue"));
-			criterion.setDateValue(rs.getDate("dateValue"));
-			criterion.setBoolValue(rs.getBoolean("boolValue"));
-			criterion.setDaysBack(rs.getInt("daysBack"));
+			
+			Double dbl = rs.getDouble("numValue");
+			criterion.setNumValue(rs.wasNull()?null:dbl);
+
+			String str = rs.getString("strValue");
+			criterion.setStrValue(rs.wasNull()?null:str);
+			
+			Date date = rs.getDate("dateValue");
+			criterion.setDateValue(rs.wasNull()?null:date);
+			
+			Boolean bool = rs.getBoolean("boolValue");
+			criterion.setBoolValue(rs.wasNull()?null:bool);
+			
+			Integer daysBack = rs.getInt("daysBack");
+			criterion.setDaysBack(rs.wasNull()?null:daysBack);
+			
 			return criterion;
 		}
 	}

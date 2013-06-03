@@ -5,6 +5,7 @@ import java.util.List;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.service.to.FilterTO;
+import at.fraubock.spendenverwaltung.util.FilterType;
 
 
 /**
@@ -46,6 +47,12 @@ public interface IFilterService {
 	 * @return List of all filters
 	 */
 	public List<Filter> getAll() throws ServiceException;
+	
+	/**
+	 * Retrieves all {@link Filter} of the given {@link FilterType}
+	 * @return List of all filters of given type
+	 */
+	public List<Filter> getAll(FilterType type) throws ServiceException;
 
 	/**
 	 * Retrieves Filter by ID

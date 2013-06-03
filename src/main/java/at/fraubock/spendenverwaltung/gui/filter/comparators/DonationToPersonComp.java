@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import at.fraubock.spendenverwaltung.gui.CustomTextField;
@@ -12,58 +13,65 @@ import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.filter.ICriterionConfigurator;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationType;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.service.to.CriterionTO;
-import at.fraubock.spendenverwaltung.service.to.PropertyCriterionTO;
-import at.fraubock.spendenverwaltung.util.FilterProperty;
+import at.fraubock.spendenverwaltung.service.to.MountedFilterCriterionTO;
 
-public class DaysBackComparator extends JPanel implements
+public class DonationToPersonComp extends JPanel implements
 		ICriterionConfigurator {
-	private static final long serialVersionUID = 5674883209607705490L;
+	private static final long serialVersionUID = -9206863381571374141L;
 
 	private RelationalOperatorPicker picker;
-	private CustomTextField textField;
+	private CustomTextField amount;
 	private JComboBox<String> timeUnit;
-	private FilterProperty property;
+	private Filter filter;
 	private String display;
 
-	public DaysBackComparator(FilterProperty property, String display) {
+	public DonationToPersonComp(Filter filter, String display) {
 		this.display = display;
-		this.property = property;
+		this.filter = filter;
 		add(picker = new RelationalOperatorPicker(
 				RelationType.FOR_NUMBER_AND_DATE));
-		add(textField = new CustomTextField(5));
+		add(new JLabel("insgesamt"));
+		add(amount = new CustomTextField(5));
 		add(timeUnit = new JComboBox<String>(new SimpleComboBoxModel<String>(
-				Arrays.asList(new String[] { "Tage", "Wochen", "Monate",
-						"Jahre" }))));
+				Arrays.asList(new String[] { "mal", "Euro",
+						"Euro durchschnittl." }))));
+		add(new JLabel("gespendet"));
 	}
 
-	private Integer getNumber() throws InvalidInputException {
-		Integer num = null;
+	private Double getNumber() throws InvalidInputException {
 		try {
-			num = Integer.valueOf(textField.getText());
+			return Double.valueOf(amount.getText());
 		} catch (NumberFormatException e) {
-			textField.invalidateInput();
+			amount.invalidateInput();
 			throw new InvalidInputException(
 					"Bitte geben Sie eine gültige Zahl ein!");
-		}
-		switch ((String) timeUnit.getModel().getSelectedItem()) {
-		case "Wochen":
-			return num * 7;
-		case "Monate":
-			return num * 30;
-		case "Jahre":
-			return num * 365;
-		default:
-			return num;
 		}
 	}
 
 	@Override
 	public CriterionTO createCriterion() throws InvalidInputException {
-		PropertyCriterionTO crit = new PropertyCriterionTO();
-		crit.setProperty(property);
+		MountedFilterCriterionTO crit = new MountedFilterCriterionTO();
+		crit.setMount(filter);
 		crit.setRelationalOperator(picker.getPickedOperator());
-		crit.setDaysBack(getNumber());
+		Double number = getNumber();
+		switch ((String) timeUnit.getModel().getSelectedItem()) {
+		case "mal":
+			crit.setCount(number.intValue());
+			break;// TODO check if double input
+		case "Euro":
+			crit.setSum(number);
+			break;
+		case "Euro durchschnittl.":
+			crit.setAvg(number);
+			break;
+		// TODO log
+		default:
+			throw new InvalidInputException(
+					"Enum picked that is not available.");
+		}
+
 		return crit;
 	}
 

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -24,9 +23,7 @@ import net.miginfocom.swing.MigLayout;
 import org.apache.log4j.Logger;
 
 import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
-import at.fraubock.spendenverwaltung.gui.filter.IPropertySelectorProvider;
-import at.fraubock.spendenverwaltung.gui.filter.PropertyComponent;
-import at.fraubock.spendenverwaltung.gui.filter.SelectorFactory;
+import at.fraubock.spendenverwaltung.gui.filter.ConfiguratorFactory;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
@@ -75,7 +72,6 @@ public class FilterOverview extends JPanel {
 		this.addressService = addressService;
 		this.donationService = donationService;
 		this.overview = overview;
-		// initTable();
 		setUp();
 	}
 
@@ -87,6 +83,7 @@ public class FilterOverview extends JPanel {
 		showTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		scrollPane = new JScrollPane(showTable);
 		scrollPane.setPreferredSize(new Dimension(800, 800));
+		add(scrollPane);
 
 	}
 
@@ -102,6 +99,8 @@ public class FilterOverview extends JPanel {
 		toolbar.setRollover(true);
 		addComponentsToToolbar(toolbar);
 		panel.add(toolbar, "growx, wrap");
+
+		initTable();
 		// panel.add(scrollPane);
 	}
 
@@ -164,42 +163,20 @@ public class FilterOverview extends JPanel {
 	public void createFilter(JButton button) {
 		FilterType type = null;
 		String plural = null;
-		IPropertySelectorProvider provider = null;
 
 		if (button == personFilter) {
 			type = FilterType.PERSON;
 			plural = "Personen";
-			provider = new IPropertySelectorProvider() {
-
-				@Override
-				public List<PropertyComponent> receiveModels() {
-					return SelectorFactory.propertySelectorForPerson();
-				}
-			};
-		} else if(button == donationFilter) {
+		} else if (button == donationFilter) {
 			type = FilterType.DONATION;
 			plural = "Spenden";
-			provider = new IPropertySelectorProvider() {
-
-				@Override
-				public List<PropertyComponent> receiveModels() {
-					return SelectorFactory.propertySelectorForDonation();
-				}
-			};
-		} else if(button == sendingsFilter) {
+		} else if (button == sendingsFilter) {
 			type = FilterType.MAILING;
 			plural = "Aussendungen";
-			provider = new IPropertySelectorProvider() {
-
-				@Override
-				public List<PropertyComponent> receiveModels() {
-					return SelectorFactory.propertySelectorForMailing();
-				}
-			};
 		}
 
-		CreateFilter cf = new CreateFilter(type, plural, provider,
-				filterService, this);
+		CreateFilter cf = new CreateFilter(type, plural, new ConfiguratorFactory(
+				type), filterService, this);
 		removeAll();
 		revalidate();
 		repaint();

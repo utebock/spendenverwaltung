@@ -25,6 +25,14 @@ public class PersonTableModel extends AbstractTableModel {
 	public Person getPersonRow(int rowIndex) {
 		return persons.get(rowIndex);
 	}
+	
+	/**
+	 * removes all items from this model
+	 */
+	public void clear() {
+		persons.clear();
+		fireTableDataChanged();
+	}
 
 	@Override
 	public int getRowCount() {

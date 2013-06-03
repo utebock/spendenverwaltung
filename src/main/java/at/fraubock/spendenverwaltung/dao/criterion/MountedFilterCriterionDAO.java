@@ -32,14 +32,14 @@ public class MountedFilterCriterionDAO {
 
 	public void insert(MountedFilterCriterion f) throws PersistenceException {
 
-//		if (f.getId() == null) {
-			MountedFilterCriterion mount = (MountedFilterCriterion) f;
-			validator.validate(mount);
-			KeyHolder mountedKeyHolder = new GeneratedKeyHolder();
+		// if (f.getId() == null) {
+		MountedFilterCriterion mount = (MountedFilterCriterion) f;
+		validator.validate(mount);
+		KeyHolder mountedKeyHolder = new GeneratedKeyHolder();
 
-			jdbcTemplate.update(new CreateMountedFilterStatementCreator(mount),
-					mountedKeyHolder);
-//		}
+		jdbcTemplate.update(new CreateMountedFilterStatementCreator(mount),
+				mountedKeyHolder);
+		// }
 	}
 
 	public MountedFilterCriterion getById(int id) throws PersistenceException {
@@ -98,7 +98,7 @@ public class MountedFilterCriterionDAO {
 				throw new SQLException();
 			}
 			int c = 1;
-			ps.setInt(c++,filter.getId());
+			ps.setInt(c++, filter.getId());
 			ps.setInt(c++, mount.getId());
 			ps.setString(c++, filter.getRelationalOperator().toString());
 			if (filter.getCount() == null) {
@@ -135,17 +135,23 @@ public class MountedFilterCriterionDAO {
 				throw new SQLException(e);
 			}
 			criterion
-			.setType(FilterType.getTypeForString(rs.getString("type")));
-			
+					.setType(FilterType.getTypeForString(rs.getString("type")));
+
 			criterion.setRelationalOperator(RelationalOperator.valueOf(rs
 					.getString("relational_operator")));
 			criterion.setId(rs.getInt("id"));
-			criterion.setCount(rs.getInt("count"));
-			
-			criterion.setProperty(FilterProperty.getPropertyForString(rs
-					.getString("property"),FilterType.getTypeForString(rs.getString("type"))));
-			criterion.setSum(rs.getDouble("sum"));
-			criterion.setAvg(rs.getDouble("avg"));
+
+			Integer count = rs.getInt("count");
+			criterion.setCount(rs.wasNull() ? null : count);
+
+			criterion.setProperty(FilterProperty.getPropertyForString(
+					rs.getString("property"),
+					FilterType.getTypeForString(rs.getString("type"))));
+
+			Double sum = rs.getDouble("sum");
+			criterion.setSum(rs.wasNull() ? null : sum);
+			Double avg = rs.getDouble("avg");
+			criterion.setAvg(rs.wasNull() ? null : avg);
 
 			return criterion;
 		}
@@ -182,5 +188,5 @@ public class MountedFilterCriterionDAO {
 	public void setValidator(FilterValidator validator) {
 		this.validator = validator;
 	}
-	
+
 }

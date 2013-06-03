@@ -1,10 +1,14 @@
 package at.fraubock.spendenverwaltung.gui.filter;
 
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -17,6 +21,7 @@ import at.fraubock.spendenverwaltung.gui.ComponentBuilder;
 import at.fraubock.spendenverwaltung.gui.FilterOverview;
 import at.fraubock.spendenverwaltung.gui.FilterTableModel;
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
+import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.service.to.CriterionTO;
@@ -42,13 +47,13 @@ public class CreateFilter extends JPanel {
 	private JButton cancel;
 	private JPanel panel2;
 	private String pluralName;
-	private IPropertySelectorProvider modelReceiver;
+	private ConfiguratorFactory factory;
 	private List<SelectorGuiComponent> selectorComponents;
 	private FilterType type;
 
 	public CreateFilter(FilterType type, String pluralName,
-			IPropertySelectorProvider modelReceiver,
-			IFilterService filterService, FilterOverview filterOverview) {
+			ConfiguratorFactory factory, IFilterService filterService,
+			FilterOverview filterOverview) {
 
 		super(new MigLayout());
 		this.filterService = filterService;
@@ -60,7 +65,7 @@ public class CreateFilter extends JPanel {
 
 		this.type = type;
 		this.pluralName = pluralName;
-		this.modelReceiver = modelReceiver;
+		this.factory = factory;
 
 		buttonListener = new ButtonListener(this);
 		actionHandler = new ActionHandler(this);
@@ -137,12 +142,13 @@ public class CreateFilter extends JPanel {
 	 * index is the position at which the selector will be placed
 	 */
 	private SelectorGuiComponent addPropertySelector(int index) {
+		List<ICriterionConfigurator> configs = factory.getConfigurators();
 		SelectorGuiComponent selectorComp = new SelectorGuiComponent(
-				new PropertySelector(modelReceiver.receiveModels()),
-				builder.createImageButton("/images/plusButton.gif",
-						buttonListener, "plusButton_create_filter"),
-				builder.createImageButton("/images/minusButton.gif",
-						buttonListener, "minusButton_create_filter"));
+				factory.getConfigurators(), builder.createImageButton(
+						"/images/plusButton.gif", buttonListener,
+						"plusButton_create_filter"), builder.createImageButton(
+						"/images/minusButton.gif", buttonListener,
+						"minusButton_create_filter"));
 
 		selectorComponents.add(index, selectorComp);
 		panel2.add(selectorComp, "wrap", index);
@@ -155,8 +161,8 @@ public class CreateFilter extends JPanel {
 			List<LogicalOperator> ops = new ArrayList<LogicalOperator>();
 
 			for (SelectorGuiComponent sel : selectorComponents) {
-				crits.add(sel.getSelector().toCriterionTO());
-				if(sel.getPicker()!=null) {
+				crits.add(sel.toCriterionTO());
+				if (sel.getPicker() != null) {
 					ops.add(sel.getPicker().getPickedOperator());
 				}
 			}
@@ -171,13 +177,14 @@ public class CreateFilter extends JPanel {
 					"Info", JOptionPane.INFORMATION_MESSAGE);
 			returnTo();
 		} catch (ServiceException e) {
-			JOptionPane.showMessageDialog(this, "Ein unerwarteter Fehler ist aufgetreten.",
-					"Error", JOptionPane.ERROR_MESSAGE);
-			//TODO log
+			JOptionPane.showMessageDialog(this,
+					"Ein unerwarteter Fehler ist aufgetreten.", "Error",
+					JOptionPane.ERROR_MESSAGE);
+			// TODO log
 			e.printStackTrace();
 		} catch (InvalidInputException e) {
-			JOptionPane.showMessageDialog(this, e.getMessage(),
-					"Warn", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(this, e.getMessage(), "Warn",
+					JOptionPane.WARNING_MESSAGE);
 		}
 	}
 
@@ -191,33 +198,54 @@ public class CreateFilter extends JPanel {
 		filterOverview.setUp();
 	}
 
-	/*
-	 * component that holds all the components for a property selector (that is
-	 * the selector itself, plus- and minusbutton, and the logical operator
-	 * dropdown
+	/**
+	 * container that holds all components for a criterion selector (that is the
+	 * selector itself, plus- and minusbutton, and the logical operator dropdown
 	 */
 	public class SelectorGuiComponent extends JPanel {
 		private static final long serialVersionUID = -2885373338561255928L;
 
 		/* might be null for the very first property selector */
 		private LogicalOperatorPicker picker;
-		private PropertySelector selector;
+		// private PropertySelector selector;
+		List<ICriterionConfigurator> configurators;
+		// private LinkedHashMap<String,CriterionConfigurator> criterionChoices;
 		private JButton plusButton;
 		private JButton minusButton;
 
-		public SelectorGuiComponent(PropertySelector selector,
+		private JPanel comparator;
+		private ComboBoxModel<ICriterionConfigurator> cbModel;
+
+		public SelectorGuiComponent(List<ICriterionConfigurator> configurators,
 				JButton plusButton, JButton minusButton) {
 			super(new MigLayout());
-			this.selector = selector;
+			this.configurators = configurators;
 			this.plusButton = plusButton;
 			this.minusButton = minusButton;
-			add(selector);
+
+			comparator = new JPanel();
+			comparator.add(configurators.get(0).getConfigComponent());
+
+			final JComboBox<ICriterionConfigurator> propertyCB = new JComboBox<ICriterionConfigurator>(
+					cbModel = new SimpleComboBoxModel<ICriterionConfigurator>(
+							configurators));
+
+			propertyCB.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					ICriterionConfigurator model = (ICriterionConfigurator) propertyCB
+							.getModel().getSelectedItem();
+					comparator.removeAll();
+					comparator.add(model.getConfigComponent());
+					comparator.repaint();
+					comparator.revalidate();
+				}
+			});
+
+			add(propertyCB);
+			add(comparator);
+
 			add(plusButton);
 			add(minusButton);
-		}
-
-		public PropertySelector getSelector() {
-			return selector;
 		}
 
 		public JButton getPlusButton() {
@@ -240,6 +268,11 @@ public class CreateFilter extends JPanel {
 				this.picker = picker;
 				add(this.picker, "wrap", 0);
 			}
+		}
+
+		public CriterionTO toCriterionTO() throws InvalidInputException {
+			return ((ICriterionConfigurator) cbModel.getSelectedItem())
+					.createCriterion();
 		}
 	}
 }

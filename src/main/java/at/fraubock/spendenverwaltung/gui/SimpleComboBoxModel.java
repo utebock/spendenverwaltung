@@ -20,22 +20,24 @@ import javax.swing.event.ListDataListener;
  */
 public class SimpleComboBoxModel<T> implements ComboBoxModel<T> {
 
-	private List<T> selectors;
+	private List<T> items;
 	private T selected;
 
-	public SimpleComboBoxModel(List<T> selectors) {
-		this.selectors = selectors;
-		this.selected = selectors.get(0);
+	public SimpleComboBoxModel(List<T> items) {
+		this.items = items;
+		if(!items.isEmpty()) {
+			this.selected = items.get(0);
+		}
 	}
 
 	@Override
 	public T getElementAt(int index) {
-		return selectors.get(index);
+		return items.get(index);
 	}
 
 	@Override
 	public int getSize() {
-		return selectors.size();
+		return items.size();
 	}
 
 	@Override

@@ -9,11 +9,12 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+
+import net.miginfocom.swing.MigLayout;
 
 import org.apache.log4j.Logger;
 
@@ -23,8 +24,6 @@ import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
-
-import net.miginfocom.swing.MigLayout;
 
 public class Overview extends JPanel{
 	private static final Logger log = Logger.getLogger(Overview.class);
@@ -300,7 +299,7 @@ public class Overview extends JPanel{
 	}
 	
 	public void goToShow(){
-		ShowPersons filter = new ShowPersons(personService, addressService, donationService, this);
+		ShowPersons filter = new ShowPersons(personService, addressService, donationService, filterService, this);
 		removeAll();
 		revalidate();
 		repaint();
