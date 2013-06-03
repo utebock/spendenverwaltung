@@ -112,7 +112,10 @@ public abstract class AbstractDonationDAOTest {
 		try {
 			donationDAO.insertOrUpdate(donation);
 			Donation savedDonation = donationDAO.getByID(donation.getId());
-			assertEquals(donation, savedDonation);
+			assertEquals(donation.getAmount(), savedDonation.getAmount());
+			assertEquals(donation.getDedication(), savedDonation.getDedication());
+			assertEquals(donation.getNote(), savedDonation.getNote());
+			assertEquals(donation.getType(), savedDonation.getType());
 
 		} catch (PersistenceException e) {
 			fail();
