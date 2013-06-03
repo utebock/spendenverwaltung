@@ -31,14 +31,14 @@ public class PersonDAOImplemented implements IPersonDAO {
 	private JdbcTemplate jdbcTemplate;
 	private PersonValidator personValidator;
 	private FilterToSqlBuilder filterToSqlBuilder;
-	
+
 	private static final Logger log = Logger
 			.getLogger(PersonDAOImplemented.class);
 
 	public void setPersonValidator(PersonValidator personValidator) {
 		this.personValidator = personValidator;
 	}
-	
+
 	public void setFilterToSqlBuilder(FilterToSqlBuilder filterToSqlBuilder) {
 		this.filterToSqlBuilder = filterToSqlBuilder;
 	}
@@ -132,7 +132,9 @@ public class PersonDAOImplemented implements IPersonDAO {
 
 			// first, check changes to all addresses:
 			for (Address oldAddress : oldAddresses) {
-				if (!person.getAddresses().contains(oldAddress) && !person.getMainAddress().equals(oldAddress)) {
+				if (!person.getAddresses().contains(oldAddress)
+						&& (person.getMainAddress() == null || !person
+								.getMainAddress().equals(oldAddress))) {
 					jdbcTemplate
 							.update("DELETE FROM livesat WHERE pid = ? AND aid = ?",
 									new Object[] { person.getId(),
@@ -167,7 +169,8 @@ public class PersonDAOImplemented implements IPersonDAO {
 			}
 			if (person.getMainAddress() == null && oldMainAddress != null
 					&& person.getAddresses().contains(oldMainAddress)) {
-				// if there is no new main address but one was set previously and the 
+				// if there is no new main address but one was set previously
+				// and the
 				// previously set address is still contained in the address list
 				jdbcTemplate
 						.update("UPDATE livesat SET ismain = FALSE WHERE pid = ? AND aid = ?",
@@ -176,9 +179,11 @@ public class PersonDAOImplemented implements IPersonDAO {
 										Types.INTEGER, Types.INTEGER });
 			}
 			if (person.getMainAddress() != null && oldMainAddress != null
-					&& !person.getMainAddress().equals(oldMainAddress) && person.getAddresses().contains(oldMainAddress)
+					&& !person.getMainAddress().equals(oldMainAddress)
+					&& person.getAddresses().contains(oldMainAddress)
 					&& oldAddresses.contains(person.getMainAddress())) {
-				// if there is a change in the main address but both addresses are still
+				// if there is a change in the main address but both addresses
+				// are still
 				// set to the person
 				jdbcTemplate
 						.update("UPDATE livesat SET ismain = FALSE WHERE pid = ? AND aid = ?",
@@ -188,8 +193,8 @@ public class PersonDAOImplemented implements IPersonDAO {
 				jdbcTemplate
 						.update("UPDATE livesat SET ismain = TRUE WHERE pid = ? AND aid = ?",
 								new Object[] { person.getId(),
-										person.getMainAddress().getId() }, new int[] {
-										Types.INTEGER, Types.INTEGER });
+										person.getMainAddress().getId() },
+								new int[] { Types.INTEGER, Types.INTEGER });
 			}
 		}
 	}
@@ -209,16 +214,17 @@ public class PersonDAOImplemented implements IPersonDAO {
 		/*
 		 * inserting relevant livesat entries
 		 */
-		
-		if(addresses != null) {
+
+		if (addresses != null) {
 			for (Address address : addresses) {
 				boolean isMain = false;
 				if (address.equals(person.getMainAddress())) {
 					isMain = true;
 				}
-				jdbcTemplate.update(insertLivesAt, new Object[] { person.getId(),
-						address.getId(), isMain }, new int[] { Types.INTEGER,
-						Types.INTEGER, Types.BOOLEAN });
+				jdbcTemplate
+						.update(insertLivesAt, new Object[] { person.getId(),
+								address.getId(), isMain }, new int[] {
+								Types.INTEGER, Types.INTEGER, Types.BOOLEAN });
 			}
 		}
 	}
@@ -317,76 +323,6 @@ public class PersonDAOImplemented implements IPersonDAO {
 		return personList;
 	}
 
-//	@Override
-//	public List<Person> getByFilter(PersonFilter filter)
-//			throws PersistenceException {
-//		if (filter == null || filter.isEmpty())
-//			return getAll();
-//
-//		String select = "SELECT * FROM persons WHERE";
-//		ArrayList<Object> args = new ArrayList<Object>();
-//
-//		if (filter.getGivenNamePart() != null) {
-//			select += " givenname LIKE %?% AND";
-//			args.add(filter.getGivenNamePart());
-//		}
-//		if (filter.getSurnamePart() != null) {
-//			select += " surname LIKE %?% AND";
-//			args.add(filter.getSurnamePart());
-//		}
-//		if (filter.getTitlePart() != null) {
-//			select += " title LIKE %?% AND";
-//			args.add(filter.getTitlePart());
-//		}
-//		if (filter.getAddressSet() != null)
-//			;// TODO address-person mapping has to be redefined first!
-//		if (filter.getEmailSet() != null) {
-//			if (filter.getEmailSet())
-//				select += " email IS NOT NULL AND";
-//			else
-//				select += " email IS NULL AND";
-//		}
-//		if (filter.getTelephoneSet() != null) {
-//			if (filter.getTelephoneSet())
-//				select += " telephone IS NOT NULL AND";
-//			else
-//				select += " telephone IS NULL AND";
-//		}
-//		if (filter.getTelephonePart() != null) {
-//			select += " telephone LIKE %?% AND";
-//			args.add(filter.getTelephonePart());
-//		}
-//		if (filter.getNotePart() != null) {
-//			select += " note LIKE %?% AND";
-//			args.add(filter.getNotePart());
-//		}
-//		if (filter.getWantsPostalNotification() != null)
-//			; // TODO way of saving information must be redefined first!
-//		if (filter.getWantsEmailNotification() != null)
-//			; // TODO way of saving information must be redefined first!
-//		if (filter.getSex() != null) {
-//			select += " sex = ? AND";
-//			args.add(filter.getSex());
-//		}
-//
-//		// omit last "AND":
-//		select = select.substring(0, select.length() - 3);
-//
-//		select += " ORDER BY id DESC";
-//
-//		List<Person> persons = jdbcTemplate.query(select, args.toArray(),
-//				new PersonMapper());
-//
-//		log.info(persons.size() + " list size");
-//
-//		for (Person entry : persons) {
-//
-//			fetchAddresses(entry);
-//		}
-//
-//		return persons;
-//	}
-	
 	@Override
 	public List<Person> getByFilter(Filter filter) throws PersistenceException {
 		String select = filterToSqlBuilder.createSqlStatement(filter);
@@ -401,7 +337,6 @@ public class PersonDAOImplemented implements IPersonDAO {
 
 		return personList;
 	}
-
 
 	private class AddressMapper implements RowMapper<Address> {
 
