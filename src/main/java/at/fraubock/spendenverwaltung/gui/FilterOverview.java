@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -61,6 +62,7 @@ public class FilterOverview extends JPanel {
 	private JButton donationFilter;
 	private JButton backButton;
 	private JButton delete;
+	private JLabel empty;
 
 	public FilterOverview(IFilterService filterService,
 			IPersonService personService, IAddressService addressService,
@@ -99,9 +101,10 @@ public class FilterOverview extends JPanel {
 		toolbar.setRollover(true);
 		addComponentsToToolbar(toolbar);
 		panel.add(toolbar, "growx, wrap");
-
+		empty = builder.createLabel("		 ");
+		panel.add(empty, "wrap");
 		initTable();
-		// panel.add(scrollPane);
+		panel.add(scrollPane);
 	}
 
 	private void addComponentsToToolbar(JToolBar toolbar) {
@@ -127,7 +130,7 @@ public class FilterOverview extends JPanel {
 		toolbar.add(donationFilter);
 		toolbar.add(sendingsFilter);
 		toolbar.add(delete);
-		toolbar.add(backButton);
+		toolbar.add(backButton, "wrap");
 
 	}
 

@@ -241,7 +241,7 @@ public class CreateFilter extends JPanel {
 				}
 			});
 
-			add(propertyCB);
+			add(propertyCB, "split3");
 			add(comparator);
 
 			add(plusButton);
