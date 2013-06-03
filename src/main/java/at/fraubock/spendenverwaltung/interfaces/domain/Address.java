@@ -55,34 +55,54 @@ public class Address {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-
-		if (obj == null) {
-			return false;
-		}
-
-		if (this == obj) {
-			return true;
-		}
-
-		if (this.getClass() != obj.getClass()) {
-			return false;
-		}
-
-		Address other = (Address) obj;
-
-		if (this.getId().equals(other.getId())
-				&& this.getPostalCode().equals(other.getPostalCode())
-				&& this.getStreet().equals(other.getStreet())
-				&& this.getCity().equals(other.getCity())
-				&& this.getCountry().equals(other.getCountry())) {
-			return true;
-		}
-
-		return false;
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((city == null) ? 0 : city.hashCode());
+		result = prime * result + ((country == null) ? 0 : country.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result
+				+ ((postalCode == null) ? 0 : postalCode.hashCode());
+		result = prime * result + ((street == null) ? 0 : street.hashCode());
+		return result;
 	}
 
-	// TODO override #hashCode for hash-based data structures
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Address other = (Address) obj;
+		if (city == null) {
+			if (other.city != null)
+				return false;
+		} else if (!city.equals(other.city))
+			return false;
+		if (country == null) {
+			if (other.country != null)
+				return false;
+		} else if (!country.equals(other.country))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (postalCode == null) {
+			if (other.postalCode != null)
+				return false;
+		} else if (!postalCode.equals(other.postalCode))
+			return false;
+		if (street == null) {
+			if (other.street != null)
+				return false;
+		} else if (!street.equals(other.street))
+			return false;
+		return true;
+	}
 
 	@Override
 	public String toString() {
