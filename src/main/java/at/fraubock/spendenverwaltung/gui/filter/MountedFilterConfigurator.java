@@ -7,9 +7,12 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
-import at.fraubock.spendenverwaltung.gui.filter.comparators.IMountedFilterComponent;
+import at.fraubock.spendenverwaltung.gui.filter.comparators.DonationToPersonComp;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
@@ -26,15 +29,17 @@ public class MountedFilterConfigurator extends JPanel implements
 		ICriterionConfigurator {
 
 	private FilterType type;
-	private IMountedFilterComponent comparator;
 	private JComboBox<Filter> filterBox;
 	private IFilterService filterService;
+	private String display;
+	private DonationToPersonComp comp;
 
-	public MountedFilterConfigurator(FilterType type,
-			IMountedFilterComponent comparator, IFilterService filterService) {
-		this.filterService = filterService;
+	public MountedFilterConfigurator(FilterType type, String display) {
+		this.display = display;
+		ApplicationContext context = new ClassPathXmlApplicationContext(
+				"/spring.xml");
+		filterService = context.getBean("filterService", IFilterService.class);
 		this.type = type;
-		this.comparator = comparator;
 		List<Filter> filters = new ArrayList<Filter>();
 		try {
 			filters = filterService.getAll(type);
@@ -44,15 +49,23 @@ public class MountedFilterConfigurator extends JPanel implements
 
 		add(filterBox = new JComboBox<Filter>(new SimpleComboBoxModel<Filter>(
 				filters)));
+
+		add(comp = new DonationToPersonComp());
 	}
 
 	@Override
 	public CriterionTO createCriterion() throws InvalidInputException {
-		return null;//comparator.getMountedFilterCriterionTOForFilter(filter);
+		return comp.createCriterion((Filter) filterBox.getModel()
+				.getSelectedItem());
 	}
 
 	@Override
 	public JComponent getConfigComponent() {
-		return comparator.getComponent();
+		return this;
+	}
+
+	@Override
+	public String toString() {
+		return display;
 	}
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import at.fraubock.spendenverwaltung.gui.filter.comparators.BooleanComparator;
 import at.fraubock.spendenverwaltung.gui.filter.comparators.DateComparator;
 import at.fraubock.spendenverwaltung.gui.filter.comparators.DaysBackComparator;
+import at.fraubock.spendenverwaltung.gui.filter.comparators.DonationToPersonComp;
 import at.fraubock.spendenverwaltung.gui.filter.comparators.EnumComparator;
 import at.fraubock.spendenverwaltung.gui.filter.comparators.NumberComparator;
 import at.fraubock.spendenverwaltung.gui.filter.comparators.StringComparator;
@@ -58,6 +59,8 @@ public class ConfiguratorFactory {
 					FilterProperty.PERSON_COMPANY, "Firma"));
 			configurators.add(new StringComparator(FilterProperty.PERSON_NOTE,
 					"Notiz"));
+			configurators.add(new MountedFilterConfigurator(FilterType.DONATION,
+					"Spendenfilter hinzufügen"));
 
 		} else if (type == FilterType.DONATION) {
 

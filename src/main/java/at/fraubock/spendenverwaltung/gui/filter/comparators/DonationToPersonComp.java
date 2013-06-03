@@ -3,36 +3,29 @@ package at.fraubock.spendenverwaltung.gui.filter.comparators;
 import java.util.Arrays;
 
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import at.fraubock.spendenverwaltung.gui.CustomTextField;
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
-import at.fraubock.spendenverwaltung.gui.filter.ICriterionConfigurator;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationType;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.service.to.CriterionTO;
 import at.fraubock.spendenverwaltung.service.to.MountedFilterCriterionTO;
 
-public class DonationToPersonComp extends JPanel implements
-		ICriterionConfigurator {
+public class DonationToPersonComp extends JPanel {
 	private static final long serialVersionUID = -9206863381571374141L;
 
 	private RelationalOperatorPicker picker;
 	private CustomTextField amount;
 	private JComboBox<String> timeUnit;
-	private Filter filter;
-	private String display;
 
-	public DonationToPersonComp(Filter filter, String display) {
-		this.display = display;
-		this.filter = filter;
+	public DonationToPersonComp() {
+		add(new JLabel("insgesamt"));
 		add(picker = new RelationalOperatorPicker(
 				RelationType.FOR_NUMBER_AND_DATE));
-		add(new JLabel("insgesamt"));
 		add(amount = new CustomTextField(5));
 		add(timeUnit = new JComboBox<String>(new SimpleComboBoxModel<String>(
 				Arrays.asList(new String[] { "mal", "Euro",
@@ -50,8 +43,8 @@ public class DonationToPersonComp extends JPanel implements
 		}
 	}
 
-	@Override
-	public CriterionTO createCriterion() throws InvalidInputException {
+	public CriterionTO createCriterion(Filter filter)
+			throws InvalidInputException {
 		MountedFilterCriterionTO crit = new MountedFilterCriterionTO();
 		crit.setMount(filter);
 		crit.setRelationalOperator(picker.getPickedOperator());
@@ -73,15 +66,5 @@ public class DonationToPersonComp extends JPanel implements
 		}
 
 		return crit;
-	}
-
-	@Override
-	public JComponent getConfigComponent() {
-		return this;
-	}
-
-	@Override
-	public String toString() {
-		return display;
 	}
 }
