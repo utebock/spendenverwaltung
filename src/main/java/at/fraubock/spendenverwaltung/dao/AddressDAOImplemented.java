@@ -168,7 +168,7 @@ public class AddressDAOImplemented implements IAddressDAO {
 			return jdbcTemplate
 					.queryForObject(
 							"select a.* from "
-									+ " addresses a,livesat l where l.aid=a.id and l.pid = ? and l.ismain=true",
+									+ " addresses a,livesat l where l.aid=a.id and l.pid = ? and l.ismain=true and a.confirmed=true",
 							new Object[] { person.getId() },
 							new int[] { Types.INTEGER }, new AddressMapper());
 		} catch (IncorrectResultSizeDataAccessException e) {
