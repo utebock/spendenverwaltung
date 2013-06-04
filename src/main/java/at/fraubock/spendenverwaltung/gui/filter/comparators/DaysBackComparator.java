@@ -12,8 +12,8 @@ import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.filter.ICriterionConfigurator;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationType;
-import at.fraubock.spendenverwaltung.service.to.CriterionTO;
-import at.fraubock.spendenverwaltung.service.to.PropertyCriterionTO;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
 
 public class DaysBackComparator extends JPanel implements
@@ -59,8 +59,8 @@ public class DaysBackComparator extends JPanel implements
 	}
 
 	@Override
-	public CriterionTO createCriterion() throws InvalidInputException {
-		PropertyCriterionTO crit = new PropertyCriterionTO();
+	public Criterion createCriterion() throws InvalidInputException {
+		PropertyCriterion crit = new PropertyCriterion();
 		crit.setProperty(property);
 		crit.setRelationalOperator(picker.getPickedOperator());
 		crit.setDaysBack(getNumber());

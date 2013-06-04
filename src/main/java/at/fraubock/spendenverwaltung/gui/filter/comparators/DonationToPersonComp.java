@@ -12,8 +12,8 @@ import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationType;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
-import at.fraubock.spendenverwaltung.service.to.CriterionTO;
-import at.fraubock.spendenverwaltung.service.to.MountedFilterCriterionTO;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
 
 public class DonationToPersonComp extends JPanel {
 	private static final long serialVersionUID = -9206863381571374141L;
@@ -43,9 +43,9 @@ public class DonationToPersonComp extends JPanel {
 		}
 	}
 
-	public CriterionTO createCriterion(Filter filter)
+	public Criterion createCriterion(Filter filter)
 			throws InvalidInputException {
-		MountedFilterCriterionTO crit = new MountedFilterCriterionTO();
+		MountedFilterCriterion crit = new MountedFilterCriterion();
 		crit.setMount(filter);
 		crit.setRelationalOperator(picker.getPickedOperator());
 		Double number = getNumber();

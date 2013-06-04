@@ -3,8 +3,8 @@ package at.fraubock.spendenverwaltung.interfaces.service;
 import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.to.FilterTO;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
-import at.fraubock.spendenverwaltung.service.to.FilterTO;
 import at.fraubock.spendenverwaltung.util.FilterType;
 
 

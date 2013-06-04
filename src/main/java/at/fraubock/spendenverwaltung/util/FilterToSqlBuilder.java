@@ -10,9 +10,9 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Property
 import at.fraubock.spendenverwaltung.service.FilterValidator;
 
 /**
- * creates the SQL statement for a {@link Filter}. executing this statement will
- * return all entries from the filter type's table that fulfill the criterias of
- * the {@link Criterion} provided by the filter.
+ * interprets a given {@link Filter} to a corresponding SQL statements.
+ * executing this statement will return all entries from the filter type's table
+ * matching the conditions of the filter's {@link Criterion}.
  * 
  * @author philipp muhoray
  * 
@@ -22,7 +22,7 @@ public class FilterToSqlBuilder {
 	private FilterValidator validator;
 
 	/**
-	 * creates the SQL statement to this filter.
+	 * creates the SQL statement for the given filter
 	 * 
 	 * @param filter
 	 * @return sql statement
@@ -73,7 +73,8 @@ public class FilterToSqlBuilder {
 		if (prop.getNumValue() != null) {
 			stmt += prop.getNumValue();
 		} else if (prop.getStrValue() != null) {
-			String percent = prop.getRelationalOperator()==RelationalOperator.LIKE?"%":"";
+			String percent = prop.getRelationalOperator() == RelationalOperator.LIKE ? "%"
+					: "";
 			stmt += "'" + percent + prop.getStrValue() + percent + "'";
 		} else if (prop.getDateValue() != null) {
 			stmt += "DATE('"
