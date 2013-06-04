@@ -1,7 +1,7 @@
 package at.fraubock.spendenverwaltung.service;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
-
+@Deprecated
 public class PersonValidator {
 
 	public synchronized void validate(Person person) {

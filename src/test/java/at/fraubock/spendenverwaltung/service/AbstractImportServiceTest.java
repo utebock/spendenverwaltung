@@ -1,7 +1,5 @@
 package at.fraubock.spendenverwaltung.service;
 
-import static org.junit.Assert.fail;
-
 import java.io.File;
 
 import org.junit.Test;

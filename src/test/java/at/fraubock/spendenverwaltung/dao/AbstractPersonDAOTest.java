@@ -1,10 +1,9 @@
 package at.fraubock.spendenverwaltung.dao;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
@@ -77,7 +75,7 @@ public abstract class AbstractPersonDAOTest {
 
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = PersistenceException.class)
 	@Transactional
 	public void createWithInvalidParametersShouldThrowException()
 			throws PersistenceException {
@@ -119,7 +117,7 @@ public abstract class AbstractPersonDAOTest {
 		assert (!updated.getSurname().equals(person.getSurname()));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = PersistenceException.class)
 	@Transactional
 	public void updateWithInvalidParametersShouldThrowException()
 			throws PersistenceException {
@@ -396,7 +394,7 @@ public abstract class AbstractPersonDAOTest {
 
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = PersistenceException.class)
 	@Transactional
 	public void deleteNullShouldThrowException() throws PersistenceException {
 		personDAO.delete(null);
@@ -457,8 +455,8 @@ public abstract class AbstractPersonDAOTest {
 
 		List<Person> list = personDAO.getAll();
 		System.out.println(list.size() + " inhalt: " + list.toString() + "\n");
-		assertThat(list.isEmpty(), is(false));
-		assertThat(list.size(), is(2)); // should return 2 after rollback
+		assertFalse(list.isEmpty());
+		assertEquals(list.size(), 2); // should return 2 after rollback
 
 	}
 
@@ -492,7 +490,7 @@ public abstract class AbstractPersonDAOTest {
 
 		Person person2 = personDAO.getById(100000);
 		List<Person> list = personDAO.getAll();
-		assertThat(list.contains(person2), is(false));
+		assertFalse(list.contains(person2));
 	}
 
 	@Test

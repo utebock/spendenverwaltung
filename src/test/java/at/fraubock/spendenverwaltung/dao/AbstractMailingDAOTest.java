@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -34,8 +33,7 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 @TransactionConfiguration(defaultRollback = true)
 public class AbstractMailingDAOTest {
 
-	private static final Logger log = Logger
-			.getLogger(AbstractMailingDAOTest.class);
+//	private static final Logger log = Logger.getLogger(AbstractMailingDAOTest.class);
 
 	/**
 	 * PersonDAO is needed to create people for the tests
@@ -370,14 +368,10 @@ public class AbstractMailingDAOTest {
 		}
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = PersistenceException.class)
 	@Transactional	
-	public void getMailingsByInvalidPerson_throwsException() {
-		try {
-			mailingDAO.getMailingsByPerson(new Person());
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void getMailingsByInvalidPerson_throwsException() throws PersistenceException {
+		mailingDAO.getMailingsByPerson(new Person());
 	}
 
 

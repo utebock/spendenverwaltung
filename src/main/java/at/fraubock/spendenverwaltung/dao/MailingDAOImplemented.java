@@ -26,7 +26,6 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedF
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
-import at.fraubock.spendenverwaltung.service.PersonValidator;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
 import at.fraubock.spendenverwaltung.util.FilterToSqlBuilder;
 import at.fraubock.spendenverwaltung.util.FilterType;
@@ -45,7 +44,6 @@ public class MailingDAOImplemented implements IMailingDAO {
 			.getLogger(MailingDAOImplemented.class);
 
 	private JdbcTemplate jdbcTemplate;
-	private PersonValidator personValidator;
 	private FilterToSqlBuilder filterToSqlBuilder;
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
@@ -55,10 +53,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 	public void setFilterToSqlBuilder(FilterToSqlBuilder filterToSqlBuilder) {
 		this.filterToSqlBuilder = filterToSqlBuilder;
 	}
-
-	public void setPersonValidator(PersonValidator personValidator) {
-		this.personValidator = personValidator;
-	}
+	
 	
 	private static void validate(Mailing mailing) throws ValidationException {
 		if(mailing == null) {
@@ -259,7 +254,11 @@ public class MailingDAOImplemented implements IMailingDAO {
 			throws PersistenceException {
 		log.debug("Entering getMailingsByPerson with param "+person);
 		
-		personValidator.validate(person);
+		try {
+			PersonDAOImplemented.validate(person);
+		} catch (ValidationException e) {
+			throw new PersistenceException(e);
+		}
 		
 		List<Mailing> mailings = jdbcTemplate.query(
 				"SELECT ma.* FROM mailings ma, sent_mailings se " +

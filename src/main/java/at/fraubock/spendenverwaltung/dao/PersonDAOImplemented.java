@@ -22,22 +22,17 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
-import at.fraubock.spendenverwaltung.service.PersonValidator;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
 import at.fraubock.spendenverwaltung.util.FilterToSqlBuilder;
 
 public class PersonDAOImplemented implements IPersonDAO {
 
 	private IAddressDAO addressDAO;
 	private JdbcTemplate jdbcTemplate;
-	private PersonValidator personValidator;
 	private FilterToSqlBuilder filterToSqlBuilder;
 
 	private static final Logger log = Logger
 			.getLogger(PersonDAOImplemented.class);
-
-	public void setPersonValidator(PersonValidator personValidator) {
-		this.personValidator = personValidator;
-	}
 
 	public void setFilterToSqlBuilder(FilterToSqlBuilder filterToSqlBuilder) {
 		this.filterToSqlBuilder = filterToSqlBuilder;
@@ -49,6 +44,40 @@ public class PersonDAOImplemented implements IPersonDAO {
 
 	public void setAddressDao(IAddressDAO addressDAO) {
 		this.addressDAO = addressDAO;
+	}
+	
+	public static void validate(Person person) throws ValidationException {
+
+		if (person == null) {
+			throw new ValidationException("Person must not be null");
+		}
+		if (person.getId() != null && person.getId() < 0) {
+			throw new ValidationException("Id must not be less than 0");
+		}
+		if (person.getSex() == null) {
+			throw new ValidationException("Sex was null");
+		}
+		if (person.getAddresses() == null) // rather use empty list
+			throw new ValidationException("Addresses was null");
+		if (person.getMainAddress() != null
+				&& !person.getAddresses().contains(person.getMainAddress()))
+			throw new ValidationException(
+					"Main address must also be present in the address list");
+		if (person.getTitle() != null && person.getSurname() == null)
+			throw new ValidationException(
+					"Person with title must have a surname");
+		if (person.getSurname() == null && person.getCompany() == null)
+			throw new ValidationException(
+					"Person must have at least a company or a surname");
+		switch (person.getSex()) {
+		case FAMILY:
+		case MALE:
+		case FEMALE:
+			if (person.getSurname() == null)
+				throw new ValidationException(
+						"Non-company person must have a surname");
+		default:
+		}
 	}
 
 	private class CreatePersonStatementCreator implements
@@ -68,16 +97,53 @@ public class PersonDAOImplemented implements IPersonDAO {
 				throws SQLException {
 			PreparedStatement ps = connection.prepareStatement(createPersons,
 					Statement.RETURN_GENERATED_KEYS);
-			ps.setString(1, person.getGivenName());
-			ps.setString(2, person.getSurname());
-			ps.setString(3, person.getEmail());
+			if(person.getGivenName() == null)
+				ps.setNull(1, Types.NULL);
+			else
+				ps.setString(1, person.getGivenName());
+			
+			if(person.getSurname() == null)
+				ps.setNull(2, Types.NULL);
+			else
+				ps.setString(2, person.getSurname());
+			
+			if(person.getEmail() == null) {
+				ps.setNull(3, Types.NULL);
+				ps.setBoolean(8, false);
+			}
+			else {
+				ps.setString(3, person.getEmail());
+				ps.setBoolean(8, person.isEmailNotification());
+			}
+			
 			ps.setString(4, person.getSex().getName());
-			ps.setString(5, person.getTitle());
-			ps.setString(6, person.getCompany());
-			ps.setString(7, person.getTelephone());
+			
+			if(person.getTitle() == null) 
+				ps.setNull(5, Types.NULL);
+			else
+				ps.setString(5, person.getTitle());
+			
+			if(person.getCompany() == null)
+				ps.setNull(6, Types.NULL);
+			else
+				ps.setString(6, person.getCompany());
+			
+			if(person.getTelephone() == null)
+				ps.setNull(7, Types.NULL);
+			else
+				ps.setString(7, person.getTelephone());
+			
 			ps.setBoolean(8, person.isEmailNotification());
-			ps.setBoolean(9, person.isPostalNotification());
-			ps.setString(10, person.getNote());
+			
+			if(person.getAddresses().isEmpty())
+				ps.setBoolean(9, false);
+			else
+				ps.setBoolean(9, person.isPostalNotification());
+			
+			if(person.getNote() == null)
+				ps.setNull(10, Types.NULL);
+			else
+				ps.setString(10, person.getNote());
 
 			return ps;
 		}
@@ -86,7 +152,11 @@ public class PersonDAOImplemented implements IPersonDAO {
 	@Override
 	public void insertOrUpdate(Person person) throws PersistenceException {
 
-		personValidator.validate(person);
+		try {
+			validate(person);
+		} catch (ValidationException e) {
+			throw new PersistenceException(e);
+		}
 
 		if (person.getId() == null) {
 			// new person to be inserted
@@ -113,12 +183,13 @@ public class PersonDAOImplemented implements IPersonDAO {
 					person.isPostalNotification(), person.getNote(),
 					person.getId() };
 
-			int[] types = new int[] { Types.VARCHAR, Types.VARCHAR,
-					Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-					Types.VARCHAR, Types.BOOLEAN, Types.BOOLEAN, Types.VARCHAR,
-					Types.INTEGER };
+//TODO	check if types is necessary for null values, if not then we can safely delete this.	
+//					int[] types = new int[] { Types.VARCHAR, Types.VARCHAR,
+//					Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
+//					Types.VARCHAR, Types.BOOLEAN, Types.BOOLEAN, Types.VARCHAR,
+//					Types.INTEGER };
 
-			jdbcTemplate.update(updatePersons, params, types);
+			jdbcTemplate.update(updatePersons, params);
 
 			// to update address relationhips, simply delete them and then
 			// insert the new ones
@@ -235,7 +306,11 @@ public class PersonDAOImplemented implements IPersonDAO {
 		// we don't need to delete references in 'livesat', since ON DELETE is
 		// set to CASCADE
 
-		personValidator.validate(person);
+		try {
+			validate(person);
+		} catch (ValidationException e) {
+			throw new PersistenceException(e);
+		}
 
 		String deletePersons = "delete from persons where id = ?";
 
