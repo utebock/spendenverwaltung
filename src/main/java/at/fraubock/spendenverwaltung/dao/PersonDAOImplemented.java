@@ -345,7 +345,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 	public List<Person> getByAddress(Address address)
 			throws PersistenceException {
 
-		String select = "SELECT p.* FROM persons p JOIN livesat l ON p.id = l.pid WHERE l.aid = ? and l.livesat = true ORDER BY p.id DESC";
+		String select = "SELECT p.* FROM persons p JOIN livesat l ON p.id = l.pid WHERE l.aid = ? ORDER BY p.id DESC";
 		List<Person> personList = jdbcTemplate.query(select,
 				new Object[] { address.getId() }, new PersonMapper());
 		log.info(personList.size() + " list size");
