@@ -25,13 +25,18 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Connecte
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
-import at.fraubock.spendenverwaltung.service.MailingValidator;
-import at.fraubock.spendenverwaltung.service.PersonValidator;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
 import at.fraubock.spendenverwaltung.util.FilterToSqlBuilder;
 import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
+
+/**
+ * 
+ * @author Chris Steele
+ *
+ */
 
 public class MailingDAOImplemented implements IMailingDAO {
 	
@@ -39,24 +44,56 @@ public class MailingDAOImplemented implements IMailingDAO {
 			.getLogger(MailingDAOImplemented.class);
 
 	private JdbcTemplate jdbcTemplate;
-	private MailingValidator mailingValidator;
-	private PersonValidator personValidator;
 	private FilterToSqlBuilder filterToSqlBuilder;
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 	
-	public void setMailingValidator(MailingValidator mailingValidator) {
-		this.mailingValidator = mailingValidator;
-	}
-	
 	public void setFilterToSqlBuilder(FilterToSqlBuilder filterToSqlBuilder) {
 		this.filterToSqlBuilder = filterToSqlBuilder;
 	}
-
-	public void setPersonValidator(PersonValidator personValidator) {
-		this.personValidator = personValidator;
+	
+	
+	private static void validate(Mailing mailing) throws ValidationException {
+		if(mailing == null) {
+			throw new ValidationException("Mailing was null");
+		}
+		
+		if(mailing.getMedium() == null) {
+			throw new ValidationException("Medium was null");
+		}
+		
+		if(mailing.getId() != null) {
+			if(mailing.getId() < 0) {
+				throw new ValidationException("Id was negative");
+			}
+		}
+		
+		if(mailing.getDate() == null) {
+			throw new ValidationException("Date was null");
+		}
+		
+		if(mailing.getType() == null) {
+			throw new ValidationException("Type was null");
+		}
+		
+		/**
+		 * fails if the mailing filter was not set, or if the type of
+		 * the mailing filter was not set, or if the type of the mailing
+		 * filter was not equal to "Person"
+		 */
+		if(mailing.getFilter() != null) {
+			if(mailing.getFilter().getType() == null) {
+				throw new ValidationException("Type of filter was null");
+			} else {
+				if(!mailing.getFilter().getType().equals(FilterType.PERSON)) {
+					throw new ValidationException("Type of filter was not equal to Person"); 
+				}
+			}
+		} else {
+			throw new ValidationException("Filter was null");
+		}
 	}
 	
 	private class CreateMailingStatementCreator implements PreparedStatementCreator {
@@ -91,7 +128,11 @@ public class MailingDAOImplemented implements IMailingDAO {
 	public void insertOrUpdate(Mailing mailing) throws PersistenceException {
 		log.debug("Entering insertOrUpdate with param "+mailing);
 		
-		mailingValidator.validate(mailing);
+		try {
+			validate(mailing);
+		} catch (ValidationException e) {
+			throw new PersistenceException(e);
+		}
 
 		if(mailing.getId() == null) {
 			//create
@@ -164,7 +205,11 @@ public class MailingDAOImplemented implements IMailingDAO {
 	public void delete(Mailing mailing) throws PersistenceException {
 		log.debug("Entering delete with param "+mailing);
 		
-		mailingValidator.validate(mailing);
+		try {
+			validate(mailing);
+		} catch (ValidationException e) {
+			throw new PersistenceException(e);
+		}
 		
 		if(mailing.getId() == null) {
 			throw new IllegalArgumentException("Mailing's id was null in delete");
@@ -209,7 +254,11 @@ public class MailingDAOImplemented implements IMailingDAO {
 			throws PersistenceException {
 		log.debug("Entering getMailingsByPerson with param "+person);
 		
-		personValidator.validate(person);
+		try {
+			PersonDAOImplemented.validate(person);
+		} catch (ValidationException e) {
+			throw new PersistenceException(e);
+		}
 		
 		List<Mailing> mailings = jdbcTemplate.query(
 				"SELECT ma.* FROM mailings ma, sent_mailings se " +

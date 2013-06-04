@@ -23,7 +23,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Import;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
-import at.fraubock.spendenverwaltung.service.DonationValidator;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
 import at.fraubock.spendenverwaltung.util.FilterToSqlBuilder;
 
 /**
@@ -36,7 +36,6 @@ public class DonationDAOImplemented implements IDonationDAO {
 	private JdbcTemplate jdbcTemplate;
 	private IPersonDAO personDAO;
 	private IImportDAO importDAO;
-	private DonationValidator donationValidator;
 	private FilterToSqlBuilder filterToSqlBuilder;
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
@@ -50,9 +49,20 @@ public class DonationDAOImplemented implements IDonationDAO {
 	public void setImportDao(IImportDAO importDAO) {
 		this.importDAO = importDAO;
 	}
-
-	public void setDonationValidator(DonationValidator donationValidator) {
-		this.donationValidator = donationValidator;
+	
+	private static void validate(Donation d) throws ValidationException {	
+		if(d == null)
+			throw new ValidationException("Donation must not be null");
+		if(d.getDonator() == null)
+			throw new ValidationException("Person must not be null");
+		if(d.getAmount() < 0)
+			throw new ValidationException("Amount must not be less than 0");
+		if(d.getDate() == null)
+			throw new ValidationException("Date must not be null");
+		if(d.getDedication() == null)
+			throw new ValidationException("Dedication must not be null");
+		if(d.getType() == null)
+			throw new ValidationException("Type must not be null");
 	}
 
 	private class CreateDonationStatementCreator implements
@@ -78,7 +88,7 @@ public class DonationDAOImplemented implements IDonationDAO {
 			ps.setString(5, donation.getType().getName());
 			ps.setString(6, donation.getNote());
 			if (donation.getSource() == null)
-				ps.setNull(7, Types.INTEGER);
+				ps.setNull(7, Types.NULL);
 			else
 				ps.setInt(7, donation.getSource().getId());
 
@@ -88,7 +98,11 @@ public class DonationDAOImplemented implements IDonationDAO {
 
 	@Override
 	public void insertOrUpdate(Donation d) throws PersistenceException {
-		donationValidator.validate(d);
+		try {
+			validate(d);
+		} catch (ValidationException e) {
+			throw new PersistenceException(e);
+		}
 
 		if (d.getId() == null) {
 			// insert
@@ -117,7 +131,11 @@ public class DonationDAOImplemented implements IDonationDAO {
 
 	@Override
 	public void delete(Donation d) throws PersistenceException {
-		donationValidator.validate(d);
+		try {
+			validate(d);
+		} catch (ValidationException e) {
+			throw new PersistenceException(e);
+		}
 
 		String deleteStatement = "delete from donations where id = ?";
 
@@ -172,8 +190,8 @@ public class DonationDAOImplemented implements IDonationDAO {
 
 	@Override
 	public List<Donation> getByPerson(Person p) throws PersistenceException {
-		if (p == null) {
-			throw new IllegalArgumentException("person must not be null");
+		if (p == null || p.getId() == null || p.getId() < 1) {
+			throw new IllegalArgumentException("Passed person was invalid");
 		}
 
 		String select = "select * from donations where personid = ? ORDER BY id DESC";

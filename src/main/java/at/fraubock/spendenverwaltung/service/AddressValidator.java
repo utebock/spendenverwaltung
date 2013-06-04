@@ -13,6 +13,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Address;
  * @author philipp muhoray
  * 
  */
+@Deprecated
 public class AddressValidator {
 
 	private static final Logger log = Logger.getLogger(AddressValidator.class);

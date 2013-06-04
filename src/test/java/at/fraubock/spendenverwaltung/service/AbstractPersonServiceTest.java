@@ -54,27 +54,23 @@ public abstract class AbstractPersonServiceTest {
 		AbstractPersonServiceTest.personService = personService;
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ServiceException.class)
 	@Transactional
-	public void createWithNullParameter_ThrowsException() {
+	public void createWithNullParameter_ThrowsException() throws ServiceException {
 		try {
-			doThrow(new IllegalArgumentException()).when(personDAO).insertOrUpdate(null);
+			doThrow(new PersistenceException()).when(personDAO).insertOrUpdate(null);
 			personService.create(null);
-		} catch (ServiceException e) {
-			fail();
 		} catch (PersistenceException e) {
 			fail();
 		}
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ServiceException.class)
 	@Transactional
-	public void createWithInvalidStateParameter_ThrowsException() {
+	public void createWithInvalidStateParameter_ThrowsException() throws ServiceException {
 		try {
-			doThrow(new IllegalArgumentException()).when(personDAO).insertOrUpdate(nullPerson);
+			doThrow(new PersistenceException()).when(personDAO).insertOrUpdate(nullPerson);
 			personService.create(nullPerson); // all values are null
-		} catch (ServiceException e) {
-			fail();
 		} catch (PersistenceException e) {
 			fail();
 		}
@@ -84,9 +80,10 @@ public abstract class AbstractPersonServiceTest {
 	@Transactional
 	public void createWithValidParameter_ReturnsSavedPerson() {
 		try {
+			person.setId(10);
 			Person returned = personService.create(person);
 			
-			assert (returned.equals(personCreated));
+			assertEquals(returned,personCreated);
 			
 			verify(personDAO).insertOrUpdate(person);
 		} catch (ServiceException e) {
@@ -100,27 +97,23 @@ public abstract class AbstractPersonServiceTest {
 	 * testing update
 	 */
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ServiceException.class)
 	@Transactional
-	public void updateWithNullParameter_ThrowsException() {
+	public void updateWithNullParameter_ThrowsException() throws ServiceException {
 		try {
-			doThrow(new IllegalArgumentException()).when(personDAO).insertOrUpdate(null);
+			doThrow(new PersistenceException()).when(personDAO).insertOrUpdate(null);
 			personService.update(null);
-		} catch (ServiceException e) {
-			fail();
 		} catch (PersistenceException e) {
 			fail();
 		}
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ServiceException.class)
 	@Transactional
-	public void updateWithInvalidStateParameter_ThrowsException() {
+	public void updateWithInvalidStateParameter_ThrowsException() throws ServiceException {
 		try {
-			doThrow(new IllegalArgumentException()).when(personDAO).insertOrUpdate(nullPerson);
+			doThrow(new PersistenceException()).when(personDAO).insertOrUpdate(nullPerson);
 			personService.update(nullPerson);
-		} catch (ServiceException e) {
-			fail();
 		} catch (PersistenceException e) {
 			fail();
 		}
@@ -145,15 +138,13 @@ public abstract class AbstractPersonServiceTest {
 	 * testing delete
 	 */
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ServiceException.class)
 	@Transactional
-	public void deleteWithNullParameter_ThrowsException() {
+	public void deleteWithNullParameter_ThrowsException() throws ServiceException {
 		try {
-			doThrow(new IllegalArgumentException()).when(personDAO).delete(null);
+			doThrow(new PersistenceException()).when(personDAO).delete(null);
 			
 			personService.delete(null);
-		} catch (ServiceException e) {
-			fail();
 		} catch (PersistenceException e) {
 			fail();
 		}
@@ -211,16 +202,14 @@ public abstract class AbstractPersonServiceTest {
 		}
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ServiceException.class)
 	@Transactional(readOnly = true)
-	public void getWithNegativeId_ThrowsException() {
+	public void getWithNegativeId_ThrowsException() throws ServiceException {
 		try {
 			when(personDAO.getById(-1)).thenThrow(
-					new IllegalArgumentException());
+					new PersistenceException());
 
 			personService.getById(-1);
-		} catch (ServiceException e) {
-			fail();
 		} catch (PersistenceException e) {
 			fail();
 		}

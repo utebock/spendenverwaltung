@@ -7,6 +7,11 @@ import org.junit.BeforeClass;
 import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 
+/**
+ * 
+ * @author Chris Steele
+ *
+ */
 public class DBMailingServiceTest extends AbstractMailingServiceTest {
 
 	@BeforeClass
