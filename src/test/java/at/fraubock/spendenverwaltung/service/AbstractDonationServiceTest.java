@@ -1,11 +1,15 @@
 package at.fraubock.spendenverwaltung.service;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -14,7 +18,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IDonationDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
@@ -22,7 +25,6 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
-import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
@@ -54,15 +56,13 @@ public abstract class AbstractDonationServiceTest {
 		AbstractDonationServiceTest.donationService = donationService;
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ServiceException.class)
 	@Transactional
-	public void createWithNullParameterShouldThrowException() {
+	public void createWithNullParameterShouldThrowException() throws ServiceException {
 		try {
-			doThrow(new IllegalArgumentException()).when(donationDAO).insertOrUpdate(null);
+			doThrow(new PersistenceException()).when(donationDAO).insertOrUpdate(null);
 			
 			donationService.create(null);
-		} catch (ServiceException e) {
-			fail();
 		} catch (PersistenceException e) {
 			fail();
 		}
@@ -73,7 +73,7 @@ public abstract class AbstractDonationServiceTest {
 	public void createWithValidParameterShouldReturnDonation() {
 		try {
 			Donation returned = donationService.create(donation);
-			assert (returned.equals(donationCreated));
+			assertEquals(returned,donationCreated);
 			verify(donationDAO).insertOrUpdate(donation);
 		} catch (ServiceException e) {
 			fail();
@@ -86,29 +86,25 @@ public abstract class AbstractDonationServiceTest {
 	 * testing update
 	 */
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ServiceException.class)
 	@Transactional
-	public void updateWithNullParameterShouldThrowException() {
+	public void updateWithNullParameterShouldThrowException() throws ServiceException {
 		try {
-			doThrow(new IllegalArgumentException()).when(donationDAO).insertOrUpdate(null);
+			doThrow(new PersistenceException()).when(donationDAO).insertOrUpdate(null);
 			
 			donationService.update(null);
-		} catch (ServiceException e) {
-			fail();
 		} catch (PersistenceException e) {
 			fail();
 		}
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ServiceException.class)
 	@Transactional
-	public void updateWithInvalidParameterShouldThrowException() {
+	public void updateWithInvalidParameterShouldThrowException() throws ServiceException {
 		try {
-			doThrow(new IllegalArgumentException()).when(donationDAO).insertOrUpdate(nullDonation);
+			doThrow(new PersistenceException()).when(donationDAO).insertOrUpdate(nullDonation);
 
 			donationService.update(nullDonation);
-		} catch (ServiceException e) {
-			fail();
 		} catch (PersistenceException e) {
 			fail();
 		}
@@ -119,7 +115,7 @@ public abstract class AbstractDonationServiceTest {
 	public void updateWithValidParametersShouldReturnUpdatedDonation() {
 		try {
 			Donation returned = donationService.update(donationCreated);
-			assert (returned.equals(donationCreated));
+			assertEquals(returned, donationCreated);
 			verify(donationDAO).insertOrUpdate(donationCreated);
 		} catch (ServiceException e) {
 			fail();
@@ -132,15 +128,13 @@ public abstract class AbstractDonationServiceTest {
 	 * testing delete
 	 */
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ServiceException.class)
 	@Transactional
-	public void deleteWithNullParameterShouldThrowException() {
+	public void deleteWithNullParameterShouldThrowException() throws ServiceException {
 		try {
-			doThrow(new IllegalArgumentException()).when(donationDAO).delete(null);
+			doThrow(new PersistenceException()).when(donationDAO).delete(null);
 			
 			donationService.delete(null);
-		} catch (ServiceException e) {
-			fail();
 		} catch (PersistenceException e) {
 			fail();
 		}
@@ -223,7 +217,7 @@ public abstract class AbstractDonationServiceTest {
 			Donation found = donationService.getByID(donationCreated
 					.getId());
 
-			assert (donationCreated.equals(found));
+			assertEquals(donationCreated,found);
 		} catch (ServiceException e) {
 			fail();
 		} catch (PersistenceException e) {
