@@ -11,7 +11,7 @@ public class AddressTableModel extends AbstractTableModel{
 
 	private static final long serialVersionUID = 1L;
 	
-	private String[] columnNames = new String[]{"Adressnummer", "Stra\u00DFe", "PLZ", "Stadt", "Land"};
+	private String[] columnNames = new String[]{"Stra\u00DFe", "PLZ", "Stadt", "Land"};
 	private Vector<Address> addresses = new Vector<Address>();
 
 	public void addAddress (Address address){
@@ -49,11 +49,11 @@ public class AddressTableModel extends AbstractTableModel{
 		Address address = (Address)addresses.get(rowIndex);
 		
 		switch(columnIndex){
-			case 0: return address.getId();
-			case 1: return address.getStreet();
-			case 2: return address.getPostalCode();
-			case 3: return address.getCity();
-			case 4: return address.getCountry();
+			case 0: return address.getStreet();
+			case 1: return address.getPostalCode();
+			case 2: return address.getCity();
+			case 3: return address.getCountry();
+			case 4: return address.getId();
 			default: return null;
 		}
 	}
@@ -61,16 +61,16 @@ public class AddressTableModel extends AbstractTableModel{
 	public Class<?> getColumnClass(int col) {
 		
 		switch (col) {
-		case 0: 
-			return Integer.class;
+		case 0:
+			return String.class;
 		case 1:
 			return String.class;
 		case 2:
 			return String.class;
-		case 3:
+		case 3: 
 			return String.class;
 		case 4: 
-			return String.class;
+			return Integer.class;
 		}
 		return null;
 	}

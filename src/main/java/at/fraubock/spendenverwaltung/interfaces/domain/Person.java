@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.interfaces.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Person {
@@ -39,7 +40,7 @@ public class Person {
 	private String company;
 	private String givenName;
 	private String surname;
-	private List<Address> addresses;
+	private List<Address> addresses = new ArrayList<Address>();
 	private Address mainAddress;
 	private String email;
 	private String telephone;
@@ -170,47 +171,9 @@ public class Person {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-
-		if (obj == null) {
-			return false;
-		}
-
-		if (this == obj) {
-			return true;
-		}
-
-		if (this.getClass() != obj.getClass()) {
-			return false;
-		}
-
-		Person other = (Person) obj;
-
-		if (this.getId().equals(other.getId())
-				&& this.getGivenName().equals(other.getGivenName())
-				&& this.getSurname().equals(other.getSurname())
-				&& this.getSex().equals(other.getSex())
-				&& this.getCompany().equals(other.getCompany())
-				&& this.getMainAddress().equals(other.getMainAddress())
-				&& this.getNote().equals(other.getNote())
-				&& this.getTitle().equals(other.getTitle())
-				&& this.getTelephone().equals(other.getTelephone())
-				&& this.isEmailNotification() == other.isEmailNotification()
-				&& this.isPostalNotification() == other.isPostalNotification()
-				&& this.getEmail().equals(other.getEmail())) {
-			return true;
-		}
-
-		return false;
-	}
-	
-	
-	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((addresses == null) ? 0 : addresses.hashCode());
 		result = prime * result + ((company == null) ? 0 : company.hashCode());
 		result = prime * result + ((email == null) ? 0 : email.hashCode());
 		result = prime * result + (emailNotification ? 1231 : 1237);
@@ -228,4 +191,68 @@ public class Person {
 		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		return result;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Person other = (Person) obj;
+		if (company == null) {
+			if (other.company != null)
+				return false;
+		} else if (!company.equals(other.company))
+			return false;
+		if (email == null) {
+			if (other.email != null)
+				return false;
+		} else if (!email.equals(other.email))
+			return false;
+		if (emailNotification != other.emailNotification)
+			return false;
+		if (givenName == null) {
+			if (other.givenName != null)
+				return false;
+		} else if (!givenName.equals(other.givenName))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (mainAddress == null) {
+			if (other.mainAddress != null)
+				return false;
+		} else if (!mainAddress.equals(other.mainAddress))
+			return false;
+		if (note == null) {
+			if (other.note != null)
+				return false;
+		} else if (!note.equals(other.note))
+			return false;
+		if (postalNotification != other.postalNotification)
+			return false;
+		if (sex != other.sex)
+			return false;
+		if (surname == null) {
+			if (other.surname != null)
+				return false;
+		} else if (!surname.equals(other.surname))
+			return false;
+		if (telephone == null) {
+			if (other.telephone != null)
+				return false;
+		} else if (!telephone.equals(other.telephone))
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		return true;
+	}
+
 }

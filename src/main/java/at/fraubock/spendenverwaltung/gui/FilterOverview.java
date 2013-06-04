@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -24,9 +24,7 @@ import net.miginfocom.swing.MigLayout;
 import org.apache.log4j.Logger;
 
 import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
-import at.fraubock.spendenverwaltung.gui.filter.IPropertySelectorProvider;
-import at.fraubock.spendenverwaltung.gui.filter.PropertyComponent;
-import at.fraubock.spendenverwaltung.gui.filter.SelectorFactory;
+import at.fraubock.spendenverwaltung.gui.filter.ConfiguratorFactory;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
@@ -64,6 +62,7 @@ public class FilterOverview extends JPanel {
 	private JButton donationFilter;
 	private JButton backButton;
 	private JButton delete;
+	private JLabel empty;
 
 	public FilterOverview(IFilterService filterService,
 			IPersonService personService, IAddressService addressService,
@@ -75,7 +74,6 @@ public class FilterOverview extends JPanel {
 		this.addressService = addressService;
 		this.donationService = donationService;
 		this.overview = overview;
-		// initTable();
 		setUp();
 	}
 
@@ -87,6 +85,7 @@ public class FilterOverview extends JPanel {
 		showTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		scrollPane = new JScrollPane(showTable);
 		scrollPane.setPreferredSize(new Dimension(800, 800));
+		add(scrollPane);
 
 	}
 
@@ -102,26 +101,37 @@ public class FilterOverview extends JPanel {
 		toolbar.setRollover(true);
 		addComponentsToToolbar(toolbar);
 		panel.add(toolbar, "growx, wrap");
-		//panel.add(scrollPane);
+		empty = builder.createLabel("		 ");
+		panel.add(empty, "wrap");
+		initTable();
+		panel.add(scrollPane);
 	}
 
 	private void addComponentsToToolbar(JToolBar toolbar) {
-		personFilter = builder.createButton("<html>&nbsp;Personenfilter erstellen</html>", buttonListener, "add_person_filter");
+		personFilter = builder.createButton(
+				"<html>&nbsp;Personenfilter erstellen</html>", buttonListener,
+				"add_filter");
 		personFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
-		sendingsFilter = builder.createButton("<html>&nbsp;Aussendungsfilter erstellen</html>", buttonListener, "add_sendings_filter");
+		sendingsFilter = builder.createButton(
+				"<html>&nbsp;Aussendungsfilter erstellen</html>",
+				buttonListener, "add_filter");
 		sendingsFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
-		donationFilter = builder.createButton("<html>&nbsp;Spendenfilter erstellen</html>", buttonListener, "add_donation_filter");
+		donationFilter = builder.createButton(
+				"<html>&nbsp;Spendenfilter erstellen</html>", buttonListener,
+				"add_filter");
 		donationFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
-		delete = builder.createButton("<html>&nbsp;Filter l\u00F6schen</html>", buttonListener, "delete_filter");
+		delete = builder.createButton("<html>&nbsp;Filter l\u00F6schen</html>",
+				buttonListener, "delete_filter");
 		delete.setFont(new Font("Bigger", Font.PLAIN, 13));
-		backButton = builder.createButton("<html>&nbsp;Zur\u00FCck</html>", buttonListener, "return_to_overview");
+		backButton = builder.createButton("<html>&nbsp;Zur\u00FCck</html>",
+				buttonListener, "return_to_overview");
 		backButton.setFont(new Font("Bigger", Font.PLAIN, 13));
-		toolbar.add(sendingsFilter);
 		toolbar.add(personFilter);
 		toolbar.add(donationFilter);
+		toolbar.add(sendingsFilter);
 		toolbar.add(delete);
-		toolbar.add(backButton);
-		
+		toolbar.add(backButton, "wrap");
+
 	}
 
 	public FilterTableModel getFilterModel() {
@@ -153,18 +163,23 @@ public class FilterOverview extends JPanel {
 		}
 	}
 
-	public void createFilter() {
-		IPropertySelectorProvider personModelReceiver = new IPropertySelectorProvider() {
+	public void createFilter(JButton button) {
+		FilterType type = null;
+		String plural = null;
 
-			@Override
-			public List<PropertyComponent> receiveModels() {
-				return SelectorFactory.propertySelectorForPerson();
-			}
+		if (button == personFilter) {
+			type = FilterType.PERSON;
+			plural = "Personen";
+		} else if (button == donationFilter) {
+			type = FilterType.DONATION;
+			plural = "Spenden";
+		} else if (button == sendingsFilter) {
+			type = FilterType.MAILING;
+			plural = "Aussendungen";
+		}
 
-		};
-
-		CreateFilter cf = new CreateFilter(FilterType.PERSON, "Personen",
-				personModelReceiver, filterService, this);
+		CreateFilter cf = new CreateFilter(type, plural, new ConfiguratorFactory(
+				type), filterService, this);
 		removeAll();
 		revalidate();
 		repaint();

@@ -66,4 +66,9 @@ public class Filter {
 		this.anonymous = anonymous;
 	}
 	
+	@Override
+	public String toString() {
+		return name!=null?name:"";
+	}
+	
 }

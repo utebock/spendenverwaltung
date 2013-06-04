@@ -3,10 +3,16 @@ package at.fraubock.spendenverwaltung.dao;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.AfterClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TransactionConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
@@ -21,9 +27,13 @@ import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("/testspring.xml")
+@TransactionConfiguration(defaultRollback = true)
 public class DBMailingDAOTest extends AbstractMailingDAOTest {
 
 	private static ApplicationContext context;
+		
 	/**
 	 * set DAOs, fill DB with testdata that must be deleted afterwards
 	 * @throws PersistenceException if initialization fails due to DAOs not creating test objects
@@ -34,9 +44,17 @@ public class DBMailingDAOTest extends AbstractMailingDAOTest {
 
 		AbstractMailingDAOTest.setAddressDAO(context.getBean("addressDao", IAddressDAO.class));
 		AbstractMailingDAOTest.setMailingDAO(context.getBean("mailingDao", IMailingDAO.class));
-		AbstractMailingDAOTest.setPersonDAO(context.getBean("personDao", IPersonDAO.class));
+		AbstractMailingDAOTest.setPersonDAO(context.getBean("personDao", IPersonDAO.class));		
+	}
+	
+	@Before
+	@Transactional
+	public void initdata() throws PersistenceException {
 		
-		// initialize addresses
+		/* set up a new transaction for our initialization and set propagation
+		 * to require other transactions called (our unit tests) to run on a new
+		 * transaction in order for the desired rollback behaviour to take place
+		 */
 		
 		addressOne.setStreet("Nussdorferstrasse 12");
 		addressOne.setCity("Wien");
@@ -53,9 +71,7 @@ public class DBMailingDAOTest extends AbstractMailingDAOTest {
 		addressThree.setCountry("Österreich");
 		addressThree.setPostalCode("6020");
 		
-		addressDAO.insertOrUpdate(addressOne);
-		addressDAO.insertOrUpdate(addressTwo);
-		addressDAO.insertOrUpdate(addressThree);
+
 		
 		//test person with one address and an email
 		personOne.setGivenName("Ralf");
@@ -82,10 +98,6 @@ public class DBMailingDAOTest extends AbstractMailingDAOTest {
 		personThree.setSurname("Duck");
 		personThree.setSex(Person.Sex.MALE);
 		
-		personDAO.insertOrUpdate(personOne);
-		personDAO.insertOrUpdate(personTwo);
-		personDAO.insertOrUpdate(personThree);
-		
 		//initialize filters
 		
 		PropertyCriterion onlyRalf = new PropertyCriterion();
@@ -99,8 +111,7 @@ public class DBMailingDAOTest extends AbstractMailingDAOTest {
 		
 		ConnectedCriterion ralfAndDaisy = new ConnectedCriterion();
 		ralfAndDaisy.connect(onlyDaisy, LogicalOperator.OR, onlyRalf);
-		
-
+	
 		filterTwoPeople.setType(FilterType.PERSON);
 		filterTwoPeople.setCriterion(ralfAndDaisy);
 		
@@ -115,14 +126,7 @@ public class DBMailingDAOTest extends AbstractMailingDAOTest {
 	 * delete testpersons and addresses
 	 * @throws PersistenceException if something goes wrong
 	 */
-	@AfterClass 
-	public static void deleteData() throws PersistenceException {
-		personDAO.delete(personOne);
-		personDAO.delete(personTwo);
-		personDAO.delete(personThree);
-		
-		addressDAO.delete(addressOne);
-		addressDAO.delete(addressTwo);
-		addressDAO.delete(addressThree);
+	@After
+	public void deleteData() throws PersistenceException {
 	}
 }

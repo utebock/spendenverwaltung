@@ -369,7 +369,7 @@ public class EditPerson extends JPanel{
 			JOptionPane.showMessageDialog(this, "Bitte Adresse ausw\u00E4hlen.");
 			return;
 		}
-		int id = (Integer) addressModel.getValueAt(row, 0);
+		int id = (Integer) addressModel.getValueAt(row, 4);
 		
 		try{
 			addr = addressService.getByID(id);
@@ -490,7 +490,7 @@ public class EditPerson extends JPanel{
 			JOptionPane.showMessageDialog(this, "Bitte Adresse ausw\u00E4hlen.");
 			return;
 		}
-		int id = (Integer) addressModel.getValueAt(row, 0);
+		int id = (Integer) addressModel.getValueAt(row, 4);
 		
 		try{
 			addr = addressService.getByID(id);

@@ -4,6 +4,7 @@ import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 
 
@@ -41,6 +42,12 @@ public interface IPersonService {
 	 * @return List of all persons
 	 */
 	public List<Person> getAll() throws ServiceException;
+	
+	/**
+	 * Retrieves {@link Person}s matching the given {@link Filter}
+	 * @return List of all persons matching the given filter
+	 */
+	public List<Person> getByFilter(Filter filter) throws ServiceException;
 	
 	/**
 	 * Retrieves Person by ID

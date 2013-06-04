@@ -7,33 +7,37 @@ import javax.swing.JComboBox;
 import javax.swing.event.ListDataListener;
 
 /**
- * implementation of {@link ComboBoxModel}. takes a {@link List} in the
- * constructor which holds the model objects to be represented in a
- * {@link JComboBox}. the methods of the interface mostly delegates to the given
- * list.
- * @NOTE the first element of the list (index 0) will be set as the default value of this model.
+ * implementation of {@link ComboBoxModel}. takes a {@link List} which holds the
+ * objects to be represented in a {@link JComboBox} via their #toString()
+ * method. the selected item can then be retrieved by calling
+ * #getSelectedItem().
+ * 
+ * @NOTE the first element of the list (index 0) will be set as the default
+ *       value of this model.
  * 
  * @author philipp muhoray
  * 
  */
 public class SimpleComboBoxModel<T> implements ComboBoxModel<T> {
 
-	private List<T> selectors;
+	private List<T> items;
 	private T selected;
 
-	public SimpleComboBoxModel(List<T> selectors) {
-		this.selectors = selectors;
-		this.selected = selectors.get(0);
+	public SimpleComboBoxModel(List<T> items) {
+		this.items = items;
+		if(!items.isEmpty()) {
+			this.selected = items.get(0);
+		}
 	}
 
 	@Override
 	public T getElementAt(int index) {
-		return selectors.get(index);
+		return items.get(index);
 	}
 
 	@Override
 	public int getSize() {
-		return selectors.size();
+		return items.size();
 	}
 
 	@Override

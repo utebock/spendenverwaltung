@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -15,6 +16,7 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.service.to.CriterionTO;
 import at.fraubock.spendenverwaltung.service.to.FilterTO;
+import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
 
 public class FilterServiceImplemented implements IFilterService {
@@ -75,6 +77,22 @@ public class FilterServiceImplemented implements IFilterService {
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
+		return list;
+	}
+	
+	@Override
+	public List<Filter> getAll(FilterType type) throws ServiceException {
+		List<Filter> list = new ArrayList<Filter>();
+		try {
+			for(Filter filter: filterDAO.getAll()) {
+				if(filter.getType()==type) {
+					list.add(filter);
+				}
+			}
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+		
 		return list;
 	}
 
@@ -149,5 +167,4 @@ public class FilterServiceImplemented implements IFilterService {
 		filter.setCriterion(current);
 		return filter;
 	}
-
 }

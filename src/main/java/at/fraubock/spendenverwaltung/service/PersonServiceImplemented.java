@@ -117,5 +117,15 @@ public class PersonServiceImplemented implements IPersonService {
 		}
 		return persons;
 	}
+	@Override
+	public List<Person> getByFilter(Filter filter) throws ServiceException {
+		List<Person> list = null;
+		try {
+			list = personDAO.getByFilter(filter);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+		return list;
+	}
 
 }

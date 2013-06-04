@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.gui.filter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class RelationalOperatorPicker extends
 	}
 
 	public enum RelationType {
-		FOR_STRING, FOR_NUMBER_AND_DATE;
+		FOR_STRING, FOR_NUMBER_AND_DATE, FOR_ENUM;
 
 		public List<RelationalOperatorGuiWrapper> getOperators() {
 			if (this == FOR_STRING) {
@@ -44,13 +45,17 @@ public class RelationalOperatorPicker extends
 						RelationalOperatorGuiWrapper.UNEQUAL,
 						RelationalOperatorGuiWrapper.LIKE });
 			} else if (this == FOR_NUMBER_AND_DATE) {
-				List<RelationalOperatorGuiWrapper> ops = Arrays
-						.asList(RelationalOperatorGuiWrapper.values());
+				List<RelationalOperatorGuiWrapper> ops = new ArrayList<RelationalOperatorGuiWrapper>();
+				ops.addAll(Arrays.asList(RelationalOperatorGuiWrapper.values()));
 				ops.remove(RelationalOperatorGuiWrapper.LIKE);
 				// TODO make this work
 				ops.remove(RelationalOperatorGuiWrapper.NOT_NULL);
 				ops.remove(RelationalOperatorGuiWrapper.IS_NULL);
 				return ops;
+			} else if (this == FOR_ENUM) {
+				return Arrays.asList(new RelationalOperatorGuiWrapper[] {
+						RelationalOperatorGuiWrapper.EQUALS,
+						RelationalOperatorGuiWrapper.UNEQUAL});
 			}
 			return null;
 		}
@@ -64,17 +69,15 @@ public class RelationalOperatorPicker extends
 	 * 
 	 */
 	public enum RelationalOperatorGuiWrapper {
-
-		GREATER(RelationalOperator.GREATER, "gr\u00F6\u00DFer als"), LESS(
-				RelationalOperator.LESS, "kleiner als"), EQUALS(
-				RelationalOperator.EQUALS, "gleich"), UNEQUAL(
-				RelationalOperator.UNEQUAL, "ungleich"), LIKE(
-				RelationalOperator.LIKE, "\u00E4hnlich wie"), GREATER_EQ(
-				RelationalOperator.GREATER_EQ,
-				"gr\u00F6\u00DFer oder gleich als"), LESS_EQ(
-				RelationalOperator.LESS_EQ, "kleiner oder gleich als"), NOT_NULL(
-				RelationalOperator.NOT_NULL, "ist gesetzt"), IS_NULL(
-				RelationalOperator.IS_NULL, "ist nicht gesetzt");
+		LESS(RelationalOperator.LESS, "weniger als"), 
+		LESS_EQ(RelationalOperator.LESS_EQ, "weniger oder gleich als"), 
+		EQUALS(RelationalOperator.EQUALS, "gleich"),
+		UNEQUAL(RelationalOperator.UNEQUAL, "ungleich"),
+		LIKE(RelationalOperator.LIKE, "\u00E4hnlich wie"),
+		GREATER_EQ(RelationalOperator.GREATER_EQ,"mehr oder gleich als"),
+		GREATER(RelationalOperator.GREATER, "mehr als"),
+		NOT_NULL(RelationalOperator.NOT_NULL, "ist vorhanden"), 
+		IS_NULL(RelationalOperator.IS_NULL, "ist nicht vorhanden");
 
 		private String text;
 		private RelationalOperator op;

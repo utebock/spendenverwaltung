@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.util;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
@@ -24,25 +25,25 @@ public class CSVImport {
 	 * Reads the given CSV file and returns a list of string arrays, 
 	 * which represent each row. Uses the default seperator, quotechar and escapechar.
 	 * @param file
-	 * 			path to CSV file
+	 * 			CSV file
 	 * @return
 	 */
-	public static List<String[]> ReadCSV(String file) throws IOException{
-		return ReadCSV(file, ';', '"', '\\');
+	public static List<String[]> ReadCSV(File file) throws IOException{
+		return readCSV(file, ';', '"', '\\');
 	}
 	
 	/**
 	 * Reads the given CSV file and returns a list of string arrays, 
 	 * which represent each row. 
 	 * @param file
-	 * 			path to CSV file
+	 * 			CSV file
 	 * @param seperator
 	 * @param quotechar
 	 * @param escape
 	 * @return
 	 * 			List of string arrays 
 	 */
-	public static List<String[]> ReadCSV(String file, char seperator, char quotechar, char escape) throws IOException{
+	public static List<String[]> readCSV(File file, char seperator, char quotechar, char escape) throws IOException{
 		CSVReader reader;
 		List<String[]> data = null;
 		
@@ -62,21 +63,21 @@ public class CSVImport {
 	/**
 	 * Reads the given CSV file and maps the values into a list of {@link ImportRow}
 	 * @param file
-	 * 			path to CSV file
+	 * 			CSV file
 	 * @param columnMapping
 	 * 			a Map<String, String> with column name to {@link ImportRow} variable name
 	 * @return
 	 * 			returns a List of {@link ImportRow} 
 	 * @throws IOException
 	 */
-	public static List<ImportRow> ReadCSVWithMapping(String file, Map<String, String> columnMapping) throws IOException{
-		return ReadCSVWithMapping(file, ';', '"', '\\', columnMapping);
+	public static List<ImportRow> readCSVWithMapping(File file, Map<String, String> columnMapping) throws IOException{
+		return readCSVWithMapping(file, ';', '"', '\\', columnMapping);
 	}
 	
 	/**
 	 * Reads the given CSV file and maps the values into a list of {@link ImportRow}
 	 * @param file
-	 * 			path to CSV file
+	 * 			CSV file
 	 * @param seperator
 	 * 			seperator character
 	 * @param quotechar
@@ -89,7 +90,7 @@ public class CSVImport {
 	 * 			returns a List of {@link ImportRow} 
 	 * @throws IOException
 	 */
-	public static List<ImportRow> ReadCSVWithMapping(String file, char seperator, 
+	public static List<ImportRow> readCSVWithMapping(File file, char seperator, 
 			char quotechar, char escape, Map<String, String> columnMapping) throws IOException{
 		List<ImportRow> importRows;
 		

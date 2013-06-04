@@ -6,9 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -106,15 +108,22 @@ public class MailingDAOImplemented implements IMailingDAO {
 			*/
 			
 			if(mailing.getMedium() == Mailing.Medium.EMAIL) {
+				Filter andEmail = new Filter();
+				andEmail.setType(FilterType.PERSON);
+				
 				PropertyCriterion hasEmail = new PropertyCriterion();
 				hasEmail.compareNotNull(FilterProperty.PERSON_EMAIL);
 				
 				ConnectedCriterion andCriterion = new ConnectedCriterion();
 				andCriterion.connect(hasEmail, LogicalOperator.AND, mailing.getFilter().getCriterion());
 				
-				mailing.getFilter().setCriterion(andCriterion);
+				andEmail.setCriterion(andCriterion);
+				mailing.setFilter(andEmail);
 				
 			} else if(mailing.getMedium() == Mailing.Medium.POSTAL) {
+				Filter andMainAddressFilter = new Filter();
+				andMainAddressFilter.setType(FilterType.PERSON);
+				
 				PropertyCriterion hasMainAddress = new PropertyCriterion();
 				hasMainAddress.compare(FilterProperty.ADDRESS_IS_MAIN, true);
 
@@ -126,16 +135,21 @@ public class MailingDAOImplemented implements IMailingDAO {
 				ConnectedCriterion andCriterion = new ConnectedCriterion();
 				andCriterion.connect(mailing.getFilter().getCriterion(),LogicalOperator.AND,mountedCompositeFilter);
 
-				mailing.getFilter().setCriterion(andCriterion);
+				andMainAddressFilter.setCriterion(andCriterion);
+				mailing.setFilter(andMainAddressFilter);
 			}
 
 			mailing.setId(keyHolder.getKey().intValue());
 			
-			//now apply personfilter and insert relevant entries into sentmailings
+			//now apply personfilter and insert relevant entries into sent_mailings
 			
 			String filterStmt = filterToSqlBuilder.createSqlStatement(mailing.getFilter());
-			
-			jdbcTemplate.query(filterStmt, new PersonMailingMapper(mailing));
+			List<Person> persons = jdbcTemplate.query(filterStmt, new PersonIdMapper());
+
+			for(Person person : persons) {
+				jdbcTemplate.update("INSERT INTO sent_mailings(person_id, mailing_id) VALUES (?, ?)"
+						, new Object[] {person.getId(), mailing.getId()});
+			}
 			
 		} else {
 			jdbcTemplate.update("UPDATE mailings SET mailing_date=?, mailing_type=?, mailing_medium=? WHERE mailing_id=?",
@@ -177,13 +191,19 @@ public class MailingDAOImplemented implements IMailingDAO {
 	public Mailing getById(int id) throws PersistenceException {
 		log.debug("Entering getById with param "+id);
 		
-		Mailing mailing = jdbcTemplate.queryForObject(
-				"SELECT * FROM mailings WHERE mailing_id=?", new Object[] {
-				id }, new MailingMapper());
+		try {
+			Mailing mailing = jdbcTemplate.queryForObject(
+					"SELECT * FROM mailings WHERE mailing_id=?", new Object[] {
+					id }, new MailingMapper());
+			
+			log.debug("Returning from getById with result "+mailing);
+			return mailing;
+		} catch(EmptyResultDataAccessException e) {
+			//return null if query returns 0 rows
+			return null;
+		}
 		
-		
-		log.debug("Returning from getById with result "+mailing);
-		return mailing;
+
 	}
 
 	@Override
@@ -196,7 +216,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 		List<Mailing> mailings = jdbcTemplate.query(
 				"SELECT ma.* FROM mailings ma, sent_mailings se " +
 				"WHERE ma.mailing_id=se.mailing_id AND se.person_id=?", 
-				new Object[] { person.getId() }, new MailingMapper());
+				new Object[] { person.getId() }, new int[] {Types.INTEGER}, new MailingMapper());
 
 		log.debug("Returning from getMailingsByPerson");
 		
@@ -229,22 +249,41 @@ public class MailingDAOImplemented implements IMailingDAO {
 	 * processes resultset of person filter and applies inserts to
 	 * sentmailings table
 	 */
-	private class PersonMailingMapper implements RowMapper<Void> {
+//	private class PersonMailingMapper implements RowMapper<Void> {
+//		
+//		private Mailing mailing;
+//		
+//		private String query = "INSERT INTO sent_mailings(mailing_id, person_id) VALUES (?, ?)";
+//		
+//		public PersonMailingMapper(Mailing mailing) {
+//			this.mailing = mailing;
+//		}
+//		
+//		@Override
+//		public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
+//			log.debug()
+//			jdbcTemplate.update(query, new Object[] { mailing.getId(), rs.getInt("person_id")});
+//			
+//			return null;
+//		}
+//		
+//	}
+	
+	/**
+	 * @author Chris Steele
+	 * maps a row of type person into a person object, used to insert entries
+	 * into sent_mailings
+	 */
+	private class PersonIdMapper implements RowMapper<Person> {
 
-		private Mailing mailing;
-		
-		private String query = "INSERT INTO sent_mailings (mailing_id, person_id) VALUES (?, ?)";
-		
-		public PersonMailingMapper(Mailing mailing) {
-			this.mailing = mailing;
-		}
-		
-		@Override
-		public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
-			jdbcTemplate.update(query, new Object[] { mailing.getId(), rs.getInt("person_id")});
+		public Person mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Person person = new Person();
+			person.setId(rs.getInt("id"));
+			person.setGivenName(rs.getString("givenname"));
+			person.setSurname(rs.getString("surname"));
 			
-			return null;
+			log.debug("returning from mapRow with param "+person);
+			return person;
 		}
-		
 	}
 }
