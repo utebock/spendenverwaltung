@@ -151,6 +151,9 @@ public class ButtonListener implements ActionListener{
 		if(cmd.equals("open_file_import_data")){
 			importData.chooseFile();
 		}
+		if(cmd.equals("import_import_data")){
+			importData.importData();
+		}
 	}
 
 }

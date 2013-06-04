@@ -26,6 +26,9 @@ public class ActionHandler implements ActionListener{
 	public ActionHandler(EditPerson editPerson) {
 		// TODO Auto-generated constructor stub
 	}
+	public ActionHandler(ImportData importData) {
+		// TODO Auto-generated constructor stub
+	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub

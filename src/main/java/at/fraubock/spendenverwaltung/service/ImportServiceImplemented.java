@@ -95,11 +95,13 @@ public class ImportServiceImplemented implements IImportService {
 				}
 				donation.setDonator(person);
 				
+				
+				
 				persons.add(person);
 				donations.add(donation);
 			}
 			
-			log.debug("Added "+donations.size()+" donations to "+persons.size()+" persons");
+			log.debug("Could add "+donations.size()+" donations to "+persons.size()+" persons (not implemented)");
 		} catch (IOException e) {
 			throw new ServiceException("IOException "+e.getMessage());
 		}
