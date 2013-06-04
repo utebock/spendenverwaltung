@@ -311,11 +311,41 @@ public class PersonDAOImplemented implements IPersonDAO {
 
 	}
 
+
+	@Override
+	public List<Person> getByAttributes(Person p) throws PersistenceException {
+		if (p == null) {
+			throw new IllegalArgumentException("Person must not be null");
+		}
+		
+		List<Person> selectedPersons;
+		
+		
+		if(p.getMainAddress() != null){
+			String select = "select * from persons p, addresses a, livesat l WHERE (l.pid = p.id AND l.aid = a.id) AND ((p.surname LIKE ? AND p.givenname LIKE ?) AND (p.email LIKE ? OR p.telephone LIKE ? OR (a.street LIKE ? AND a.postcode LIKE ? AND a.city LIKE ?)))";
+			selectedPersons = jdbcTemplate.query(select,
+				new Object[] { p.getSurname(), p.getGivenName(), p.getEmail(), p.getTelephone(), p.getMainAddress().getStreet(), p.getMainAddress().getPostalCode(), p.getMainAddress().getCity() }, new PersonMapper());
+		} else{
+			String select = "select * from persons p, addresses a, livesat l WHERE (l.pid = p.id AND l.aid = a.id) AND ((p.surname LIKE ? AND p.givenname LIKE ?) AND (p.email LIKE ? OR p.telephone LIKE ?))";
+			selectedPersons = jdbcTemplate.query(select,
+					new Object[] { p.getSurname(), p.getGivenName(), p.getEmail(), p.getTelephone() }, new PersonMapper());
+		}
+		
+		log.info("found " + selectedPersons.size() + " persons by given attributes");
+
+		// now, load their addresses
+		for (Person entry : selectedPersons) {
+			fetchAddresses(entry);
+		}
+		
+		return selectedPersons;
+	}
+	
 	@Override
 	public List<Person> getByAddress(Address address)
 			throws PersistenceException {
 
-		String select = "SELECT p.* FROM persons p JOIN livesat l ON p.id = l.pid WHERE l.aid = ? ORDER BY p.id DESC";
+		String select = "SELECT p.* FROM persons p JOIN livesat l ON p.id = l.pid WHERE l.aid = ? and l.livesat = true ORDER BY p.id DESC";
 		List<Person> personList = jdbcTemplate.query(select,
 				new Object[] { address.getId() }, new PersonMapper());
 		log.info(personList.size() + " list size");

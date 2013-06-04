@@ -7,6 +7,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
+import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 public class StartMainFrame {
@@ -19,11 +20,13 @@ public class StartMainFrame {
 	    IAddressService addressService = context.getBean("addressService", IAddressService.class);
 	    IDonationService donationService = context.getBean("donationService", IDonationService.class);
 	    IFilterService filterService = context.getBean("filterService", IFilterService.class);
+	    IImportService importService = context.getBean("importService", IImportService.class);
 	    
 	    mf.setPersonService(personService);
 	    mf.setAddressService(addressService);
 	    mf.setDonationService(donationService);
 	    mf.setFilterService(filterService);
+	    mf.setImportService(importService);
 	    mf.openMainWindow();
 	    
 		if(context != null) {
