@@ -309,9 +309,16 @@ public class PersonDAOImplemented implements IPersonDAO {
 		
 		List<Person> selectedPersons;
 		
-		String select = "select * from persons p, addresses a, livesat l WHERE (l.pid = p.id AND l.aid = a.id AND l.confirmed = true) AND ((p.surname LIKE ? AND p.givenname LIKE ?) AND (p.email LIKE ? OR p.telephone LIKE ? OR (a.street LIKE ? AND a.postcode LIKE ? AND a.city LIKE ?)))";
-		selectedPersons = jdbcTemplate.query(select,
+		
+		if(p.getMainAddress() != null){
+			String select = "select * from persons p, addresses a, livesat l WHERE (l.pid = p.id AND l.aid = a.id AND l.confirmed = true) AND ((p.surname LIKE ? AND p.givenname LIKE ?) AND (p.email LIKE ? OR p.telephone LIKE ? OR (a.street LIKE ? AND a.postcode LIKE ? AND a.city LIKE ?)))";
+			selectedPersons = jdbcTemplate.query(select,
 				new Object[] { p.getSurname(), p.getGivenName(), p.getEmail(), p.getTelephone(), p.getMainAddress().getStreet(), p.getMainAddress().getPostalCode(), p.getMainAddress().getCity() }, new PersonMapper());
+		} else{
+			String select = "select * from persons p, addresses a, livesat l WHERE (l.pid = p.id AND l.aid = a.id AND l.confirmed = true) AND ((p.surname LIKE ? AND p.givenname LIKE ?) AND (p.email LIKE ? OR p.telephone LIKE ?))";
+			selectedPersons = jdbcTemplate.query(select,
+					new Object[] { p.getSurname(), p.getGivenName(), p.getEmail(), p.getTelephone() }, new PersonMapper());
+		}
 		
 		log.info("found " + selectedPersons.size() + " persons by given attributes");
 

@@ -44,7 +44,7 @@ public class ImportValidator {
 			
 			if(matchedPerson == null){
 				//person doesn't exist -> create new
-				validatedData.addNewEntry(matchedPerson, currentDonation);
+				validatedData.addNewEntry(currentPerson, currentDonation);
 			} else{
 				// check if person has a unique identifier
 				if(!currentPerson.getTelephone().equals("")
