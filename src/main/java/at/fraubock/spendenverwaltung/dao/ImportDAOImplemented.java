@@ -50,12 +50,10 @@ public class ImportDAOImplemented implements IImportDAO {
 			throw new ValidationException("import must not be null");
 		if (i.getId() != null && i.getId() < 0)
 			throw new ValidationException("id must not be less than 0");
-		/* creator will be set by insert/update statement
 		if (i.getCreator() == null)
 			throw new ValidationException("creator must not be null");
 		if (i.getCreator().length() > 30)
 			throw new ValidationException("creator must be max 30 chars long");
-		*/
 		if (i.getImportDate() == null)
 			throw new ValidationException("import date must not be null");
 		if (i.getSource() == null)

@@ -70,6 +70,7 @@ public class ImportServiceImplemented implements IImportService {
 			imp = new Import();
 			imp.setImportDate(new Date());
 			imp.setSource("native");
+			imp.setCreator("");
 			try{
 				importDAO.insertOrUpdate(imp);
 			}

@@ -68,13 +68,23 @@ public abstract class AbstractImportDAOTest {
 		i.setSource("CSVCSVCSVCSVCSVCSVCSVCSVCSVCSVCSV");
 		importDAO.insertOrUpdate(i);
 	}
-
+	
 	@Test(expected = PersistenceException.class)
 	@Transactional
 	public void createWithNullDate_shouldFail() throws PersistenceException {
 		Import i = new Import();
 		i.setCreator("melanie");
 		i.setImportDate(null);
+		i.setSource("CSV");
+		importDAO.insertOrUpdate(i);	
+	}
+
+	@Test(expected = PersistenceException.class)
+	@Transactional
+	public void createWithNullCreator_shouldFail() throws PersistenceException {
+		Import i = new Import();
+		i.setCreator(null);
+		i.setImportDate(new GregorianCalendar(2013, 2, 15).getTime());
 		i.setSource("CSV");
 		importDAO.insertOrUpdate(i);
 	}
