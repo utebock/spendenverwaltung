@@ -1,0 +1,9 @@
+givenname;surname;email;sex;title;company;telephone;emailnotification;postalnotification;personnote;date;amount;dedication;donationnote;type;street;postcode;city;country;
+Martin;Bara;;male;;;;1;1;;2004-01-09 00:00:00;20;Wohnprojekt;;bank transfer;Firmiangasse 37;1130;Wien;Österreich
+Martin;Bara;;male;;;;1;1;;2008-09-15 00:00:00;10;Spende;;bank transfer;Firmiangasse 37;1130;Wien;Österreich
+Martin;Bara;;male;;;;1;1;;2011-04-20 00:00:00;10;Spende;;bank transfer;Firmiangasse 37;1130;Wien;Österreich
+Anne-Marie;Bauer;;female;;;;1;1;;2007-12-12 00:00:00;35;Spende;;bank transfer;Mondweg 5/3/9;1140;Wien;Österreich
+Anne-Marie;Bauer;;female;;;;1;1;;2003-11-04 00:00:00;50;Wohnprojekt;;bank transfer;Mondweg 5/3/9;1140;Wien;Österreich
+Anne-Marie;Bauer;;female;;;;1;1;;2008-12-03 00:00:00;40;Spende;;bank transfer;Mondweg 5/3/9;1140;Wien;Österreich
+Rosa;Baumann;;female;;;;1;1;;2007-12-11 00:00:00;20;Kinderprojekt;;bank transfer;Jagdschlossgasse 52/8/10;1130;Wien;Österreich
+Rosa;Baumann;;female;;;;1;1;;2003-10-15 00:00:00;30;Spende;;bank transfer;Jagdschlossgasse 52/8/10;1130;Wien;Österreich

@@ -5,9 +5,12 @@ public class ImportRow {
 	private String givenName;
 	private String surname;
 	private String email;
+	private String sex;
 	private String title;
 	private String company;
 	private String telephone;
+	private String emailNotification;
+	private String postalNotification;
 	private String personNote;
 	
 	//Donation
@@ -15,6 +18,7 @@ public class ImportRow {
 	private String amount;
 	private String dedication;
 	private String donationNote;
+	private String type;
 	
 	//Address
 	private String street;
@@ -116,6 +120,46 @@ public class ImportRow {
 	}
 	public void setCountry(String country) {
 		this.country = country;
+	}
+
+
+	public String getSex() {
+		return sex;
+	}
+
+
+	public String getEmailNotification() {
+		return emailNotification;
+	}
+
+
+	public String getPostalNotification() {
+		return postalNotification;
+	}
+
+
+	public void setSex(String sex) {
+		this.sex = sex;
+	}
+
+
+	public void setEmailNotification(String emailNotification) {
+		this.emailNotification = emailNotification;
+	}
+
+
+	public void setPostalNotification(String postalNotification) {
+		this.postalNotification = postalNotification;
+	}
+
+
+	public String getType() {
+		return type;
+	}
+
+
+	public void setType(String type) {
+		this.type = type;
 	}
 	
 	
