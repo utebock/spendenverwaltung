@@ -158,27 +158,6 @@ public class AddressDAOImplemented implements IAddressDAO {
 		}
 	}
 
-<<<<<<< HEAD
-=======
-	@Override
-	public Address getMainAddressByPerson(Person person)
-			throws PersistenceException {
-		try {
-			return jdbcTemplate
-					.queryForObject(
-							"select a.* from "
-									+ " addresses a,livesat l where l.aid=a.id and l.pid = ? and l.ismain=true and a.confirmed=true",
-							new Object[] { person.getId() },
-							new int[] { Types.INTEGER }, new AddressMapper());
-		} catch (IncorrectResultSizeDataAccessException e) {
-			if (e.getActualSize() == 0)
-				return null;
-			else
-				throw new PersistenceException(e);
-		}
-	}
-
->>>>>>> refs/remotes/origin/ImportValidation
 	private class AddressMapper implements RowMapper<Address> {
 
 		public Address mapRow(ResultSet rs, int rowNum) throws SQLException {
