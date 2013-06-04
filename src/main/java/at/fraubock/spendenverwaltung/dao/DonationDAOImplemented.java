@@ -234,4 +234,13 @@ public class DonationDAOImplemented implements IDonationDAO {
 		return donations;
 	}
 
+	@Override
+	public void setImportToNull(List<Donation> donationList) throws PersistenceException {
+		String updateStmt = "UPDATE donations SET import=null WHERE id=?";
+		
+		for(Donation d : donationList){
+			jdbcTemplate.update(updateStmt, new Object[] { d.getId() }, new int[] { Types.INTEGER });
+		}
+	}
+
 }

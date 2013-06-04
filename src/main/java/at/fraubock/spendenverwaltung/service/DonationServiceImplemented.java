@@ -110,4 +110,13 @@ public class DonationServiceImplemented implements IDonationService {
 	public DonationType getDonationTypeByIndex(int index) {
 		return Donation.DonationType.values()[index];
 	}
+
+	@Override
+	public void setImportToNull(List<Donation> donationList) throws ServiceException {
+		try {
+			donationDAO.setImportToNull(donationList);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
 }

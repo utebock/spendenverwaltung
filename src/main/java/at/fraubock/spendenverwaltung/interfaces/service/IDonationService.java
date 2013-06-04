@@ -5,6 +5,7 @@ import java.util.List;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 
 
@@ -80,4 +81,13 @@ public interface IDonationService {
 	 * @return DonationType with index "index"
 	 */
 	public DonationType getDonationTypeByIndex(int index);
+	
+	/**
+	 * For the donations in the donation list the import attribute will be updated to null
+	 * @param donationList
+	 * 			List of donations which should be affected
+	 * @throws PersistenceException
+	 *          If communication to the underlying persistence system failed
+	 */
+	public void setImportToNull(List<Donation> donationList) throws ServiceException;
 }

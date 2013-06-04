@@ -148,4 +148,12 @@ public interface IDonationDAO {
 	// public long sumByFilter(DonationFilter filter) throws
 	// PersistenceException;
 
+	/**
+	 * For the donations in the donation list the import attribute will be updated to null
+	 * @param donationList
+	 * 			List of donations which should be affected
+	 * @throws PersistenceException
+	 *          If communication to the underlying persistence system failed
+	 */
+	public void setImportToNull(List<Donation> donationList) throws PersistenceException;
 }

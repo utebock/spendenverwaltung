@@ -142,6 +142,9 @@ public class ButtonListener implements ActionListener{
 		if(cmd.equals("return_from_import_validation_to_overview")){
 			importValidation.returnTo();
 		}
+		if(cmd.equals("save_validation")){
+			importValidation.saveValidation();
+		}
 		if(cmd.equals("donationImport_overview")){
 			overview.goToImport();
 		}

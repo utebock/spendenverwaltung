@@ -46,6 +46,7 @@ public class ImportValidation extends JPanel {
 	private JPanel matchPanel;
 	private ComponentBuilder builder;
 	private JButton backBtn;
+	private JButton saveBtn;
 	private ButtonListener buttonListener;
 	private List<Donation> donationList;
 	private List<Person> personList;
@@ -58,7 +59,7 @@ public class ImportValidation extends JPanel {
 		this.builder = new ComponentBuilder();
 		this.buttonListener = new ButtonListener(this);
 		this.importValidator = new ImportValidator(personService);
-		this.validatedData = validatedData;
+		this.validatedData = new ValidatedData();
 		this.personService = personService;
 		this.addressService = addressService;
 		this.donationService = donationService;
@@ -98,7 +99,10 @@ public class ImportValidation extends JPanel {
 		
 		conflictPanel.add(conflictPane, "wrap, growx");
 		newPanel.add(newPane, "wrap, growx");
-		matchPanel.add(matchPane, "wrap, growx");
+		matchPanel.add(matchPane, "wrap, growx, span 2");
+
+		saveBtn = builder.createButton("Speichern", buttonListener, "save_validation");
+		matchPanel.add(saveBtn, "");
 
 		backBtn = builder.createButton("Abbrechen", buttonListener, "return_from_import_validation_to_overview");
 		matchPanel.add(backBtn, "");
@@ -146,6 +150,16 @@ public class ImportValidation extends JPanel {
 		matchTable.revalidate();
 	}
 
+	public void saveValidation(){
+		try {
+			donationService.setImportToNull(validatedData.getDonationListNew());
+		} catch (ServiceException e) {
+			JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+		    e.printStackTrace();
+		    return;
+		}
+	}
+	
 	public void returnTo() {
 		this.removeAll();
 		this.revalidate();
@@ -155,4 +169,5 @@ public class ImportValidation extends JPanel {
 		overview.repaint();
 		overview.setUp();
 	}
+	
 }
