@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,27 +14,43 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
+import at.fraubock.spendenverwaltung.interfaces.dao.IImportDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
+import at.fraubock.spendenverwaltung.interfaces.domain.Import;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person.Sex;
 import at.fraubock.spendenverwaltung.interfaces.domain.csvimport.ImportRow;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
+import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
+import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
+import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.CSVImport;
 
+/**
+ * 
+ * @author romanvoglhuber
+ *
+ */
 public class ImportServiceImplemented implements IImportService {
-
-	private static final Logger log = Logger.getLogger(ImportServiceImplemented.class);
+	private IPersonService personService;
+	private IDonationService donationService;
+	private IAddressService addressService;
 	
+	private IImportDAO importDAO;
+	
+	private static final Logger log = Logger.getLogger(ImportServiceImplemented.class);
+
 	public void nativeImport(File file) throws ServiceException{
 		Map<String, String> columnMapping = new HashMap<String, String>();
-		List<Person> persons;
-		List<Donation> donations;
+		
 		Person person;
 		Donation donation;
 		Address address;
+		Import imp;
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		
 		log.debug("Native import file: "+file);
@@ -51,8 +67,17 @@ public class ImportServiceImplemented implements IImportService {
 
 			List<ImportRow> importRows = CSVImport.readCSVWithMapping(file, columnMapping);
 		
-			persons = new ArrayList<Person>();
-			donations = new ArrayList<Donation>();
+			imp = new Import();
+			imp.setImportDate(new Date());
+			imp.setSource("native");
+			imp.setCreator("");
+			try{
+				importDAO.insertOrUpdate(imp);
+			}
+			catch(PersistenceException e){
+				throw new ServiceException("Persistence error while creating import ");
+			}
+			
 			for(ImportRow row : importRows){
 				//Person
 				person = new Person();
@@ -87,23 +112,54 @@ public class ImportServiceImplemented implements IImportService {
 				address.setCountry(row.getCountry());
 				
 				//Connect Domains
+				address = addressService.create(address);
 				List<Address> addresses = person.getAddresses();
 				addresses.add(address);
+				
 				person.setAddresses(addresses);
-				if(person.getMainAddress()==null){
-					person.setMainAddress(address);
-				}
+				person.setMainAddress(address);
+				person = personService.create(person);
+				
 				donation.setDonator(person);
-				
-				
-				
-				persons.add(person);
-				donations.add(donation);
+				donation.setSource(imp);
+				donationService.create(donation);				
 			}
 			
-			log.debug("Could add "+donations.size()+" donations to "+persons.size()+" persons (not implemented)");
+			log.debug("Imported "+importRows.size()+" donations");
 		} catch (IOException e) {
 			throw new ServiceException("IOException "+e.getMessage());
 		}
+	}
+
+	public IImportDAO getImportDAO() {
+		return importDAO;
+	}
+
+	public void setImportDAO(IImportDAO importDAO) {
+		this.importDAO = importDAO;
+	}
+
+	public IPersonService getPersonService() {
+		return personService;
+	}
+
+	public IDonationService getDonationService() {
+		return donationService;
+	}
+
+	public IAddressService getAddressService() {
+		return addressService;
+	}
+
+	public void setPersonService(IPersonService personService) {
+		this.personService = personService;
+	}
+
+	public void setDonationService(IDonationService donationService) {
+		this.donationService = donationService;
+	}
+
+	public void setAddressService(IAddressService addressService) {
+		this.addressService = addressService;
 	}
 }
