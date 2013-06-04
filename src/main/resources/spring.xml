@@ -125,12 +125,10 @@
 	</bean>
 	<bean id="filterValidator" class="at.fraubock.spendenverwaltung.service.FilterValidator">
 	</bean>
-<<<<<<< HEAD
-
-=======
-	
 	<bean id="importService" class="at.fraubock.spendenverwaltung.service.ImportServiceImplemented">
+		<property name="importDAO" ref="importDao" />
+		<property name="personService" ref="personService" />
+		<property name="addressService" ref="addressService" />
+		<property name="donationService" ref="donationService" />
 	</bean>
-	
->>>>>>> refs/remotes/origin/ImportValidation
 </beans>
