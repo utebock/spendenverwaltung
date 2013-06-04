@@ -160,7 +160,7 @@ public class ShowPersons extends JPanel {
 
 		try {
 			if (filter == null) {
-				personList = personService.getAll();
+				personList = personService.getConfirmed();
 			} else {
 				personList = personService.getByFilter(filter);
 			}

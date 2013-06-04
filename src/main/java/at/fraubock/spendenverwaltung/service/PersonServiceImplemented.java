@@ -129,4 +129,15 @@ public class PersonServiceImplemented implements IPersonService {
 		return list;
 	}
 
+	@Override
+	public List<Person> getConfirmed() throws ServiceException {
+		List<Person> list = null;
+		try {
+			list = personDAO.getConfirmed();
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+		return list;
+	}
+
 }

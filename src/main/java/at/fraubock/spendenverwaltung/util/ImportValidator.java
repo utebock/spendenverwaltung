@@ -43,26 +43,27 @@ public class ImportValidator {
 			
 			
 			if(matchedPerson == null){
-				//person doesn't exist -> create new
-				validatedData.addNewEntry(currentPerson, currentDonation);
-			} else{
 				// check if person hass a unique identifier
-				if(!currentPerson.getTelephone().equals("")
+				if( currentPerson != null
+						&& (!currentPerson.getTelephone().equals("")
 						|| !currentPerson.getEmail().equals("")
-						|| currentPerson.getMainAddress() != null){
+						|| currentPerson.getMainAddress() != null)){
 
 					//validate next entry, if donation is a duplicate
 					if(isDuplicate(currentDonation)){
 						validatedData.addConflictEntry(currentPerson, currentDonation, ConflictType.DUPLICATE);
 						continue;
 					}
-					
-					//unique identifier found -> person matched
-					validatedData.addMatchEntry(currentPerson, currentDonation);
+
+					//person doesn't exist -> create new
+					validatedData.addNewEntry(currentPerson, currentDonation);
 				} else{
 					//no unique identifier -> conflict
 					validatedData.addConflictEntry(currentPerson, currentDonation, ConflictType.ANONYM);
 				}
+			} else{
+				//unique identifier found -> person matched
+				validatedData.addMatchEntry(matchedPerson, currentDonation);
 			}
 		}
 		

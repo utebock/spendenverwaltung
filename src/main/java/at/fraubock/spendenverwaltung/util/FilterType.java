@@ -2,10 +2,10 @@ package at.fraubock.spendenverwaltung.util;
 
 public enum FilterType {
 	
-	PERSON("persons"), 
-	DONATION("donations"), 
+	PERSON("validated_persons"), 
+	DONATION("validated_donations"), 
 	MAILING("mailings"), 
-	ADDRESS("addresses");
+	ADDRESS("validated_addresses");
 	
 	private String type;
 	
@@ -19,13 +19,13 @@ public enum FilterType {
 	}
 	
 	public static FilterType getTypeForString(String value) {
-		if("persons".equals(value)) {
+		if("validated_persons".equals(value)) {
 			return PERSON;
-		} else if("donations".equals(value)) {
+		} else if("validated_donations".equals(value)) {
 			return DONATION;
-		} else if("mailings".equals(value)) {
+		} else if("validated_mailings".equals(value)) {
 			return MAILING;
-		} else if("addresses".equals(value)) {
+		} else if("validated_addresses".equals(value)) {
 			return ADDRESS;
 		}
 		return null;
