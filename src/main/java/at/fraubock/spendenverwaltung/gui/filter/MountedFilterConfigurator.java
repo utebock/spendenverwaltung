@@ -14,9 +14,9 @@ import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.filter.comparators.DonationToPersonComp;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
-import at.fraubock.spendenverwaltung.service.to.CriterionTO;
 import at.fraubock.spendenverwaltung.util.FilterType;
 
 /**
@@ -27,7 +27,8 @@ import at.fraubock.spendenverwaltung.util.FilterType;
  */
 public class MountedFilterConfigurator extends JPanel implements
 		ICriterionConfigurator {
-
+	private static final long serialVersionUID = -7505945596725892100L;
+	
 	private FilterType type;
 	private JComboBox<Filter> filterBox;
 	private IFilterService filterService;
@@ -54,7 +55,7 @@ public class MountedFilterConfigurator extends JPanel implements
 	}
 
 	@Override
-	public CriterionTO createCriterion() throws InvalidInputException {
+	public Criterion createCriterion() throws InvalidInputException {
 		return comp.createCriterion((Filter) filterBox.getModel()
 				.getSelectedItem());
 	}

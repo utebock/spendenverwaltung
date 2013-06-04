@@ -4,11 +4,11 @@ import javax.swing.JComponent;
 
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
-import at.fraubock.spendenverwaltung.service.to.MountedFilterCriterionTO;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
 
 public interface IMountedFilterComponent {
 
-	public MountedFilterCriterionTO getMountedFilterCriterionTOForFilter(
+	public MountedFilterCriterion getMountedFilterCriterionTOForFilter(
 			Filter filter) throws InvalidInputException;
 
 	public JComponent getComponent();

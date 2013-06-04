@@ -6,8 +6,8 @@ import javax.swing.JPanel;
 
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.filter.ICriterionConfigurator;
-import at.fraubock.spendenverwaltung.service.to.CriterionTO;
-import at.fraubock.spendenverwaltung.service.to.PropertyCriterionTO;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
@@ -25,8 +25,8 @@ public class BooleanComparator extends JPanel implements ICriterionConfigurator 
 	}
 
 	@Override
-	public CriterionTO createCriterion() throws InvalidInputException {
-		PropertyCriterionTO crit = new PropertyCriterionTO();
+	public Criterion createCriterion() throws InvalidInputException {
+		PropertyCriterion crit = new PropertyCriterion();
 		crit.setProperty(property);
 		crit.setRelationalOperator(RelationalOperator.EQUALS);
 		crit.setBoolValue(checkBox.isSelected());

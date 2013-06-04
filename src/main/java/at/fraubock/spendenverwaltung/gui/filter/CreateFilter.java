@@ -12,7 +12,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
 import at.fraubock.spendenverwaltung.gui.ActionHandler;
@@ -23,10 +22,10 @@ import at.fraubock.spendenverwaltung.gui.FilterOverview;
 import at.fraubock.spendenverwaltung.gui.FilterTableModel;
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.to.FilterTO;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
-import at.fraubock.spendenverwaltung.service.to.CriterionTO;
-import at.fraubock.spendenverwaltung.service.to.FilterTO;
 import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
 
@@ -170,7 +169,7 @@ public class CreateFilter extends JPanel {
 		}
 		
 		try {
-			List<CriterionTO> crits = new ArrayList<CriterionTO>();
+			List<Criterion> crits = new ArrayList<Criterion>();
 			List<LogicalOperator> ops = new ArrayList<LogicalOperator>();
 
 			for (SelectorGuiComponent sel : selectorComponents) {
@@ -284,7 +283,7 @@ public class CreateFilter extends JPanel {
 			}
 		}
 
-		public CriterionTO toCriterionTO() throws InvalidInputException {
+		public Criterion toCriterionTO() throws InvalidInputException {
 			return ((ICriterionConfigurator) cbModel.getSelectedItem())
 					.createCriterion();
 		}

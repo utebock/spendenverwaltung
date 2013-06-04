@@ -11,11 +11,10 @@ import at.fraubock.spendenverwaltung.interfaces.dao.IFilterDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.ConnectedCriterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.to.FilterTO;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
-import at.fraubock.spendenverwaltung.service.to.CriterionTO;
-import at.fraubock.spendenverwaltung.service.to.FilterTO;
 import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
 
@@ -115,7 +114,7 @@ public class FilterServiceImplemented implements IFilterService {
 		filter.setName(filterTO.getName());
 		filter.setAnonymous(filterTO.isAnonymous());
 
-		List<CriterionTO> crits = filterTO.getCriterions();
+		List<Criterion> crits = filterTO.getCriterions();
 		List<LogicalOperator> ops = filterTO.getOperators();
 		
 		// check if criterions and operators match in number
@@ -131,7 +130,7 @@ public class FilterServiceImplemented implements IFilterService {
 			// one or no criterion was provided
 			Criterion crit = null;
 			if (crits.size() == 1) {
-				crit = crits.get(0).createCriterion();
+				crit = crits.get(0);
 			}
 			filter.setCriterion(crit);
 			return filter;
@@ -153,14 +152,14 @@ public class FilterServiceImplemented implements IFilterService {
 			Criterion operand1 = null;
 			if (current == null) {
 				// starting point, set first criterion as left child
-				operand1 = crits.get(index).createCriterion();
+				operand1 = crits.get(index);
 			} else {
 				// set the prior ConnectedCriterion to this one's left child
 				operand1 = current;
 			}
 			ConnectedCriterion con = new ConnectedCriterion();
 			// set the next criterion to this one's right child
-			con.connect(operand1, op, crits.get(index + 1).createCriterion());
+			con.connect(operand1, op, crits.get(index + 1));
 			current = con;
 			index++;
 		}

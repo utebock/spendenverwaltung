@@ -7,7 +7,6 @@ import java.util.List;
 import at.fraubock.spendenverwaltung.gui.filter.comparators.BooleanComparator;
 import at.fraubock.spendenverwaltung.gui.filter.comparators.DateComparator;
 import at.fraubock.spendenverwaltung.gui.filter.comparators.DaysBackComparator;
-import at.fraubock.spendenverwaltung.gui.filter.comparators.DonationToPersonComp;
 import at.fraubock.spendenverwaltung.gui.filter.comparators.EnumComparator;
 import at.fraubock.spendenverwaltung.gui.filter.comparators.NumberComparator;
 import at.fraubock.spendenverwaltung.gui.filter.comparators.StringComparator;

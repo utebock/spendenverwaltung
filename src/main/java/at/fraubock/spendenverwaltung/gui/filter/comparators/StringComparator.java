@@ -8,8 +8,8 @@ import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.filter.ICriterionConfigurator;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationType;
-import at.fraubock.spendenverwaltung.service.to.CriterionTO;
-import at.fraubock.spendenverwaltung.service.to.PropertyCriterionTO;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
 
 public class StringComparator extends JPanel implements ICriterionConfigurator {
@@ -28,8 +28,8 @@ public class StringComparator extends JPanel implements ICriterionConfigurator {
 	}
 
 	@Override
-	public CriterionTO createCriterion() throws InvalidInputException {
-		PropertyCriterionTO crit = new PropertyCriterionTO();
+	public Criterion createCriterion() throws InvalidInputException {
+		PropertyCriterion crit = new PropertyCriterion();
 		crit.setProperty(property);
 		crit.setRelationalOperator(picker.getPickedOperator());
 		crit.setStrValue(textField.getText());
