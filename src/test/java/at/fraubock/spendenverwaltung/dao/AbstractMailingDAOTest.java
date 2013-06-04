@@ -369,7 +369,7 @@ public class AbstractMailingDAOTest {
 	public void getMailingsByValidPersonWithNoMailings_shouldReturnNull() {
 		try {
 			initData();
-			assertNull(mailingDAO.getMailingsByPerson(personOne));
+			assertTrue(mailingDAO.getMailingsByPerson(personOne).isEmpty());
 		} catch (PersistenceException e) {
 			fail();
 		}

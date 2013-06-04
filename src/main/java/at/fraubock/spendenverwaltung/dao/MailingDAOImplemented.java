@@ -202,8 +202,6 @@ public class MailingDAOImplemented implements IMailingDAO {
 			//return null if query returns 0 rows
 			return null;
 		}
-		
-
 	}
 
 	@Override
@@ -219,10 +217,6 @@ public class MailingDAOImplemented implements IMailingDAO {
 				new Object[] { person.getId() }, new int[] {Types.INTEGER}, new MailingMapper());
 
 		log.debug("Returning from getMailingsByPerson");
-		
-		if(mailings.isEmpty()) {
-			return null;
-		}
 		
 		return mailings;
 	}
@@ -242,32 +236,6 @@ public class MailingDAOImplemented implements IMailingDAO {
 		}
 		
 	}
-	
-	/**
-	 * @author Chris
-	 *
-	 * processes resultset of person filter and applies inserts to
-	 * sentmailings table
-	 */
-//	private class PersonMailingMapper implements RowMapper<Void> {
-//		
-//		private Mailing mailing;
-//		
-//		private String query = "INSERT INTO sent_mailings(mailing_id, person_id) VALUES (?, ?)";
-//		
-//		public PersonMailingMapper(Mailing mailing) {
-//			this.mailing = mailing;
-//		}
-//		
-//		@Override
-//		public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
-//			log.debug()
-//			jdbcTemplate.update(query, new Object[] { mailing.getId(), rs.getInt("person_id")});
-//			
-//			return null;
-//		}
-//		
-//	}
 	
 	/**
 	 * @author Chris Steele
