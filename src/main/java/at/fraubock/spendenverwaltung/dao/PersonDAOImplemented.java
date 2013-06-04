@@ -250,13 +250,13 @@ public class PersonDAOImplemented implements IPersonDAO {
 	 */
 	private void fetchAddresses(Person person) throws PersistenceException {
 		List<Address> addresses = jdbcTemplate.query(
-				"SELECT * FROM livesat l WHERE l.pid = ? and l.confirmed = true ORDER BY aid DESC",
+				"SELECT * FROM livesat l WHERE l.pid = ? ORDER BY aid DESC",
 				new Object[] { person.getId() }, new AddressMapper());
 		person.setAddresses(addresses);
 		try {
 			Address mainAddress = jdbcTemplate
 					.queryForObject(
-							"SELECT * FROM livesat l WHERE l.pid = ? AND l.ismain = TRUE AND l.confirmed = true",
+							"SELECT * FROM livesat l WHERE l.pid = ? AND l.ismain = TRUE",
 							new Object[] { person.getId() },
 							new AddressMapper());
 			person.setMainAddress(mainAddress);
@@ -270,7 +270,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 	@Override
 	public List<Person> getAll() throws PersistenceException {
 
-		String select = "SELECT * FROM persons WHERE confirmed = true ORDER BY id DESC";
+		String select = "SELECT * FROM persons ORDER BY id DESC";
 		List<Person> personList = jdbcTemplate
 				.query(select, new PersonMapper());
 		log.info(personList.size() + " list size");
@@ -311,11 +311,11 @@ public class PersonDAOImplemented implements IPersonDAO {
 		
 		
 		if(p.getMainAddress() != null){
-			String select = "select * from persons p, addresses a, livesat l WHERE (l.pid = p.id AND l.aid = a.id AND l.confirmed = true) AND ((p.surname LIKE ? AND p.givenname LIKE ?) AND (p.email LIKE ? OR p.telephone LIKE ? OR (a.street LIKE ? AND a.postcode LIKE ? AND a.city LIKE ?)))";
+			String select = "select * from persons p, addresses a, livesat l WHERE (l.pid = p.id AND l.aid = a.id) AND ((p.surname LIKE ? AND p.givenname LIKE ?) AND (p.email LIKE ? OR p.telephone LIKE ? OR (a.street LIKE ? AND a.postcode LIKE ? AND a.city LIKE ?)))";
 			selectedPersons = jdbcTemplate.query(select,
 				new Object[] { p.getSurname(), p.getGivenName(), p.getEmail(), p.getTelephone(), p.getMainAddress().getStreet(), p.getMainAddress().getPostalCode(), p.getMainAddress().getCity() }, new PersonMapper());
 		} else{
-			String select = "select * from persons p, addresses a, livesat l WHERE (l.pid = p.id AND l.aid = a.id AND l.confirmed = true) AND ((p.surname LIKE ? AND p.givenname LIKE ?) AND (p.email LIKE ? OR p.telephone LIKE ?))";
+			String select = "select * from persons p, addresses a, livesat l WHERE (l.pid = p.id AND l.aid = a.id) AND ((p.surname LIKE ? AND p.givenname LIKE ?) AND (p.email LIKE ? OR p.telephone LIKE ?))";
 			selectedPersons = jdbcTemplate.query(select,
 					new Object[] { p.getSurname(), p.getGivenName(), p.getEmail(), p.getTelephone() }, new PersonMapper());
 		}
