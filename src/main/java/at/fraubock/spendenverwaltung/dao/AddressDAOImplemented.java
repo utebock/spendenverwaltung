@@ -18,7 +18,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
-import at.fraubock.spendenverwaltung.service.AddressValidator;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
 
 /**
  * implementation of {@link IAddressDAO}
@@ -38,6 +38,38 @@ public class AddressDAOImplemented implements IAddressDAO {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
+	/**
+	 * checks the integrity of any {@link Address} entity
+	 * TODO not a satisfying solution, refactoring needed
+	 * (program logic implemented by exceptions, doesnt propagate errors, etc)
+	 * 
+	 * @author philipp muhoray
+	 * @throws ValidationException 
+	 * 
+	 */
+	
+	private static void validate(Address address) throws ValidationException {
+		if (address == null) {
+			log.error("Argument was null");
+			throw new ValidationException("Address must not be null");
+		}
+
+		if (address.getStreet() == null) {
+			log.error("Street was null");
+			throw new ValidationException("Street must not be null");
+		}
+
+		if (address.getCity() == null) {
+			log.error("City was null");
+			throw new ValidationException("City must not be null");
+		}
+
+		if (address.getCountry() == null) {
+			log.error("Country was null");
+			throw new ValidationException("Country must not be null");
+		}
+	}
+	
 	private class CreateAddressStatementCreator implements
 			PreparedStatementCreator {
 
@@ -90,43 +122,51 @@ public class AddressDAOImplemented implements IAddressDAO {
 
 	@Override
 	public void insertOrUpdate(final Address a) throws PersistenceException {
-		AddressValidator.validate(a);
-		if (a.getId() == null) {
-			log.info("Inserting Address...");
-
-			KeyHolder keyHolder = new GeneratedKeyHolder();
-			jdbcTemplate
-					.update(new CreateAddressStatementCreator(a), keyHolder);
-
-			// set address id to update result
-			a.setId(keyHolder.getKey().intValue());
-
-			log.info("Address entity successfully created: " + a.toString());
-		} else {
-			log.info("Updating Address...");
-			jdbcTemplate.update(new UpdateAddressStatementCreator(a));
-			log.info("Address entity successfully updated: " + a.toString());
+		try {
+			validate(a);
+			
+			if (a.getId() == null) {
+				log.info("Inserting Address...");
+	
+				KeyHolder keyHolder = new GeneratedKeyHolder();
+				jdbcTemplate
+						.update(new CreateAddressStatementCreator(a), keyHolder);
+	
+				// set address id to update result
+				a.setId(keyHolder.getKey().intValue());
+	
+				log.info("Address entity successfully created: " + a.toString());
+			} else {
+				log.info("Updating Address...");
+				jdbcTemplate.update(new UpdateAddressStatementCreator(a));
+				log.info("Address entity successfully updated: " + a.toString());
+			}
+		} catch (ValidationException e) {
+			throw new PersistenceException(e);
 		}
 	}
 
 	@Override
 	public void delete(final Address a) throws PersistenceException {
 		log.info("Deleting Address...");
-		AddressValidator.validate(a);
-		jdbcTemplate.update(new PreparedStatementCreator() {
-
-			@Override
-			public PreparedStatement createPreparedStatement(Connection con)
-					throws SQLException {
-				String updateAddress = "delete from addresses where id=?";
-
-				PreparedStatement ps = con.prepareStatement(updateAddress);
-				ps.setInt(1, a.getId());
-				return ps;
-			}
-
-		});
-
+		try {
+			validate(a);
+			jdbcTemplate.update(new PreparedStatementCreator() {
+	
+				@Override
+				public PreparedStatement createPreparedStatement(Connection con)
+						throws SQLException {
+					String updateAddress = "delete from addresses where id=?";
+	
+					PreparedStatement ps = con.prepareStatement(updateAddress);
+					ps.setInt(1, a.getId());
+					return ps;
+				}
+	
+			});
+		} catch (ValidationException e) {
+			throw new PersistenceException(e);
+		}
 		log.info("Address entity successfully deleted:" + a.toString());
 	}
 

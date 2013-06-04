@@ -22,6 +22,10 @@ import at.fraubock.spendenverwaltung.util.FilterProperty;
 import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
+/**
+ * @author Chris Steele
+ *
+ */
 public class AbstractMailingServiceTest {
 
 	private static IMailingService mailingService;

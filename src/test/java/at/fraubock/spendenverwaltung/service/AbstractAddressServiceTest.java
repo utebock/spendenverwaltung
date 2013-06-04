@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.service;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -11,7 +12,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
@@ -44,43 +44,41 @@ public abstract class AbstractAddressServiceTest {
 	 * testing create
 	 */
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ServiceException.class)
 	@Transactional
-	public void createWithNullParameter_ThrowsException() {
+	public void createWithNullParameter_ThrowsException() throws ServiceException {
 		try {
-			doThrow(new IllegalArgumentException()).when(addressDAO)
-					.insertOrUpdate(null);
-
-			addressService.create(null);
-		} catch (ServiceException e) {
-			fail();
+			doThrow(new PersistenceException()).when(addressDAO)
+						.insertOrUpdate(null);
 		} catch (PersistenceException e) {
 			fail();
 		}
+		addressService.create(null);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ServiceException.class)
 	@Transactional
-	public void createWithInvalidStateParameter_ThrowsException() {
+	public void createWithInvalidStateParameter_ThrowsException() throws ServiceException {
 		try {
-			doThrow(new IllegalArgumentException()).when(addressDAO)
+			doThrow(new PersistenceException()).when(addressDAO)
 			.insertOrUpdate(nullAddress);
-
-			addressService.create(nullAddress);
-		} catch (ServiceException e) {
-			fail();
 		} catch (PersistenceException e) {
 			fail();
 		}
+		addressService.create(nullAddress);
 	}
 
 	@Test
 	@Transactional
 	public void createWithValidParameter_ReturnsSavedAddress() {
 		try {
+			//change id so that invocation count doesnt fail this test
+			//(both create and update tests call insertOrUpdate on the DAO mock
+			//so they should not equal each other)
+			newAddress.setId(3);
 			Address returnedAddress = addressService.create(newAddress);
 			
-			assert (returnedAddress.equals(newAddressCreated));
+			assertEquals(returnedAddress, newAddressCreated);
 			verify(addressDAO).insertOrUpdate(newAddress);
 		} catch (ServiceException e) {
 			fail();
@@ -93,34 +91,31 @@ public abstract class AbstractAddressServiceTest {
 	 * testing update
 	 */
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ServiceException.class)
 	@Transactional
-	public void updateWithNullParameter_ThrowsException() {
+	public void updateWithNullParameter_ThrowsException() throws ServiceException {
 		try {
-			doThrow(new IllegalArgumentException()).when(addressDAO)
+			doThrow(new PersistenceException()).when(addressDAO)
 			.insertOrUpdate(null);
 
-			addressService.update(null);
-		} catch (ServiceException e) {
-			fail();
 		} catch (PersistenceException e) {
 			fail();
 		}
+		
+		addressService.update(null);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ServiceException.class)
 	@Transactional
-	public void updateWithInvalidStateParameter_ThrowsException() {
+	public void updateWithInvalidStateParameter_ThrowsException() throws ServiceException {
 		try {
-			doThrow(new IllegalArgumentException()).when(addressDAO)
+			doThrow(new PersistenceException()).when(addressDAO)
 			.insertOrUpdate(nullAddress);
-
-			addressService.update(nullAddress);
-		} catch (ServiceException e) {
-			fail();
 		} catch (PersistenceException e) {
 			fail();
 		}
+		
+		addressService.update(nullAddress);
 	}
 
 	@Test
@@ -142,19 +137,17 @@ public abstract class AbstractAddressServiceTest {
 	 * testing delete
 	 */
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ServiceException.class)
 	@Transactional
-	public void deleteWithNullParameter_ThrowsException() {
+	public void deleteWithNullParameter_ThrowsException() throws ServiceException {
 		try {
-			doThrow(new IllegalArgumentException()).when(addressDAO).delete(
+			doThrow(new PersistenceException()).when(addressDAO).delete(
 					null);
-
-			addressService.delete(null);
-		} catch (ServiceException e) {
-			fail();
 		} catch (PersistenceException e) {
 			fail();
 		}
+		
+		addressService.delete(null);
 	}
 
 	@Test
@@ -194,34 +187,17 @@ public abstract class AbstractAddressServiceTest {
 		}
 	}
 
-	@Test(expected = EmptyResultDataAccessException.class)
+	@Test(expected = ServiceException.class)
 	@Transactional(readOnly = true)
-	public void getWithInvalidId_ThrowsException() {
-		try {
-			when(addressDAO.getByID(100)).thenThrow(
-					new EmptyResultDataAccessException(0));
-
-			addressService.getByID(100);
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	@Transactional(readOnly = true)
-	public void getWithNegativeId_ThrowsException() {
+	public void getWithNegativeId_ThrowsException() throws ServiceException {
 		try {
 			when(addressDAO.getByID(-1)).thenThrow(
-					new IllegalArgumentException());
-
-			addressService.getByID(-1);
-		} catch (ServiceException e) {
-			fail();
+					new PersistenceException());
 		} catch (PersistenceException e) {
 			fail();
 		}
+
+		addressService.getByID(-1);
 	}
 
 	@Test

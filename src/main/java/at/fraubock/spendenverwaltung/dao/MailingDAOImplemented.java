@@ -33,6 +33,12 @@ import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
+/**
+ * 
+ * @author Chris Steele
+ *
+ */
+
 public class MailingDAOImplemented implements IMailingDAO {
 	
 	private static final Logger log = Logger
