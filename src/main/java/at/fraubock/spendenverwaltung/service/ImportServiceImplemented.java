@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
+
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
@@ -24,6 +26,7 @@ import at.fraubock.spendenverwaltung.util.CSVImport;
 
 public class ImportServiceImplemented implements IImportService {
 
+	private static final Logger log = Logger.getLogger(ImportServiceImplemented.class);
 	
 	public void nativeImport(File file) throws ServiceException{
 		Map<String, String> columnMapping = new HashMap<String, String>();
@@ -33,6 +36,8 @@ public class ImportServiceImplemented implements IImportService {
 		Donation donation;
 		Address address;
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		
+		log.debug("Native import file: "+file);
 		
 		Properties config = new Properties();
 		try {
@@ -94,7 +99,7 @@ public class ImportServiceImplemented implements IImportService {
 				donations.add(donation);
 			}
 			
-			donations.size();
+			log.debug("Added "+donations.size()+" donations to "+persons.size()+" persons");
 		} catch (IOException e) {
 			throw new ServiceException("IOException "+e.getMessage());
 		}

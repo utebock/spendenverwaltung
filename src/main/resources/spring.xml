@@ -113,4 +113,7 @@
 	<bean id="filterValidator" class="at.fraubock.spendenverwaltung.service.FilterValidator">
 	</bean>
 	
+	<bean id="importService" class="at.fraubock.spendenverwaltung.service.ImportServiceImplemented">
+	</bean>
+	
 </beans>

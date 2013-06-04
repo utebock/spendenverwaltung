@@ -23,6 +23,7 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
+import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 public class Overview extends JPanel{
@@ -31,6 +32,7 @@ public class Overview extends JPanel{
 	private IPersonService personService;
 	private IAddressService addressService;
 	private IDonationService donationService;
+	private IImportService importService;
 	private ComponentBuilder builder;
 	private ButtonListener buttonListener;
 	private JButton person;
@@ -82,7 +84,7 @@ public class Overview extends JPanel{
 	private JTable showTable;
 	private JScrollPane scrollPane;
 	private JPanel overviewPanel;
-	public Overview(IFilterService filterService, IPersonService personService, IAddressService addressService, IDonationService donationService){
+	public Overview(IFilterService filterService, IPersonService personService, IAddressService addressService, IDonationService donationService, IImportService importService){
 		/**
 		 * good to know: basic font is 13pt
 		 */
@@ -91,6 +93,7 @@ public class Overview extends JPanel{
 		this.personService = personService;
 		this.addressService = addressService;
 		this.donationService = donationService;
+		this.importService = importService;
 
 		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
@@ -312,6 +315,14 @@ public class Overview extends JPanel{
 		revalidate();
 		repaint();
 		add(validation);
+	}
+
+	public void goToImport() {
+		ImportData importData = new ImportData(importService, this);
+		removeAll();
+		revalidate();
+		repaint();
+		add(importData);
 	}
 	
 

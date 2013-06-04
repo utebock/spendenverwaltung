@@ -10,7 +10,7 @@ import org.mockito.internal.util.collections.Sets;
 import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
 import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
 
-public class DBImportServiceTest extends AbstractImportServiceTest {
+public class ImportServiceTest extends AbstractImportServiceTest {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
