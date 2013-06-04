@@ -57,7 +57,7 @@ CREATE TABLE donations ( -- for querying, you may want to use validated_donation
 	dedication VARCHAR(1024),
 	type ENUM('sms','bar','bank transfer','merchandise','online') NOT NULL,
 	note VARCHAR(1024),
-        import INTEGER UNSIGNED DEFAULT NULL REFERENCES imports(id) ON DELETE SET NULL, -- if NULL, this donation is considered confirmed/validated. If not null, it is not yet validated by a user.
+        import INTEGER UNSIGNED DEFAULT NULL REFERENCES imports(id) ON DELETE SET NULL, -- if NULL, this donation is considered confirmed/validated. If not null, it is not yet validated by any user.
 	FOREIGN KEY(personid) REFERENCES persons(id) ON DELETE CASCADE
 );
 

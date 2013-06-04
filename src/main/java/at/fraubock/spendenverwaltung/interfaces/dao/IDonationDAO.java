@@ -3,9 +3,9 @@ package at.fraubock.spendenverwaltung.interfaces.dao;
 import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
+import at.fraubock.spendenverwaltung.interfaces.domain.Import;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
-
 
 /**
  * Interface to the data source for {@link Donation} entities
@@ -21,8 +21,10 @@ public interface IDonationDAO {
 	 * yet existent) or updates the donation with the already existent id. If
 	 * the donation is inserted, its id will and other fields may be set.
 	 * 
-	 * The donator of this donation must have been persisted or retrieved using
-	 * an {@link IPersonDAO} prior to calling this method.
+	 * The donator and the import source (if any) of this donation must have
+	 * been persisted or retrieved using an {@link IPersonDAO} and/or
+	 * {@link IImportDAO} prior to calling this method.
+	 * 
 	 * 
 	 * @param d
 	 *            Donation to be inserted or updated
@@ -43,24 +45,51 @@ public interface IDonationDAO {
 	public void delete(Donation d) throws PersistenceException;
 
 	/**
-	 * Retrieves all donations stored in the underlying persistence layer which already confirmed by a user
+	 * Retrieves all donations stored in the underlying persistence layer
 	 * 
 	 * @return List of all donations, sorted by id descending, including their
-	 *         donators.
+	 *         donators and imports (if any).
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
-	public List<Donation> getAllConfirmed() throws PersistenceException;
+	public List<Donation> getAll() throws PersistenceException;
 
 	/**
-	 * Retrieves all unconfirmed donations stored in the underlying persistence layer
+	 * Retrieves all confirmed donations stored in the underlying persistence
+	 * layer which are already confirmed by a user
 	 * 
 	 * @return List of all donations, sorted by id descending, including their
-	 *         donators.
+	 *         donators and imports (if any).
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
-	public List<Donation> getAllUnconfirmed() throws PersistenceException;
+	public List<Donation> getConfirmed() throws PersistenceException;
+
+	/**
+	 * Retrieves all unconfirmed donations stored in the underlying persistence
+	 * layer
+	 * 
+	 * @return List of all unconfirmed donations, sorted by id descending,
+	 *         including their donators and imports (if any).
+	 * @throws PersistenceException
+	 *             if communication to the underlying persistence system failed
+	 */
+	public List<Donation> getUnconfirmed() throws PersistenceException;
+
+	/**
+	 * Retrieves all unconfirmed donations stored in the underlying persistence
+	 * layer which are part of the given import
+	 * 
+	 * @param i
+	 *            the import the desired donations should base on. This import
+	 *            must have an id, i.e. must have been persisted or retrieved by
+	 *            an {@link IImportDAO} prior to calling this method.
+	 * @return List of all unconfirmed donations of the given import, sorted by
+	 *         id descending, including their donators and imports.
+	 * @throws PersistenceException
+	 *             if communication to the underlying persistence system failed
+	 */
+	public List<Donation> getByImport(Import i) throws PersistenceException;
 
 	/**
 	 * Retrieves donation by ID
@@ -81,7 +110,7 @@ public interface IDonationDAO {
 	 *            retrieved by an {@link IPersonDAO} prior to calling this
 	 *            method.
 	 * @return a list of all donations by the given person, sorted by id
-	 *         descending, including their donator
+	 *         descending, including their donator and import (if any)
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
@@ -98,8 +127,8 @@ public interface IDonationDAO {
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
-//	public List<Donation> getByFilter(DonationFilter filter)
-//			throws PersistenceException;
+	// public List<Donation> getByFilter(DonationFilter filter)
+	// throws PersistenceException;
 
 	/**
 	 * Calculates the sum of the donations matching the given filter.
@@ -116,6 +145,7 @@ public interface IDonationDAO {
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
-//	public long sumByFilter(DonationFilter filter) throws PersistenceException;
+	// public long sumByFilter(DonationFilter filter) throws
+	// PersistenceException;
 
 }

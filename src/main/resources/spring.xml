@@ -40,10 +40,12 @@
 		<property name="personValidator" ref="personValidator" />
 		<property name="filterToSqlBuilder" ref="filterToSqlBuilder" />
 	</bean>
-	<bean id="donationDao" class="at.fraubock.spendenverwaltung.dao.DonationDAOImplemented">
+	<bean id="donationDao"
+		class="at.fraubock.spendenverwaltung.dao.DonationDAOImplemented">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="donationValidator" ref="donationValidator" />
 		<property name="personDao" ref="personDao" />
+		<property name="importDao" ref="importDao" />
 		<property name="filterToSqlBuilder" ref="filterToSqlBuilder" />
 	</bean>
 	<bean id="mailingDao" class="at.fraubock.spendenverwaltung.dao.MailingDAOImplemented">
@@ -52,32 +54,39 @@
 		<property name="filterToSqlBuilder" ref="filterToSqlBuilder" />
 		<property name="personValidator" ref="personValidator" />
 	</bean>
-	<bean id="abstractCritDao" class="at.fraubock.spendenverwaltung.dao.criterion.AbstractCriterionDAO">
+	<bean id="abstractCritDao"
+		class="at.fraubock.spendenverwaltung.dao.criterion.AbstractCriterionDAO">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="connectedCritDAO" ref="connectedCritDao" />
 		<property name="propertyCritDAO" ref="propertyCritDao" />
 		<property name="mountedCritDAO" ref="mountedCritDao" />
 	</bean>
-	
-	<bean id="connectedCritDao" class="at.fraubock.spendenverwaltung.dao.criterion.ConnectedCriterionDAO">
+	<bean id="importDao" class="at.fraubock.spendenverwaltung.dao.ImportDAOImplemented">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+	</bean>
+
+	<bean id="connectedCritDao"
+		class="at.fraubock.spendenverwaltung.dao.criterion.ConnectedCriterionDAO">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="validator" ref="filterValidator" />
 		<property name="abstractCritDAO" ref="abstractCritDao" />
 	</bean>
-	
-	<bean id="mountedCritDao" class="at.fraubock.spendenverwaltung.dao.criterion.MountedFilterCriterionDAO">
+
+	<bean id="mountedCritDao"
+		class="at.fraubock.spendenverwaltung.dao.criterion.MountedFilterCriterionDAO">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="abstractCritDAO" ref="abstractCritDao" />
 		<property name="validator" ref="filterValidator" />
 		<property name="filterDAO" ref="filterDao" />
 	</bean>
-	
-	<bean id="propertyCritDao" class="at.fraubock.spendenverwaltung.dao.criterion.PropertyCriterionDAO">
+
+	<bean id="propertyCritDao"
+		class="at.fraubock.spendenverwaltung.dao.criterion.PropertyCriterionDAO">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="validator" ref="filterValidator" />
 		<property name="abstractCritDAO" ref="abstractCritDao" />
 	</bean>
-	
+
 	<bean id="filterDao" class="at.fraubock.spendenverwaltung.dao.FilterDAOImplemented">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="validator" ref="filterValidator" />
@@ -88,29 +97,33 @@
 	</bean>
 
 	<!-- BEANS FOR SERVICES -->
-	<bean id="addressService" class="at.fraubock.spendenverwaltung.service.AddressServiceImplemented">
+	<bean id="addressService"
+		class="at.fraubock.spendenverwaltung.service.AddressServiceImplemented">
 		<property name="addressDAO" ref="addressDao" />
 	</bean>
 	<bean id="personValidator" class="at.fraubock.spendenverwaltung.service.PersonValidator">
 	</bean>
-	
-	<bean id="personService" class="at.fraubock.spendenverwaltung.service.PersonServiceImplemented">
+
+	<bean id="personService"
+		class="at.fraubock.spendenverwaltung.service.PersonServiceImplemented">
 		<property name="personDAO" ref="personDao" />
 		<property name="addressDAO" ref="addressDao" />
 	</bean>
 	<bean id="donationValidator" class="at.fraubock.spendenverwaltung.service.DonationValidator">
 	</bean>
-	<bean id="donationService" class="at.fraubock.spendenverwaltung.service.DonationServiceImplemented">
+	<bean id="donationService"
+		class="at.fraubock.spendenverwaltung.service.DonationServiceImplemented">
 		<property name="donationDAO" ref="donationDao" />
 	</bean>
-	
-	<bean id="filterService" class="at.fraubock.spendenverwaltung.service.FilterServiceImplemented">
+
+	<bean id="filterService"
+		class="at.fraubock.spendenverwaltung.service.FilterServiceImplemented">
 		<property name="filterDAO" ref="filterDao" />
 	</bean>
-	
+
 	<bean id="mailingValidator" class="at.fraubock.spendenverwaltung.service.MailingValidator">
 	</bean>
 	<bean id="filterValidator" class="at.fraubock.spendenverwaltung.service.FilterValidator">
 	</bean>
-	
+
 </beans>

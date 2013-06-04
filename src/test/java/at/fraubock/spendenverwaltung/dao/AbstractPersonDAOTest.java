@@ -127,13 +127,12 @@ public abstract class AbstractPersonDAOTest {
 		personDAO.insertOrUpdate(person);
 	}
 
-	@Test(expected = EmptyResultDataAccessException.class)
+	@Test
 	@Transactional
-	public void updateNonExistentPersonShouldThrowException()
+	public void getNonExistentPersonShouldReturnNull()
 			throws PersistenceException {
 		Person person = personDAO.getById(1000000);
-		person.setSurname("XXX");
-		personDAO.insertOrUpdate(person);
+		assertNull(person);
 	}
 
 	/**
@@ -349,11 +348,11 @@ public abstract class AbstractPersonDAOTest {
 		assert (p.getTelephone().equals(person.getTelephone()));
 	}
 
-	@Test(expected = EmptyResultDataAccessException.class)
+	@Test
 	@Transactional(readOnly = true)
-	public void getByIdOfNonExistentPersonShouldThrowException()
+	public void getByIdOfNonExistentPersonShouldReturnNull()
 			throws PersistenceException {
-		personDAO.getById(10000);
+		assertNull(personDAO.getById(10000));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -362,7 +361,7 @@ public abstract class AbstractPersonDAOTest {
 		personDAO.getById(-6);
 	}
 
-	@Test(expected = EmptyResultDataAccessException.class)
+	@Test
 	@Transactional
 	public void deleteShouldDeletePerson() throws PersistenceException {
 		Person person = new Person();
@@ -389,22 +388,12 @@ public abstract class AbstractPersonDAOTest {
 		person.setNote("");
 
 		personDAO.insertOrUpdate(person);
-		assert (person != null);
 
 		personDAO.delete(person);
 
-		assert (person == null);
 		Person deleted = personDAO.getById(person.getId());
-		assert (deleted == null);
+		assertNull(deleted);
 
-	}
-
-	@Test(expected = EmptyResultDataAccessException.class)
-	@Transactional
-	public void deleteNonExistentPersonShouldThrowException()
-			throws PersistenceException {
-		Person person = personDAO.getById(1000000);
-		personDAO.delete(person);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -473,7 +462,7 @@ public abstract class AbstractPersonDAOTest {
 
 	}
 
-	@Test(expected = EmptyResultDataAccessException.class)
+	@Test
 	@Transactional
 	public void getAllShouldReturnFalse() throws PersistenceException {
 		Person person = new Person();

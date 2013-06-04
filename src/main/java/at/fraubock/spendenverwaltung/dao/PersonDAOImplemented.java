@@ -297,13 +297,18 @@ public class PersonDAOImplemented implements IPersonDAO {
 		}
 
 		String select = "select * from persons where id = ?;";
+		try {
+			Person person = jdbcTemplate.queryForObject(select,
+					new Object[] { id }, new PersonMapper());
+			fetchAddresses(person);
 
-		Person person = jdbcTemplate.queryForObject(select,
-				new Object[] { id }, new PersonMapper());
+			return person;
+		} catch (IncorrectResultSizeDataAccessException e) {
+			if (e.getActualSize() == 0)
+				return null;
+			throw new PersistenceException(e);
+		}
 
-		fetchAddresses(person);
-
-		return person;
 	}
 
 	@Override
@@ -377,6 +382,21 @@ public class PersonDAOImplemented implements IPersonDAO {
 
 			return person;
 		}
+	}
+
+	@Override
+	public List<Person> getConfirmed() throws PersistenceException {
+		String select = "SELECT * FROM validated_persons ORDER BY id DESC";
+		List<Person> personList = jdbcTemplate
+				.query(select, new PersonMapper());
+		log.info(personList.size() + " list size");
+
+		// now, load their addresses
+		for (Person entry : personList) {
+			fetchAddresses(entry);
+		}
+
+		return personList;
 	}
 
 }

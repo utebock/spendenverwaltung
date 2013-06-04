@@ -15,7 +15,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Property
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/testspring.xml")
 @TransactionConfiguration(defaultRollback = true)
-public class AbstractFilterToSqlBuilderTest {
+public abstract class AbstractFilterToSqlBuilderTest {
 
 	private static FilterToSqlBuilder builder;
 

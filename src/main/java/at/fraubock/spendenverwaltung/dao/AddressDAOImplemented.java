@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -18,10 +17,8 @@ import org.springframework.jdbc.support.KeyHolder;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
-import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.service.AddressValidator;
-
 
 /**
  * implementation of {@link IAddressDAO}
@@ -161,24 +158,6 @@ public class AddressDAOImplemented implements IAddressDAO {
 		}
 	}
 
-	@Override
-	public Address getMainAddressByPerson(Person person)
-			throws PersistenceException {
-		try {
-			return jdbcTemplate
-					.queryForObject(
-							"select a.* from "
-									+ " addresses a,livesat l where l.aid=a.id and l.pid = ? and l.ismain=true",
-							new Object[] { person.getId() },
-							new int[] { Types.INTEGER }, new AddressMapper());
-		} catch (IncorrectResultSizeDataAccessException e) {
-			if (e.getActualSize() == 0)
-				return null;
-			else
-				throw new PersistenceException(e);
-		}
-	}
-
 	private class AddressMapper implements RowMapper<Address> {
 
 		public Address mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -190,6 +169,14 @@ public class AddressDAOImplemented implements IAddressDAO {
 			address.setStreet(rs.getString("street"));
 			return address;
 		}
+	}
+
+	@Override
+	public List<Address> getConfirmed() throws PersistenceException {
+		log.info("Reading confirmed Addresses.");
+		return jdbcTemplate.query(
+				"select * from validated_addresses ORDER BY id DESC",
+				new AddressMapper());
 	}
 
 }
