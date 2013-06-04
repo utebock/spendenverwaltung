@@ -94,27 +94,16 @@ public class AbstractMailingDAOTest {
 		personDAO.insertOrUpdate(personThree);
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = PersistenceException.class)
 	@Transactional
-	public void createWithNullParameter_ThrowsException() {
-		try {
-			mailingDAO.insertOrUpdate(null);
-		} catch (PersistenceException e) {
-			log.error("PersistenceException caught in test createWithNullParameter_ThrowsException");
-			fail();
-		}
+	public void createWithNullParameter_ThrowsException() throws PersistenceException {
+		mailingDAO.insertOrUpdate(null);
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = PersistenceException.class)
 	@Transactional
-	public void createWithInvalidStateParameter_ThrowsException() {
-		try {
-			mailingDAO.insertOrUpdate(new Mailing()); // all values are null
-		} catch (PersistenceException e) {
-
-			log.error("PersistenceException caught in test createWithInvalidStateParameter_ThrowsException");
-			fail();
-		}
+	public void createWithInvalidStateParameter_ThrowsException() throws PersistenceException {
+		mailingDAO.insertOrUpdate(new Mailing()); // all values are null
 	}
 	
 	@Test

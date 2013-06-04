@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
-import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
@@ -118,17 +117,15 @@ public class AbstractMailingServiceTest {
 		}
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
-	public void createNull_shouldThrowException() {
+	@Test(expected = ServiceException.class)
+	public void createNull_shouldThrowException() throws ServiceException {
 		try {
-			doThrow(new IllegalArgumentException()).when(mailingDAO).insertOrUpdate(null);
+			doThrow(new PersistenceException()).when(mailingDAO).insertOrUpdate(null);
 			mailingService.insertOrUpdate(null);
 			verify(mailingDAO).insertOrUpdate(null);
 		} catch (PersistenceException e) {
 			fail();
-		} catch (ServiceException e) {
-			fail();
-		}
+		} 
 	}
 	
 	@Test
