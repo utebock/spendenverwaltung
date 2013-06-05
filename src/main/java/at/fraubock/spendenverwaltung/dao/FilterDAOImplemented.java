@@ -20,6 +20,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import at.fraubock.spendenverwaltung.dao.criterion.AbstractCriterionDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IFilterDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.service.FilterValidator;
 import at.fraubock.spendenverwaltung.util.FilterType;
@@ -93,9 +94,10 @@ public class FilterDAOImplemented implements IFilterDAO {
 			FilterMapper mapper = new FilterMapper();
 			result = jdbcTemplate.queryForObject(select, new Object[] { id },
 					mapper);
-			if (mapper.getCriterionId() != null) {
-				result.setCriterion(abstractCritDAO.getById(mapper
-						.getCriterionId().get(result.getId())));
+
+			Integer criterionId = mapper.getCriterionId().get(result.getId());
+			if (criterionId != null) {
+				result.setCriterion(abstractCritDAO.getById(criterionId));
 			}
 		} catch (IncorrectResultSizeDataAccessException e) {
 			if (e.getActualSize() == 0)
