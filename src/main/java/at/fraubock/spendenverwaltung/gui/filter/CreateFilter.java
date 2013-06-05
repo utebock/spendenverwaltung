@@ -255,7 +255,7 @@ public class CreateFilter extends JPanel {
 			
 			
 			add(propertyCB, "w 200!");
-			add(comparator, "w 380!");
+			add(comparator, "w 520!");
 
 			add(plusButton);
 			add(minusButton);

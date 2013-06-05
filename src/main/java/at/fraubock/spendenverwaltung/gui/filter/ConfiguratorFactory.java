@@ -62,8 +62,6 @@ public class ConfiguratorFactory {
 			sexMap.put("Familie", Person.Sex.FAMILY.getName());
 			sexMap.put("Unternehmen", Person.Sex.COMPANY.getName());
 
-			configurators.add(new PersonToDonationFilterConfig(
-					"Spendenfilter hinzufügen", donationFilters));
 			configurators.add(new StringComparator(
 					FilterProperty.PERSON_GIVENNAME, "Vorname"));
 			configurators.add(new StringComparator(
@@ -87,8 +85,10 @@ public class ConfiguratorFactory {
 					"Notiz"));
 			configurators.add(new MountedFilterSingleResultConfig(
 					"Personenfilter hinzufügen", personFilters));
-			configurators.add(new PersonToMailingFilterConfig(
-					"Aussendungsfilter hinzufügen", mailingFilters));
+			configurators.add(new PersonToDonationFilterConfig(
+					"Spendenfilter hinzufügen", donationFilters));
+//			configurators.add(new PersonToMailingFilterConfig(
+//					"Aussendungsfilter hinzufügen", mailingFilters));
 
 		} else if (type == FilterType.DONATION) {
 
