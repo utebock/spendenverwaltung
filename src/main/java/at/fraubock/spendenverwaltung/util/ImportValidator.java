@@ -64,6 +64,7 @@ public class ImportValidator {
 			} else{
 				//unique identifier found -> person matched
 				validatedData.addMatchEntry(matchedPerson, currentDonation);
+				validatedData.addPersonToDelete(currentPerson);
 			}
 		}
 		

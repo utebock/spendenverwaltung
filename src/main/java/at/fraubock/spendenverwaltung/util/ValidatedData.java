@@ -15,6 +15,8 @@ public class ValidatedData {
 	private List<Person> personListNew;
 	private List<Donation> donationListMatch;
 	private List<Person> personListMatch;
+	private List<Person> personsToDelete;
+	private List<Donation> donationsToDelete;
 	
 	public ValidatedData(){
 		this.donationListConflict = new ArrayList<Donation>();
@@ -26,6 +28,9 @@ public class ValidatedData {
 		this.personListMatch = new ArrayList<Person>();
 		
 		this.conflictTypes = new ArrayList<ConflictType>();
+		
+		this.personsToDelete = new ArrayList<Person>();
+		this.donationsToDelete = new ArrayList<Donation>();
 	}
 	
 	public List<Donation> getDonationListConflict() {
@@ -49,6 +54,12 @@ public class ValidatedData {
 	public List<ConflictType> getConflictTypes() {
 		return conflictTypes;
 	}
+	public List<Person> getPersonsToDelete() {
+		return personsToDelete;
+	}
+	public List<Donation> getDonationsToDelete() {
+		return donationsToDelete;
+	}
 	
 	
 	public void addConflictEntry(Person p, Donation d, ConflictType t){
@@ -63,5 +74,46 @@ public class ValidatedData {
 	public void addMatchEntry(Person p, Donation d){
 		personListMatch.add(p);
 		donationListMatch.add(d);
+	}
+	public void addPersonToDelete(Person p){
+		personsToDelete.add(p);
+	}
+	public void addDonationToDelete(Donation d){
+		donationsToDelete.add(d);
+	}
+	
+	public void checkPersonDoublesInNewEntries(){
+		List<Person> uniquePersons = new ArrayList<Person>();
+		Person doublePerson;
+		
+		for(Donation d : donationListNew){
+			doublePerson = getDoublePersonIdFromList(d.getDonator(), uniquePersons);
+			
+			if(doublePerson == null){
+				uniquePersons.add(d.getDonator());
+			} else{
+				personsToDelete.add(d.getDonator());
+				d.setDonator(doublePerson);
+			}
+		}
+	}
+	
+	private Person getDoublePersonIdFromList(Person p, List<Person> checkList){
+		Person doublePerson = null;
+		
+		for(Person donator : checkList){
+			
+			if(donator.getSurname().equals(p.getSurname())
+					&& donator.getGivenName().equals(p.getGivenName())
+					&& (donator.getEmail().equals(p.getEmail()))
+						|| (!donator.getTelephone().equals("") && donator.getTelephone().equals(p.getTelephone()))
+						|| (donator.getMainAddress() != null && donator.getMainAddress().getCity().equals(p.getMainAddress().getCity())
+								&& donator.getMainAddress().getPostalCode().equals(p.getMainAddress().getPostalCode())
+								&& donator.getMainAddress().getStreet().equals(p.getMainAddress().getStreet()))){
+				return donator;
+			}
+		}
+		
+		return doublePerson;
 	}
 }
