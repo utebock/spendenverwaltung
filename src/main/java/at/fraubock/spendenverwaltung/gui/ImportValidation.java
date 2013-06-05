@@ -58,7 +58,7 @@ public class ImportValidation extends JPanel {
 		
 		this.builder = new ComponentBuilder();
 		this.buttonListener = new ButtonListener(this);
-		this.importValidator = new ImportValidator(personService);
+		this.importValidator = new ImportValidator(personService, donationService);
 		this.validatedData = new ValidatedData();
 		this.personService = personService;
 		this.addressService = addressService;
@@ -154,9 +154,13 @@ public class ImportValidation extends JPanel {
 		try {
 			
 			validatedData.checkPersonDoublesInNewEntries();
+			
 			donationService.setImportToNull(validatedData.getDonationListNew());
-			//donationService.setImportToNull(validatedData.getDonationListMatch());
+			donationService.setImportToNull(validatedData.getDonationListMatch());
+			
 			updateDonationList(validatedData.getDonationListNew());
+			updateDonationList(validatedData.getDonationListMatch());
+			
 			deletePersonList(validatedData.getPersonsToDelete());
 		} catch (ServiceException e) {
 			JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);

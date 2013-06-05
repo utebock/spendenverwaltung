@@ -90,4 +90,13 @@ public interface IDonationService {
 	 *          If communication to the underlying persistence system failed
 	 */
 	public void setImportToNull(List<Donation> donationList) throws ServiceException;
+	
+	/**
+	 * check if donation d exists already
+	 * @param d
+	 * 			Donation which should be proofed
+	 * @return	true, is donation already exists
+	 * @throws PersistenceException
+	 */
+	public boolean donationExists(Donation d) throws ServiceException;
 }

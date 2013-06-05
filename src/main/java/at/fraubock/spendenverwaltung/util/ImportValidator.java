@@ -7,15 +7,18 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
+import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 public class ImportValidator {
 	private ValidatedData validatedData;
 	private IPersonService personService;
+	private IDonationService donationService;
 	
-	public ImportValidator(IPersonService personService){
+	public ImportValidator(IPersonService personService, IDonationService donationService){
 		this.validatedData = new ValidatedData();
 		this.personService = personService;
+		this.donationService = donationService;
 	}
 	
 	public static enum ConflictType {
@@ -43,17 +46,11 @@ public class ImportValidator {
 			
 			
 			if(matchedPerson == null){
-				// check if person hass a unique identifier
+				// check if person has a unique identifier
 				if( currentPerson != null
 						&& (!currentPerson.getTelephone().equals("")
 						|| !currentPerson.getEmail().equals("")
 						|| currentPerson.getMainAddress() != null)){
-
-					//validate next entry, if donation is a duplicate
-					if(isDuplicate(currentDonation)){
-						validatedData.addConflictEntry(currentPerson, currentDonation, ConflictType.DUPLICATE);
-						continue;
-					}
 
 					//person doesn't exist -> create new
 					validatedData.addNewEntry(currentPerson, currentDonation);
@@ -62,7 +59,17 @@ public class ImportValidator {
 					validatedData.addConflictEntry(currentPerson, currentDonation, ConflictType.ANONYM);
 				}
 			} else{
+				
 				//unique identifier found -> person matched
+				currentDonation.setDonator(matchedPerson);
+
+				//validate next entry, if donation is a duplicate
+				if(isDuplicate(currentDonation)){
+					validatedData.addConflictEntry(currentPerson, currentDonation, ConflictType.DUPLICATE);
+					validatedData.addDonationToDelete(currentDonation);
+					continue;
+				}
+				
 				validatedData.addMatchEntry(matchedPerson, currentDonation);
 				validatedData.addPersonToDelete(currentPerson);
 			}
@@ -82,7 +89,7 @@ public class ImportValidator {
 			return matchedPersons.get(0);
 	}
 	
-	private boolean isDuplicate(Donation d){
-		return false;
+	private boolean isDuplicate(Donation d) throws ServiceException{
+		return donationService.donationExists(d);
 	}
 }

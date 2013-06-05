@@ -120,4 +120,13 @@ public class DonationServiceImplemented implements IDonationService {
 			throw new ServiceException(e);
 		}
 	}
+
+	@Override
+	public boolean donationExists(Donation donation) throws ServiceException {
+		try {
+			return donationDAO.donationExists(donation);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
 }

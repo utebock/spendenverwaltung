@@ -243,4 +243,20 @@ public class DonationDAOImplemented implements IDonationDAO {
 		}
 	}
 
+	@Override
+	public boolean donationExists(Donation d) throws PersistenceException {
+		String select = "SELECT * FROM validated_donations WHERE personid=? AND amount=? AND donationdate=? AND dedication=? AND type=? AND note=?";
+
+		Object[] params = new Object[] { d.getDonator().getId(),
+				d.getAmount(), d.getDate(), d.getDedication(),
+				d.getType().getName(), d.getNote() };
+
+		List<Donation> donations = jdbcTemplate.query(select, params, new DonationMapper());
+		
+		if(donations.size() == 0)
+			return false;
+		else
+			return true;
+	}
+
 }
