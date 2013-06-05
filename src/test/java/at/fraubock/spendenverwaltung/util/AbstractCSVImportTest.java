@@ -13,7 +13,6 @@ import java.util.Properties;
 
 import org.junit.Test;
 
-import at.fraubock.spendenverwaltung.gui.App;
 import at.fraubock.spendenverwaltung.interfaces.domain.csvimport.ImportRow;
 
 public abstract class AbstractCSVImportTest {
@@ -56,7 +55,7 @@ public abstract class AbstractCSVImportTest {
 		Map<String, String> columnMapping = new HashMap<String, String>();
 		
 		Properties config = new Properties();
-		config.load(App.class.getClassLoader().getResourceAsStream("hypo_import_config.properties"));
+		config.load(getClass().getClassLoader().getResourceAsStream("hypo_import_config.properties"));
 		
 		for(Entry<Object, Object> entry : config.entrySet()){
 			if(String.valueOf(entry.getValue()).length()>0){
@@ -77,7 +76,7 @@ public abstract class AbstractCSVImportTest {
 		Map<String, String> columnMapping = new HashMap<String, String>();
 		
 		Properties config = new Properties();
-		config.load(App.class.getClassLoader().getResourceAsStream("sms_import_config.properties"));
+		config.load(getClass().getClassLoader().getResourceAsStream("sms_import_config.properties"));
 		
 		for(Entry<Object, Object> entry : config.entrySet()){
 			if(String.valueOf(entry.getValue()).length()>0){

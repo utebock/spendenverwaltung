@@ -27,6 +27,12 @@ import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
+/**
+ * 
+ * @author Chris Steele
+ *
+ */
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/testspring.xml")
 @TransactionConfiguration(defaultRollback = true)

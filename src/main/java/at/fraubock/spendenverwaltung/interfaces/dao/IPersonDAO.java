@@ -7,7 +7,6 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 
-
 /**
  * interface to a data source for {@link Person} entities
  * 
@@ -45,7 +44,8 @@ public interface IPersonDAO {
 	public void delete(Person p) throws PersistenceException;
 
 	/**
-	 * Retrieves all persons stored in the underlying persistence layer
+	 * Retrieves all persons stored in the underlying persistence layer,
+	 * including unconfirmed ones.
 	 * 
 	 * @return List of all persons, sorted by id descending, including their
 	 *         addresses.
@@ -53,6 +53,17 @@ public interface IPersonDAO {
 	 *             if communication to the underlying persistence system failed
 	 */
 	public List<Person> getAll() throws PersistenceException;
+
+	/**
+	 * Retrieves all confirmed/validated persons stored in the underlying
+	 * persistence layer
+	 * 
+	 * @return List of all confirmed persons, sorted by id descending, including
+	 *         their addresses.
+	 * @throws PersistenceException
+	 *             if communication to the underlying persistence system failed
+	 */
+	public List<Person> getConfirmed() throws PersistenceException;
 
 	/**
 	 * Retrieves Person by ID
@@ -66,6 +77,17 @@ public interface IPersonDAO {
 	 */
 	public Person getById(int id) throws PersistenceException;
 
+	/**
+	 * Retrieves Person by Person Attributes
+	 * 
+	 * @param p
+	 * 				person with it's attributes
+	 * @return List of persons where the attributes are equal to Person p
+	 * @throws PersistenceException
+	 *             if communication to the underlying persistence system failed
+	 */
+	public List<Person> getByAttributes(Person p) throws PersistenceException;
+	
 	/**
 	 * Retrieves all persons having the given address
 	 * 
@@ -91,8 +113,5 @@ public interface IPersonDAO {
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
-//	public List<Person> getByFilter(PersonFilter filter)
-//			throws PersistenceException;
-	
 	public List<Person> getByFilter(Filter filter) throws PersistenceException;
 }

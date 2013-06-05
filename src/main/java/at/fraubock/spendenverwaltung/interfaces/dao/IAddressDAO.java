@@ -3,9 +3,7 @@ package at.fraubock.spendenverwaltung.interfaces.dao;
 import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
-import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
-
 
 /**
  * interface to the data source for {@link Address} entities.
@@ -47,13 +45,24 @@ public interface IAddressDAO {
 	public void delete(Address a) throws PersistenceException;
 
 	/**
-	 * Retrieves all addresses stored in the underlying persistence layer
+	 * Retrieves all addresses stored in the underlying persistence layer,
+	 * including unconfirmed ones.
 	 * 
 	 * @return List of all addresses, sorted by id descending.
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
 	public List<Address> getAll() throws PersistenceException;
+
+	/**
+	 * Retrieves all confirmed/validated addresses stored in the underlying
+	 * persistence layer
+	 * 
+	 * @return List of all confirmed addresses, sorted by id descending.
+	 * @throws PersistenceException
+	 *             if communication to the underlying persistence system failed
+	 */
+	public List<Address> getConfirmed() throws PersistenceException;
 
 	/**
 	 * Retrieves Address by ID
@@ -66,23 +75,4 @@ public interface IAddressDAO {
 	 *             if communication to the underlying persistence system failed
 	 */
 	public Address getByID(int id) throws PersistenceException;
-
-	/**
-	 * Retrieves the main address of a given person stored in the underlying
-	 * persistence layer
-	 * 
-	 * @deprecated persons retrieved by {@link IPersonDAO} already have their
-	 *             main address set
-	 * @param person
-	 *            the person to retrieve the main address from, must have been
-	 *            persisted or retrieved using an {@link IPersonDAO} prior to
-	 *            calling this method
-	 * @return the main address of the given person, or null if the given person
-	 *         has no main address
-	 * @throws PersistenceException
-	 *             if communication to the underlying persistence system failed
-	 */
-	@Deprecated
-	public Address getMainAddressByPerson(Person person)
-			throws PersistenceException;
 }

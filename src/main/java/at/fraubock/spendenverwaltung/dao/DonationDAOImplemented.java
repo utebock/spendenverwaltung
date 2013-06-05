@@ -17,14 +17,14 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IDonationDAO;
+import at.fraubock.spendenverwaltung.interfaces.dao.IImportDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
+import at.fraubock.spendenverwaltung.interfaces.domain.Import;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
-import at.fraubock.spendenverwaltung.service.DonationValidator;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
 import at.fraubock.spendenverwaltung.util.FilterToSqlBuilder;
-
-
 
 /**
  * 
@@ -35,7 +35,7 @@ public class DonationDAOImplemented implements IDonationDAO {
 
 	private JdbcTemplate jdbcTemplate;
 	private IPersonDAO personDAO;
-	private DonationValidator donationValidator;
+	private IImportDAO importDAO;
 	private FilterToSqlBuilder filterToSqlBuilder;
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
@@ -46,8 +46,23 @@ public class DonationDAOImplemented implements IDonationDAO {
 		this.personDAO = personDAO;
 	}
 
-	public void setDonationValidator(DonationValidator donationValidator) {
-		this.donationValidator = donationValidator;
+	public void setImportDao(IImportDAO importDAO) {
+		this.importDAO = importDAO;
+	}
+	
+	private static void validate(Donation d) throws ValidationException {	
+		if(d == null)
+			throw new ValidationException("Donation must not be null");
+		if(d.getDonator() == null)
+			throw new ValidationException("Person must not be null");
+		if(d.getAmount() < 0)
+			throw new ValidationException("Amount must not be less than 0");
+		if(d.getDate() == null)
+			throw new ValidationException("Date must not be null");
+		if(d.getDedication() == null)
+			throw new ValidationException("Dedication must not be null");
+		if(d.getType() == null)
+			throw new ValidationException("Type must not be null");
 	}
 
 	private class CreateDonationStatementCreator implements
@@ -59,7 +74,7 @@ public class DonationDAOImplemented implements IDonationDAO {
 			this.donation = donation;
 		}
 
-		private String createDonations = "insert into donations (personid, amount, donationdate, dedication, type, note) values (?,?,?,?,?,?)";
+		private String createDonations = "insert into donations (personid, amount, donationdate, dedication, type, note, import) values (?,?,?,?,?,?,?)";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
@@ -72,6 +87,10 @@ public class DonationDAOImplemented implements IDonationDAO {
 			ps.setString(4, donation.getDedication());
 			ps.setString(5, donation.getType().getName());
 			ps.setString(6, donation.getNote());
+			if (donation.getSource() == null)
+				ps.setNull(7, Types.NULL);
+			else
+				ps.setInt(7, donation.getSource().getId());
 
 			return ps;
 		}
@@ -79,7 +98,11 @@ public class DonationDAOImplemented implements IDonationDAO {
 
 	@Override
 	public void insertOrUpdate(Donation d) throws PersistenceException {
-		donationValidator.validate(d);
+		try {
+			validate(d);
+		} catch (ValidationException e) {
+			throw new PersistenceException(e);
+		}
 
 		if (d.getId() == null) {
 			// insert
@@ -108,7 +131,11 @@ public class DonationDAOImplemented implements IDonationDAO {
 
 	@Override
 	public void delete(Donation d) throws PersistenceException {
-		donationValidator.validate(d);
+		try {
+			validate(d);
+		} catch (ValidationException e) {
+			throw new PersistenceException(e);
+		}
 
 		String deleteStatement = "delete from donations where id = ?";
 
@@ -120,10 +147,9 @@ public class DonationDAOImplemented implements IDonationDAO {
 	}
 
 	@Override
-	public List<Donation> getAllConfirmed() throws PersistenceException {
+	public List<Donation> getConfirmed() throws PersistenceException {
 
-		//String select = "SELECT * FROM donations WHERE confirmed=1 ORDER BY id DESC";
-		String select = "SELECT * FROM donations ORDER BY id DESC";
+		String select = "SELECT * FROM validated_donations ORDER BY id DESC";
 
 		List<Donation> donations = jdbcTemplate.query(select,
 				new DonationMapper());
@@ -132,10 +158,9 @@ public class DonationDAOImplemented implements IDonationDAO {
 	}
 
 	@Override
-	public List<Donation> getAllUnconfirmed() throws PersistenceException {
+	public List<Donation> getUnconfirmed() throws PersistenceException {
 
-		//String select = "SELECT * FROM donations WHERE confirmed=0 ORDER BY id DESC";
-		String select = "SELECT * FROM donations ORDER BY id DESC";
+		String select = "SELECT * FROM donations WHERE import IS NOT NULL ORDER BY id DESC";
 
 		List<Donation> donations = jdbcTemplate.query(select,
 				new DonationMapper());
@@ -150,7 +175,6 @@ public class DonationDAOImplemented implements IDonationDAO {
 			throw new IllegalArgumentException("Id must not be less than 0");
 		}
 
-		//String select = "select * from donations where id = ? and confirmed=1";
 		String select = "select * from donations where id = ?";
 
 		try {
@@ -166,11 +190,10 @@ public class DonationDAOImplemented implements IDonationDAO {
 
 	@Override
 	public List<Donation> getByPerson(Person p) throws PersistenceException {
-		if (p == null) {
-			throw new IllegalArgumentException("person must not be null");
+		if (p == null || p.getId() == null || p.getId() < 1) {
+			throw new IllegalArgumentException("Passed person was invalid");
 		}
 
-		//String select = "select * from donations where personid = ? and confirmed=1 ORDER BY id DESC";
 		String select = "select * from donations where personid = ? ORDER BY id DESC";
 
 		List<Donation> donations = jdbcTemplate.query(select,
@@ -187,91 +210,6 @@ public class DonationDAOImplemented implements IDonationDAO {
 		this.filterToSqlBuilder = filterToSqlBuilder;
 	}
 
-	/**
-	 * @param filter
-	 *            a not-null, not-empty donation filter
-	 * @return a pair consisting of the mysql WHERE clause to this filter
-	 *         (without the "WHERE", including placeholders) and the array for
-	 *         filling the placeholders
-	 */
-//	private Pair<String, Object[]> createFilterWhereClause(DonationFilter filter) {
-//		String where = "";
-//		ArrayList<Object> args = new ArrayList<Object>();
-//
-//		if (filter.getDedicationPart() != null) {
-//			where += "dedication like ? AND ";
-//			args.add("%"+filter.getDedicationPart()+"%");
-//		}
-//
-//		if (filter.getMaxAmount() != null) {
-//			where += "amount <= ? AND ";
-//			args.add(filter.getMaxAmount());
-//		}
-//
-//		if (filter.getMinAmount() != null) {
-//			where += "amount >= ? AND ";
-//			args.add(filter.getMinAmount());
-//		}
-//
-//		if (filter.getMaxDate() != null) {
-//			where += "date <= ? AND ";
-//			args.add(new Timestamp(filter.getMaxDate().getTime()));
-//		}
-//
-//		if (filter.getMinDate() != null) {
-//			where += "date >= ? AND ";
-//			args.add(new Timestamp(filter.getMinDate().getTime()));
-//		}
-//
-//		if (filter.getNotePart() != null) {
-//			where += "note like ? AND ";
-//			args.add("%"+filter.getNotePart()+"%");
-//		}
-//
-//		if (filter.getType() != null) {
-//			where += "type = ? AND ";
-//			args.add(filter.getType().getName());
-//		}
-//
-//		// remove last "AND "
-//		where = where.substring(0, where.length() - 4);
-//
-//		return new Pair<String, Object[]>(where, args.toArray());
-//	}
-
-//	@Override
-//	public List<Donation> getByFilter(DonationFilter filter)
-//			throws PersistenceException {
-//
-//		if (filter == null || filter.isEmpty()) {
-//			return getAll();
-//		}
-//
-//		Pair<String, Object[]> clause = createFilterWhereClause(filter);
-//
-//		String select = "SELECT * FROM donations WHERE " + clause.a
-//				+ " ORDER BY id DESC";
-//
-//		List<Donation> donations = jdbcTemplate.query(select, clause.b,
-//				new DonationMapper());
-//
-//		return donations;
-//	}
-
-//	@Override
-//	public long sumByFilter(DonationFilter filter) throws PersistenceException {
-//		if (filter == null || filter.isEmpty()) {
-//			return jdbcTemplate.queryForObject(
-//					"SELECT SUM(amount) FROM donations", Long.class);
-//		}
-//
-//		Pair<String, Object[]> clause = createFilterWhereClause(filter);
-//
-//		String select = "SELECT SUM(amount) FROM donations WHERE " + clause.a;
-//
-//		return jdbcTemplate.queryForObject(select, clause.b, Long.class);
-//	}
-
 	private class DonationMapper implements RowMapper<Donation> {
 
 		public Donation mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -279,6 +217,7 @@ public class DonationDAOImplemented implements IDonationDAO {
 			donation.setId(rs.getInt("id"));
 			try {
 				donation.setDonator(personDAO.getById(rs.getInt("personid")));
+				donation.setSource(importDAO.getByID(rs.getInt("import")));
 			} catch (PersistenceException e) {
 				throw new SQLException(e);
 			}
@@ -291,6 +230,26 @@ public class DonationDAOImplemented implements IDonationDAO {
 
 			return donation;
 		}
+	}
+
+	@Override
+	public List<Donation> getAll() throws PersistenceException {
+		String select = "SELECT * FROM donations ORDER BY id DESC";
+
+		List<Donation> donations = jdbcTemplate.query(select,
+				new DonationMapper());
+
+		return donations;
+	}
+
+	@Override
+	public List<Donation> getByImport(Import i) throws PersistenceException {
+		String select = "SELECT * FROM donations WHERE import = ? ORDER BY id DESC";
+
+		List<Donation> donations = jdbcTemplate.query(select,
+				new Object[] { i.getId() }, new DonationMapper());
+
+		return donations;
 	}
 
 }

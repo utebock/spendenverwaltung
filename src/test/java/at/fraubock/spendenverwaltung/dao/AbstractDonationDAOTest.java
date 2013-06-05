@@ -55,14 +55,10 @@ public abstract class AbstractDonationDAOTest {
 	 * testing create
 	 */
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = PersistenceException.class)
 	@Transactional
-	public void createWithNullParameterShouldThrowException() {
-		try {
-			donationDAO.insertOrUpdate(null);
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void createWithNullParameterShouldThrowException() throws PersistenceException {
+		donationDAO.insertOrUpdate(null);
 	}
 
 	@Test
@@ -126,19 +122,15 @@ public abstract class AbstractDonationDAOTest {
 	 * testing update
 	 */
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = PersistenceException.class)
 	@Transactional
-	public void updateWithNullParameterShouldThrowException() {
-		try {
-			donationDAO.insertOrUpdate(null);
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void updateWithNullParameterShouldThrowException() throws PersistenceException {
+		donationDAO.insertOrUpdate(null);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = PersistenceException.class)
 	@Transactional
-	public void updateWithInvalidParameterShouldThrowException() {
+	public void updateWithInvalidParameterShouldThrowException() throws PersistenceException {
 		Person person = new Person();
 		Donation donation = new Donation();
 		Address address = new Address();
@@ -180,26 +172,21 @@ public abstract class AbstractDonationDAOTest {
 		try {
 			donationDAO.insertOrUpdate(donation);
 			donation.setDonator(null);
-
-			donationDAO.insertOrUpdate(donation);
-
 		} catch (PersistenceException e) {
 			fail();
 		}
+		
+		donationDAO.insertOrUpdate(donation);
 	}
 
 	/*
 	 * testing delete
 	 */
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = PersistenceException.class)
 	@Transactional
-	public void deleteWithNullParameterShouldThrowException() {
-		try {
-			donationDAO.delete(null);
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void deleteWithNullParameterShouldThrowException() throws PersistenceException {
+		donationDAO.delete(null);
 	}
 
 	@Test
@@ -356,12 +343,8 @@ public abstract class AbstractDonationDAOTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	@Transactional(readOnly = true)
-	public void getByPersonWithNullThrowsException() {
-		try {
-			donationDAO.getByPerson(null);
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void getByPersonWithNullThrowsException() throws PersistenceException {
+		donationDAO.getByPerson(null);
 	}
 
 	@Test
@@ -376,12 +359,8 @@ public abstract class AbstractDonationDAOTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	@Transactional(readOnly = true)
-	public void getWithNegativeIdThrowsException() {
-		try {
-			assertNull(donationDAO.getByID(-1));
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void getWithNegativeIdThrowsException() throws PersistenceException {
+		assertNull(donationDAO.getByID(-1));
 	}
 
 	@Test
@@ -657,14 +636,14 @@ public abstract class AbstractDonationDAOTest {
 //		donation2.setDonator(person1);
 //		donation2.setAmount(10L);
 //		donation2.setDate(new Date());
-//		donation2.setDedication("Spendenaufruf 2013 JŠnner");
+//		donation2.setDedication("Spendenaufruf 2013 Jï¿½nner");
 //		donation2.setNote("bla22");
 //		donation2.setType(Donation.DonationType.SMS);
 //		
 //		donation3.setDonator(person1);
 //		donation3.setAmount(80L);
 //		donation3.setDate(new Date());
-//		donation3.setDedication("RegelmŠ§ige Spende");
+//		donation3.setDedication("Regelmï¿½ï¿½ige Spende");
 //		donation3.setNote("bla31");
 //		donation3.setType(Donation.DonationType.BANK_TRANSFER);
 //		

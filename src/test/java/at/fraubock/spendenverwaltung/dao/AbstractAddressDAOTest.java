@@ -32,24 +32,16 @@ public abstract class AbstractAddressDAOTest {
 	 * testing create
 	 */
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = PersistenceException.class)
 	@Transactional
-	public void createWithNullParameter_ThrowsException() {
-		try {
-			addressDAO.insertOrUpdate(null);
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void createWithNullParameter_ThrowsException() throws PersistenceException {
+		addressDAO.insertOrUpdate(null);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = PersistenceException.class)
 	@Transactional
-	public void createWithInvalidStateParameter_ThrowsException() {
-		try {
-			addressDAO.insertOrUpdate(new Address()); // all values are null
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void createWithInvalidStateParameter_ThrowsException() throws PersistenceException {
+		addressDAO.insertOrUpdate(new Address()); // all values are null
 	}
 
 	@Test
@@ -79,19 +71,15 @@ public abstract class AbstractAddressDAOTest {
 	 * testing update
 	 */
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = PersistenceException.class)
 	@Transactional
-	public void updateWithNullParameter_ThrowsException() {
-		try {
-			addressDAO.insertOrUpdate(null);
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void updateWithNullParameter_ThrowsException() throws PersistenceException {
+		addressDAO.insertOrUpdate(null);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = PersistenceException.class)
 	@Transactional
-	public void updateWithInvalidStateParameter_ThrowsException() {
+	public void updateWithInvalidStateParameter_ThrowsException() throws PersistenceException {
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
 		address.setPostalCode("00000");
@@ -100,12 +88,13 @@ public abstract class AbstractAddressDAOTest {
 
 		try {
 			addressDAO.insertOrUpdate(address);
-			address.setCity(null); // not allowed null value
-
-			addressDAO.insertOrUpdate(address);
 		} catch (PersistenceException e) {
 			fail();
 		}
+		address.setCity(null); // not allowed null value
+
+		addressDAO.insertOrUpdate(address);
+		
 	}
 
 	@Test
@@ -143,14 +132,10 @@ public abstract class AbstractAddressDAOTest {
 	 * testing delete
 	 */
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = PersistenceException.class)
 	@Transactional
-	public void deleteWithNullParameter_ThrowsException() {
-		try {
-			addressDAO.delete(null);
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void deleteWithNullParameter_ThrowsException() throws PersistenceException {
+		addressDAO.delete(null);
 	}
 
 	@Test

@@ -70,10 +70,10 @@ public class ValidationTableModel extends AbstractTableModel{
 			case 1: return person.getSurname();
 			case 2: return person.getTelephone();
 			case 3: return person.getEmail();
-			case 4: return person.getMainAddress().getStreet();
-			case 5: return person.getMainAddress().getPostalCode();
-			case 6: return person.getMainAddress().getCity();
-			case 7: return person.getMainAddress().getCountry();
+			case 4: return person.getAddresses()==null ? "-" : person.getMainAddress().getStreet();
+			case 5: return person.getAddresses().isEmpty() ? "-" : person.getMainAddress().getPostalCode();
+			case 6: return person.getAddresses().isEmpty() ? "-" : person.getMainAddress().getCity();
+			case 7: return person.getAddresses().isEmpty() ? "-" : person.getMainAddress().getCountry();
 			case 8: return donation.getAmount();
 			case 9: return donation.getDate();
 			case 10: return donation.getDedication();

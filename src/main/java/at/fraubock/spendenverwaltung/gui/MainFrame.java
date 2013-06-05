@@ -9,6 +9,7 @@ import javax.swing.UIManager;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
+import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 
@@ -19,6 +20,7 @@ public class MainFrame extends JFrame{
 	private IAddressService addressService;
 	private IDonationService donationService;
 	private IFilterService filterService;
+	private IImportService importService;
 	
 	public MainFrame(){
 		super("Ute Bock Spendenverwaltungssystem");
@@ -36,6 +38,9 @@ public class MainFrame extends JFrame{
 	}
 	public void setFilterService(IFilterService filterService){
 		this.filterService = filterService;
+	}
+	public void setImportService(IImportService importService){
+		this.importService = importService;
 	}
 	
 	public void openMainWindow(){
@@ -60,7 +65,7 @@ public class MainFrame extends JFrame{
 		MainFrame frame = new MainFrame();
 		JPanel panel = new JPanel();
 		frame.add(new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
-		frame.add(new Overview(filterService, personService, addressService, donationService));
+		frame.add(new Overview(filterService, personService, addressService, donationService, importService));
 		frame.setSize(800, 800);
 		frame.setLocation(100,100);
 		frame.setResizable(true);

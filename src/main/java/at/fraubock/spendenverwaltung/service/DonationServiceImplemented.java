@@ -14,7 +14,6 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 
-
 /**
  * implementation of {@link IAddressService}
  * 
@@ -34,7 +33,7 @@ public class DonationServiceImplemented implements IDonationService {
 	}
 
 	@Override
-	@Transactional(isolation=Isolation.SERIALIZABLE)
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public Donation create(Donation d) throws ServiceException {
 		try {
 			donationDAO.insertOrUpdate(d);
@@ -45,7 +44,7 @@ public class DonationServiceImplemented implements IDonationService {
 	}
 
 	@Override
-	@Transactional(isolation=Isolation.SERIALIZABLE)
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public Donation update(Donation d) throws ServiceException {
 		try {
 			donationDAO.insertOrUpdate(d);
@@ -56,7 +55,7 @@ public class DonationServiceImplemented implements IDonationService {
 	}
 
 	@Override
-	@Transactional(isolation=Isolation.SERIALIZABLE)
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public void delete(Donation d) throws ServiceException {
 		try {
 			donationDAO.delete(d);
@@ -66,7 +65,7 @@ public class DonationServiceImplemented implements IDonationService {
 	}
 
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	public Donation getByID(int id) throws ServiceException {
 		try {
 			return donationDAO.getByID(id);
@@ -76,7 +75,7 @@ public class DonationServiceImplemented implements IDonationService {
 	}
 
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	public List<Donation> getByPerson(Person p) throws ServiceException {
 		try {
 			return donationDAO.getByPerson(p);
@@ -86,10 +85,10 @@ public class DonationServiceImplemented implements IDonationService {
 	}
 
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	public List<Donation> getUnconfirmed() throws ServiceException {
 		try {
-			return donationDAO.getAllUnconfirmed();
+			return donationDAO.getUnconfirmed();
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
@@ -100,10 +99,10 @@ public class DonationServiceImplemented implements IDonationService {
 		DonationType[] donationTypes = Donation.DonationType.values();
 		String[] stringDonationTypes = new String[donationTypes.length];
 		int counter = 0;
-		
-		for(DonationType type : donationTypes)
+
+		for (DonationType type : donationTypes)
 			stringDonationTypes[counter++] = type.toString();
-		
+
 		return stringDonationTypes;
 	}
 

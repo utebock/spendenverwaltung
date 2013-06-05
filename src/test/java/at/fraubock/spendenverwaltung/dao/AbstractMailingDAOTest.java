@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -23,13 +22,18 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 
+/**
+ * 
+ * @author Chris Steele
+ *
+ */
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/testspring.xml")
 @TransactionConfiguration(defaultRollback = true)
 public class AbstractMailingDAOTest {
 
-	private static final Logger log = Logger
-			.getLogger(AbstractMailingDAOTest.class);
+//	private static final Logger log = Logger.getLogger(AbstractMailingDAOTest.class);
 
 	/**
 	 * PersonDAO is needed to create people for the tests
@@ -88,27 +92,16 @@ public class AbstractMailingDAOTest {
 		personDAO.insertOrUpdate(personThree);
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = PersistenceException.class)
 	@Transactional
-	public void createWithNullParameter_ThrowsException() {
-		try {
-			mailingDAO.insertOrUpdate(null);
-		} catch (PersistenceException e) {
-			log.error("PersistenceException caught in test createWithNullParameter_ThrowsException");
-			fail();
-		}
+	public void createWithNullParameter_ThrowsException() throws PersistenceException {
+		mailingDAO.insertOrUpdate(null);
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = PersistenceException.class)
 	@Transactional
-	public void createWithInvalidStateParameter_ThrowsException() {
-		try {
-			mailingDAO.insertOrUpdate(new Mailing()); // all values are null
-		} catch (PersistenceException e) {
-
-			log.error("PersistenceException caught in test createWithInvalidStateParameter_ThrowsException");
-			fail();
-		}
+	public void createWithInvalidStateParameter_ThrowsException() throws PersistenceException {
+		mailingDAO.insertOrUpdate(new Mailing()); // all values are null
 	}
 	
 	@Test
@@ -369,20 +362,16 @@ public class AbstractMailingDAOTest {
 	public void getMailingsByValidPersonWithNoMailings_shouldReturnNull() {
 		try {
 			initData();
-			assertNull(mailingDAO.getMailingsByPerson(personOne));
+			assertTrue(mailingDAO.getMailingsByPerson(personOne).isEmpty());
 		} catch (PersistenceException e) {
 			fail();
 		}
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = PersistenceException.class)
 	@Transactional	
-	public void getMailingsByInvalidPerson_throwsException() {
-		try {
-			mailingDAO.getMailingsByPerson(new Person());
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void getMailingsByInvalidPerson_throwsException() throws PersistenceException {
+		mailingDAO.getMailingsByPerson(new Person());
 	}
 
 

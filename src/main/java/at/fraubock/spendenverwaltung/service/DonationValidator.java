@@ -2,7 +2,7 @@ package at.fraubock.spendenverwaltung.service;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 
-
+@Deprecated
 public class DonationValidator {
 	
 	public synchronized void validate(Donation d){

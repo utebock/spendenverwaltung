@@ -9,6 +9,7 @@ import at.fraubock.spendenverwaltung.util.FilterType;
  *
  */
 
+@Deprecated
 public class MailingValidator {
 
 	public synchronized void validate(Mailing mailing) {
