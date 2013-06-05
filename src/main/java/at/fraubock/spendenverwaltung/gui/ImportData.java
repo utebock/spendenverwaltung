@@ -89,11 +89,16 @@ public class ImportData extends JPanel {
 	}
 
 	public void importData() {
+		int errors;
 		if(pathField.getText().length()>0){
 			switch(importType.getSelectedItem().toString()){
 			case "native import":
 				try {
-					importService.nativeImport(new File(pathField.getText()));
+					errors = importService.nativeImport(new File(pathField.getText()));
+					if(errors > 0)
+						JOptionPane.showMessageDialog(this, "Failed to import "+errors+ " Donations", "Error", JOptionPane.ERROR_MESSAGE);
+					else
+						JOptionPane.showMessageDialog(this, "All rows imported", "Import", JOptionPane.INFORMATION_MESSAGE);
 				} catch (ServiceException e) {
 					JOptionPane.showMessageDialog(this, "An error occured during import", "Error", JOptionPane.ERROR_MESSAGE);
 					e.printStackTrace();
