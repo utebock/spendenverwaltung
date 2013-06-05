@@ -2,29 +2,43 @@ package at.fraubock.spendenverwaltung.gui.components;
 
 import at.fraubock.spendenverwaltung.gui.components.interfaces.ValidateableComponent;
 
-public class NumericTextField implements ValidateableComponent {
+/**
+ * 
+ * @author Chris Steele
+ *
+ */
+public class NumericTextField extends CustomTextField implements ValidateableComponent {
 
-	private CustomTextField field;
+	private static final long serialVersionUID = 1L;
+	private boolean nullAllowed = true;
+	private ComponentConstants length;
+
 	
 	public NumericTextField(ComponentConstants length) {
-		field = new CustomTextField(length.getValue(length));
+		super(length.getValue(length));
+	}
+	
+	public NumericTextField(ComponentConstants length, boolean nullAllowed) {
+		super(length.getValue(length));
+		this.nullAllowed = nullAllowed;
 	}
 	
 	//validation allows for 2 decimals after decimal point
 	@Override
 	public boolean validateContents() {
-		  if(!field.getText().matches("\\d+(\\.(\\d){1,2})?")) {
-			  field.invalidateInput();
-			  return false;
+		  if(getText() == null) {
+			  if(!nullAllowed)
+				  return false;
 		  }
+		  else {
+			  if(getText().length() > length.getValue(length))
+				  return false;
+			  if(!getText().matches("\\d+(\\.(\\d){1,2})?")) {
+				  invalidateInput();
+				  return false;
+			  }
+		  }
+		  
 		  return true;
-	}
-	
-	public void setText(String text) {
-		field.setText(text);
-	}
-	
-	public String getText() {
-		return field.getText();
 	}
 } 

@@ -2,28 +2,29 @@ package at.fraubock.spendenverwaltung.gui.components;
 
 import at.fraubock.spendenverwaltung.gui.components.interfaces.ValidateableComponent;
 
-public class AlphabeticTextField implements ValidateableComponent {
-	
-	private CustomTextField field;
+/**
+ * 
+ * @author Chris Steele
+ *
+ */
+public class AlphabeticTextField extends CustomTextField implements ValidateableComponent {
+
+	private static final long serialVersionUID = 1L;
+
+	private ComponentConstants length;
 	
 	public AlphabeticTextField(ComponentConstants length) {
-		field = new CustomTextField(length.getValue(length));
+		super(length.getValue(length));
+		this.length = length;
 	}
 
 	@Override
 	public boolean validateContents() {
-		  if(!field.getText().matches("[a-zA-Z)]*")) {
-			  field.invalidateInput();
+		  if(!getText().matches("[a-zA-Z)]*") || getText().length() > length.getValue(length)) {
+			  invalidateInput();
 			  return false;
 		  }
 		  return true;
 	}
 	
-	public void setText(String text) {
-		field.setText(text);
-	}
-	
-	public String getText() {
-		return field.getText();
-	}
 }

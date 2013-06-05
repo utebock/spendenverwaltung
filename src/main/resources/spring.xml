@@ -119,4 +119,6 @@
 	<bean id="importService"
 		class="at.fraubock.spendenverwaltung.service.ImportServiceImplemented">
 	</bean>
+	
+		<!-- BEANS FOR GUI -->
 </beans>
