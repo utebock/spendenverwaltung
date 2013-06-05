@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import at.fraubock.spendenverwaltung.gui.filter.comparators.BooleanComparator;
 import at.fraubock.spendenverwaltung.gui.filter.comparators.DateComparator;
 import at.fraubock.spendenverwaltung.gui.filter.comparators.DaysBackComparator;
@@ -15,18 +18,40 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing.MailingType;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
+import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
 import at.fraubock.spendenverwaltung.util.FilterType;
 
 public class ConfiguratorFactory {
 
 	private FilterType type;
+	private List<Filter> personFilters;
+	private List<Filter> donationFilters;
+	private List<Filter> mailingFilters;
+	private List<Filter> addressFilters;
 
 	public ConfiguratorFactory(FilterType type) {
 		this.type = type;
+		@SuppressWarnings("resource")
+		ApplicationContext context = new ClassPathXmlApplicationContext(
+				"/spring.xml");
+		IFilterService filterService = context.getBean("filterService",
+				IFilterService.class);
+		this.personFilters = new ArrayList<Filter>();
+		try {
+			personFilters = filterService.getAll(FilterType.PERSON);
+			mailingFilters = filterService.getAll(FilterType.MAILING);
+			donationFilters = filterService.getAll(FilterType.DONATION);
+			addressFilters = filterService.getAll(FilterType.ADDRESS);
+		} catch (ServiceException e) {
+			// TODO err msg + log
+		}
 	}
 
 	public List<ICriterionConfigurator> getConfigurators() {
+
 		List<ICriterionConfigurator> configurators = new ArrayList<ICriterionConfigurator>();
 
 		if (type == FilterType.PERSON) {
@@ -58,8 +83,10 @@ public class ConfiguratorFactory {
 					FilterProperty.PERSON_COMPANY, "Firma"));
 			configurators.add(new StringComparator(FilterProperty.PERSON_NOTE,
 					"Notiz"));
-//			configurators.add(new MountedFilterConfigurator(FilterType.DONATION,
-//					"Spendenfilter hinzufügen"));
+			configurators.add(new MountedFilterSingleResultConfig(
+					"Personenfilter hinzufügen", personFilters));
+			configurators.add(new PersonToDonationFilterConfig(
+					"Spendenfilter hinzufügen", donationFilters));
 
 		} else if (type == FilterType.DONATION) {
 

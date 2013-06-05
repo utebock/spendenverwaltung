@@ -71,7 +71,7 @@ public class CreateFilter extends JPanel {
 		actionHandler = new ActionHandler(this);
 		builder = new ComponentBuilder();
 
-		panel = builder.createPanel(800, 300);
+		panel = builder.createPanel(800, 800);
 //		panel2 = builder.createPanel(800, 300);
 
 		setUpCreate();

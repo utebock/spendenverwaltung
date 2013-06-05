@@ -78,20 +78,20 @@ public class FilterServiceImplemented implements IFilterService {
 		}
 		return list;
 	}
-	
+
 	@Override
 	public List<Filter> getAll(FilterType type) throws ServiceException {
 		List<Filter> list = new ArrayList<Filter>();
 		try {
-			for(Filter filter: filterDAO.getAll()) {
-				if(filter.getType()==type) {
+			for (Filter filter : filterDAO.getAll()) {
+				if (filter.getType() == type) {
 					list.add(filter);
 				}
 			}
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
-		
+
 		return list;
 	}
 
@@ -116,16 +116,17 @@ public class FilterServiceImplemented implements IFilterService {
 
 		List<Criterion> crits = filterTO.getCriterions();
 		List<LogicalOperator> ops = filterTO.getOperators();
-		
+
 		// check if criterions and operators match in number
-		if (ops.size() != crits.size() - 1 || crits.isEmpty() && !ops.isEmpty()) {
+		if ((ops.size() != crits.size() - 1 && !(crits.isEmpty() && ops
+				.isEmpty())) || crits.isEmpty() && !ops.isEmpty()) {
 			log.error("Error building query from filterTO: n criterions"
 					+ "must be connected with n-1 operators");
 			throw new ServiceException(
 					"Illegal state of FilterTO: Too many or few operators "
 							+ "for the given amount of criterions");
 		}
-		
+
 		if (ops.isEmpty()) {
 			// one or no criterion was provided
 			Criterion crit = null;

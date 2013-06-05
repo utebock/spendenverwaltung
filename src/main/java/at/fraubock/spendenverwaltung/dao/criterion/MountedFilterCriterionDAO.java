@@ -48,10 +48,17 @@ public class MountedFilterCriterionDAO {
 		}
 
 		String select = "select * from mountedfilter_criterion mc join criterion c on mc.id=c.id where mc.id = ?";
-
+		MountedFilterMapper mapper = new MountedFilterMapper();
 		try {
-			return jdbcTemplate.queryForObject(select, new Object[] { id },
-					new MountedFilterMapper());
+			MountedFilterCriterion result = jdbcTemplate.queryForObject(select,
+					new Object[] { id }, mapper);
+
+			result.setMount(filterDAO.getById(mapper.getMountId()));
+			if (mapper.getProperty() != null) {
+				result.setProperty(FilterProperty.getPropertyForString(
+						mapper.getProperty(), result.getMount().getType()));
+			}
+			return result;
 		} catch (IncorrectResultSizeDataAccessException e) {
 			if (e.getActualSize() == 0)
 				return null;
@@ -106,7 +113,13 @@ public class MountedFilterCriterionDAO {
 			} else {
 				ps.setInt(c++, filter.getCount());
 			}
-			ps.setString(c++, filter.getProperty().toString());
+
+			if (filter.getProperty() == null) {
+				ps.setNull(c++, java.sql.Types.VARCHAR);
+			} else {
+				ps.setString(c++, filter.getProperty().toString());
+			}
+
 			if (filter.getSum() == null) {
 				ps.setNull(c++, java.sql.Types.DOUBLE);
 			} else {
@@ -125,28 +138,29 @@ public class MountedFilterCriterionDAO {
 	private class MountedFilterMapper implements
 			RowMapper<MountedFilterCriterion> {
 
+		private Integer mountId;
+		private String property;
+
 		public MountedFilterCriterion mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
 			MountedFilterCriterion criterion = new MountedFilterCriterion();
+			this.setMountId(rs.getInt("mount"));
 
-			try {
-				criterion.setMount(filterDAO.getById(rs.getInt("mount")));
-			} catch (PersistenceException e) {
-				throw new SQLException(e);
-			}
 			criterion
 					.setType(FilterType.getTypeForString(rs.getString("type")));
 
 			criterion.setRelationalOperator(RelationalOperator.valueOf(rs
 					.getString("relational_operator")));
+
 			criterion.setId(rs.getInt("id"));
 
 			Integer count = rs.getInt("count");
 			criterion.setCount(rs.wasNull() ? null : count);
 
-			criterion.setProperty(FilterProperty.getPropertyForString(
-					rs.getString("property"),
-					FilterType.getTypeForString(rs.getString("type"))));
+			String prop = rs.getString("property");
+			if (!rs.wasNull()) {
+				this.setProperty(prop);
+			}
 
 			Double sum = rs.getDouble("sum");
 			criterion.setSum(rs.wasNull() ? null : sum);
@@ -154,6 +168,22 @@ public class MountedFilterCriterionDAO {
 			criterion.setAvg(rs.wasNull() ? null : avg);
 
 			return criterion;
+		}
+
+		public Integer getMountId() {
+			return mountId;
+		}
+
+		public void setMountId(Integer mountId) {
+			this.mountId = mountId;
+		}
+
+		public String getProperty() {
+			return property;
+		}
+
+		public void setProperty(String property) {
+			this.property = property;
 		}
 	}
 

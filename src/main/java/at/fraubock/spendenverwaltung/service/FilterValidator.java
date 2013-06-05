@@ -120,14 +120,20 @@ public class FilterValidator {
 			throw new IllegalArgumentException(
 					"RelationalOperator must not be null");
 		}
-
-		if (!((criterion.getCount() != null && criterion.getProperty() == null
-				&& criterion.getSum() == null && criterion.getAvg() == null) ^ (criterion
-				.getProperty() != null && criterion.getCount() == null && (criterion
-				.getSum() != null ^ criterion.getAvg() != null)))) {
-			log.error("The combination of set value for this MountedFilterCriterion was invalid");
+		
+		
+		if(criterion.getCount() != null && (criterion.getProperty() != null
+				|| criterion.getSum()!= null || criterion.getAvg()!= null)) {
+			log.error("Count value was set for mounted filter but also other values.");
 			throw new IllegalArgumentException(
 					"Either the count value or property and (avg or sum) value"
+							+ " must be set for a MountedFilterCriterion");
+		}
+		
+		if(criterion.getProperty() != null && (criterion.getCount()!=null || !(criterion.getAvg()!=null ^ criterion.getSum()!=null))) {
+			log.error("Property was set for mounted filter but also either count value or both avg and sum value.");
+			throw new IllegalArgumentException(
+					"Either the count value or property and [avg or sum] value"
 							+ " must be set for a MountedFilterCriterion");
 		}
 	}

@@ -45,10 +45,15 @@ public class ConnectedCriterionDAO {
 		}
 
 		String select = "select * from connected_criterion cc join criterion c on cc.id=c.id where cc.id = ?";
-
+		ConnectedCriterionMapper mapper = new ConnectedCriterionMapper();
 		try {
-			return jdbcTemplate.queryForObject(select, new Object[] { id },
-					new ConnectedCriterionMapper());
+			ConnectedCriterion result = jdbcTemplate.queryForObject(select, new Object[] { id },
+					mapper);
+			result.setOperand1(abstractCritDAO.getById(mapper.getOperand1Id()));
+			if(mapper.getOperand2Id()!=null) {
+				result.setOperand2(abstractCritDAO.getById(mapper.getOperand2Id()));
+			}
+			return result;
 		} catch (IncorrectResultSizeDataAccessException e) {
 			if (e.getActualSize() == 0)
 				return null;
@@ -105,6 +110,9 @@ public class ConnectedCriterionDAO {
 	private class ConnectedCriterionMapper implements
 			RowMapper<ConnectedCriterion> {
 
+		private Integer operand1Id;
+		private Integer operand2Id;
+		
 		public ConnectedCriterion mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
 			ConnectedCriterion criterion = new ConnectedCriterion();
@@ -114,16 +122,25 @@ public class ConnectedCriterionDAO {
 			criterion.setLogicalOperator(LogicalOperator.valueOf(rs
 					.getString("logical_operator")));
 			criterion.setId(rs.getInt("id"));
-			try {
-				criterion.setOperand1(abstractCritDAO.getById(rs
-						.getInt("operand1")));
-				criterion.setOperand2(abstractCritDAO.getById(rs
-						.getInt("operand2")));
-			} catch (PersistenceException e) {
-				throw new SQLException(e);
+			
+			this.operand1Id = rs.getInt("operand1");
+			Integer operand2Id = rs.getInt("operand2");
+			if(!rs.wasNull()) {
+				this.operand2Id = operand2Id;
 			}
+			
 			return criterion;
 		}
+
+		public Integer getOperand1Id() {
+			return operand1Id;
+		}
+
+		public Integer getOperand2Id() {
+			return operand2Id;
+		}
+		
+		
 	}
 
 	public FilterValidator getValidator() {

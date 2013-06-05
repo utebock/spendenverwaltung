@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -33,7 +35,9 @@ public class FilterDAOImplemented implements IFilterDAO {
 		validator.validate(f);
 
 		if (f.getId() == null) {
-			abstractCritDAO.insert(f.getCriterion());
+			if (f.getCriterion() != null) {
+				abstractCritDAO.insert(f.getCriterion());
+			}
 
 			// new filter to be inserted
 			KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -64,10 +68,15 @@ public class FilterDAOImplemented implements IFilterDAO {
 	@Override
 	public List<Filter> getAll() throws PersistenceException {
 		// FIXME order alphabetically by name?
-
+		FilterMapper mapper = new FilterMapper();
 		String select = "SELECT * FROM filter ORDER BY id DESC";
-		List<Filter> filterList = jdbcTemplate
-				.query(select, new FilterMapper());
+		List<Filter> filterList = jdbcTemplate.query(select, mapper);
+		for (Filter result : filterList) {
+			Integer critId = mapper.getCriterionId().get(result.getId());
+			if (critId != null) {
+				result.setCriterion(abstractCritDAO.getById(critId));
+			}
+		}
 
 		return filterList;
 	}
@@ -79,16 +88,22 @@ public class FilterDAOImplemented implements IFilterDAO {
 		}
 
 		String select = "select * from filter where id = ?";
-
+		Filter result = null;
 		try {
-			return jdbcTemplate.queryForObject(select, new Object[] { id },
-					new FilterMapper());
+			FilterMapper mapper = new FilterMapper();
+			result = jdbcTemplate.queryForObject(select, new Object[] { id },
+					mapper);
+			if (mapper.getCriterionId() != null) {
+				result.setCriterion(abstractCritDAO.getById(mapper
+						.getCriterionId().get(result.getId())));
+			}
 		} catch (IncorrectResultSizeDataAccessException e) {
 			if (e.getActualSize() == 0)
 				return null;
 			else
 				throw new PersistenceException(e);
 		}
+		return result;
 	}
 
 	/* mappers for inserting and reading this entity */
@@ -112,28 +127,38 @@ public class FilterDAOImplemented implements IFilterDAO {
 			ps.setString(1, filter.getType().toString());
 			ps.setString(2, filter.getName());
 			ps.setBoolean(3, filter.isAnonymous());
-			ps.setInt(4, filter.getCriterion().getId());
+			if (filter.getCriterion() == null) {
+				ps.setNull(4, java.sql.Types.INTEGER);
+			} else {
+				ps.setInt(4, filter.getCriterion().getId());
+			}
 			return ps;
 		}
 	}
 
 	private class FilterMapper implements RowMapper<Filter> {
 
+		private Map<Integer, Integer> criterionId = new HashMap<Integer, Integer>();
+
 		public Filter mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Filter filter = new Filter();
-
-			filter.setType(FilterType.getTypeForString(rs.getString("type")));
-			try {
-				filter.setCriterion(abstractCritDAO.getById(rs
-						.getInt("criterion")));
-			} catch (PersistenceException e) {
-				throw new SQLException(e);
-			}
 			filter.setId(rs.getInt("id"));
 			filter.setName(rs.getString("name"));
 			filter.setAnonymous(rs.getBoolean("anonymous"));
 
+			filter.setType(FilterType.getTypeForString(rs.getString("type")));
+			Integer crit_id = rs.getInt("criterion");
+			if (!rs.wasNull()) {
+				this.criterionId.put(filter.getId(), crit_id);
+			} else {
+
+			}
+
 			return filter;
+		}
+
+		public Map<Integer, Integer> getCriterionId() {
+			return criterionId;
 		}
 	}
 

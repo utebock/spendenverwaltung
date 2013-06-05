@@ -88,6 +88,10 @@
 		<property name="validator" ref="filterValidator" />
 	</bean>
 	
+	<bean id="testDao" class="at.fraubock.spendenverwaltung.dao.TestDAO">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+	</bean>
+	
 	
 	
 	<!-- BEANS FOR SERVICES -->
