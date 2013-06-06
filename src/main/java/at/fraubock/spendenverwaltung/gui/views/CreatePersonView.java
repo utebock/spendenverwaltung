@@ -2,7 +2,6 @@ package at.fraubock.spendenverwaltung.gui.views;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,22 +9,24 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
-import javax.swing.JTextField;
+
+import org.jdesktop.swingx.JXDatePicker;
 
 import net.miginfocom.swing.MigLayout;
 import at.fraubock.spendenverwaltung.gui.MainFrame;
 import at.fraubock.spendenverwaltung.gui.PersonTableModel;
-import at.fraubock.spendenverwaltung.gui.components.AlphabeticTextField;
+import at.fraubock.spendenverwaltung.gui.components.StringTextField;
 import at.fraubock.spendenverwaltung.gui.components.ComponentConstants;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.EmailTextField;
 import at.fraubock.spendenverwaltung.gui.components.NumericTextField;
-import at.fraubock.spendenverwaltung.gui.components.StringTextField;
 import at.fraubock.spendenverwaltung.gui.components.interfaces.ValidateableComponent;
+import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
@@ -59,10 +60,10 @@ public class CreatePersonView extends JPanel{
 	private StringTextField companyField;
 	
 	private JLabel given_name;
-	private AlphabeticTextField givenField;
+	private StringTextField givenField;
 	
 	private JLabel surname;
-	private AlphabeticTextField surnameField;
+	private StringTextField surnameField;
 	
 	private JLabel telephone;
 	private NumericTextField telephoneField;
@@ -71,16 +72,16 @@ public class CreatePersonView extends JPanel{
 	private EmailTextField emailField;
 	
 	private JLabel street;
-	private AlphabeticTextField streetField;
+	private StringTextField streetField;
 	
 	private JLabel postal;
 	private NumericTextField postalField;
 	
 	private JLabel city;
-	private AlphabeticTextField cityField;
+	private StringTextField cityField;
 	
 	private JLabel country;
-	private AlphabeticTextField countryField;
+	private StringTextField countryField;
 	
 	private JLabel notifyType;
 	private JCheckBox notifyMail;
@@ -108,27 +109,25 @@ public class CreatePersonView extends JPanel{
 	private JLabel dedicationNoteLabel;
 	private StringTextField dedicationNoteField;
 	private JLabel dateLabel;
-	//TODO replace with datepicker
-	private JTextField dateField;
+	private JXDatePicker datePicker;
 	private JLabel dateInstruction;
 	private JPanel overviewPanel;
 
-	private MainFrame mainframe;
+	private ViewDisplayer viewDisplayer;
 	
-	public CreatePersonView(IPersonService personService, IAddressService addressService, IDonationService donationService, MainFrame mainframe, ComponentFactory
+	public CreatePersonView(IPersonService personService, IAddressService addressService, IDonationService donationService, ViewDisplayer viewDisplayer, ComponentFactory
 			componentFactory){
 		super(new MigLayout());
 		
 		this.personService = personService;
 		this.addressService = addressService;
 		this.donationService = donationService;
-		this.mainframe = mainframe;
+		this.viewDisplayer = viewDisplayer;
 		this.componentFactory = componentFactory;
-		//TODO
-//		this.personModel = this.overview.getPersonModel();
 		setUpCreate();
 	}
-
+	
+	
 	private void setUpCreate() {
 		overviewPanel = componentFactory.createPanel(800, 850);
 		//JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -163,13 +162,13 @@ public class CreatePersonView extends JPanel{
 		validateablePersonComponents.add(companyField);
 		
 		given_name = componentFactory.createLabel("Vorname: ");
-		givenField = new AlphabeticTextField(ComponentConstants.MEDIUM_TEXT);
+		givenField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
 		panel.add(given_name);
 		panel.add(givenField, "wrap, growx");
 		validateablePersonComponents.add(givenField);
 		
 		surname = componentFactory.createLabel("Nachname: ");
-		surnameField = new AlphabeticTextField(ComponentConstants.MEDIUM_TEXT);
+		surnameField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
 		panel.add(surname);
 		panel.add(surnameField, "wrap, growx");
 		validateablePersonComponents.add(surnameField);
@@ -187,7 +186,7 @@ public class CreatePersonView extends JPanel{
 		validateablePersonComponents.add(emailField);
 
 		street = componentFactory.createLabel("Stra\u00DFe: ");
-		streetField = new AlphabeticTextField(ComponentConstants.MEDIUM_TEXT);
+		streetField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
 		panel.add(street);
 		panel.add(streetField, "growx, wrap");
 		validateablePersonComponents.add(streetField);
@@ -199,13 +198,13 @@ public class CreatePersonView extends JPanel{
 		validateablePersonComponents.add(postalField);
 		
 		city = componentFactory.createLabel("Ort: ");
-		cityField = new AlphabeticTextField(ComponentConstants.MEDIUM_TEXT);
+		cityField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
 		panel.add(city);
 		panel.add(cityField, "wrap, growx");
 		validateablePersonComponents.add(cityField);
 		
 		country = componentFactory.createLabel("Land: ");
-		countryField = new AlphabeticTextField(ComponentConstants.MEDIUM_TEXT);
+		countryField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
 		panel.add(country);
 		panel.add(countryField, "wrap, growx");
 		validateablePersonComponents.add(countryField);
@@ -250,10 +249,10 @@ public class CreatePersonView extends JPanel{
 		dateLabel = componentFactory.createLabel("Spendendatum: ");
 		dateInstruction = componentFactory.createLabel("(YYYY-MM-DD)");
 		dateInstruction.setFont(new Font("Instruction", Font.PLAIN, 9));
-		dateField = componentFactory.createTextField(30);
+		datePicker = new JXDatePicker(new java.util.Date());
 		donationPanel.add(dateLabel, "split 2");
 		donationPanel.add(dateInstruction);
-		donationPanel.add(dateField, "wrap, growx");
+		donationPanel.add(datePicker, "wrap, growx");
 		
 		dedicationLabel = componentFactory.createLabel("Widmung: ");
 		dedicationField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
@@ -292,7 +291,6 @@ public class CreatePersonView extends JPanel{
 				address = new Address();
 				
 				person.setSex(Person.Sex.values()[salutation.getSelectedIndex()]);
-				
 				String title = (String) titleBox.getSelectedItem();
 				person.setTitle(title);
 				person.setCompany(companyField.getText());
@@ -326,37 +324,20 @@ public class CreatePersonView extends JPanel{
 					donationValidated = false;
 			}
 			
-			if(donationValidated) {
+			if(donationValidated && personValidated) {
 				donation = new Donation();
 				
 				donation.setType(Donation.DonationType.values()[donationCombo.getSelectedIndex()]);
 				
-				long d_amount;
-				if(amount.getText() == null || amount.getText().isEmpty()){
-					d_amount = 0;
-				}
-				else{
-					try{
-						d_amount = Long.parseLong(amount.getText());
-					}
-					catch(NumberFormatException e1){
-						JOptionPane.showMessageDialog(null, "Bitte nur Zahlen eingeben.", "Warn", JOptionPane.WARNING_MESSAGE);
-						amount.requestFocus();
-						return;
-					}
+				Long d_amount = null;
+				
+				if(!amount.getText().isEmpty()) { 
+					d_amount = amount.getHundredths();
 				}
 			
 				donation.setAmount(d_amount);
-				
-				//TODO datepicker
-				if(dateField.getText().isEmpty() || dateField.getText().equals(null)){
-					dateField.setText("2000-01-01");
-	//				JOptionPane.showMessageDialog(this, "Bitte Datum eingeben.", "Warn", JOptionPane.WARNING_MESSAGE);
-	//				dateField.requestFocus();
-	//				return;
-				}
 			
-				donation.setDate(Date.valueOf(dateField.getText()));
+				donation.setDate(datePicker.getDate());
 				
 				donation.setDedication(dedicationField.getText());
 				
@@ -389,7 +370,6 @@ public class CreatePersonView extends JPanel{
 		}
 	}
 	
-	
     private final class CancelAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -400,4 +380,13 @@ public class CreatePersonView extends JPanel{
 		}
 		
 	}
+    
+    public static void main(String[] args) {
+    	JFrame frame = new JFrame("CreatePersonViewTest");
+    	CreatePersonView view = new CreatePersonView(null, null, null, null, new ComponentFactory());
+    	frame.add(view);
+    	frame.validate();
+    	frame.pack();
+    	frame.setVisible(true);
+    }
 }

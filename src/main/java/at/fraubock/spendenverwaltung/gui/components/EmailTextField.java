@@ -5,7 +5,12 @@ import at.fraubock.spendenverwaltung.gui.components.interfaces.ValidateableCompo
 /**
  * 
  * @author Chris Steele
+ * 
+ * EmailTextField extends CustomTextField and implements the ValidateableComponent
+ * interface, allowing for easy validation of the contents. Validation is based
+ * on the regex at http://www.mkyong.com/regular-expressions/how-to-validate-email-address-with-regular-expression/
  *
+ * see tests for concrete examples
  */
 public class EmailTextField extends CustomTextField implements ValidateableComponent {
 	
@@ -26,7 +31,7 @@ public class EmailTextField extends CustomTextField implements ValidateableCompo
 
 	@Override
 	public boolean validateContents() {
-		 if(getText() == null) {
+		 if(getText().equals("")){
 			  if(!nullAllowed)
 				  return false;
 		 }

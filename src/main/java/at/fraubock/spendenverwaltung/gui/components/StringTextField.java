@@ -14,18 +14,19 @@ public class StringTextField extends CustomTextField implements ValidateableComp
 	private ComponentConstants length;
 	
 	public StringTextField(ComponentConstants length) {
-		super(length.getValue(length));
+		this(length, true);
 	}
 	
 	public StringTextField(ComponentConstants length, boolean nullAllowed) {
 		super(length.getValue(length));
+		this.length = length;
 		this.nullAllowed = nullAllowed;
 	}
 
 	@Override
 	public boolean validateContents() {
-		if(getText() == null) {
-			if(nullAllowed == true)
+		if(getText().equals("")) {
+			if(!nullAllowed)
 				return false;
 		} else if(getText().length() > length.getValue(length)) {
 			return false;
