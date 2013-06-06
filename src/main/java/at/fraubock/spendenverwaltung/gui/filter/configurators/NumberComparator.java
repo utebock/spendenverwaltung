@@ -1,24 +1,24 @@
-package at.fraubock.spendenverwaltung.gui.filter.comparators;
-
-import java.awt.Font;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+package at.fraubock.spendenverwaltung.gui.filter.configurators;
 
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import at.fraubock.spendenverwaltung.gui.CustomTextField;
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
-import at.fraubock.spendenverwaltung.gui.filter.ICriterionConfigurator;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationType;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
 
-public class DateComparator extends JPanel implements ICriterionConfigurator {
+/**
+ * implements {@link ICriterionConfigurator} for {@link PropertyCriterion}s of
+ * type {@link Number}.
+ * 
+ * @author philipp muhoray
+ * 
+ */
+public class NumberComparator extends JPanel implements ICriterionConfigurator {
 	private static final long serialVersionUID = 5674883209607705490L;
 
 	private RelationalOperatorPicker picker;
@@ -26,25 +26,21 @@ public class DateComparator extends JPanel implements ICriterionConfigurator {
 	private FilterProperty property;
 	private String display;
 
-	public DateComparator(FilterProperty property, String display) {
+	public NumberComparator(FilterProperty property, String display) {
 		this.display = display;
 		this.property = property;
 		add(picker = new RelationalOperatorPicker(
 				RelationType.FOR_NUMBER_AND_DATE));
-		add(textField = new CustomTextField(12));
-		JLabel format = new JLabel("(dd.MM.yyyy)");
-		format.setFont(new Font("Headline", Font.PLAIN, 11));
-		add(format);
+		add(textField = new CustomTextField(5));
 	}
 
-	private Date getDate() throws InvalidInputException {
+	private Double getNumber() throws InvalidInputException {
 		try {
-			return new SimpleDateFormat("dd.MM.yyyy")
-					.parse(textField.getText());
-		} catch (ParseException e) {
+			return Double.valueOf(textField.getText());
+		} catch (NumberFormatException e) {
 			textField.invalidateInput();
 			throw new InvalidInputException(
-					"Bitte tragen Sie ein gültiges Datum ein!");
+					"Bitte geben Sie eine gültige Zahl ein!");
 		}
 	}
 
@@ -53,7 +49,7 @@ public class DateComparator extends JPanel implements ICriterionConfigurator {
 		PropertyCriterion crit = new PropertyCriterion();
 		crit.setProperty(property);
 		crit.setRelationalOperator(picker.getPickedOperator());
-		crit.setDateValue(getDate());
+		crit.setNumValue(getNumber());
 		return crit;
 	}
 

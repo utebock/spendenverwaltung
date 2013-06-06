@@ -113,56 +113,24 @@ public class FilterServiceImplemented implements IFilterService {
 		filter.setType(filterTO.getType());
 		filter.setName(filterTO.getName());
 		filter.setAnonymous(filterTO.isAnonymous());
-
+		
+		LogicalOperator operator = filterTO.getOperator();
 		List<Criterion> crits = filterTO.getCriterions();
-		List<LogicalOperator> ops = filterTO.getOperators();
 
-		// check if criterions and operators match in number
-		if ((ops.size() != crits.size() - 1 && !(crits.isEmpty() && ops
-				.isEmpty())) || crits.isEmpty() && !ops.isEmpty()) {
-			log.error("Error building query from filterTO: n criterions"
-					+ "must be connected with n-1 operators");
-			throw new ServiceException(
-					"Illegal state of FilterTO: Too many or few operators "
-							+ "for the given amount of criterions");
-		}
-
-		if (ops.isEmpty()) {
-			// one or no criterion was provided
-			Criterion crit = null;
-			if (crits.size() == 1) {
-				crit = crits.get(0);
-			}
-			filter.setCriterion(crit);
+		if(crits.isEmpty()) {
+			return filter;
+		} else if (crits.size()==1) {
+			filter.setCriterion(crits.get(0));
 			return filter;
 		}
-
-		/*
-		 * iterate through all operators and build the filter tree. NOTE: this
-		 * will create a linear tree. so far, we don't provide priorisation of
-		 * operators ((a or b) and c) WITHOUT using mounted filters. therefore i
-		 * don't care how the tree is created at this point, since it will end
-		 * up in the same sql query anyway. though this is not the exact
-		 * interpretation of the filter tree, it is the fastest and most stable
-		 * solution for now. if this will be fixed, FilterToSqlBuilder needs to
-		 * be fixed too (see comments in ConnectedCriterion part).
-		 */
-		ConnectedCriterion current = null;
-		int index = 0;
-		for (LogicalOperator op : ops) {
-			Criterion operand1 = null;
-			if (current == null) {
-				// starting point, set first criterion as left child
-				operand1 = crits.get(index);
-			} else {
-				// set the prior ConnectedCriterion to this one's left child
-				operand1 = current;
-			}
+		
+		ConnectedCriterion current = new ConnectedCriterion();
+		current.connect(crits.get(0), operator, crits.get(1));
+		
+		for (int index=2; index<crits.size(); index++) {
 			ConnectedCriterion con = new ConnectedCriterion();
-			// set the next criterion to this one's right child
-			con.connect(operand1, op, crits.get(index + 1));
+			con.connect(current, operator, crits.get(index));
 			current = con;
-			index++;
 		}
 		filter.setCriterion(current);
 		return filter;

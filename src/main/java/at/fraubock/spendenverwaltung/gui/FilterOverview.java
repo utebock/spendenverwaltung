@@ -178,12 +178,24 @@ public class FilterOverview extends JPanel {
 			plural = "Aussendungen";
 		}
 
-		CreateFilter cf = new CreateFilter(type, plural, new ConfiguratorFactory(
-				type), filterService, this);
+		CreateFilter cf = new CreateFilter(type, filterService, this);
 		removeAll();
 		revalidate();
 		repaint();
 		add(cf);
+	}
+
+	public void deleteFilter() {
+		Filter filter = filterModel.getFilterRow(showTable.getSelectedRow());
+		try {
+			filterService.delete(filter);
+		} catch (ServiceException e) {
+			JOptionPane.showMessageDialog(this,
+					"Ein unerwarter Fehler ist aufgetreten!", "Fehler",
+					JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+			return;
+		}
 	}
 
 	public void returnTo() {

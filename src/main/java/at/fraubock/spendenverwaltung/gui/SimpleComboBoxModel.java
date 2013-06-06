@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.gui;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.ComboBoxModel;
@@ -28,6 +29,14 @@ public class SimpleComboBoxModel<T> implements ComboBoxModel<T> {
 		if(!items.isEmpty()) {
 			this.selected = items.get(0);
 		}
+	}
+	
+	public SimpleComboBoxModel(T... items) {
+		this.items = new ArrayList<T>();
+		for(T item: items) {
+			this.items.add(item);
+		}
+		this.selected = items[0];
 	}
 
 	@Override

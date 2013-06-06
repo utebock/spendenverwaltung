@@ -7,12 +7,15 @@ import java.util.List;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import at.fraubock.spendenverwaltung.gui.filter.comparators.BooleanComparator;
-import at.fraubock.spendenverwaltung.gui.filter.comparators.DateComparator;
-import at.fraubock.spendenverwaltung.gui.filter.comparators.DaysBackComparator;
-import at.fraubock.spendenverwaltung.gui.filter.comparators.EnumComparator;
-import at.fraubock.spendenverwaltung.gui.filter.comparators.NumberComparator;
-import at.fraubock.spendenverwaltung.gui.filter.comparators.StringComparator;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.BooleanComparator;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.DateComparator;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.DaysBackComparator;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.EnumComparator;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.ICriterionConfigurator;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.SameFilterMountConfig;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.NumberComparator;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.DonationToPersonFilterConfig;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.StringComparator;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
@@ -24,6 +27,12 @@ import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
 import at.fraubock.spendenverwaltung.util.FilterType;
 
+/**
+ * creates a list of {@link ICriterionConfigurator}s for a given {@link FilterType}
+ * 
+ * @author philipp muhoray
+ *
+ */
 public class ConfiguratorFactory {
 
 	private FilterType type;
@@ -83,10 +92,10 @@ public class ConfiguratorFactory {
 					FilterProperty.PERSON_COMPANY, "Firma"));
 			configurators.add(new StringComparator(FilterProperty.PERSON_NOTE,
 					"Notiz"));
-			configurators.add(new MountedFilterSingleResultConfig(
-					"Personenfilter hinzufügen", personFilters));
-			configurators.add(new PersonToDonationFilterConfig(
+			configurators.add(new DonationToPersonFilterConfig(
 					"Spendenfilter hinzufügen", donationFilters));
+			configurators.add(new SameFilterMountConfig(
+					"Personenfilter hinzufügen", personFilters));
 //			configurators.add(new PersonToMailingFilterConfig(
 //					"Aussendungsfilter hinzufügen", mailingFilters));
 

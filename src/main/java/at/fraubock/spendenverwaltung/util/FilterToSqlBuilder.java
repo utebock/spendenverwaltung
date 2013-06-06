@@ -100,24 +100,18 @@ public class FilterToSqlBuilder {
 		validator.validate(con);
 		LogicalOperator op = con.getLogicalOperator();
 
-		/*
-		 * NOTE: to fulfill the specification of the filters, brackets should be
-		 * placed around the created statement (for priorisation of the
-		 * operators). this is NOT done here for now. we don't need it so far,
-		 * because the GUI provides no possibility for priorisation anyway.
-		 */
 		if (op == LogicalOperator.AND_NOT || op == LogicalOperator.OR_NOT) {
 			// operator involves NOT, therefore some modifications are needed
-			return createConditionalStatement(con.getOperand1(), mountLevel)
+			return "("+createConditionalStatement(con.getOperand1(), mountLevel)
 					+ " " + (op == LogicalOperator.AND_NOT ? "AND" : "OR")
 					+ " NOT ("
 					+ createConditionalStatement(con.getOperand2(), mountLevel)
-					+ ")";
+					+ "))";
 		}
 
-		return createConditionalStatement(con.getOperand1(), mountLevel) + " "
+		return "("+createConditionalStatement(con.getOperand1(), mountLevel) + " "
 				+ op + " "
-				+ createConditionalStatement(con.getOperand2(), mountLevel);
+				+ createConditionalStatement(con.getOperand2(), mountLevel) + ")";
 	}
 
 	private String createMountedCritSqlStmt(MountedFilterCriterion criterion,

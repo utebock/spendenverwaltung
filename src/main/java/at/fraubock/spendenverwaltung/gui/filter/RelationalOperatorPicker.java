@@ -11,9 +11,9 @@ import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.Relatio
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
 /**
- * ComboBox for picking a {@link RelationalOperator} in the {@link CreateFilter}
- * view. use {@link RelationType} to define for which data type operators should
- * be provided.
+ * GUI component for picking a {@link RelationalOperator} in the
+ * {@link CreateFilter} view. use {@link RelationType} to define for what data
+ * type operators should be provided.
  * 
  * @author philipp muhoray
  * 
@@ -55,29 +55,28 @@ public class RelationalOperatorPicker extends
 			} else if (this == FOR_ENUM) {
 				return Arrays.asList(new RelationalOperatorGuiWrapper[] {
 						RelationalOperatorGuiWrapper.EQUALS,
-						RelationalOperatorGuiWrapper.UNEQUAL});
+						RelationalOperatorGuiWrapper.UNEQUAL });
 			}
 			return null;
 		}
 	}
 
 	/**
-	 * used to map viewable text strings to {@link RelationalOperator} for the
-	 * GUI
+	 * used to map representative labels to {@link RelationalOperator}s
 	 * 
 	 * @author philipp muhoray
 	 * 
 	 */
 	public enum RelationalOperatorGuiWrapper {
-		LESS(RelationalOperator.LESS, "weniger als"), 
-		LESS_EQ(RelationalOperator.LESS_EQ, "weniger oder gleich als"), 
-		EQUALS(RelationalOperator.EQUALS, "gleich"),
-		UNEQUAL(RelationalOperator.UNEQUAL, "ungleich"),
-		LIKE(RelationalOperator.LIKE, "\u00E4hnlich wie"),
-		GREATER_EQ(RelationalOperator.GREATER_EQ,"mehr oder gleich als"),
-		GREATER(RelationalOperator.GREATER, "mehr als"),
-		NOT_NULL(RelationalOperator.NOT_NULL, "ist vorhanden"), 
-		IS_NULL(RelationalOperator.IS_NULL, "ist nicht vorhanden");
+		LESS(RelationalOperator.LESS, "weniger als"), LESS_EQ(
+				RelationalOperator.LESS_EQ, "weniger oder gleich als"), EQUALS(
+				RelationalOperator.EQUALS, "gleich"), UNEQUAL(
+				RelationalOperator.UNEQUAL, "ungleich"), LIKE(
+				RelationalOperator.LIKE, "enth\u00E4lt"), GREATER_EQ(
+				RelationalOperator.GREATER_EQ, "mehr oder gleich als"), GREATER(
+				RelationalOperator.GREATER, "mehr als"), NOT_NULL(
+				RelationalOperator.NOT_NULL, "ist vorhanden"), IS_NULL(
+				RelationalOperator.IS_NULL, "ist nicht vorhanden");
 
 		private String text;
 		private RelationalOperator op;

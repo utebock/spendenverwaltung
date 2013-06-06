@@ -64,10 +64,10 @@ public class ConnectedCriterionDAO {
 
 	public void delete(ConnectedCriterion f) throws PersistenceException {
 		validator.validate(f);
-		abstractCritDAO.delete(f.getOperand1());
-		abstractCritDAO.delete(f.getOperand2());
 		jdbcTemplate.update("delete from connected_criterion where id = ?",
 				new Object[] { f.getId() }, new int[] { Types.INTEGER });
+		abstractCritDAO.delete(f.getOperand1());
+		abstractCritDAO.delete(f.getOperand2());
 	}
 
 	/* mappers for inserting and reading this entity */

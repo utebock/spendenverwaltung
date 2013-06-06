@@ -1,16 +1,22 @@
-package at.fraubock.spendenverwaltung.gui.filter.comparators;
+package at.fraubock.spendenverwaltung.gui.filter.configurators;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
-import at.fraubock.spendenverwaltung.gui.filter.ICriterionConfigurator;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
+/**
+ * implements {@link ICriterionConfigurator} for {@link PropertyCriterion}s of
+ * type {@link Boolean}.
+ * 
+ * @author philipp muhoray
+ * 
+ */
 public class BooleanComparator extends JPanel implements ICriterionConfigurator {
 	private static final long serialVersionUID = 5674883209607705490L;
 
@@ -37,7 +43,7 @@ public class BooleanComparator extends JPanel implements ICriterionConfigurator 
 	public JComponent getConfigComponent() {
 		return this;
 	}
-	
+
 	@Override
 	public String toString() {
 		return display;

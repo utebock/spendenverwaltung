@@ -24,7 +24,7 @@ public class FilterTO {
 	private boolean anonymous;
 	private FilterType type;
 	private List<Criterion> criterions;
-	private List<LogicalOperator> operators;
+	private LogicalOperator operator;
 
 	public FilterType getType() {
 		return type;
@@ -42,14 +42,6 @@ public class FilterTO {
 		this.criterions = criterions;
 	}
 
-	public List<LogicalOperator> getOperators() {
-		return operators;
-	}
-
-	public void setOperators(List<LogicalOperator> operators) {
-		this.operators = operators;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -64,6 +56,14 @@ public class FilterTO {
 
 	public void setAnonymous(boolean anonymous) {
 		this.anonymous = anonymous;
+	}
+
+	public LogicalOperator getOperator() {
+		return operator;
+	}
+
+	public void setOperator(LogicalOperator operator) {
+		this.operator = operator;
 	}
 
 }

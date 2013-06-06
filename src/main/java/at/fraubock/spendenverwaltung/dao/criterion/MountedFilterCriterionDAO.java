@@ -70,12 +70,13 @@ public class MountedFilterCriterionDAO {
 	public void delete(MountedFilterCriterion f) throws PersistenceException {
 		validator.validate(f);
 
+		jdbcTemplate.update("delete from mountedfilter_criterion where id = ?",
+				new Object[] { f.getId() }, new int[] { Types.INTEGER });
+
 		if (f.getMount().isAnonymous()) { // only delete mount when
 											// anonymous
 			filterDAO.delete(f.getMount());
 		}
-		jdbcTemplate.update("delete from mountedfilter_criterion where id = ?",
-				new Object[] { f.getId() }, new int[] { Types.INTEGER });
 	}
 
 	/* mappers for inserting and reading this entity */
