@@ -121,4 +121,12 @@
 	</bean>
 	
 		<!-- BEANS FOR GUI -->
-</beans>
+	<bean id="createPersonView"
+			class="at.fraubock.spendenverwaltung.gui.views.CreatePersonView">
+			<constructor-arg index="0"><ref bean=""></ref></constructor-arg>
+			<constructor-arg index="1"><ref bean=""></ref></constructor-arg>
+			<constructor-arg index="2"><ref bean=""></ref></constructor-arg>
+			<constructor-arg index="3"><ref bean=""></ref></constructor-arg>
+			<constructor-arg index="4"><ref bean=""></ref></constructor-arg>
+	</bean>
+	</beans>
