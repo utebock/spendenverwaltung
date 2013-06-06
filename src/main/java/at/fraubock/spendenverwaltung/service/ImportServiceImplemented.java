@@ -130,6 +130,11 @@ public class ImportServiceImplemented implements IImportService {
 			throw new ServiceException("IOException "+e.getMessage());
 		}
 	}
+	
+	@Override
+	public void hypoImport(File file) throws ServiceException {
+		
+	}
 
 	public IImportDAO getImportDAO() {
 		return importDAO;
