@@ -70,7 +70,7 @@
 	</bean>
 
 	<bean id="mountedCritDao"
-		class="at.fraubock.spendenverwaltung.dao.criterion.MountedFilterCriterionDAO">
+		class="at.fraubock.spendenverwaltung.dao.criterion.MountedFilterCriterionDAOImplemented">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="abstractCritDAO" ref="abstractCritDao" />
 		<property name="validator" ref="filterValidator" />
@@ -100,8 +100,16 @@
 		class="at.fraubock.spendenverwaltung.service.AddressServiceImplemented">
 		<property name="addressDAO" ref="addressDao" />
 	</bean>
+
+	<bean id="filterService"
+		class="at.fraubock.spendenverwaltung.service.FilterServiceImplemented">
+		<property name="filterDAO" ref="filterDao" />
+		<property name="mountedCritDAO" ref="mountedCritDao" />
+	</bean>
+
 	<bean id="filterValidator" class="at.fraubock.spendenverwaltung.service.FilterValidator">
 	</bean>
+	
 	<bean id="personService"
 		class="at.fraubock.spendenverwaltung.service.PersonServiceImplemented">
 		<property name="personDAO" ref="personDao" />
