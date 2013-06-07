@@ -96,7 +96,8 @@ public class CreatePersonView extends JPanel{
 	private NumericTextField amount;
 	
 	private JButton ok = new JButton(new SubmitAction());
-	private JButton cancel = new JButton(new CancelAction());
+	//TODO
+//	private JButton cancel = new JButton(new CancelAction());
 	
 	private Person person;
 	private Address address;
@@ -269,7 +270,8 @@ public class CreatePersonView extends JPanel{
 		donationPanel.add(empty, "wrap");
 		
 		donationPanel.add(ok, "split 2");
-		donationPanel.add(cancel, "wrap");
+		//TODO
+//		donationPanel.add(cancel, "wrap");
 	}
 	
 	private final class SubmitAction extends AbstractAction {
@@ -354,14 +356,13 @@ public class CreatePersonView extends JPanel{
 					
 					
 						personService.create(person);
-					
+						personModel.addPerson(person);
 					
 						if(donation != null) {
 							donation.setDonator(person);
 							donationService.create(donation);
 						}
 						
-						personModel.addPerson(person);
 					} catch (ServiceException e1) {
 						JOptionPane.showConfirmDialog(null, "An error occured while trying to create a person. Message was "+e1.getMessage());
 					}
@@ -369,17 +370,7 @@ public class CreatePersonView extends JPanel{
 			}
 		}
 	}
-	
-    private final class CancelAction extends AbstractAction {
 
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			//TODO go back to overview
-		}
-		
-	}
     
     public static void main(String[] args) {
     	JFrame frame = new JFrame("CreatePersonViewTest");

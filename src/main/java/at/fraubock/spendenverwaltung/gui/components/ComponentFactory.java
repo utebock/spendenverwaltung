@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionListener;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -21,7 +22,7 @@ import net.miginfocom.swing.MigLayout;
 
 public class ComponentFactory {
 
-	public JButton createImageButton(String path, AbstractAction action) {
+	public JButton createImageButton(String path, Action action) {
 		java.net.URL url = getClass().getResource(path);
 		JButton button = new JButton(new ImageIcon(url));
 		button.setAction(action);
@@ -79,14 +80,6 @@ public class ComponentFactory {
 		return new JTextArea(row, col);
 	}
 
-	public JButton createButton(String text, ActionListener listener,
-			String actionCommand) {
-		JButton button = new JButton(text);
-		button.addActionListener(listener);
-		button.setActionCommand(actionCommand);
-		return button;
-	}
-
 	public JToolBar createToolbar() {
 		return new JToolBar();
 	}
@@ -112,10 +105,9 @@ public class ComponentFactory {
 	}
 
 	public JMenuItem createMenuItem(String string,
-			ActionListener buttonListener, String actionCommand) {
+			Action action) {
 		JMenuItem item = new JMenuItem(string);
-		item.addActionListener(buttonListener);
-		item.setActionCommand(actionCommand);
+		item.setAction(action);
 		return item;
 	}
 

@@ -119,4 +119,17 @@
 	<bean id="importService"
 		class="at.fraubock.spendenverwaltung.service.ImportServiceImplemented">
 	</bean>
+	
+	<!--  BEANS FOR GUI -->
+	<bean id="componentFactory" class="at.fraubock.spendenverwaltung.gui.components.ComponentFactory">
+	</bean>
+	<bean id="viewDisplayer" class="at.fraubock.spendenverwaltung.gui.container.ViewDisplayer">
+	</bean>
+	<bean id="createPersonView" class="at.fraubock.spendenverwaltung.gui.views.CreatePersonView">
+		<constructor-arg name="addressService" ref="addressService" />
+		<constructor-arg name="personService" ref="personService" />
+		<constructor-arg name="donationService" ref="donationService" />
+		<constructor-arg name="viewDisplayer" ref="viewDisplayer" />
+		<constructor-arg name="componentFactory" ref="componentFactory" />
+	</bean>
 	</beans>
