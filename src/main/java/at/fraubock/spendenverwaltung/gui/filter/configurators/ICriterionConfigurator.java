@@ -31,6 +31,15 @@ public interface ICriterionConfigurator {
 	public Criterion createCriterion() throws InvalidInputException;
 
 	/**
+	 * if suitable, applies the given {@link Criterion} to this panel's
+	 * components. that means that the values of the criterion will be set as
+	 * the values of the components.
+	 * 
+	 * @return true is this criterion was applied
+	 */
+	public boolean applyCriterion(Criterion criterion);
+
+	/**
 	 * a panel that let's a user configure this criterion
 	 * 
 	 * @return

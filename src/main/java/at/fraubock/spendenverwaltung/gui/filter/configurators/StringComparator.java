@@ -9,6 +9,7 @@ import net.miginfocom.swing.MigLayout;
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationType;
+import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationalOperatorGuiWrapper;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
@@ -21,7 +22,7 @@ import at.fraubock.spendenverwaltung.util.FilterProperty;
  * 
  */
 public class StringComparator extends JPanel implements ICriterionConfigurator {
-	
+
 	private static final long serialVersionUID = 5674883209607705490L;
 
 	private RelationalOperatorPicker picker;
@@ -33,7 +34,8 @@ public class StringComparator extends JPanel implements ICriterionConfigurator {
 		super(new MigLayout());
 		this.display = display;
 		this.property = property;
-		add(picker = new RelationalOperatorPicker(RelationType.FOR_STRING), "split 2");
+		add(picker = new RelationalOperatorPicker(RelationType.FOR_STRING),
+				"split 2");
 		add(textField = new JTextField(20), "wrap");
 	}
 
@@ -54,5 +56,22 @@ public class StringComparator extends JPanel implements ICriterionConfigurator {
 	@Override
 	public String toString() {
 		return display;
+	}
+
+	@Override
+	public boolean applyCriterion(Criterion criterion) {
+		if (criterion instanceof PropertyCriterion) {
+			PropertyCriterion prop = (PropertyCriterion) criterion;
+			if (prop.getProperty() == this.property) {
+				this.picker.setSelectedItem(
+						RelationalOperatorGuiWrapper.getForOperator(prop
+								.getRelationalOperator()));
+
+				this.textField.setText("" + prop.getStrValue());
+
+				return true;
+			}
+		}
+		return false;
 	}
 }

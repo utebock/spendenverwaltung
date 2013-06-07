@@ -13,6 +13,7 @@ import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
+import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
 /**
@@ -27,11 +28,14 @@ public class SameFilterMountConfig extends JPanel implements
 		ICriterionConfigurator {
 	private static final long serialVersionUID = -7505945596725892100L;
 
+	private FilterType type;
 	private JComboBox<Filter> filterBox;
 	private String display;
 
-	public SameFilterMountConfig(String display, List<Filter> filters) {
+	public SameFilterMountConfig(String display, List<Filter> filters,
+			FilterType type) {
 		this.display = display;
+		this.type = type;
 
 		JLabel descr = new JLabel("Dieser Filter soll erfüllt sein: ");
 		descr.setFont(new Font("Headline", Font.PLAIN, 14));
@@ -59,6 +63,20 @@ public class SameFilterMountConfig extends JPanel implements
 	@Override
 	public String toString() {
 		return display;
+	}
+
+	@Override
+	public boolean applyCriterion(Criterion criterion) {
+		if (criterion instanceof MountedFilterCriterion) {
+			MountedFilterCriterion crit = (MountedFilterCriterion) criterion;
+			if (crit.getMount().getType() == this.type) {
+
+				this.filterBox.setSelectedItem(crit.getMount());
+
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

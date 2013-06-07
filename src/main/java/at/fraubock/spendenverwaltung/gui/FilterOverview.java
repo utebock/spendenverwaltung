@@ -62,6 +62,7 @@ public class FilterOverview extends JPanel {
 	private JButton sendingsFilter;
 	private JButton donationFilter;
 	private JButton backButton;
+	private JButton edit;
 	private JButton delete;
 	private JLabel empty;
 
@@ -121,6 +122,8 @@ public class FilterOverview extends JPanel {
 				"<html>&nbsp;Spendenfilter erstellen</html>", buttonListener,
 				"add_filter");
 		donationFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
+		edit = builder.createButton("<html>&nbsp;Filter bearbeiten</html>",
+				buttonListener, "edit_filter");
 		delete = builder.createButton("<html>&nbsp;Filter l\u00F6schen</html>",
 				buttonListener, "delete_filter");
 		delete.setFont(new Font("Bigger", Font.PLAIN, 13));
@@ -130,6 +133,7 @@ public class FilterOverview extends JPanel {
 		toolbar.add(personFilter);
 		toolbar.add(donationFilter);
 		toolbar.add(sendingsFilter);
+		toolbar.add(edit);
 		toolbar.add(delete);
 		toolbar.add(backButton, "wrap");
 
@@ -166,20 +170,24 @@ public class FilterOverview extends JPanel {
 
 	public void createFilter(JButton button) {
 		FilterType type = null;
-		String plural = null;
-
+		Filter filter = null;
 		if (button == personFilter) {
 			type = FilterType.PERSON;
-			plural = "Personen";
 		} else if (button == donationFilter) {
 			type = FilterType.DONATION;
-			plural = "Spenden";
 		} else if (button == sendingsFilter) {
 			type = FilterType.MAILING;
-			plural = "Aussendungen";
+		} else if(button == edit) {
+			if (showTable.getSelectedRow() == -1) {
+				JOptionPane.showMessageDialog(this,
+						"Bitte Filter zum Bearbeiten ausw\u00E4hlen.");
+				return;
+			}
+			filter = filterModel.getFilterRow(showTable.getSelectedRow());
+			type = filter.getType();
 		}
 
-		CreateFilter cf = new CreateFilter(type, filterService, this);
+		CreateFilter cf = new CreateFilter(type, filterService, this,filter);
 		removeAll();
 		revalidate();
 		repaint();

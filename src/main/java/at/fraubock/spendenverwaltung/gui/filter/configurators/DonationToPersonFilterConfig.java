@@ -18,10 +18,12 @@ import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationType;
+import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationalOperatorGuiWrapper;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
+import at.fraubock.spendenverwaltung.util.FilterType;
 
 /**
  * implements {@link ICriterionConfigurator} for {@link MountedFilterCriterion}s
@@ -41,6 +43,7 @@ public class DonationToPersonFilterConfig extends JPanel implements
 	private boolean euro = true;
 	private JPanel firstLine = new JPanel();
 	private JPanel secondLine = new JPanel();
+	private JLabel euroLabel;
 
 	public DonationToPersonFilterConfig(String display, List<Filter> filters) {
 		super(new MigLayout());
@@ -56,10 +59,9 @@ public class DonationToPersonFilterConfig extends JPanel implements
 		secondLine.add(amount = new CustomTextField(5));
 		amount.setText("10");
 
-		final JLabel euroLabel = new JLabel("\u20AC",JLabel.CENTER);
+		euroLabel = new JLabel("\u20AC", JLabel.CENTER);
 		euroLabel.setPreferredSize(new Dimension(45, 22));
 		euroLabel.setFont(new Font("Headline", Font.PLAIN, 18));
-//		euroLabel.setVerticalTextPosition(JLabel.CENTER);
 		euroLabel.setBorder(BorderFactory.createRaisedBevelBorder());
 		euroLabel.addMouseListener(new MouseListener() {
 
@@ -93,7 +95,7 @@ public class DonationToPersonFilterConfig extends JPanel implements
 
 			}
 		});
-		secondLine.add(euroLabel,"w 200!");
+		secondLine.add(euroLabel, "w 200!");
 
 		JLabel gespendet = new JLabel("gespendet");
 		gespendet.setFont(new Font("Headline", Font.PLAIN, 14));
@@ -144,5 +146,30 @@ public class DonationToPersonFilterConfig extends JPanel implements
 	@Override
 	public String toString() {
 		return display;
+	}
+
+	@Override
+	public boolean applyCriterion(Criterion criterion) {
+		if (criterion instanceof MountedFilterCriterion) {
+			MountedFilterCriterion crit = (MountedFilterCriterion) criterion;
+			if (crit.getMount().getType() == FilterType.DONATION) {
+				this.picker.setSelectedItem(
+						RelationalOperatorGuiWrapper.getForOperator(crit
+								.getRelationalOperator()));
+				this.filterBox.setSelectedItem(crit.getMount());
+				if (crit.getCount() != null) {
+					this.amount.setText("" + crit.getCount());
+					euro = false;
+					euroLabel.setText("mal");
+				} else {
+					this.amount.setText("" + crit.getSum());
+					euro = true;
+					euroLabel.setText("\u20AC");
+				}
+
+				return true;
+			}
+		}
+		return false;
 	}
 }

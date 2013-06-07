@@ -83,7 +83,17 @@ public class FilterToSqlBuilder {
 		} else if (prop.getBoolValue() != null) {
 			stmt += prop.getBoolValue();
 		} else if (prop.getDaysBack() != null) {
-			stmt += "DATE_SUB(DATE(NOW()),INTERVAL " + prop.getDaysBack()
+			// switch relational operator to fulfill the 'days back' condition
+			if(operator==RelationalOperator.GREATER) {
+				operator=RelationalOperator.LESS;
+			} else if(operator==RelationalOperator.GREATER_EQ) {
+				operator=RelationalOperator.LESS_EQ;
+			} else if(operator==RelationalOperator.LESS_EQ) {
+				operator=RelationalOperator.GREATER_EQ;
+			} else if(operator==RelationalOperator.LESS) {
+				operator=RelationalOperator.GREATER;
+			}
+			stmt = prop.getProperty() + " " + operator.toExpression() + " DATE_SUB(DATE(NOW()),INTERVAL " + prop.getDaysBack()
 					+ " DAY)";
 		} else {
 			throw new IllegalArgumentException(

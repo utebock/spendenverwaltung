@@ -71,6 +71,17 @@ public class MountedFilterCriterionDAOImplemented implements
 				throw new PersistenceException(e);
 		}
 	}
+	
+
+
+	@Override
+	public void replaceMountId(int mountId, int replaceWith)
+			throws PersistenceException {
+
+		jdbcTemplate.update("update mountedfilter_criterion set mount=? where mount = ?",
+				new Object[] { replaceWith , mountId }, new int[] { Types.INTEGER,Types.INTEGER });
+		
+	}
 
 	@Override
 	public void delete(MountedFilterCriterion f) throws PersistenceException {

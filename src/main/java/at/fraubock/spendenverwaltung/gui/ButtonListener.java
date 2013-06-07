@@ -56,7 +56,11 @@ public class ButtonListener implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
-		String cmd = e.getActionCommand();
+		String cmd = e.getActionCommand();		
+		
+		if(cmd.equals("edit_filter")){
+			filterOverview.createFilter((JButton)e.getSource());
+		}
 		
 		if(cmd.equals("delete_filter")){
 			filterOverview.deleteFilter();

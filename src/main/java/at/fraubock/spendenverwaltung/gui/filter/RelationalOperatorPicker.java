@@ -8,6 +8,7 @@ import javax.swing.JComboBox;
 
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationalOperatorGuiWrapper;
+import at.fraubock.spendenverwaltung.util.LogicalOperator;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
 /**
@@ -93,6 +94,17 @@ public class RelationalOperatorPicker extends
 
 		public RelationalOperator getOperator() {
 			return op;
+		}
+
+		public static RelationalOperatorGuiWrapper getForOperator(
+				RelationalOperator op) {
+			for (RelationalOperatorGuiWrapper wrapper : RelationalOperatorGuiWrapper
+					.values()) {
+				if (wrapper.getOperator() == op) {
+					return wrapper;
+				}
+			}
+			return null;
 		}
 
 	}

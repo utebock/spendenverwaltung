@@ -23,7 +23,7 @@ public interface IFilterService {
 	 *            Filter to be created
 	 * @return Fully defined filter
 	 */
-	public FilterTO create(FilterTO f) throws ServiceException;
+	public Filter create(FilterTO f) throws ServiceException;
 
 	/**
 	 * Updates an existing filter
@@ -32,7 +32,7 @@ public interface IFilterService {
 	 *            Filter to be updated
 	 * @return Updated filter
 	 */
-	public Filter update(Filter f) throws ServiceException;
+	public Filter update(Filter f, FilterTO to) throws ServiceException;
 
 	/**
 	 * Deletes an existing filter

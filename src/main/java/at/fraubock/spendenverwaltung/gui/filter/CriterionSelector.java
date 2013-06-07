@@ -35,6 +35,11 @@ public class CriterionSelector extends JPanel {
 	private ComboBoxModel<ICriterionConfigurator> cbModel;
 
 	public CriterionSelector(List<ICriterionConfigurator> configurators) {
+		this(configurators, null);
+	}
+
+	public CriterionSelector(List<ICriterionConfigurator> configurators,
+			Criterion crit) {
 		super(new MigLayout());
 		// border layout for better definition
 		setBorder(BorderFactory.createTitledBorder(
@@ -45,6 +50,14 @@ public class CriterionSelector extends JPanel {
 		final JComboBox<ICriterionConfigurator> propertyCB = new JComboBox<ICriterionConfigurator>(
 				cbModel = new SimpleComboBoxModel<ICriterionConfigurator>(
 						configurators));
+		ICriterionConfigurator selCon = null;
+		for (ICriterionConfigurator con : configurators) {
+			if (con.applyCriterion(crit)) {
+				propertyCB.setSelectedItem(con);
+				selCon = con;
+				break;
+			}
+		}
 
 		propertyCB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -58,7 +71,8 @@ public class CriterionSelector extends JPanel {
 		});
 
 		add(propertyCB);
-		add(configurators.get(0).getConfigComponent());
+		add(selCon != null ? selCon.getConfigComponent() : configurators.get(0)
+				.getConfigComponent());
 	}
 
 	public Criterion toCriterionTO() throws InvalidInputException {

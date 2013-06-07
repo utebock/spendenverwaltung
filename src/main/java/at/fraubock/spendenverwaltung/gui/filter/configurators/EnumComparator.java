@@ -11,6 +11,7 @@ import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationType;
+import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationalOperatorGuiWrapper;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
@@ -64,5 +65,27 @@ public class EnumComparator extends JPanel implements ICriterionConfigurator {
 	@Override
 	public String toString() {
 		return display;
+	}
+
+	@Override
+	public boolean applyCriterion(Criterion criterion) {
+		if (criterion instanceof PropertyCriterion) {
+			PropertyCriterion prop = (PropertyCriterion) criterion;
+			if (prop.getProperty() == this.property) {
+				this.picker.setSelectedItem(
+						RelationalOperatorGuiWrapper.getForOperator(prop
+								.getRelationalOperator()));
+
+				for (Object obj : enums.keySet()) {
+					String str = enums.get(obj);
+					if (prop.getStrValue().equals(str)) {
+						this.comboBox.setSelectedItem(obj);
+					}
+				}
+
+				return true;
+			}
+		}
+		return false;
 	}
 }

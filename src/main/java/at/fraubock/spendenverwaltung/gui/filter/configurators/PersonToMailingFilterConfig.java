@@ -11,6 +11,7 @@ import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
+import at.fraubock.spendenverwaltung.util.FilterType;
 
 /**
  * implements {@link ICriterionConfigurator} for {@link MountedFilterCriterion}s
@@ -46,5 +47,29 @@ public class PersonToMailingFilterConfig extends JPanel implements
 	@Override
 	public String toString() {
 		return display;
+	}
+
+	@Override
+	public boolean applyCriterion(Criterion criterion) {
+		if (criterion instanceof MountedFilterCriterion) {
+			MountedFilterCriterion crit = (MountedFilterCriterion) criterion;
+			if (crit.getMount().getType() == FilterType.MAILING) {
+//				this.picker.getModel().setSelectedItem(
+//						crit.getRelationalOperator());
+//
+//				if (crit.getCount() != null) {
+//					this.amount.setText("" + crit.getCount());
+//					euro = false;
+//					euroLabel.setText("mal");
+//				} else {
+//					this.amount.setText("" + crit.getSum());
+//					euro = true;
+//					euroLabel.setText("\u20AC");
+//				}
+
+				return true;
+			}
+		}
+		return false;
 	}
 }

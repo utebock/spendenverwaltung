@@ -31,7 +31,7 @@ public class SimpleComboBoxModel<T> implements ComboBoxModel<T> {
 		}
 	}
 	
-	public SimpleComboBoxModel(T... items) {
+	public SimpleComboBoxModel(@SuppressWarnings("unchecked") T... items) {
 		this.items = new ArrayList<T>();
 		for(T item: items) {
 			this.items.add(item);

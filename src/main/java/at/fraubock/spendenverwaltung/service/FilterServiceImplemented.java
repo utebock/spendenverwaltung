@@ -39,24 +39,29 @@ public class FilterServiceImplemented implements IFilterService {
 
 	@Override
 	@Transactional(isolation = Isolation.SERIALIZABLE)
-	public FilterTO create(FilterTO f) throws ServiceException {
+	public Filter create(FilterTO f) throws ServiceException {
 		try {
-			filterDAO.insertOrUpdate(createFilterFromTransferObject(f));
+			Filter filter = createFilterFromTransferObject(f);
+			filterDAO.insertOrUpdate(filter);
+			return filter;
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
-		return f;
 	}
 
 	@Override
 	@Transactional(isolation = Isolation.SERIALIZABLE)
-	public Filter update(Filter f) throws ServiceException {
+	public Filter update(Filter f, FilterTO to) throws ServiceException {
 		try {
-			filterDAO.insertOrUpdate(f);
+			Filter filter = create(to);
+			mountedCritDAO.replaceMountId(f.getId(),filter.getId());
+			delete(f);
+			return filter;
+		} catch (FilterInUseException e) {
+			throw new ServiceException();
 		} catch (PersistenceException e) {
-			throw new ServiceException(e);
+			throw new ServiceException();
 		}
-		return f;
 	}
 
 	@Override

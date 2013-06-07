@@ -48,4 +48,16 @@ public class BooleanComparator extends JPanel implements ICriterionConfigurator 
 	public String toString() {
 		return display;
 	}
+
+	@Override
+	public boolean applyCriterion(Criterion criterion) {
+		if(criterion instanceof PropertyCriterion) {
+			PropertyCriterion prop = (PropertyCriterion)criterion;
+			if(prop.getProperty() == this.property) {
+				this.checkBox.setSelected(prop.getBoolValue());
+				return true;
+			}
+		}
+		return false;
+	}
 }

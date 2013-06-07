@@ -95,7 +95,7 @@ public class ConfiguratorFactory {
 			configurators.add(new DonationToPersonFilterConfig(
 					"Spendenfilter hinzuf\u00FCgen", donationFilters));
 			configurators.add(new SameFilterMountConfig(
-					"Personenfilter hinzuf\u00FCgen", personFilters));
+					"Personenfilter hinzuf\u00FCgen", personFilters, this.type));
 //			configurators.add(new PersonToMailingFilterConfig(
 //					"Aussendungsfilter hinzufuegen", mailingFilters));
 
