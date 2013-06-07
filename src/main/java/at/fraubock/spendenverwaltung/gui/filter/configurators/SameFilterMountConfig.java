@@ -1,9 +1,11 @@
 package at.fraubock.spendenverwaltung.gui.filter.configurators;
 
+import java.awt.Font;
 import java.util.List;
 
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
@@ -31,6 +33,9 @@ public class SameFilterMountConfig extends JPanel implements
 	public SameFilterMountConfig(String display, List<Filter> filters) {
 		this.display = display;
 
+		JLabel descr = new JLabel("Dieser Filter soll erfüllt sein: ");
+		descr.setFont(new Font("Headline", Font.PLAIN, 14));
+		add(descr);
 		add(filterBox = new JComboBox<Filter>(new SimpleComboBoxModel<Filter>(
 				filters)));
 	}

@@ -5,6 +5,7 @@ import java.util.List;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Import;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 
 /**
@@ -127,8 +128,8 @@ public interface IDonationDAO {
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
-	// public List<Donation> getByFilter(DonationFilter filter)
-	// throws PersistenceException;
+	 public List<Donation> getByFilter(Filter filter)
+	 throws PersistenceException;
 
 	/**
 	 * Calculates the sum of the donations matching the given filter.

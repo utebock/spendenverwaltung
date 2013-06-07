@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -22,6 +23,7 @@ import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Import;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
 import at.fraubock.spendenverwaltung.util.FilterToSqlBuilder;
@@ -38,6 +40,9 @@ public class DonationDAOImplemented implements IDonationDAO {
 	private IImportDAO importDAO;
 	private FilterToSqlBuilder filterToSqlBuilder;
 
+	private static final Logger log = Logger
+			.getLogger(DonationDAOImplemented.class);
+
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
@@ -49,19 +54,19 @@ public class DonationDAOImplemented implements IDonationDAO {
 	public void setImportDao(IImportDAO importDAO) {
 		this.importDAO = importDAO;
 	}
-	
-	private static void validate(Donation d) throws ValidationException {	
-		if(d == null)
+
+	private static void validate(Donation d) throws ValidationException {
+		if (d == null)
 			throw new ValidationException("Donation must not be null");
-		if(d.getDonator() == null)
+		if (d.getDonator() == null)
 			throw new ValidationException("Person must not be null");
-		if(d.getAmount() < 0)
+		if (d.getAmount() < 0)
 			throw new ValidationException("Amount must not be less than 0");
-		if(d.getDate() == null)
+		if (d.getDate() == null)
 			throw new ValidationException("Date must not be null");
-		if(d.getDedication() == null)
+		if (d.getDedication() == null)
 			throw new ValidationException("Dedication must not be null");
-		if(d.getType() == null)
+		if (d.getType() == null)
 			throw new ValidationException("Type must not be null");
 	}
 
@@ -250,6 +255,17 @@ public class DonationDAOImplemented implements IDonationDAO {
 				new Object[] { i.getId() }, new DonationMapper());
 
 		return donations;
+	}
+
+	@Override
+	public List<Donation> getByFilter(Filter filter)
+			throws PersistenceException {
+		String select = filterToSqlBuilder.createSqlStatement(filter);
+		List<Donation> DonationList = jdbcTemplate.query(select,
+				new DonationMapper());
+		log.info(DonationList.size() + " list size");
+
+		return DonationList;
 	}
 
 }
