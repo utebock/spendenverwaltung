@@ -107,7 +107,7 @@ public class DonationToPersonFilterConfig extends JPanel implements
 		} catch (NumberFormatException e) {
 			amount.invalidateInput();
 			throw new InvalidInputException(
-					"Bitte geben Sie eine gültige Zahl ein!");
+					"Bitte geben Sie eine g\u00FCltige Zahl ein!");
 		}
 	}
 

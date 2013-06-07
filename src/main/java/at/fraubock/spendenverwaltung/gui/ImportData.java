@@ -1,10 +1,12 @@
 package at.fraubock.spendenverwaltung.gui;
 
+import java.awt.Font;
 import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -33,6 +35,7 @@ public class ImportData extends JPanel {
 	private String[] importTypes;
 	private JButton importBtn;
 	private JButton backBtn;
+	private JLabel headline;
 
 	
 	public ImportData(IImportService importService, Overview overview){
@@ -49,24 +52,34 @@ public class ImportData extends JPanel {
 	}
 	
 	private void setUp(){
-		panel = builder.createPanel(800, 300);
+		panel = builder.createPanel(800, 800);
+		
+		headline = builder.createLabel("CSV-Files importieren ");
+		headline.setFont(new Font("Headline", Font.PLAIN, 14));
+		panel.add(headline, "wrap");
+		JLabel empty = builder.createLabel("		");
+		panel.add(empty, "wrap");
+		
+		
+		importTypes = new String[]{"native import", "Hypo import", "SMS import"};
+		importType = builder.createComboBox(importTypes, actionHandler);
+		panel.add(importType, "wrap, growx");
 		
 		pathField = builder.createTextField("");
 		panel.add(pathField, "growx");
 		openFileBtn = builder.createButton("Choose file", buttonListener, "open_file_import_data");
 		panel.add(openFileBtn, "wrap, growx");
-
-		importTypes = new String[]{"native import", "Hypo import", "SMS import"};
-		importType = builder.createComboBox(importTypes, actionHandler);
-		panel.add(importType, "wrap, growx");
+		
+		JLabel empty2 = builder.createLabel("		");
+		panel.add(empty2, "wrap");
 		
 		importBtn = builder.createButton("Import", buttonListener, "import_import_data");
-		panel.add(importBtn, "wrap, growx");
+		panel.add(importBtn, "split2");
 		
 		backBtn = builder.createButton("Abbrechen", buttonListener, "return_from_import_data_to_overview");
 		panel.add(backBtn);
 		
-		this.add(panel, "wrap, growx");
+		this.add(panel, "wrap");
 	}
 
 	public void returnTo() {

@@ -19,7 +19,7 @@ public class ValidationTableModel extends AbstractTableModel{
 
 	private static final long serialVersionUID = 1L;
 	
-	private String[] columnNames = new String[]{"Vorname", "Nachname", "Telefonnummer", "E-Mail Adresse", "Stra§e", "PLZ", "Ort", "Land", "Betrag", "Datum", "Widmun", "Typ", "Notiz"};
+	private String[] columnNames = new String[]{"Vorname", "Nachname", "Telefonnummer", "E-Mail Adresse", "Stra\u00DFe", "PLZ", "Ort", "Land", "Betrag", "Datum", "Widmung", "Typ", "Notiz"};
 	private Vector<Donation> donations = new Vector<Donation>();
 	private Vector<Person> persons = new Vector<Person>();
 	private IDonationService donationService;

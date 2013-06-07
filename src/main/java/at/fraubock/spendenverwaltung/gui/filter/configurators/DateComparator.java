@@ -50,7 +50,7 @@ public class DateComparator extends JPanel implements ICriterionConfigurator {
 		} catch (ParseException e) {
 			textField.invalidateInput();
 			throw new InvalidInputException(
-					"Bitte tragen Sie ein gültiges Datum ein!");
+					"Bitte tragen Sie ein g\u00FCltiges Datum ein!");
 		}
 	}
 
