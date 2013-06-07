@@ -74,12 +74,6 @@ public class ComponentFactory {
 		
 		return textField;
 	}
-	
-	public AlphabeticTextField createAlphabeticTextField(ComponentConstants size) {
-		AlphabeticTextField textField = new AlphabeticTextField(size);
-		
-		return textField;
-	}
 
 	public JTextArea createTextArea(int row, int col) {
 		return new JTextArea(row, col);
