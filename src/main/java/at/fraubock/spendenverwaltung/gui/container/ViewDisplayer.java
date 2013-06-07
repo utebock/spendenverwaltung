@@ -5,8 +5,8 @@ import java.awt.Component;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
-import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
-import at.fraubock.spendenverwaltung.gui.views.CreatePersonView;
+//import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
+//import at.fraubock.spendenverwaltung.gui.views.CreatePersonView;
 
 /**
  * 

@@ -1,9 +1,6 @@
 package at.fraubock.spendenverwaltung.gui.components;
 
 import java.awt.Dimension;
-import java.awt.event.ActionListener;
-
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;

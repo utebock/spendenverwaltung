@@ -129,7 +129,6 @@
 		<constructor-arg name="addressService" ref="addressService" />
 		<constructor-arg name="personService" ref="personService" />
 		<constructor-arg name="donationService" ref="donationService" />
-		<constructor-arg name="viewDisplayer" ref="viewDisplayer" />
 		<constructor-arg name="componentFactory" ref="componentFactory" />
 	</bean>
 	</beans>
