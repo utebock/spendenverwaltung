@@ -35,7 +35,7 @@ public class FilterTableModel extends AbstractTableModel{
 		
 		switch(columnIndex){
 			case 0: return filter.getName();
-			case 1: return filter.getType();
+			case 1: return filter.getType().getDisplayName();
 			default: return null;
 		}
 	}

@@ -36,7 +36,6 @@ public class CriterionSelector extends JPanel {
 
 	public CriterionSelector(List<ICriterionConfigurator> configurators) {
 		super(new MigLayout());
-
 		// border layout for better definition
 		setBorder(BorderFactory.createTitledBorder(
 				MetalBorders.getTextFieldBorder(), "Kriterium"));

@@ -2,20 +2,26 @@ package at.fraubock.spendenverwaltung.util;
 
 public enum FilterType {
 	
-	PERSON("persons"), 
-	DONATION("donations"), 
-	MAILING("mailings"), 
-	ADDRESS("addresses");
+	PERSON("persons","Personen"), 
+	DONATION("donations","Spenden"), 
+	MAILING("mailings","Aussendungen"), 
+	ADDRESS("addresses","Adressen");
 	
 	private String type;
+	private String display;
 	
-	private FilterType(String type) {
+	private FilterType(String type,String display) {
+		this.display = display;
 		this.type = type;
 	}
 
 	@Override
 	public String toString() {
 		return type;
+	}
+	
+	public String getDisplayName() {
+		return display;
 	}
 	
 	public static FilterType getTypeForString(String value) {

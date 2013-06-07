@@ -7,11 +7,13 @@ import org.apache.log4j.Logger;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import at.fraubock.spendenverwaltung.dao.criterion.IMountedFilterCriterionDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IFilterDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.ConnectedCriterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.to.FilterTO;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.FilterInUseException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
@@ -24,6 +26,7 @@ public class FilterServiceImplemented implements IFilterService {
 			.getLogger(FilterServiceImplemented.class);
 
 	private IFilterDAO filterDAO;
+	private IMountedFilterCriterionDAO mountedCritDAO;
 
 	public IFilterDAO getFilterDAO() {
 
@@ -58,8 +61,14 @@ public class FilterServiceImplemented implements IFilterService {
 
 	@Override
 	@Transactional(isolation = Isolation.SERIALIZABLE)
-	public void delete(Filter f) throws ServiceException {
+	public void delete(Filter f) throws ServiceException, FilterInUseException {
 		try {
+			for (Integer id : mountedCritDAO.getAllMountedFilterIds()) {
+				if (f.getId().equals(id)) {
+					throw new FilterInUseException();
+				}
+			}
+
 			filterDAO.delete(f);
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
@@ -113,21 +122,21 @@ public class FilterServiceImplemented implements IFilterService {
 		filter.setType(filterTO.getType());
 		filter.setName(filterTO.getName());
 		filter.setAnonymous(filterTO.isAnonymous());
-		
+
 		LogicalOperator operator = filterTO.getOperator();
 		List<Criterion> crits = filterTO.getCriterions();
 
-		if(crits.isEmpty()) {
+		if (crits.isEmpty()) {
 			return filter;
-		} else if (crits.size()==1) {
+		} else if (crits.size() == 1) {
 			filter.setCriterion(crits.get(0));
 			return filter;
 		}
-		
+
 		ConnectedCriterion current = new ConnectedCriterion();
 		current.connect(crits.get(0), operator, crits.get(1));
-		
-		for (int index=2; index<crits.size(); index++) {
+
+		for (int index = 2; index < crits.size(); index++) {
 			ConnectedCriterion con = new ConnectedCriterion();
 			con.connect(current, operator, crits.get(index));
 			current = con;
@@ -135,4 +144,13 @@ public class FilterServiceImplemented implements IFilterService {
 		filter.setCriterion(current);
 		return filter;
 	}
+
+	public IMountedFilterCriterionDAO getMountedCritDAO() {
+		return mountedCritDAO;
+	}
+
+	public void setMountedCritDAO(IMountedFilterCriterionDAO mountedCritDAO) {
+		this.mountedCritDAO = mountedCritDAO;
+	}
+
 }

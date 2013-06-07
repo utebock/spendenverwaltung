@@ -77,11 +77,11 @@ public enum FilterProperty {
 			}
 
 		} else if (filterType.equals(FilterType.MAILING)) {
-			if ("type".equals(value)) {
+			if ("mailing_type".equals(value)) {
 				return MAILING_TYPE;
-			} else if ("medium".equals(value)) {
+			} else if ("mailing_medium".equals(value)) {
 				return MAILING_MEDIUM;
-			} else if ("mailingdate".equals(value)) {
+			} else if ("mailing_date".equals(value)) {
 				return MAILING_DATE;
 			}
 

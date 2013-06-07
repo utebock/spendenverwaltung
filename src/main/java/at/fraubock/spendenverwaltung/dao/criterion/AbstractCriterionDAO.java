@@ -26,7 +26,7 @@ public class AbstractCriterionDAO {
 	private JdbcTemplate jdbcTemplate;
 	private ConnectedCriterionDAO connectedCritDAO;
 	private PropertyCriterionDAO propertyCritDAO;
-	private MountedFilterCriterionDAO mountedCritDAO;
+	private MountedFilterCriterionDAOImplemented mountedCritDAO;
 
 	public void insert(Criterion f) throws PersistenceException {
 
@@ -132,11 +132,11 @@ public class AbstractCriterionDAO {
 		this.propertyCritDAO = propertyCritDAO;
 	}
 
-	public MountedFilterCriterionDAO getMountedCritDAO() {
+	public MountedFilterCriterionDAOImplemented getMountedCritDAO() {
 		return mountedCritDAO;
 	}
 
-	public void setMountedCritDAO(MountedFilterCriterionDAO mountedCritDAO) {
+	public void setMountedCritDAO(MountedFilterCriterionDAOImplemented mountedCritDAO) {
 		this.mountedCritDAO = mountedCritDAO;
 	}
 

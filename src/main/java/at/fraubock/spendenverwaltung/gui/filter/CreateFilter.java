@@ -73,7 +73,7 @@ public class CreateFilter extends JPanel {
 		// add plus button
 		plusButton = builder.createImageButton("/images/plusButton.gif",
 				buttonListener, "plusButton_create_filter");
-		add(plusButton, "wrap, gapleft 7, gapbottom 10");
+		criterionSelectorPanel.add(plusButton, "wrap, gapleft 7, gaptop 10");
 
 		// add controls
 		this.controlButtonPanel = new JPanel();
@@ -89,16 +89,8 @@ public class CreateFilter extends JPanel {
 	private void setUpCreate() {
 
 		// create headline
-		String filterTypeName = "";
-		if (type == FilterType.PERSON) {
-			filterTypeName = "Personen";
-		} else if (type == FilterType.DONATION) {
-			filterTypeName = "Spenden";
-		} else if (type == FilterType.MAILING) {
-			filterTypeName = "Aussendungen";
-		}
 		headline = builder.createLabel("Neuen Filter f\u00FCr "
-				+ filterTypeName + " anlegen:");
+				+ type.getDisplayName() + " anlegen:");
 		headline.setFont(new Font("Headline", Font.PLAIN, 14));
 		add(headline, "wrap, gapbottom 10");
 
@@ -150,9 +142,14 @@ public class CreateFilter extends JPanel {
 		// add selector to panel and list
 		selectors.add(selectorComp);
 		minusButtons.add(minusButton);
-		criterionSelectorPanel.add(selectorComp, "w 500");
+		criterionSelectorPanel.add(selectorComp, "w 550!");
 		criterionSelectorPanel.add(minusButton, "wrap");
 		
+		if(plusButton!=null) {
+			criterionSelectorPanel.remove(plusButton);
+			criterionSelectorPanel.add(plusButton, "wrap, gapleft 7, gaptop 10");
+		}
+
 		if (selectors.size() == MAXIMUM_CRITERIONS) {
 			plusButton.setEnabled(false);
 		}

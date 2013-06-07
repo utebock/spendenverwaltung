@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -23,13 +25,15 @@ import at.fraubock.spendenverwaltung.util.FilterProperty;
 import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
-public class MountedFilterCriterionDAO {
+public class MountedFilterCriterionDAOImplemented implements
+		IMountedFilterCriterionDAO {
 
 	private JdbcTemplate jdbcTemplate;
 	private AbstractCriterionDAO abstractCritDAO;
 	private FilterDAOImplemented filterDAO;
 	private FilterValidator validator;
 
+	@Override
 	public void insert(MountedFilterCriterion f) throws PersistenceException {
 
 		// if (f.getId() == null) {
@@ -42,6 +46,7 @@ public class MountedFilterCriterionDAO {
 		// }
 	}
 
+	@Override
 	public MountedFilterCriterion getById(int id) throws PersistenceException {
 		if (id < 0) {
 			throw new IllegalArgumentException("Id must not be less than 0");
@@ -53,7 +58,7 @@ public class MountedFilterCriterionDAO {
 			MountedFilterCriterion result = jdbcTemplate.queryForObject(select,
 					new Object[] { id }, mapper);
 
-			result.setMount(filterDAO.getById(mapper.getMountId()));
+			result.setMount(filterDAO.getById(mapper.getMountIds().get(0)));
 			if (mapper.getProperty() != null) {
 				result.setProperty(FilterProperty.getPropertyForString(
 						mapper.getProperty(), result.getMount().getType()));
@@ -67,6 +72,7 @@ public class MountedFilterCriterionDAO {
 		}
 	}
 
+	@Override
 	public void delete(MountedFilterCriterion f) throws PersistenceException {
 		validator.validate(f);
 
@@ -77,6 +83,15 @@ public class MountedFilterCriterionDAO {
 											// anonymous
 			filterDAO.delete(f.getMount());
 		}
+	}
+
+	@Override
+	public List<Integer> getAllMountedFilterIds() {
+		MountedFilterMapper mapper = new MountedFilterMapper();
+		String select = "select * from mountedfilter_criterion mc " +
+				"join criterion c on mc.id=c.id";
+		jdbcTemplate.query(select, mapper);
+		return mapper.getMountIds();
 	}
 
 	/* mappers for inserting and reading this entity */
@@ -139,13 +154,13 @@ public class MountedFilterCriterionDAO {
 	private class MountedFilterMapper implements
 			RowMapper<MountedFilterCriterion> {
 
-		private Integer mountId;
+		private List<Integer> mountIds = new ArrayList<Integer>();
 		private String property;
 
 		public MountedFilterCriterion mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
 			MountedFilterCriterion criterion = new MountedFilterCriterion();
-			this.setMountId(rs.getInt("mount"));
+			this.mountIds.add(rs.getInt("mount"));
 
 			criterion
 					.setType(FilterType.getTypeForString(rs.getString("type")));
@@ -171,12 +186,8 @@ public class MountedFilterCriterionDAO {
 			return criterion;
 		}
 
-		public Integer getMountId() {
-			return mountId;
-		}
-
-		public void setMountId(Integer mountId) {
-			this.mountId = mountId;
+		public List<Integer> getMountIds() {
+			return mountIds;
 		}
 
 		public String getProperty() {

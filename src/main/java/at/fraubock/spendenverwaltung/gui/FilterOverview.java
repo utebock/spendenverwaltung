@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
 import at.fraubock.spendenverwaltung.gui.filter.ConfiguratorFactory;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.FilterInUseException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
@@ -186,15 +187,35 @@ public class FilterOverview extends JPanel {
 	}
 
 	public void deleteFilter() {
+		if (showTable.getSelectedRow() == -1) {
+			JOptionPane.showMessageDialog(this,
+					"Bitte Filter zum L\u00F6schen ausw\u00E4hlen.");
+			return;
+		}
+
+		
 		Filter filter = filterModel.getFilterRow(showTable.getSelectedRow());
+		int answer = JOptionPane.showConfirmDialog(this, "Wollen Sie den Filter " + filter.getName() + " wirklich löschen?");
+		
+		if(answer!=0) {
+			return;
+		}
+		
 		try {
 			filterService.delete(filter);
+			filterModel.removeFilter(showTable.getSelectedRow());
 		} catch (ServiceException e) {
 			JOptionPane.showMessageDialog(this,
 					"Ein unerwarter Fehler ist aufgetreten!", "Fehler",
 					JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
-			return;
+			log.error(e);
+		} catch (FilterInUseException e) {
+			JOptionPane
+					.showMessageDialog(
+							this,
+							"Dieser Filter ist mit einem anderen verknüpft. " +
+							"Bitte löschen Sie die Verknüpfung zuerst.",
+							"Fehler", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
