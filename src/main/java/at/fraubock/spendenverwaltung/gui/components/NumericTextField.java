@@ -36,14 +36,18 @@ public class NumericTextField extends CustomTextField implements
 	@Override
 	public boolean validateContents() {
 		if (getText().equals("")) {
-			if (!nullAllowed)
+			if (!nullAllowed) {
+				 invalidateInput();
 				return false;
+			}
 		} else {
 			char separator = DecimalFormatSymbols.getInstance()
 					.getDecimalSeparator();
 
-			if (getText().length() > length.getValue(length))
+			if (getText().length() > length.getValue(length)) {
+				invalidateInput();
 				return false;
+			}
 			if (!getText().matches("\\d+(\\" + separator + "(\\d){1,2})?")) {
 				invalidateInput();
 				return false;

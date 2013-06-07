@@ -32,12 +32,17 @@ public class EmailTextField extends CustomTextField implements ValidateableCompo
 	@Override
 	public boolean validateContents() {
 		 if(getText().equals("")){
-			  if(!nullAllowed)
-				  return false;
+			  if(!nullAllowed) {
+				invalidateInput();
+			  	return false;
+			  }
 		 }
 		 else {
-			 if(getText().length() > length.getValue(length))
+			 if(getText().length() > length.getValue(length)) {
+				 invalidateInput();
 				 return false;
+			 }
+	
 			 
 			 if(!getText().matches("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$")) {
 				 invalidateInput();

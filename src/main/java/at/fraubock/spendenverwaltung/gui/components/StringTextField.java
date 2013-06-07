@@ -26,10 +26,13 @@ public class StringTextField extends CustomTextField implements ValidateableComp
 	@Override
 	public boolean validateContents() {
 		if(getText().equals("")) {
-			if(!nullAllowed)
-				return false;
+			if(!nullAllowed) {
+				 invalidateInput();
+				 return false;
+			}
 		} else if(getText().length() > length.getValue(length)) {
-			return false;
+			 invalidateInput();
+			 return false;
 		}
 		
 		return true;
