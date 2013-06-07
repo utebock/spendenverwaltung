@@ -30,8 +30,10 @@ public class AlphabeticTextField extends CustomTextField implements Validateable
 	@Override
 	public boolean validateContents() {
 		if(getText().equals("")) {
-			if(nullAllowed == true)
-				return false;
+			if(!nullAllowed) {
+				 invalidateInput();
+				 return false;
+			}
 		} else if(!getText().matches("[a-zA-Z]*") || getText().length() > length.getValue(length)) {
 			  invalidateInput();
 			  return false;

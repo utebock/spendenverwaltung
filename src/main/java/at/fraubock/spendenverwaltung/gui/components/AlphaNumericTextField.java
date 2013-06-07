@@ -24,8 +24,10 @@ public class AlphaNumericTextField extends CustomTextField implements
 	@Override
 	public boolean validateContents() {
 		if(getText().equals("")) {
-			if(!nullAllowed)
-				return false;
+			if(!nullAllowed) {
+				 invalidateInput();
+				 return false;
+			}
 		} else if(!getText().matches("[a-zA-Z0-9]*") || getText().length() > length.getValue(length)) {
 			  invalidateInput();
 			  return false;
