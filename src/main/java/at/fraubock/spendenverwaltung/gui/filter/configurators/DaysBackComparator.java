@@ -52,7 +52,7 @@ public class DaysBackComparator extends JPanel implements
 		} catch (NumberFormatException e) {
 			textField.invalidateInput();
 			throw new InvalidInputException(
-					"Bitte geben Sie eine gültige Zahl ein!");
+					"Bitte geben Sie eine g\u00FCltige Zahl ein!");
 		}
 		switch ((String) timeUnit.getModel().getSelectedItem()) {
 		case "Wochen":

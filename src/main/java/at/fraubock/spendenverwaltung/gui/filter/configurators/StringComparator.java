@@ -4,6 +4,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import net.miginfocom.swing.MigLayout;
+
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationType;
@@ -19,6 +21,7 @@ import at.fraubock.spendenverwaltung.util.FilterProperty;
  * 
  */
 public class StringComparator extends JPanel implements ICriterionConfigurator {
+	
 	private static final long serialVersionUID = 5674883209607705490L;
 
 	private RelationalOperatorPicker picker;
@@ -27,10 +30,11 @@ public class StringComparator extends JPanel implements ICriterionConfigurator {
 	private String display;
 
 	public StringComparator(FilterProperty property, String display) {
+		super(new MigLayout());
 		this.display = display;
 		this.property = property;
-		add(picker = new RelationalOperatorPicker(RelationType.FOR_STRING));
-		add(textField = new JTextField(20));
+		add(picker = new RelationalOperatorPicker(RelationType.FOR_STRING), "split 2");
+		add(textField = new JTextField(20), "wrap");
 	}
 
 	@Override

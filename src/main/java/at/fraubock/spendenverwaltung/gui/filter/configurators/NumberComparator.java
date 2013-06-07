@@ -40,7 +40,7 @@ public class NumberComparator extends JPanel implements ICriterionConfigurator {
 		} catch (NumberFormatException e) {
 			textField.invalidateInput();
 			throw new InvalidInputException(
-					"Bitte geben Sie eine gültige Zahl ein!");
+					"Bitte geben Sie eine g\u00FCltige Zahl ein!");
 		}
 	}
 

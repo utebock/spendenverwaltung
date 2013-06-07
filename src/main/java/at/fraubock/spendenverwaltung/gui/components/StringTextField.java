@@ -5,27 +5,23 @@ import at.fraubock.spendenverwaltung.gui.components.interfaces.ValidateableCompo
 /**
  * 
  * @author Chris Steele
- * @deprecated not useful for this project, as any field might have to contain other characters...
+ *
  */
-@Deprecated
-public class AlphabeticTextField extends CustomTextField implements ValidateableComponent {
-
+public class StringTextField extends CustomTextField implements ValidateableComponent {
+	
 	private static final long serialVersionUID = 1L;
 	private boolean nullAllowed = true;
-
 	private ComponentConstants length;
 	
-	public AlphabeticTextField(ComponentConstants length) {
-		super(length.getValue(length));
-		this.length = length;
+	public StringTextField(ComponentConstants length) {
+		this(length, true);
 	}
 	
-	public AlphabeticTextField(ComponentConstants length, boolean nullAllowed) {
+	public StringTextField(ComponentConstants length, boolean nullAllowed) {
 		super(length.getValue(length));
 		this.length = length;
 		this.nullAllowed = nullAllowed;
 	}
-
 
 	@Override
 	public boolean validateContents() {
@@ -34,11 +30,12 @@ public class AlphabeticTextField extends CustomTextField implements Validateable
 				 invalidateInput();
 				 return false;
 			}
-		} else if(!getText().matches("[a-zA-Z]*") || getText().length() > length.getValue(length)) {
-			  invalidateInput();
-			  return false;
+		} else if(getText().length() > length.getValue(length)) {
+			 invalidateInput();
+			 return false;
 		}
+		
 		return true;
 	}
-	
+
 }

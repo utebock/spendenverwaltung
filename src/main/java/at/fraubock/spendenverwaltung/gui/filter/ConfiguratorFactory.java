@@ -66,7 +66,7 @@ public class ConfiguratorFactory {
 		if (type == FilterType.PERSON) {
 
 			LinkedHashMap<Object, String> sexMap = new LinkedHashMap<Object, String>();
-			sexMap.put("männlich", Person.Sex.MALE.getName());
+			sexMap.put("m\u00E4nnlich", Person.Sex.MALE.getName());
 			sexMap.put("weiblich", Person.Sex.FEMALE.getName());
 			sexMap.put("Familie", Person.Sex.FAMILY.getName());
 			sexMap.put("Unternehmen", Person.Sex.COMPANY.getName());
@@ -79,25 +79,25 @@ public class ConfiguratorFactory {
 					"E-Mail"));
 			configurators.add(new BooleanComparator(
 					FilterProperty.PERSON_WANTS_EMAIL,
-					"empfängt von uns E-Mails"));
+					"empf\u00E4ngt von uns E-Mails"));
 			configurators.add(new BooleanComparator(
-					FilterProperty.PERSON_WANTS_MAIL, "empfängt von uns Post"));
+					FilterProperty.PERSON_WANTS_MAIL, "empf\u00E4ngt von uns Post"));
 			configurators.add(new EnumComparator(sexMap,
 					FilterProperty.PERSON_SEX, "Geschlecht"));
 			configurators.add(new StringComparator(FilterProperty.PERSON_TITLE,
 					"Titel"));
 			configurators.add(new StringComparator(
-					FilterProperty.PERSON_TELEPHONE, "Telephonnummer"));
+					FilterProperty.PERSON_TELEPHONE, "Telefonnummer"));
 			configurators.add(new StringComparator(
 					FilterProperty.PERSON_COMPANY, "Firma"));
 			configurators.add(new StringComparator(FilterProperty.PERSON_NOTE,
 					"Notiz"));
 			configurators.add(new DonationToPersonFilterConfig(
-					"Spendenfilter hinzufügen", donationFilters));
+					"Spendenfilter hinzuf\u00FCgen", donationFilters));
 			configurators.add(new SameFilterMountConfig(
-					"Personenfilter hinzufügen", personFilters));
+					"Personenfilter hinzuf\u00FCgen", personFilters));
 //			configurators.add(new PersonToMailingFilterConfig(
-//					"Aussendungsfilter hinzufügen", mailingFilters));
+//					"Aussendungsfilter hinzufuegen", mailingFilters));
 
 		} else if (type == FilterType.DONATION) {
 
@@ -111,7 +111,7 @@ public class ConfiguratorFactory {
 			configurators.add(new DateComparator(FilterProperty.DONATION_DATE,
 					"Datum"));
 			configurators.add(new DaysBackComparator(
-					FilterProperty.DONATION_DATE, "Liegt zurück"));
+					FilterProperty.DONATION_DATE, "Liegt zur\u00FCck"));
 			configurators.add(new StringComparator(
 					FilterProperty.DONATION_DEDICATION, "Widmung"));
 			configurators.add(new EnumComparator(donationTypes,
@@ -133,7 +133,7 @@ public class ConfiguratorFactory {
 			configurators.add(new DateComparator(FilterProperty.MAILING_DATE,
 					"Datum"));
 			configurators.add(new DaysBackComparator(
-					FilterProperty.MAILING_DATE, "Liegt zurück"));
+					FilterProperty.MAILING_DATE, "Liegt zur\u00FCck"));
 			configurators.add(new EnumComparator(mediumMap,
 					FilterProperty.MAILING_MEDIUM, "Medium der Aussendung"));
 			configurators.add(new EnumComparator(typeMap,

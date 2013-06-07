@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.gui.filter;
 
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -63,7 +64,7 @@ public class CreateFilter extends JPanel {
 		this.builder = new ComponentBuilder();
 		this.type = type;
 		this.factory = new ConfiguratorFactory(type);
-		this.criterionSelectorPanel = builder.createPanel(500, 0);
+		this.criterionSelectorPanel = builder.createPanel(800, 500);
 
 		// set up GUI
 		setUpCreate();
@@ -92,19 +93,21 @@ public class CreateFilter extends JPanel {
 		headline = builder.createLabel("Neuen Filter f\u00FCr "
 				+ type.getDisplayName() + " anlegen:");
 		headline.setFont(new Font("Headline", Font.PLAIN, 14));
-		add(headline, "wrap, gapbottom 10");
+		this.add(headline, "wrap");
 
 		// create filter name panel
-		this.filterNamePanel = new JPanel();
+	//	this.filterNamePanel = new JPanel(); - by putting nameField in a separate panel, 
+	//	nameField is not usable, since height is ~1px - ch
+	//	filterNamePanel.setPreferredSize(new Dimension(800,250));
 		nameField = new CustomTextField(100);
-		filterNamePanel.add(builder.createLabel("Filtername: "));
-		filterNamePanel.add(nameField, "growx");
-		add(filterNamePanel, "wrap, gapbottom 10");
+		this.add(builder.createLabel("Filtername: "),"split 2");
+		this.add(nameField, "growx, wrap");
+	//	add(filterNamePanel, "wrap");
 
 		// create operator picker panel
 		this.operatorPicker = new JPanel();
-		final JLabel operatorLabel = new JLabel(" Kriterien erfüllt sind:");
-		operatorPicker.add(new JLabel("Gültig, wenn"));
+		final JLabel operatorLabel = new JLabel(" Kriterien erf\u00FCllt sind:");
+		operatorPicker.add(new JLabel("G\u00FCltig, wenn"));
 		final JComboBox<String> operatorCombo = new JComboBox<String>(
 				new SimpleComboBoxModel<String>("alle", "ein"));
 		operatorCombo.addActionListener(new ActionListener() {
@@ -113,10 +116,10 @@ public class CreateFilter extends JPanel {
 						.getSelectedItem();
 				if ("alle".equals(operator)) {
 					andOperator = true;
-					operatorLabel.setText(" Kriterien erfüllt sind:");
+					operatorLabel.setText(" Kriterien erf\u00FCllt sind:");
 				} else {
 					andOperator = false;
-					operatorLabel.setText(" Kriterium erfüllt ist:");
+					operatorLabel.setText(" Kriterium erf\u00FCllt ist:");
 				}
 				operatorLabel.repaint();
 				operatorLabel.revalidate();
@@ -142,7 +145,7 @@ public class CreateFilter extends JPanel {
 		// add selector to panel and list
 		selectors.add(selectorComp);
 		minusButtons.add(minusButton);
-		criterionSelectorPanel.add(selectorComp, "w 550!");
+		criterionSelectorPanel.add(selectorComp, "w 800");
 		criterionSelectorPanel.add(minusButton, "wrap");
 		
 		if(plusButton!=null) {
@@ -176,7 +179,7 @@ public class CreateFilter extends JPanel {
 		String name = nameField.getText();
 		if (name.equals("") || name == null) {
 			JOptionPane.showMessageDialog(this,
-					"Bitte geben Sie einen Namen für den Filter an.", "Warn",
+					"Bitte geben Sie einen Namen f\u00FCr den Filter an.", "Warn",
 					JOptionPane.WARNING_MESSAGE);
 			nameField.invalidateInput();
 			return;
