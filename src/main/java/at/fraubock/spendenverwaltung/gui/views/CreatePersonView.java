@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -16,8 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
-import net.miginfocom.swing.MigLayout;
-
+import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXDatePicker;
 
 import at.fraubock.spendenverwaltung.gui.PersonTableModel;
@@ -37,6 +35,8 @@ import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 public class CreatePersonView extends JPanel {
 	
+	private static final Logger log = Logger.getLogger(CreatePersonView.class);
+
 	private static final long serialVersionUID = 1L;
 	private IPersonService personService;
 	private IAddressService addressService;
@@ -292,8 +292,8 @@ public class CreatePersonView extends JPanel {
 		
 		donationPanel.add(empty, "wrap");
 		
-		submit = new JButton("Submit");
-		cancel = new JButton("Cancel");
+		submit = new JButton();
+		cancel = new JButton();
 		
 		donationPanel.add(submit, "split 2");
 		donationPanel.add(cancel, "wrap");
@@ -390,6 +390,7 @@ public class CreatePersonView extends JPanel {
 					
 						if(donation != null) {
 							donation.setDonator(person);
+							log.info("Creating donation");
 							donationService.create(donation);
 						}
 						

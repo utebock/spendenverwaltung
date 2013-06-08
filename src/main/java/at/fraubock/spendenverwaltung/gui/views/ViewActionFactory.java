@@ -4,9 +4,8 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.JPanel;
-
-import org.apache.log4j.Logger;
 
 import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
 
@@ -24,7 +23,7 @@ import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
 
 public class ViewActionFactory {
 	
-	private static final Logger log = Logger.getLogger(MainMenuView.class);
+//	private static final Logger log = Logger.getLogger(MainMenuView.class);
 	private ViewDisplayer viewDisplayer;
 	
 	//views
@@ -32,6 +31,7 @@ public class ViewActionFactory {
 	private MainMenuView mainMenuView;
 
 /* TODO: add setters for other views & uncomment the relevant methods
+ * rename them if you want, as long as it stays consistent
  */
 	
 //	private FindPersonsView findPersonsView;
@@ -75,81 +75,67 @@ public class ViewActionFactory {
 	}
 	
 	public Action getCreatePersonsViewAction() {
-		return new DisplayViewAction(createPersonView);
+		return new DisplayViewAction(createPersonView,"/images/createPerson.jpg");
 	}
 	
 	public Action getMainMenuViewAction() {
 		return new DisplayViewAction(mainMenuView);
 	}
 	
-//	private FindPersonsView findPersonsView;
-//	private MainFilterView mainFilterView;
-//	private DonationImportView donationImportView;
-//	private ImportValidationView importValidationView;
-//	private CreateDonationConfirmationView createDonationConfirmationView;
-//	private CreateEMailingView createEMailingView;
-//	private CreatePostalMailingView createPostalMailingView;
-//	private	FindMailingsView findMailingsView;
-//	private	ConfirmMailingsView confirmMailingsView;
-//	private	DeleteMailingsView - is this necessary? wouldn't this be done over find? -Chris
-//	private DonationProgressStatsView donationProgressStatsView;
-//	private MailingStatsView mailingStatsView;
-//	private PersonStatsView personStatsView;
-	
 	public Action getFindPersonsViewAction() {
-		return new DisplayViewAction(new JPanel());
+		return new DisplayViewAction(new JPanel(), "/images/getPersons.jpg");
 	}
 	
 	public Action getMainFilterViewAction() {
-		return new DisplayViewAction(new JPanel());
+		return new DisplayViewAction(new JPanel(), "/images/filter.jpg");
 	}
 	
 	public Action getDonationImportViewAction() {
-		return new DisplayViewAction(new JPanel());
+		return new DisplayViewAction(new JPanel(), "/images/importOverview.jpg" );
 	}
 	
 	public Action getImportValidationViewAction() {
-		return new DisplayViewAction(new JPanel());
+		return new DisplayViewAction(new JPanel(), "/images/importValidate.jpg");
 	}
 	
 	public Action getCreateDonationConfirmationViewAction() {
-		return new DisplayViewAction(new JPanel());
+		return new DisplayViewAction(new JPanel(), "/images/createDonationConfirmation.jpg");
 	}
 	
 	public Action getFindDonationConfirmationViewAction() {
-		return new DisplayViewAction(new JPanel());
+		return new DisplayViewAction(new JPanel(), "/images/obtainDonationConfirmation.jpg");
 	}
 	
 	public Action getCreateEMailingViewAction() {
-		return new DisplayViewAction(new JPanel());
+		return new DisplayViewAction(new JPanel(), "/images/eNotification.jpg");
 	}
 	
 	public Action getCreatePostalMailingViewAction() {
-		return new DisplayViewAction(new JPanel());
+		return new DisplayViewAction(new JPanel(), "/images/postalNotification.jpg");
 	}
 
 	public Action getFindMailingsViewAction() {
-		return new DisplayViewAction(new JPanel());
+		return new DisplayViewAction(new JPanel(), "/images/showNotifications.jpg");
 	}
 	
 	public Action getConfirmMailingsViewAction() {
-		return new DisplayViewAction(new JPanel());
+		return new DisplayViewAction(new JPanel(), "/images/confirmSendings.jpg");
 	}
 	
 	public Action getDeleteMailingsViewAction() {
-		return new DisplayViewAction(new JPanel());
+		return new DisplayViewAction(new JPanel(), "/images/deleteNotifications.jpg");
 	}
 	
 	public Action getDonationProgressStatsViewAction() {
-		return new DisplayViewAction(new JPanel());
+		return new DisplayViewAction(new JPanel(), "/images/statisticsDonation.jpg");
 	}
 	
 	public Action getShowMailingStatsViewAction() {
-		return new DisplayViewAction(new JPanel());
+		return new DisplayViewAction(new JPanel(), "/images/statisticsNotification.jpg");
 	}
 	
 	public Action getShowPersonStatsViewAction() {
-		return new DisplayViewAction(new JPanel());
+		return new DisplayViewAction(new JPanel(), "/images/statisticsPerson.jpg");
 	}
 	
 	private final class DisplayViewAction extends AbstractAction {
@@ -158,6 +144,12 @@ public class ViewActionFactory {
 		
 		public DisplayViewAction(JPanel view) {
 			this.view = view;
+		}
+		
+		public DisplayViewAction(JPanel view, String path) {
+			this.view = view;
+			java.net.URL url = getClass().getResource(path);
+			this.putValue(Action.SMALL_ICON, new ImageIcon(url));
 		}
 		/**
 		 * 

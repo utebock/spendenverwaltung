@@ -1,6 +1,5 @@
 package at.fraubock.spendenverwaltung.gui;
 
-import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -18,7 +17,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 public class GuiStarter {
 	
-	private static final Logger log = Logger.getLogger(GuiStarter.class);
+//	private static final Logger log = Logger.getLogger(GuiStarter.class);
 	
 	public void startGui() {
 		
@@ -46,7 +45,7 @@ public class GuiStarter {
 		ViewActionFactory viewActionFactory = new ViewActionFactory(viewDisplayer);
 		
 		//need to call mainMenu.init() after all views are set in the viewActionFactory
-		//layout code is called from constructor, wiring code is called from init()
+		//layout code is called from constructor, button initialization code is called from init()
 		MainMenuView mainMenu = new MainMenuView(viewActionFactory, componentFactory);
 		CreatePersonView createPerson = new CreatePersonView(componentFactory, viewActionFactory, personService, addressService, donationService, new PersonTableModel());
 		
@@ -58,6 +57,7 @@ public class GuiStarter {
 		createPerson.init();
 		mainMenu.init();
 		
+		//display initial main menu
 		viewDisplayer.changeView(mainMenu);
 	}
 

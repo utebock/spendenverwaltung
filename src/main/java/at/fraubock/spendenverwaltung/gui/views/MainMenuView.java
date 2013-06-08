@@ -5,12 +5,10 @@ import java.awt.Font;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 
 import net.miginfocom.swing.MigLayout;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
-import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
 
 public class MainMenuView extends JPanel {
 //	private static final Logger log = Logger.getLogger(MainMenuView.class);
@@ -89,8 +87,7 @@ public class MainMenuView extends JPanel {
 
 	public void setUp() {
 		overviewPanel = componentFactory.createPanel(800, 850);
-		JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		this.add(pane, "wrap 0px");
+		this.add(overviewPanel);
 		/**
 		 * "Allgemein"-panel contains persons and filter
 		 */
@@ -103,11 +100,11 @@ public class MainMenuView extends JPanel {
 
 		//CreatePersonView
 		personsPanel.add(general, "wrap");
-		person = componentFactory.createImageButton("/images/createPerson.jpg");
+		person = new JButton();;
 		personsPanel.add(person);
-		search = componentFactory.createImageButton("/images/getPersons.jpg");
+		search = new JButton();;
 		personsPanel.add(search, "gap 35");
-		filter = componentFactory.createImageButton("/images/filter.jpg");
+		filter = new JButton();;
 		personsPanel.add(filter, "wrap 0px, gap 25");
 		//button labels
 		persons = componentFactory.createLabel("Person anlegen");
@@ -136,10 +133,10 @@ public class MainMenuView extends JPanel {
 		donationImport.setFont(new Font("Headline", Font.PLAIN, 14));
 		importPanel.add(donationImport, "wrap");
 		
-		imports = componentFactory.createImageButton("/images/importOverview.jpg");
+		imports = new JButton();;
 		importPanel.add(imports, "split 2");
 		//DonationValidation
-		validation = componentFactory.createImageButton("/images/importValidate.jpg");
+		validation = new JButton();;
 		importPanel.add(validation, "gap 55, wrap 0px");
 		
 		importLabel = componentFactory.createLabel("Importe");
@@ -162,11 +159,12 @@ public class MainMenuView extends JPanel {
 		confirm.setFont(new Font("Headline", Font.PLAIN, 14));
 		confirmPanel.add(confirm, "wrap");
 		//importPanel.add(empty, "wrap");
-		createConfirm = componentFactory.createImageButton("/images/createDonationConfirmation.jpg");
+		createConfirm = new JButton();;
 		confirmPanel.add(createConfirm, "split 2");
-		
+
+
 		//ObtainDonationConfirmation
-		obtainConfirm = componentFactory.createImageButton("/images/obtainDonationConfirmation.jpg");
+		obtainConfirm = new JButton();;
 		confirmPanel.add(obtainConfirm, "wrap 0px, gap 55");
 		
 		createConfirmLabel = componentFactory.createLabel("<html><center>Best\u00E4tigung <br> erstellen</html>");
@@ -179,6 +177,7 @@ public class MainMenuView extends JPanel {
 		confirmSeparator = componentFactory.createSeparator();
 		overviewPanel.add(confirmSeparator, "wrap 0px, growx");
 		
+
 		/**
 		 * "Aussendungen"-panel contains e-aussendung erstellen, briefaussendung erstellen, aussendungen anzeigen, 
 		 * aussendungen bestaetigen, aussendung loeschen
@@ -190,15 +189,15 @@ public class MainMenuView extends JPanel {
 		sending.setFont(new Font("Headline", Font.PLAIN, 14));
 		sendPanel.add(sending, "wrap 0px");
 		//importPanel.add(empty, "wrap");
-		eSending = componentFactory.createImageButton("/images/eNotification.jpg");
+		eSending = new JButton();;
 		sendPanel.add(eSending, "split 3");
-		postalSending = componentFactory.createImageButton("/images/postalNotification.jpg");
+		postalSending = new JButton();;
 		sendPanel.add(postalSending, "gap 55");
-		showSendings = componentFactory.createImageButton("/images/showNotifications.jpg");
+		showSendings = new JButton();;
 		sendPanel.add(showSendings, "gap 55");
-		confirmSendings = componentFactory.createImageButton("/images/confirmSendings.jpg");
+		confirmSendings = new JButton();;
 		sendPanel.add(confirmSendings, "gap 40");
-		deleteSendings = componentFactory.createImageButton("/images/deleteNotifications.jpg");
+		deleteSendings = new JButton();;
 		sendPanel.add(deleteSendings, "wrap 0px, gap 40");
 		
 		eSendingLabel = componentFactory.createLabel("<html><center>E-Aussendung<br>erstellen");
@@ -227,11 +226,11 @@ public class MainMenuView extends JPanel {
 		stats = componentFactory.createLabel("Statistiken");
 		stats.setFont(new Font("Headline", Font.PLAIN, 14));
 		statsPanel.add(stats, "wrap");
-		progress = componentFactory.createImageButton("/images/statisticsDonation.jpg");
+		progress = new JButton();;
 		statsPanel.add(progress, "split 2");
-		statsSendings = componentFactory.createImageButton("/images/statisticsNotification.jpg");
+		statsSendings = new JButton();;
 		statsPanel.add(statsSendings, "gap 55");
-		statsPersons = componentFactory.createImageButton("/images/statisticsPerson.jpg");
+		statsPersons = new JButton();;
 		statsPanel.add(statsPersons, "wrap 0px, gap 45");
 		
 		progressLabel = componentFactory.createLabel("<html><center>Spenden-<br>entwicklung</html>");
@@ -240,10 +239,12 @@ public class MainMenuView extends JPanel {
 		statsPanel.add(statsSendingsLabel, "gap 55");
 		statsPersonsLabel = componentFactory.createLabel("Personen");
 		statsPanel.add(statsPersonsLabel, "gap 55");
+
 	}
 	
 	//call when viewActionFactory is fully populated
 	public void init() {
+		
 		person.setAction(viewActionFactory.getCreatePersonsViewAction());
 		search.setAction(viewActionFactory.getFindPersonsViewAction());
 		filter.setAction(viewActionFactory.getMainFilterViewAction());

@@ -15,9 +15,15 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 
+import org.apache.log4j.Logger;
+
+import at.fraubock.spendenverwaltung.gui.Overview;
+
 import net.miginfocom.swing.MigLayout;
 
 public class ComponentFactory {
+
+	private static final Logger log = Logger.getLogger(ComponentFactory.class);
 
 	public JButton createImageButton(String path, Action action) {
 		java.net.URL url = getClass().getResource(path);
@@ -26,8 +32,16 @@ public class ComponentFactory {
 		return button;
 	}
 	
-	public JButton createImageButton(String path) {
+	public ImageIcon createIcon(String path) {
 		java.net.URL url = getClass().getResource(path);
+		return new ImageIcon(url);
+	}
+	
+	public JButton createImageButton(String path) {
+		log.info("createImageButton path "+path);
+		java.net.URL url = getClass().getResource(path);
+		log.info("URL path "+url.getPath());
+
 		JButton button = new JButton(new ImageIcon(url));
 		return button;
 	}
