@@ -1,4 +1,4 @@
-package at.fraubock.spendenverwaltung.gui.filter.configurators;
+package at.fraubock.spendenverwaltung.gui.filter.configurators.mounted;
 
 import java.awt.Font;
 import java.util.List;
@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.ICriterionConfigurator;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
@@ -24,7 +25,7 @@ import at.fraubock.spendenverwaltung.util.RelationalOperator;
  * @author philipp muhoray
  * 
  */
-public class SameFilterMountConfig extends JPanel implements
+public class SimpleFilterMountConfig extends JPanel implements
 		ICriterionConfigurator {
 	private static final long serialVersionUID = -7505945596725892100L;
 
@@ -32,16 +33,22 @@ public class SameFilterMountConfig extends JPanel implements
 	private JComboBox<Filter> filterBox;
 	private String display;
 
-	public SameFilterMountConfig(String display, List<Filter> filters,
-			FilterType type) {
+	public SimpleFilterMountConfig(String display, List<Filter> filters,
+			FilterType type, String descrText) {
 		this.display = display;
 		this.type = type;
 
-		JLabel descr = new JLabel("Dieser Filter soll erfüllt sein: ");
+		JLabel descr = null;
+		if(filters.isEmpty()) {
+			descr = new JLabel("Es existiert kein weiterer Filter dieser Art.");
+			add(descr);
+		} else {
+			descr = new JLabel(descrText);
+			add(descr);
+			add(filterBox = new JComboBox<Filter>(new SimpleComboBoxModel<Filter>(
+					filters)));
+		}
 		descr.setFont(new Font("Headline", Font.PLAIN, 14));
-		add(descr);
-		add(filterBox = new JComboBox<Filter>(new SimpleComboBoxModel<Filter>(
-				filters)));
 	}
 
 	@Override

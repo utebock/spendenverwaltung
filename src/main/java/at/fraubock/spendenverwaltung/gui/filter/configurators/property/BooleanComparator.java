@@ -1,10 +1,11 @@
-package at.fraubock.spendenverwaltung.gui.filter.configurators;
+package at.fraubock.spendenverwaltung.gui.filter.configurators.property;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.ICriterionConfigurator;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.util.FilterProperty;

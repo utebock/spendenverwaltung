@@ -1,4 +1,4 @@
-package at.fraubock.spendenverwaltung.gui.filter.configurators;
+package at.fraubock.spendenverwaltung.gui.filter.configurators.property;
 
 import java.awt.Font;
 import java.text.ParseException;
@@ -14,6 +14,7 @@ import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationType;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationalOperatorGuiWrapper;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.ICriterionConfigurator;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.util.FilterProperty;

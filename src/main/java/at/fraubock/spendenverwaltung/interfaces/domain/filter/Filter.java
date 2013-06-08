@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.interfaces.domain.filter;
 
+import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.util.FilterType;
 
@@ -104,6 +105,23 @@ public class Filter {
 	@Override
 	public String toString() {
 		return name != null ? name : "";
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Filter other = (Filter) obj;
+		
+		if(this.getId()!=null && this.getId().equals(other.getId())) {
+			return true;
+		}
+		
+		return false;
 	}
 
 }

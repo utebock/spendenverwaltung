@@ -24,7 +24,6 @@ import net.miginfocom.swing.MigLayout;
 import org.apache.log4j.Logger;
 
 import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
-import at.fraubock.spendenverwaltung.gui.filter.ConfiguratorFactory;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.FilterInUseException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
@@ -147,7 +146,7 @@ public class FilterOverview extends JPanel {
 		filterList = new ArrayList<Filter>();
 
 		try {
-			filterList = filterService.getAll();
+			filterList = filterService.getAllByAnonymous(false);
 			log.info("List " + filterList.size() + " filter");
 		} catch (ServiceException e) {
 			JOptionPane
@@ -177,7 +176,7 @@ public class FilterOverview extends JPanel {
 			type = FilterType.DONATION;
 		} else if (button == sendingsFilter) {
 			type = FilterType.MAILING;
-		} else if(button == edit) {
+		} else if (button == edit) {
 			if (showTable.getSelectedRow() == -1) {
 				JOptionPane.showMessageDialog(this,
 						"Bitte Filter zum Bearbeiten ausw\u00E4hlen.");
@@ -187,7 +186,7 @@ public class FilterOverview extends JPanel {
 			type = filter.getType();
 		}
 
-		CreateFilter cf = new CreateFilter(type, filterService, this,filter);
+		CreateFilter cf = new CreateFilter(type, filterService, this, filter);
 		removeAll();
 		revalidate();
 		repaint();
@@ -201,14 +200,15 @@ public class FilterOverview extends JPanel {
 			return;
 		}
 
-		
 		Filter filter = filterModel.getFilterRow(showTable.getSelectedRow());
-		int answer = JOptionPane.showConfirmDialog(this, "Wollen Sie den Filter " + filter.getName() + " wirklich löschen?");
-		
-		if(answer!=0) {
+		int answer = JOptionPane.showConfirmDialog(this,
+				"Wollen Sie den Filter " + filter.getName()
+						+ " wirklich löschen?");
+
+		if (answer != 0) {
 			return;
 		}
-		
+
 		try {
 			filterService.delete(filter);
 			filterModel.removeFilter(showTable.getSelectedRow());
@@ -218,12 +218,10 @@ public class FilterOverview extends JPanel {
 					JOptionPane.ERROR_MESSAGE);
 			log.error(e);
 		} catch (FilterInUseException e) {
-			JOptionPane
-					.showMessageDialog(
-							this,
-							"Dieser Filter ist mit einem anderen verknüpft. " +
-							"Bitte löschen Sie die Verknüpfung zuerst.",
-							"Fehler", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this,
+					"Dieser Filter ist mit einem anderen verknüpft. "
+							+ "Bitte löschen Sie die Verknüpfung zuerst.",
+					"Fehler", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 

@@ -7,15 +7,17 @@ import java.util.List;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import at.fraubock.spendenverwaltung.gui.filter.configurators.BooleanComparator;
-import at.fraubock.spendenverwaltung.gui.filter.configurators.DateComparator;
-import at.fraubock.spendenverwaltung.gui.filter.configurators.DaysBackComparator;
-import at.fraubock.spendenverwaltung.gui.filter.configurators.EnumComparator;
 import at.fraubock.spendenverwaltung.gui.filter.configurators.ICriterionConfigurator;
-import at.fraubock.spendenverwaltung.gui.filter.configurators.SameFilterMountConfig;
-import at.fraubock.spendenverwaltung.gui.filter.configurators.NumberComparator;
-import at.fraubock.spendenverwaltung.gui.filter.configurators.DonationToPersonFilterConfig;
-import at.fraubock.spendenverwaltung.gui.filter.configurators.StringComparator;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.mounted.AddressConfigurator;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.mounted.DonationToPersonFilterConfig;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.mounted.MailingToPersonFilterConfig;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.mounted.SimpleFilterMountConfig;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.property.BooleanComparator;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.property.DateComparator;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.property.DaysBackComparator;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.property.EnumComparator;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.property.NumberComparator;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.property.StringComparator;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
@@ -28,21 +30,29 @@ import at.fraubock.spendenverwaltung.util.FilterProperty;
 import at.fraubock.spendenverwaltung.util.FilterType;
 
 /**
- * creates a list of {@link ICriterionConfigurator}s for a given {@link FilterType}
+ * creates a list of {@link ICriterionConfigurator}s for a given
+ * {@link FilterType}
  * 
  * @author philipp muhoray
- *
+ * 
  */
 public class ConfiguratorFactory {
 
 	private FilterType type;
+	@SuppressWarnings("unused")
+	private Filter editFilter;
 	private List<Filter> personFilters;
 	private List<Filter> donationFilters;
 	private List<Filter> mailingFilters;
 	private List<Filter> addressFilters;
 
 	public ConfiguratorFactory(FilterType type) {
+		this(type, null);
+	}
+
+	public ConfiguratorFactory(FilterType type, Filter editFilter) {
 		this.type = type;
+		this.editFilter = editFilter;
 		@SuppressWarnings("resource")
 		ApplicationContext context = new ClassPathXmlApplicationContext(
 				"/spring.xml");
@@ -50,12 +60,24 @@ public class ConfiguratorFactory {
 				IFilterService.class);
 		this.personFilters = new ArrayList<Filter>();
 		try {
-			personFilters = filterService.getAll(FilterType.PERSON);
-			mailingFilters = filterService.getAll(FilterType.MAILING);
-			donationFilters = filterService.getAll(FilterType.DONATION);
-			addressFilters = filterService.getAll(FilterType.ADDRESS);
+			personFilters = filterService.getAllByFilter(FilterType.PERSON);
+			mailingFilters = filterService.getAllByFilter(FilterType.MAILING);
+			donationFilters = filterService.getAllByFilter(FilterType.DONATION);
+			addressFilters = filterService.getAllByFilter(FilterType.ADDRESS);
 		} catch (ServiceException e) {
 			// TODO err msg + log
+		}
+
+		if (editFilter != null) {
+			if (personFilters.contains(editFilter)) {
+				personFilters.remove(editFilter);
+			} else if (donationFilters.contains(editFilter)) {
+				donationFilters.remove(editFilter);
+			} else if (donationFilters.contains(editFilter)) {
+				donationFilters.remove(editFilter);
+			} else if (addressFilters.contains(editFilter)) {
+				addressFilters.remove(editFilter);
+			}
 		}
 	}
 
@@ -81,7 +103,8 @@ public class ConfiguratorFactory {
 					FilterProperty.PERSON_WANTS_EMAIL,
 					"empf\u00E4ngt von uns E-Mails"));
 			configurators.add(new BooleanComparator(
-					FilterProperty.PERSON_WANTS_MAIL, "empf\u00E4ngt von uns Post"));
+					FilterProperty.PERSON_WANTS_MAIL,
+					"empf\u00E4ngt von uns Post"));
 			configurators.add(new EnumComparator(sexMap,
 					FilterProperty.PERSON_SEX, "Geschlecht"));
 			configurators.add(new StringComparator(FilterProperty.PERSON_TITLE,
@@ -92,12 +115,25 @@ public class ConfiguratorFactory {
 					FilterProperty.PERSON_COMPANY, "Firma"));
 			configurators.add(new StringComparator(FilterProperty.PERSON_NOTE,
 					"Notiz"));
-			configurators.add(new DonationToPersonFilterConfig(
-					"Spendenfilter hinzuf\u00FCgen", donationFilters));
-			configurators.add(new SameFilterMountConfig(
-					"Personenfilter hinzuf\u00FCgen", personFilters, this.type));
-//			configurators.add(new PersonToMailingFilterConfig(
-//					"Aussendungsfilter hinzufuegen", mailingFilters));
+
+			configurators.add(new AddressConfigurator("Adresse"));
+
+			if (!donationFilters.isEmpty()) {
+				configurators.add(new DonationToPersonFilterConfig(
+						"Spenden der Person", donationFilters));
+			}
+
+			if (!mailingFilters.isEmpty()) {
+				configurators.add(new MailingToPersonFilterConfig(
+						"Aussendungen der Person", mailingFilters));
+			}
+
+			if (!personFilters.isEmpty()) {
+				configurators.add(new SimpleFilterMountConfig(
+						"Weiteren Personenfilter hinzuf\u00FCgen",
+						personFilters, this.type,
+						"Die Person erf\u00FCllt diesen Filter:"));
+			}
 
 		} else if (type == FilterType.DONATION) {
 
@@ -119,6 +155,19 @@ public class ConfiguratorFactory {
 			configurators.add(new StringComparator(
 					FilterProperty.DONATION_NOTE, "Notiz"));
 
+			if (!personFilters.isEmpty()) {
+				configurators.add(new SimpleFilterMountConfig("Spender",
+						personFilters, FilterType.PERSON,
+						"Der Spender erf\u00FCllt diesen Personenfilter:"));
+			}
+
+			if (!donationFilters.isEmpty()) {
+				configurators.add(new SimpleFilterMountConfig(
+						"Weiteren Spendenfilter hinzuf\u00FCgen",
+						donationFilters, this.type,
+						"Die Spende erf\u00FCllt diesen Filter:"));
+			}
+
 		} else if (type == FilterType.MAILING) {
 
 			LinkedHashMap<Object, String> mediumMap = new LinkedHashMap<Object, String>();
@@ -138,6 +187,20 @@ public class ConfiguratorFactory {
 					FilterProperty.MAILING_MEDIUM, "Medium der Aussendung"));
 			configurators.add(new EnumComparator(typeMap,
 					FilterProperty.MAILING_TYPE, "Art der Aussendung"));
+
+			if (!personFilters.isEmpty()) {
+				configurators
+						.add(new SimpleFilterMountConfig("Empf\u00E4nger",
+								personFilters, FilterType.PERSON,
+								"Der Empf\u00E4nger erf\u00FCllt diesen Personenfilter:"));
+			}
+
+			if (!mailingFilters.isEmpty()) {
+				configurators.add(new SimpleFilterMountConfig(
+						"Weiteren Aussendungsfilter hinzuf\u00FCgen",
+						mailingFilters, this.type,
+						"Die Aussendung erf\u00FCllt diesen Filter:"));
+			}
 
 		}
 

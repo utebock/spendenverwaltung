@@ -70,7 +70,7 @@ public class CreateFilter extends JPanel {
 		this.buttonListener = new ButtonListener(this);
 		this.builder = new ComponentBuilder();
 		this.type = type;
-		this.factory = new ConfiguratorFactory(type);
+		this.factory = new ConfiguratorFactory(type, editFilter);
 		this.criterionSelectorPanel = builder.createPanel(800, 500);
 		this.plusButton = builder.createImageButton("/images/plusButton.gif",
 				buttonListener, "plusButton_create_filter");

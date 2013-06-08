@@ -1,48 +1,43 @@
-package at.fraubock.spendenverwaltung.gui.filter.configurators;
+package at.fraubock.spendenverwaltung.gui.filter.configurators.property;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
-import at.fraubock.spendenverwaltung.gui.CustomTextField;
+import net.miginfocom.swing.MigLayout;
+
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationType;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationalOperatorGuiWrapper;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.ICriterionConfigurator;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
 
 /**
  * implements {@link ICriterionConfigurator} for {@link PropertyCriterion}s of
- * type {@link Number}.
+ * type {@link String}.
  * 
  * @author philipp muhoray
  * 
  */
-public class NumberComparator extends JPanel implements ICriterionConfigurator {
+public class StringComparator extends JPanel implements ICriterionConfigurator {
+
 	private static final long serialVersionUID = 5674883209607705490L;
 
 	private RelationalOperatorPicker picker;
-	private CustomTextField textField;
+	private JTextField textField;
 	private FilterProperty property;
 	private String display;
 
-	public NumberComparator(FilterProperty property, String display) {
+	public StringComparator(FilterProperty property, String display) {
+		super(new MigLayout());
 		this.display = display;
 		this.property = property;
-		add(picker = new RelationalOperatorPicker(
-				RelationType.FOR_NUMBER_AND_DATE));
-		add(textField = new CustomTextField(5));
-	}
-
-	private Double getNumber() throws InvalidInputException {
-		try {
-			return Double.valueOf(textField.getText());
-		} catch (NumberFormatException e) {
-			textField.invalidateInput();
-			throw new InvalidInputException(
-					"Bitte geben Sie eine g\u00FCltige Zahl ein!");
-		}
+		add(picker = new RelationalOperatorPicker(RelationType.FOR_STRING),
+				"split 2");
+		add(textField = new JTextField(20), "wrap");
 	}
 
 	@Override
@@ -50,7 +45,7 @@ public class NumberComparator extends JPanel implements ICriterionConfigurator {
 		PropertyCriterion crit = new PropertyCriterion();
 		crit.setProperty(property);
 		crit.setRelationalOperator(picker.getPickedOperator());
-		crit.setNumValue(getNumber());
+		crit.setStrValue(textField.getText());
 		return crit;
 	}
 
@@ -63,7 +58,7 @@ public class NumberComparator extends JPanel implements ICriterionConfigurator {
 	public String toString() {
 		return display;
 	}
-	
+
 	@Override
 	public boolean applyCriterion(Criterion criterion) {
 		if (criterion instanceof PropertyCriterion) {
@@ -73,7 +68,7 @@ public class NumberComparator extends JPanel implements ICriterionConfigurator {
 						RelationalOperatorGuiWrapper.getForOperator(prop
 								.getRelationalOperator()));
 
-				this.textField.setText(""+prop.getNumValue());
+				this.textField.setText("" + prop.getStrValue());
 
 				return true;
 			}

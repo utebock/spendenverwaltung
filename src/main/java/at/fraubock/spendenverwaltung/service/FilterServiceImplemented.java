@@ -3,7 +3,6 @@ package at.fraubock.spendenverwaltung.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,9 +20,6 @@ import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
 
 public class FilterServiceImplemented implements IFilterService {
-
-	private static final Logger log = Logger
-			.getLogger(FilterServiceImplemented.class);
 
 	private IFilterDAO filterDAO;
 	private IMountedFilterCriterionDAO mountedCritDAO;
@@ -54,7 +50,7 @@ public class FilterServiceImplemented implements IFilterService {
 	public Filter update(Filter f, FilterTO to) throws ServiceException {
 		try {
 			Filter filter = create(to);
-			mountedCritDAO.replaceMountId(f.getId(),filter.getId());
+			mountedCritDAO.replaceMountId(f.getId(), filter.getId());
 			delete(f);
 			return filter;
 		} catch (FilterInUseException e) {
@@ -94,7 +90,7 @@ public class FilterServiceImplemented implements IFilterService {
 	}
 
 	@Override
-	public List<Filter> getAll(FilterType type) throws ServiceException {
+	public List<Filter> getAllByFilter(FilterType type) throws ServiceException {
 		List<Filter> list = new ArrayList<Filter>();
 		try {
 			for (Filter filter : filterDAO.getAll()) {
@@ -106,6 +102,19 @@ public class FilterServiceImplemented implements IFilterService {
 			throw new ServiceException(e);
 		}
 
+		return list;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Filter> getAllByAnonymous(boolean anonymous)
+			throws ServiceException {
+		List<Filter> list = new ArrayList<Filter>();
+		for (Filter f : getAll()) {
+			if (f.isAnonymous() == anonymous) {
+				list.add(f);
+			}
+		}
 		return list;
 	}
 

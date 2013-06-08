@@ -107,7 +107,7 @@ public class ShowPersons extends JPanel {
 		List<Filter> personFilters = new ArrayList<Filter>();
 		personFilters.add(showAllFilter);
 		try {
-			personFilters.addAll(filterService.getAll(FilterType.PERSON));
+			personFilters.addAll(filterService.getAllByFilter(FilterType.PERSON));
 		} catch (ServiceException e) {
 			// TODO log,errormsg
 		}

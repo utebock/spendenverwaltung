@@ -57,7 +57,14 @@ public interface IFilterService {
 	 * 
 	 * @return List of all filters of given type
 	 */
-	public List<Filter> getAll(FilterType type) throws ServiceException;
+	public List<Filter> getAllByFilter(FilterType type) throws ServiceException;
+	
+	/**
+	 * Retrieves all {@link Filter} depending on their anonymous state
+	 * 
+	 * @return List of all filters depending on their anonymous state
+	 */
+	public List<Filter> getAllByAnonymous(boolean anonymous) throws ServiceException;
 
 	/**
 	 * Retrieves Filter by ID
@@ -67,11 +74,4 @@ public interface IFilterService {
 	 * @return Filter based on given id or NULL if id non existent
 	 */
 	public Filter getByID(int id) throws ServiceException;
-
-	/**
-	 * Puts all Filter Types in a String Array
-	 * 
-	 * @return Returns a String Array including all Filter Types
-	 */
-	// public String[] getFilterTypes();
 }

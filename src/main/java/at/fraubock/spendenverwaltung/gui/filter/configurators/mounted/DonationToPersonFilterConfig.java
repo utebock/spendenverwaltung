@@ -1,4 +1,4 @@
-package at.fraubock.spendenverwaltung.gui.filter.configurators;
+package at.fraubock.spendenverwaltung.gui.filter.configurators.mounted;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -19,6 +19,7 @@ import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationType;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationalOperatorGuiWrapper;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.ICriterionConfigurator;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
@@ -48,59 +49,64 @@ public class DonationToPersonFilterConfig extends JPanel implements
 	public DonationToPersonFilterConfig(String display, List<Filter> filters) {
 		super(new MigLayout());
 		this.display = display;
-		JLabel descr = new JLabel("Die Person hat in diesen Spenden: ");
-		descr.setFont(new Font("Headline", Font.PLAIN, 14));
-		firstLine.add(descr);
-		firstLine.add(filterBox = new JComboBox<Filter>(
-				new SimpleComboBoxModel<Filter>(filters)), "wrap");
-		add(firstLine, "wrap");
-		secondLine.add(picker = new RelationalOperatorPicker(
-				RelationType.FOR_NUMBER_AND_DATE));
-		secondLine.add(amount = new CustomTextField(5));
-		amount.setText("10");
 
-		euroLabel = new JLabel("\u20AC", JLabel.CENTER);
-		euroLabel.setPreferredSize(new Dimension(45, 22));
-		euroLabel.setFont(new Font("Headline", Font.PLAIN, 18));
-		euroLabel.setBorder(BorderFactory.createRaisedBevelBorder());
-		euroLabel.addMouseListener(new MouseListener() {
+		if (filters.isEmpty()) {
+			add(new JLabel("Bitte legen Sie zuerst einen Spendenfilter an."));
+		} else {
+			JLabel descr = new JLabel("Die Person hat in diesen Spenden: ");
+			descr.setFont(new Font("Headline", Font.PLAIN, 14));
+			firstLine.add(descr);
+			firstLine.add(filterBox = new JComboBox<Filter>(
+					new SimpleComboBoxModel<Filter>(filters)), "wrap");
+			add(firstLine, "wrap");
+			secondLine.add(picker = new RelationalOperatorPicker(
+					RelationType.FOR_NUMBER_AND_DATE));
+			secondLine.add(amount = new CustomTextField(5));
+			amount.setText("10");
 
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-			}
+			euroLabel = new JLabel("\u20AC", JLabel.CENTER);
+			euroLabel.setPreferredSize(new Dimension(45, 22));
+			euroLabel.setFont(new Font("Headline", Font.PLAIN, 18));
+			euroLabel.setBorder(BorderFactory.createRaisedBevelBorder());
+			euroLabel.addMouseListener(new MouseListener() {
 
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-			}
-
-			@Override
-			public void mouseExited(MouseEvent arg0) {
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-			}
-
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				if (euro) {
-					euroLabel.setText("mal");
-					euro = false;
-				} else {
-					euroLabel.setText("\u20AC");
-					euro = true;
+				@Override
+				public void mouseReleased(MouseEvent arg0) {
 				}
-				euroLabel.revalidate();
-				euroLabel.repaint();
 
-			}
-		});
-		secondLine.add(euroLabel, "w 200!");
+				@Override
+				public void mousePressed(MouseEvent arg0) {
+				}
 
-		JLabel gespendet = new JLabel("gespendet");
-		gespendet.setFont(new Font("Headline", Font.PLAIN, 14));
-		secondLine.add(gespendet);
-		add(secondLine);
+				@Override
+				public void mouseExited(MouseEvent arg0) {
+				}
+
+				@Override
+				public void mouseEntered(MouseEvent arg0) {
+				}
+
+				@Override
+				public void mouseClicked(MouseEvent arg0) {
+					if (euro) {
+						euroLabel.setText("mal");
+						euro = false;
+					} else {
+						euroLabel.setText("\u20AC");
+						euro = true;
+					}
+					euroLabel.revalidate();
+					euroLabel.repaint();
+
+				}
+			});
+			secondLine.add(euroLabel, "w 200!");
+
+			JLabel gespendet = new JLabel("gespendet");
+			gespendet.setFont(new Font("Headline", Font.PLAIN, 14));
+			secondLine.add(gespendet);
+			add(secondLine);
+		}
 	}
 
 	private Double getNumber() throws InvalidInputException {
@@ -153,9 +159,8 @@ public class DonationToPersonFilterConfig extends JPanel implements
 		if (criterion instanceof MountedFilterCriterion) {
 			MountedFilterCriterion crit = (MountedFilterCriterion) criterion;
 			if (crit.getMount().getType() == FilterType.DONATION) {
-				this.picker.setSelectedItem(
-						RelationalOperatorGuiWrapper.getForOperator(crit
-								.getRelationalOperator()));
+				this.picker.setSelectedItem(RelationalOperatorGuiWrapper
+						.getForOperator(crit.getRelationalOperator()));
 				this.filterBox.setSelectedItem(crit.getMount());
 				if (crit.getCount() != null) {
 					this.amount.setText("" + crit.getCount());
