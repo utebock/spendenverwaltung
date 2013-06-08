@@ -1,36 +1,24 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
 
 import net.miginfocom.swing.MigLayout;
-
-import org.apache.log4j.Logger;
-
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
 
-public class MainMenuView extends JPanel{
-	private static final Logger log = Logger.getLogger(MainMenuView.class);
+public class MainMenuView extends JPanel {
+//	private static final Logger log = Logger.getLogger(MainMenuView.class);
 	private static final long serialVersionUID = 1L;
-
-	Component createPersonsView;
 	
+	private ViewActionFactory viewActionFactory;
 	private ComponentFactory componentFactory;
+	
 	private JButton person;
 	private JLabel general;
 	private JPanel importPanel;
@@ -72,29 +60,31 @@ public class MainMenuView extends JPanel{
 	private JLabel progressLabel;
 	private JLabel statsSendingsLabel;
 	private JLabel statsPersonsLabel;
-	private IFilterService filterService;
 	private JButton search;
 	private JLabel searchLabel;
-	private JTable showTable;
-	private JScrollPane scrollPane;
 	private JPanel overviewPanel;
 	
-	private ViewDisplayer viewDisplayer;
+	public MainMenuView() {
+		componentFactory = new ComponentFactory();
+	}
 	
-	//views to switch to
-	private CreatePersonView createPersonView;
-	
-	public MainMenuView(ViewDisplayer viewDisplayer, ComponentFactory componentFactory,
-				CreatePersonView createPersonView) {
+	public MainMenuView(ViewActionFactory viewActionFactory, ComponentFactory componentFactory) {
 		/**
 		 * good to know: basic font is 13pt
 		 */
 		super(new MigLayout());
 
-		this.viewDisplayer = viewDisplayer;
+		this.viewActionFactory = viewActionFactory;
 		this.componentFactory = componentFactory;
-		this.createPersonView = createPersonView;
 		setUp();
+	}
+	
+	public void setViewActionFactory(ViewActionFactory viewActionFactory) {
+		this.viewActionFactory = viewActionFactory;
+	}
+
+	public void setComponentFactory(ComponentFactory componentFactory) {
+		this.componentFactory = componentFactory;
 	}
 
 	public void setUp() {
@@ -110,14 +100,14 @@ public class MainMenuView extends JPanel{
 		overviewPanel.add(personsPanel, "wrap 0px");
 		general = componentFactory.createLabel("Allgemein");
 		general.setFont(new Font("Headline", Font.PLAIN, 14));
-		
+
 		//CreatePersonView
 		personsPanel.add(general, "wrap");
-		person = componentFactory.createImageButton("/images/createPerson.jpg", new ShowCreatePersonsView());
+		person = componentFactory.createImageButton("/images/createPerson.jpg");
 		personsPanel.add(person);
-		search = componentFactory.createImageButton("/images/getPersons.jpg", buttonListener, "search_person");
+		search = componentFactory.createImageButton("/images/getPersons.jpg");
 		personsPanel.add(search, "gap 35");
-		filter = componentFactory.createImageButton("/images/filter.jpg", buttonListener, "filter_overview");
+		filter = componentFactory.createImageButton("/images/filter.jpg");
 		personsPanel.add(filter, "wrap 0px, gap 25");
 		//button labels
 		persons = componentFactory.createLabel("Person anlegen");
@@ -145,10 +135,11 @@ public class MainMenuView extends JPanel{
 		donationImport = componentFactory.createLabel("Spendenimport");
 		donationImport.setFont(new Font("Headline", Font.PLAIN, 14));
 		importPanel.add(donationImport, "wrap");
-		imports = componentFactory.createImageButton("/images/importOverview.jpg", buttonListener, "donationImport_overview");
+		
+		imports = componentFactory.createImageButton("/images/importOverview.jpg");
 		importPanel.add(imports, "split 2");
 		//DonationValidation
-		validation = componentFactory.createImageButton("/images/importValidate.jpg", buttonListener, "donation_validation");
+		validation = componentFactory.createImageButton("/images/importValidate.jpg");
 		importPanel.add(validation, "gap 55, wrap 0px");
 		
 		importLabel = componentFactory.createLabel("Importe");
@@ -171,11 +162,11 @@ public class MainMenuView extends JPanel{
 		confirm.setFont(new Font("Headline", Font.PLAIN, 14));
 		confirmPanel.add(confirm, "wrap");
 		//importPanel.add(empty, "wrap");
-		createConfirm = componentFactory.createImageButton("/images/createDonationConfirmation.jpg", buttonListener, "create_donation_confirmation");
+		createConfirm = componentFactory.createImageButton("/images/createDonationConfirmation.jpg");
 		confirmPanel.add(createConfirm, "split 2");
 		
 		//ObtainDonationConfirmation
-		obtainConfirm = componentFactory.createImageButton("/images/obtainDonationConfirmation.jpg", buttonListener, "obtain_donation_confirmation");
+		obtainConfirm = componentFactory.createImageButton("/images/obtainDonationConfirmation.jpg");
 		confirmPanel.add(obtainConfirm, "wrap 0px, gap 55");
 		
 		createConfirmLabel = componentFactory.createLabel("<html><center>Best\u00E4tigung <br> erstellen</html>");
@@ -199,15 +190,15 @@ public class MainMenuView extends JPanel{
 		sending.setFont(new Font("Headline", Font.PLAIN, 14));
 		sendPanel.add(sending, "wrap 0px");
 		//importPanel.add(empty, "wrap");
-		eSending = componentFactory.createImageButton("/images/eNotification.jpg", buttonListener, "create_eSending");
+		eSending = componentFactory.createImageButton("/images/eNotification.jpg");
 		sendPanel.add(eSending, "split 3");
-		postalSending = componentFactory.createImageButton("/images/postalNotification.jpg", buttonListener, "obtain_postalSending");
+		postalSending = componentFactory.createImageButton("/images/postalNotification.jpg");
 		sendPanel.add(postalSending, "gap 55");
-		showSendings = componentFactory.createImageButton("/images/showNotifications.jpg", buttonListener, "show_sendings");
+		showSendings = componentFactory.createImageButton("/images/showNotifications.jpg");
 		sendPanel.add(showSendings, "gap 55");
-		confirmSendings = componentFactory.createImageButton("/images/confirmSendings.jpg", buttonListener, "confirm_sendings");
+		confirmSendings = componentFactory.createImageButton("/images/confirmSendings.jpg");
 		sendPanel.add(confirmSendings, "gap 40");
-		deleteSendings = componentFactory.createImageButton("/images/deleteNotifications.jpg", buttonListener, "delete_sendings");
+		deleteSendings = componentFactory.createImageButton("/images/deleteNotifications.jpg");
 		sendPanel.add(deleteSendings, "wrap 0px, gap 40");
 		
 		eSendingLabel = componentFactory.createLabel("<html><center>E-Aussendung<br>erstellen");
@@ -230,17 +221,17 @@ public class MainMenuView extends JPanel{
 		/**
 		 * "Statistiken"-panel contains spendenentwicklung, aussendungen, personen
 		 */
-		
+				
 		statsPanel = componentFactory.createPanel(800,160);
 		overviewPanel.add(statsPanel, "wrap 0px");
 		stats = componentFactory.createLabel("Statistiken");
 		stats.setFont(new Font("Headline", Font.PLAIN, 14));
 		statsPanel.add(stats, "wrap");
-		progress = componentFactory.createImageButton("/images/statisticsDonation.jpg", buttonListener, "stats_progress");
+		progress = componentFactory.createImageButton("/images/statisticsDonation.jpg");
 		statsPanel.add(progress, "split 2");
-		statsSendings = componentFactory.createImageButton("/images/statisticsNotification.jpg", buttonListener, "stats_sendings");
+		statsSendings = componentFactory.createImageButton("/images/statisticsNotification.jpg");
 		statsPanel.add(statsSendings, "gap 55");
-		statsPersons = componentFactory.createImageButton("/images/statisticsPerson.jpg", buttonListener, "stats_persons");
+		statsPersons = componentFactory.createImageButton("/images/statisticsPerson.jpg");
 		statsPanel.add(statsPersons, "wrap 0px, gap 45");
 		
 		progressLabel = componentFactory.createLabel("<html><center>Spenden-<br>entwicklung</html>");
@@ -251,88 +242,27 @@ public class MainMenuView extends JPanel{
 		statsPanel.add(statsPersonsLabel, "gap 55");
 	}
 	
-	public void ShowCreate(){
-		CreatePerson cp = new CreatePerson(personService, addressService, donationService, this);
-		removeAll();
-		revalidate();
-		repaint();
-		add(cp);
+	//call when viewActionFactory is fully populated
+	public void init() {
+		person.setAction(viewActionFactory.getCreatePersonsViewAction());
+		search.setAction(viewActionFactory.getFindPersonsViewAction());
+		filter.setAction(viewActionFactory.getMainFilterViewAction());
+		imports.setAction(viewActionFactory.getDonationImportViewAction());
+		validation.setAction(viewActionFactory.getImportValidationViewAction());
+		createConfirm.setAction(viewActionFactory.getCreateDonationConfirmationViewAction());
+		obtainConfirm.setAction( viewActionFactory.getFindDonationConfirmationViewAction());
+		eSending.setAction(viewActionFactory.getCreateEMailingViewAction());
+		postalSending.setAction(viewActionFactory.getCreatePostalMailingViewAction());
+		showSendings.setAction(viewActionFactory.getFindMailingsViewAction());
+		confirmSendings.setAction(viewActionFactory.getConfirmMailingsViewAction());
+		deleteSendings.setAction(viewActionFactory.getDeleteMailingsViewAction());
+		progress.setAction(viewActionFactory.getDonationProgressStatsViewAction());
+		statsSendings.setAction(viewActionFactory.getShowMailingStatsViewAction());
+		statsPersons.setAction( viewActionFactory.getShowPersonStatsViewAction());
 	}
-
-	public void ShowFilter() {
-		FilterOverview fo = new FilterOverview(filterService, personService, addressService, donationService, this);
-		removeAll();
-		revalidate();
-		repaint();
-		add(fo);
-		
-	}
 	
-//	public void initTable(){
-//		personModel = new PersonTableModel();
-//		getPersons();
-//		showTable = new JTable(personModel);
-//		
-//		showTable.setFillsViewportHeight(true);
-//		showTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//		
-//		scrollPane = new JScrollPane(showTable);
-//		scrollPane.setPreferredSize(new Dimension(650,650));
+//	public static void main(String[] args) {
+//		ViewDisplayer displayer = new ViewDisplayer();
+//		displayer.changeView(new MainMenuView(new ViewActionFactory(), new ComponentFactory()));
 //	}
-	
-//	public PersonTableModel getPersonModel(){
-//		return this.personModel;
-//	}
-	
-//	private void getPersons(){
-//		personList = new ArrayList<Person>();
-//		
-//		try{
-//			personList = personService.getAll();
-//			log.info("List " + personList.size() + " persons");
-//		}
-//		catch(ServiceException e){
-//			JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
-//		    e.printStackTrace();
-//		    return;
-//		}
-//		if(personList == null){
-//			JOptionPane.showMessageDialog(this, "GetAll() returns null.", "Error", JOptionPane.ERROR_MESSAGE);
-//		    return;
-//		}
-//		for(Person p : personList){
-//			personModel.addPerson(p);
-//		}	
-//	}
-	
-//	public void ShowShow(){
-//		ShowPersons filter = new ShowPersons(personService, addressService, donationService, filterService, this);
-//		removeAll();
-//		revalidate();
-//		repaint();
-//		add(filter);
-//	}
-//	
-//	public void ShowValidation(){
-//		ImportValidation validation = new ImportValidation(personService, addressService, donationService, this);
-//		removeAll();
-//		revalidate();
-//		repaint();
-//		add(validation);
-//	}
-//
-//	public void ShowImport() {
-//		ImportData importData = new ImportData(importService, this);
-//		removeAll();
-//		revalidate();
-//		repaint();
-//		add(importData);
-//	}
-//	
-	
-	//CreatePersonView
-	//FindPersonsView
-			//MainFilterView
-
-	
 }

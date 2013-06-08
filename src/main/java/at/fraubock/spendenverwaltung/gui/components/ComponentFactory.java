@@ -25,6 +25,12 @@ public class ComponentFactory {
 		button.setAction(action);
 		return button;
 	}
+	
+	public JButton createImageButton(String path) {
+		java.net.URL url = getClass().getResource(path);
+		JButton button = new JButton(new ImageIcon(url));
+		return button;
+	}
 
 	public JPanel createPanel(int x, int y) {
 		JPanel panel = new JPanel();

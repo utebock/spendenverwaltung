@@ -5,28 +5,28 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
+import net.miginfocom.swing.MigLayout;
+
 import org.jdesktop.swingx.JXDatePicker;
 
-import net.miginfocom.swing.MigLayout;
-import at.fraubock.spendenverwaltung.gui.MainFrame;
 import at.fraubock.spendenverwaltung.gui.PersonTableModel;
-import at.fraubock.spendenverwaltung.gui.components.StringTextField;
 import at.fraubock.spendenverwaltung.gui.components.ComponentConstants;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.EmailTextField;
 import at.fraubock.spendenverwaltung.gui.components.NumericTextField;
+import at.fraubock.spendenverwaltung.gui.components.StringTextField;
 import at.fraubock.spendenverwaltung.gui.components.interfaces.ValidateableComponent;
-import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
@@ -35,12 +35,14 @@ import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
-public class CreatePersonView extends JPanel{
+public class CreatePersonView extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	private IPersonService personService;
 	private IAddressService addressService;
 	private IDonationService donationService;
+
+	private ViewActionFactory viewActionFactory;
 	private ComponentFactory componentFactory;
 	private PersonTableModel personModel;
 	private JPanel panel;
@@ -95,9 +97,8 @@ public class CreatePersonView extends JPanel{
 	private JComboBox<String> donationCombo;
 	private NumericTextField amount;
 	
-	private JButton ok = new JButton(new SubmitAction());
-	//TODO
-//	private JButton cancel = new JButton(new CancelAction());
+	private JButton submit;
+	private JButton cancel;
 	
 	private Person person;
 	private Address address;
@@ -114,20 +115,42 @@ public class CreatePersonView extends JPanel{
 	private JLabel dateInstruction;
 	private JPanel overviewPanel;
 
-	private ViewDisplayer viewDisplayer;
-	
-	public CreatePersonView(IPersonService personService, IAddressService addressService, IDonationService donationService, ViewDisplayer viewDisplayer, ComponentFactory
-			componentFactory){
-		super(new MigLayout());
-		
+	public CreatePersonView(ComponentFactory componentFactory, ViewActionFactory viewActionFactory, 
+			IPersonService personService, IAddressService addressService,
+			IDonationService donationService, PersonTableModel personModel) {
+		this.componentFactory = componentFactory;
+		this.viewActionFactory = viewActionFactory;
 		this.personService = personService;
 		this.addressService = addressService;
 		this.donationService = donationService;
-		this.viewDisplayer = viewDisplayer;
-		this.componentFactory = componentFactory;
+		this.personModel = personModel;
+		
 		setUpCreate();
 	}
 	
+	public void setPersonService(IPersonService personService) {
+		this.personService = personService;
+	}
+
+	public void setAddressService(IAddressService addressService) {
+		this.addressService = addressService;
+	}
+
+	public void setDonationService(IDonationService donationService) {
+		this.donationService = donationService;
+	}
+
+	public void setComponentFactory(ComponentFactory componentFactory) {
+		this.componentFactory = componentFactory;
+	}
+	
+	public void setViewActionFactory(ViewActionFactory viewActionFactory) {
+		this.viewActionFactory = viewActionFactory;
+	}
+
+	public void setPersonModel(PersonTableModel personModel) {
+		this.personModel = personModel;
+	}
 	
 	private void setUpCreate() {
 		overviewPanel = componentFactory.createPanel(800, 850);
@@ -269,9 +292,16 @@ public class CreatePersonView extends JPanel{
 		
 		donationPanel.add(empty, "wrap");
 		
-		donationPanel.add(ok, "split 2");
-		//TODO
-//		donationPanel.add(cancel, "wrap");
+		submit = new JButton("Submit");
+		cancel = new JButton("Cancel");
+		
+		donationPanel.add(submit, "split 2");
+		donationPanel.add(cancel, "wrap");
+	}
+	
+	public void init() {
+		submit.setAction(new SubmitAction());
+		cancel.setAction(viewActionFactory.getMainMenuViewAction());
 	}
 	
 	private final class SubmitAction extends AbstractAction {
@@ -363,6 +393,9 @@ public class CreatePersonView extends JPanel{
 							donationService.create(donation);
 						}
 						
+						Action switchToMenu = viewActionFactory.getMainMenuViewAction();
+						switchToMenu.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+
 					} catch (ServiceException e1) {
 						JOptionPane.showConfirmDialog(null, "An error occured while trying to create a person. Message was "+e1.getMessage());
 					}
@@ -370,14 +403,4 @@ public class CreatePersonView extends JPanel{
 			}
 		}
 	}
-
-    
-    public static void main(String[] args) {
-    	JFrame frame = new JFrame("CreatePersonViewTest");
-    	CreatePersonView view = new CreatePersonView(null, null, null, null, new ComponentFactory());
-    	frame.add(view);
-    	frame.validate();
-    	frame.pack();
-    	frame.setVisible(true);
-    }
 }
