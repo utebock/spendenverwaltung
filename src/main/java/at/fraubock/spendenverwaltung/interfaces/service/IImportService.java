@@ -1,6 +1,7 @@
 package at.fraubock.spendenverwaltung.interfaces.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Import;
@@ -16,9 +17,11 @@ public interface IImportService {
 	 * @param file
 	 *            The CSV file
 	 * @return returns the amount of errors during import
+	 * @throws IOException
+	 *             if an error occurs while reading the given file
 	 * @throws ServiceException
 	 */
-	public int nativeImport(File file) throws ServiceException;
+	public int nativeImport(File file) throws ServiceException, IOException;
 
 	/**
 	 * Reads a mapping config file and returns a Map<String, String> with the
@@ -49,7 +52,9 @@ public interface IImportService {
 	 * 
 	 * @param file
 	 *            the CSV file in Hypo structure
+	 * @throws IOException
+	 *             if an error occurs while reading the given file
 	 * @throws ServiceException
 	 */
-	public void hypoImport(File file) throws ServiceException;
+	public void hypoImport(File file) throws ServiceException, IOException;
 }

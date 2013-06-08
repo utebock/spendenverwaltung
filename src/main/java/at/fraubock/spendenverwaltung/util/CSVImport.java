@@ -15,6 +15,12 @@ import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.bean.CsvToBean;
 import au.com.bytecode.opencsv.bean.HeaderColumnNameTranslateMappingStrategy;
 
+/**
+ * 
+ * @author Roman
+ * @author manuel-bichler
+ * 
+ */
 public class CSVImport {
 
 	private static final Logger log = Logger.getLogger(CSVImport.class);
@@ -127,8 +133,8 @@ public class CSVImport {
 	/**
 	 * @param csvFile
 	 *            the CSV file in hypo structure
-	 * @return a list of rows where the donation dates and the amounts are set.
-	 *         The donation note is set to "Umsatztext".
+	 * @return a list of rows where the donation dates, the donation type and
+	 *         the amounts are set. The donation note is set to "Umsatztext".
 	 * @throws IOException
 	 *             if reading the file fails
 	 * @throws ValidationException
@@ -152,6 +158,7 @@ public class CSVImport {
 				continue;
 			ImportRow row = new ImportRow();
 			row.setAmount(line[7]);
+			row.setType("bank transfer");
 			row.setDate(line[2]); // "Buchungsdatum"
 			row.setDonationNote(line[9] + " " + line[10] + " " + line[11] + " "
 					+ line[12]); // Text

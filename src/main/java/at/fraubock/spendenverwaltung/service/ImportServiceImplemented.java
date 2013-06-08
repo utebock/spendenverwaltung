@@ -3,28 +3,35 @@ package at.fraubock.spendenverwaltung.service;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IImportDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
+import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
 import at.fraubock.spendenverwaltung.interfaces.domain.Import;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
-import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person.Sex;
 import at.fraubock.spendenverwaltung.interfaces.domain.csvimport.ImportRow;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
@@ -46,7 +53,7 @@ public class ImportServiceImplemented implements IImportService {
 	private static final Logger log = Logger
 			.getLogger(ImportServiceImplemented.class);
 
-	public int nativeImport(File file) throws ServiceException {
+	public int nativeImport(File file) throws ServiceException, IOException {
 		Map<String, String> columnMapping;
 		int errors = 0;
 		Person person;
@@ -59,11 +66,7 @@ public class ImportServiceImplemented implements IImportService {
 		log.debug("Native import with CSV: " + file);
 
 		columnMapping = readMappingConfig("native_import_config.properties");
-		try {
-			importRows = CSVImport.readCSVWithMapping(file, columnMapping);
-		} catch (IOException e) {
-			throw new ServiceException(e);
-		}
+		importRows = CSVImport.readCSVWithMapping(file, columnMapping);
 		imp = new Import();
 		imp.setImportDate(new Date());
 		imp.setSource("native");
@@ -93,7 +96,7 @@ public class ImportServiceImplemented implements IImportService {
 				try {
 					donation.setDate(df.parse(row.getDate()));
 				} catch (ParseException e) {
-					e.printStackTrace();
+					e.printStackTrace(); // TODO seriously?
 				}
 				donation.setAmount(Long.valueOf((long) (Double.valueOf(row
 						.getAmount()) * 100)));
@@ -172,8 +175,79 @@ public class ImportServiceImplemented implements IImportService {
 	}
 
 	@Override
-	public void hypoImport(File file) throws ServiceException {
-		// TODO
+	public void hypoImport(File file) throws ServiceException, IOException {
+		List<ImportRow> rowList;
+		try {
+			rowList = CSVImport.readHypoCsv(file);
+		} catch (ValidationException e) {
+			throw new ServiceException(e);
+		}
+
+		Import i = new Import();
+		i.setImportDate(new Date());
+		i.setSource("Hypo-Export");
+
+		List<Donation> donations = new ArrayList<Donation>(rowList.size());
+
+		// set up formats for date and amount parsing
+		NumberFormat f = NumberFormat.getInstance(Locale.GERMAN);
+		if (!(f instanceof DecimalFormat)) {
+			String msg = "Number format used for importing Hypo CSV data is not applicable for decimal amounts";
+			log.error(msg);
+			throw new ServiceException(msg);
+		}
+		DecimalFormat df = (DecimalFormat) f;
+		df.setParseBigDecimal(true);
+
+		DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy",
+				Locale.GERMAN);
+
+		// convert the rows to donation entities
+		for (ImportRow row : rowList) {
+			Donation d = new Donation();
+
+			BigDecimal n = (BigDecimal) df.parse(row.getAmount(),
+					new ParsePosition(0));
+			n = n.multiply(new BigDecimal(100));
+			d.setAmount(n.toBigInteger().longValue());
+
+			try {
+				d.setDate(dateFormat.parse(row.getDate()));
+			} catch (ParseException e) {
+				String msg = "Date in the Hypo CSV file has wrong format";
+				log.warn(msg);
+				throw new ServiceException(msg, e);
+			}
+
+			d.setNote(row.getDonationNote());
+
+			d.setSource(i);
+
+			d.setType(Donation.DonationType.getByName(row.getType()));
+
+			donations.add(d);
+		}
+
+		createImport(i);
+
+		// now, save donations
+		for (Donation d : donations) {
+			try {
+				donationService.create(d);
+			} catch (Throwable t) {
+				log.debug("reverting import...");
+				int last = donations.indexOf(d);
+				for (int index = 0; index < last; ++index) {
+					try {
+						donationService.delete(donations.get(index));
+					} catch (Throwable t2) {
+						log.debug("deletion of previously-inserted donation failed: "
+								+ t2.getMessage());
+					}
+				}
+				throw t;
+			}
+		}
 	}
 
 	public IImportDAO getImportDAO() {

@@ -18,9 +18,8 @@ public class ImportServiceTest extends AbstractImportServiceTest {
 		init();
 		importDAO = mock(IImportDAO.class);
 		ImportServiceImplemented importService = new ImportServiceImplemented();
-		
+
 		importService.setImportDAO(importDAO);
 		setImportService(importService);
 	}
-
 }

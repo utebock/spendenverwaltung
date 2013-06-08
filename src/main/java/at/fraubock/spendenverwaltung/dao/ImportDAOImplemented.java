@@ -50,10 +50,7 @@ public class ImportDAOImplemented implements IImportDAO {
 			throw new ValidationException("import must not be null");
 		if (i.getId() != null && i.getId() < 0)
 			throw new ValidationException("id must not be less than 0");
-		if (i.getCreator() == null)
-			throw new ValidationException("creator must not be null");
-		if (i.getCreator().length() > 30)
-			throw new ValidationException("creator must be max 30 chars long");
+		// creator may be null for import
 		if (i.getImportDate() == null)
 			throw new ValidationException("import date must not be null");
 		if (i.getSource() == null)
@@ -61,6 +58,7 @@ public class ImportDAOImplemented implements IImportDAO {
 		if (i.getSource().length() > 30)
 			throw new ValidationException("source must be max 30 chars long");
 	}
+
 	@Override
 	public void insertOrUpdate(final Import i) throws PersistenceException {
 		log.debug("insertOrUpdate " + i);
@@ -74,6 +72,9 @@ public class ImportDAOImplemented implements IImportDAO {
 			// new entry
 			KeyHolder keyHolder = new GeneratedKeyHolder();
 
+			final String creator = jdbcTemplate.queryForObject(
+					"SELECT SUBSTRING_INDEX(USER(),'@',1)", String.class);
+
 			jdbcTemplate.update(new PreparedStatementCreator() {
 
 				@Override
@@ -81,24 +82,28 @@ public class ImportDAOImplemented implements IImportDAO {
 						throws SQLException {
 					PreparedStatement ps = con
 							.prepareStatement(
-									"INSERT INTO imports (creator, import_date, source) VALUES ((SELECT SUBSTRING_INDEX(USER(),'@',1)),?,?)",
+									"INSERT INTO imports (creator, import_date, source) VALUES (?,?,?)",
 									Statement.RETURN_GENERATED_KEYS);
-					//ps.setString(1, i.getCreator());
-					ps.setDate(1, new Date(i.getImportDate().getTime()));
-					ps.setString(2, i.getSource());
+					ps.setString(1, creator);
+					ps.setDate(2, new Date(i.getImportDate().getTime()));
+					ps.setString(3, i.getSource());
 					return ps;
 				}
 			}, keyHolder);
 
 			i.setId(keyHolder.getKey().intValue());
+			i.setCreator(creator);
 		} else {
 			// update
 			jdbcTemplate
-					.update("UPDATE imports SET creator = ? , import_date = ?, source = ? WHERE id = ?",
-							new Object[] { i.getCreator(), i.getImportDate(),
-									i.getSource(), i.getId() }, new int[] {
-									Types.VARCHAR, Types.DATE, Types.VARCHAR,
-									Types.INTEGER });
+					.update("UPDATE imports SET import_date = ?, source = ? WHERE id = ?",
+							new Object[] { i.getImportDate(), i.getSource(),
+									i.getId() }, new int[] { Types.DATE,
+									Types.VARCHAR, Types.INTEGER });
+			i.setCreator(jdbcTemplate.queryForObject(
+					"SELECT creator FROM imports WHERE id = ?",
+					new Object[] { i.getId() }, new int[] { Types.INTEGER },
+					String.class));
 		}
 
 	}
