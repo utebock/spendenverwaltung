@@ -66,6 +66,9 @@ public abstract class AbstractStatsTest {
 		Filter filter = new Filter();
 		PropertyCriterion crit = new PropertyCriterion();
 		List<Donation> list = new ArrayList<Donation>();
+		Filter filter2 = new Filter();
+		PropertyCriterion crit2 = new PropertyCriterion();
+		List<Donation> list2 = new ArrayList<Donation>();
 		
 		address.setStreet("Teststreet 1/1");
 		address.setPostalCode("00000");
@@ -140,20 +143,39 @@ public abstract class AbstractStatsTest {
 			fail();
 		}
 		
+		crit2.setType(FilterType.DONATION);
+		crit2.setProperty(FilterProperty.DONATION_AMOUNT);
+		crit2.setRelationalOperator(RelationalOperator.LESS);
+		crit2.setStrValue("150");
+		
+		filter2.setCriterion(crit2);
+		filter2.setName("Test2");
+		filter2.setType(FilterType.DONATION);
+		
+		try{
+			filterDAO.insertOrUpdate(filter2);
+		}catch(PersistenceException e){
+			fail();
+		}
+		
 		try {
-			list = donationDAO.getByFilter(filter);
+			list2 = donationDAO.getByFilter(filter2);
 			
 		} catch (PersistenceException e) {
 			fail();
 			log.error("GetByFilter in AbsractStatsTest does not work");
 		}
 		
-		assert(list.size()==2);
+		assert(donationStats.getCount(list)==2);
 		assert(donationStats.getSum(list)==300.0);
 		assert(donationStats.getMean(list)==150.0);
 		assert(donationStats.getMax(list)==200.0);
 		assert(donationStats.getMin(list)==100.0);
 		assert(donationStats.getMedian(list)==150.0);
+		
+		assert(donationStats.getCount(list2)==1);
+		assert(donationStats.getSum(list2)==100.0);
+		
 		
 		
 	}
