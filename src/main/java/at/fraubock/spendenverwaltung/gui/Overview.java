@@ -256,7 +256,7 @@ public class Overview extends JPanel{
 	}
 
 	public void goToFilter() {
-		FilterOverview fo = new FilterOverview(filterService, personService, addressService, donationService, this);
+		MainFilterView fo = null;//new MainFilterView(filterService, personService, addressService, donationService, this);
 		removeAll();
 		revalidate();
 		repaint();

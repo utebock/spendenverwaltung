@@ -16,7 +16,7 @@ import net.miginfocom.swing.MigLayout;
 import at.fraubock.spendenverwaltung.gui.ButtonListener;
 import at.fraubock.spendenverwaltung.gui.ComponentBuilder;
 import at.fraubock.spendenverwaltung.gui.CustomTextField;
-import at.fraubock.spendenverwaltung.gui.FilterOverview;
+import at.fraubock.spendenverwaltung.gui.MainFilterView;
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
@@ -34,7 +34,7 @@ public class CreateFilter extends JPanel {
 
 	private int MAXIMUM_CRITERIONS = 4;
 
-	private FilterOverview filterOverview;
+	private MainFilterView filterOverview;
 	private ComponentBuilder builder;
 	private ButtonListener buttonListener;
 
@@ -55,12 +55,12 @@ public class CreateFilter extends JPanel {
 	private List<JButton> minusButtons = new ArrayList<JButton>();
 
 	public CreateFilter(FilterType type, IFilterService filterService,
-			FilterOverview overview) {
+			MainFilterView overview) {
 		this(type, filterService, overview, null);
 	}
 
 	public CreateFilter(FilterType type, IFilterService filterService,
-			FilterOverview filterOverview, Filter editFilter) {
+			MainFilterView filterOverview, Filter editFilter) {
 		super(new MigLayout());
 
 		// set attributes
@@ -264,7 +264,7 @@ public class CreateFilter extends JPanel {
 		filterOverview.removeAll();
 		filterOverview.revalidate();
 		filterOverview.repaint();
-		filterOverview.setUp();
+		filterOverview.init();
 	}
 	
 	private void renderCriterion(Criterion crit) {

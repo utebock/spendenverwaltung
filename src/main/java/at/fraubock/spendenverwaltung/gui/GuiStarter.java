@@ -48,7 +48,7 @@ public class GuiStarter {
 		//layout code is called from constructor, button initialization code is called from init()
 		MainMenuView mainMenu = new MainMenuView(viewActionFactory, componentFactory);
 		CreatePersonView createPerson = new CreatePersonView(componentFactory, viewActionFactory, personService, addressService, donationService, new PersonTableModel());
-		MainFilterView mainFilterView = new MainFilterView(filterService, componentFactory, viewActionFactory);
+		MainFilterView mainFilterView = new MainFilterView(componentFactory, viewActionFactory,filterService);
 		
 		//populate viewActionFactory
 		viewActionFactory.setMainMenuView(mainMenu);
