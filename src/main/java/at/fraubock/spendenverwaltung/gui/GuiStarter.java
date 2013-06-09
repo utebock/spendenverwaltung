@@ -7,6 +7,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
 import at.fraubock.spendenverwaltung.gui.views.CreatePersonView;
+import at.fraubock.spendenverwaltung.gui.views.DonationProgressStatsView;
 import at.fraubock.spendenverwaltung.gui.views.MainMenuView;
 import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
@@ -49,16 +50,18 @@ public class GuiStarter {
 		MainMenuView mainMenu = new MainMenuView(viewActionFactory, componentFactory);
 		CreatePersonView createPerson = new CreatePersonView(componentFactory, viewActionFactory, personService, addressService, donationService, new PersonTableModel());
 		MainFilterView mainFilterView = new MainFilterView(filterService, componentFactory, viewActionFactory);
-		
+		DonationProgressStatsView donationProgressStatsView = new DonationProgressStatsView(componentFactory, viewActionFactory, donationService, filterService);
 		//populate viewActionFactory
 		viewActionFactory.setMainMenuView(mainMenu);
 		viewActionFactory.setCreatePersonView(createPerson);
 		viewActionFactory.setMainFilterView(mainFilterView);
+		viewActionFactory.setDonationProgressStatsView(donationProgressStatsView);
 		
 		
 		//finish view initialization after viewActionFactory is populated (for button wiring)
 		createPerson.init();
 		mainFilterView.init();
+		donationProgressStatsView.init();
 		mainMenu.init();
 		
 		//display initial main menu

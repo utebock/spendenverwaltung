@@ -4,7 +4,9 @@ import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 
 
@@ -80,4 +82,17 @@ public interface IDonationService {
 	 * @return DonationType with index "index"
 	 */
 	public DonationType getDonationTypeByIndex(int index);
+	
+	
+	/**
+	 * Retrieves donations matching the given filter
+	 * 
+	 * @param filter
+	 *            the filter to be used
+	 * @return a list of all those donations matching the given filter, sorted
+	 *         by id descending, including their donators
+	 * @throws PersistenceException
+	 *             if communication to the underlying persistence system failed
+	 */
+	 public List<Donation> getByFilter(Filter filter) throws ServiceException;
 }

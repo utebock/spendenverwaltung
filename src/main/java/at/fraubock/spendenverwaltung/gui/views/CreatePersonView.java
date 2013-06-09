@@ -271,11 +271,8 @@ public class CreatePersonView extends JPanel {
 		validateableDonationComponents.add(amount);
 		
 		dateLabel = componentFactory.createLabel("Spendendatum: ");
-		dateInstruction = componentFactory.createLabel("(YYYY-MM-DD)");
-		dateInstruction.setFont(new Font("Instruction", Font.PLAIN, 9));
 		datePicker = new JXDatePicker(new java.util.Date());
-		donationPanel.add(dateLabel, "split 2");
-		donationPanel.add(dateInstruction);
+		donationPanel.add(dateLabel);
 		donationPanel.add(datePicker, "wrap, growx");
 		
 		dedicationLabel = componentFactory.createLabel("Widmung: ");
@@ -300,8 +297,13 @@ public class CreatePersonView extends JPanel {
 	}
 	
 	public void init() {
-		submit.setAction(new SubmitAction());
-		cancel.setAction(viewActionFactory.getMainMenuViewAction());
+		SubmitAction submitAction = new SubmitAction();
+		submitAction.putValue(Action.NAME, "Anlegen");
+		submit.setAction(submitAction);
+		
+		Action cancelAction = viewActionFactory.getMainMenuViewAction();
+		cancelAction.putValue(Action.NAME, "Abbrechen");
+		cancel.setAction(cancelAction);
 	}
 	
 	private final class SubmitAction extends AbstractAction {

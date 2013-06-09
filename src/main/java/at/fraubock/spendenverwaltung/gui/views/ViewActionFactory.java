@@ -47,7 +47,7 @@ public class ViewActionFactory {
 //	private	FindMailingsView findMailingsView;
 //	private	ConfirmMailingsView confirmMailingsView;
 //	private	DeleteMailingsView - is this necessary? wouldn't this be done over find? -Chris
-//	private DonationProgressStatsView donationProgressStatsView;
+	private DonationProgressStatsView donationProgressStatsView;
 //	private MailingStatsView mailingStatsView;
 //	private PersonStatsView personStatsView;
 	
@@ -78,6 +78,10 @@ public class ViewActionFactory {
 	
 	public void setMainFilterView(MainFilterView mainFilterView) {
 		this.mainFilterView = mainFilterView;
+	}
+	
+	public void setDonationProgressStatsView(DonationProgressStatsView donationProgressStatsView){
+		this.donationProgressStatsView = donationProgressStatsView;
 	}
 	
 	public Action getCreatePersonsViewAction() {
@@ -133,7 +137,7 @@ public class ViewActionFactory {
 	}
 	
 	public Action getDonationProgressStatsViewAction() {
-		return new DisplayViewAction(new JPanel(), "/images/statisticsDonation.jpg");
+		return new DisplayViewAction(donationProgressStatsView, "/images/statisticsDonation.jpg");
 	}
 	
 	public Action getShowMailingStatsViewAction() {

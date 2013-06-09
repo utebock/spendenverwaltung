@@ -9,6 +9,7 @@ import at.fraubock.spendenverwaltung.interfaces.dao.IDonationDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
@@ -109,5 +110,15 @@ public class DonationServiceImplemented implements IDonationService {
 	@Override
 	public DonationType getDonationTypeByIndex(int index) {
 		return Donation.DonationType.values()[index];
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Donation> getByFilter(Filter filter) throws ServiceException {
+		try{
+			return donationDAO.getByFilter(filter);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
 	}
 }
