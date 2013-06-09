@@ -97,7 +97,7 @@ public class ViewActionFactory {
 	}
 	
 	public Action getFindPersonsViewAction() {
-		return new DisplayViewAction(new JPanel(), "/images/getPersons.jpg");
+		return new DisplayViewAction(findPersonsView, "/images/getPersons.jpg");
 	}
 	
 	public Action getMainFilterViewAction() {

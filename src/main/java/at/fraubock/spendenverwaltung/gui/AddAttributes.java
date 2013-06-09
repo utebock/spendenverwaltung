@@ -453,7 +453,7 @@ public class AddAttributes extends JPanel{
 		filterPersons.removeAll();
 		filterPersons.revalidate();
 		filterPersons.repaint();
-		filterPersons.setUp();
+		//filterPersons.setUp();
 	}
 	
 }

@@ -107,7 +107,7 @@ public class ButtonListener implements ActionListener{
 		}
 		
 		if(cmd.equals("edit_person")){
-			filterPersons.editPerson();
+		//	filterPersons.editPerson();
 		}
 		if(cmd.equals("edit_person_in_db")){
 			editPerson.editPerson();
@@ -123,10 +123,10 @@ public class ButtonListener implements ActionListener{
 		}
 		
 		if(cmd.equals("add_donation_address")){
-			filterPersons.addAttributes();
+		//	filterPersons.addAttributes();
 		}
 		if(cmd.equals("return_to_personOverview")){
-			filterPersons.returnTo();
+			//filterPersons.returnTo();
 		}
 		if(cmd.equals("return_to_overview")){
 			filterOverview.returnTo();

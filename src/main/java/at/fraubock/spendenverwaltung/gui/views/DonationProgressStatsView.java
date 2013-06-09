@@ -42,7 +42,7 @@ public class DonationProgressStatsView extends JPanel {
 	private JPanel overviewPanel;
 	private JLabel doSingleStat;
 	private Filter showAllFilter;
-	private JComboBox<String> choooseSingleFilter;
+	private JComboBox<Filter> choooseSingleFilter;
 	private JLabel chooseFilter;
 	private JLabel chooseOperation;
 	private JComboBox<String> operationBox;
@@ -74,7 +74,6 @@ public class DonationProgressStatsView extends JPanel {
 		this.viewActionFactory = viewActionFactory;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void setUpCreate() {
 		overviewPanel = componentFactory.createPanel(800, 800);
 		this.add(overviewPanel);
@@ -99,7 +98,7 @@ public class DonationProgressStatsView extends JPanel {
 		}
 		chooseFilter = componentFactory.createLabel("Filter ausw\u00E4hlen: ");
 		overviewPanel.add(chooseFilter, "split2");
-		choooseSingleFilter = new JComboBox(new SimpleComboBoxModel<Filter>(donationFilters));
+		choooseSingleFilter = new JComboBox<Filter>(new SimpleComboBoxModel<Filter>(donationFilters));
 		overviewPanel.add(choooseSingleFilter, "wrap, growx");
 		
 		chooseOperation = componentFactory.createLabel("Operation ausw\u00E4hlen: ");

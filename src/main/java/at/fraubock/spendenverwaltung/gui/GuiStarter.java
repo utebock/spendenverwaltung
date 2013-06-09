@@ -57,6 +57,7 @@ public class GuiStarter {
 		viewActionFactory.setMainMenuView(mainMenu);
 		viewActionFactory.setCreatePersonView(createPerson);
 		viewActionFactory.setMainFilterView(mainFilterView);
+		viewActionFactory.setFindPersonsView(findPersonsView);
 		viewActionFactory.setDonationProgressStatsView(donationProgressStatsView);
 		
 		

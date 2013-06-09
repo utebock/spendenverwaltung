@@ -292,7 +292,7 @@ public class EditPerson extends JPanel{
 		filterPersons.removeAll();
 		filterPersons.revalidate();
 		filterPersons.repaint();
-		filterPersons.setUp();
+		//filterPersons.setUp();
 	}
 	
 	public void editPerson() {
