@@ -193,7 +193,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 			}
 			
 		} else {
-			jdbcTemplate.update("UPDATE mailings SET mailing_date=?, mailing_type=?, mailing_medium=? WHERE mailing_id=?",
+			jdbcTemplate.update("UPDATE mailings SET mailing_date=?, mailing_type=?, mailing_medium=? WHERE id=?",
 					new Object[] { new Timestamp(mailing.getDate().getTime()), mailing.getType().getName()
 					, mailing.getMedium().getName(), mailing.getId() });
 		}
@@ -215,7 +215,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 			throw new IllegalArgumentException("Mailing's id was null in delete");
 		}
 			
-		jdbcTemplate.update("DELETE FROM mailings where mailing_id=?", 
+		jdbcTemplate.update("DELETE FROM mailings where id=?", 
 				new Object[] { mailing.getId() });
 		
 		log.debug("Returning from delete");
@@ -238,7 +238,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 		
 		try {
 			Mailing mailing = jdbcTemplate.queryForObject(
-					"SELECT * FROM mailings WHERE mailing_id=?", new Object[] {
+					"SELECT * FROM mailings WHERE id=?", new Object[] {
 					id }, new MailingMapper());
 			
 			log.debug("Returning from getById with result "+mailing);
@@ -262,7 +262,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 		
 		List<Mailing> mailings = jdbcTemplate.query(
 				"SELECT ma.* FROM mailings ma, sent_mailings se " +
-				"WHERE ma.mailing_id=se.mailing_id AND se.person_id=?", 
+				"WHERE ma.id=se.mailing_id AND se.person_id=?", 
 				new Object[] { person.getId() }, new int[] {Types.INTEGER}, new MailingMapper());
 
 		log.debug("Returning from getMailingsByPerson");
@@ -276,7 +276,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 		public Mailing mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Mailing mailing = new Mailing();
 			
-			mailing.setId(rs.getInt("mailing_id"));
+			mailing.setId(rs.getInt("id"));
 			mailing.setDate(new java.util.Date(rs.getDate("mailing_date").getTime()));
 			mailing.setType(Mailing.MailingType.getByName(rs.getString("mailing_type")));
 			mailing.setMedium(Mailing.Medium.getByName(rs.getString("mailing_medium")));
