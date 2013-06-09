@@ -53,20 +53,40 @@ public class ImportServiceImplemented implements IImportService {
 	private static final Logger log = Logger
 			.getLogger(ImportServiceImplemented.class);
 
-	public int nativeImport(File file) throws ServiceException, IOException {
+	public void nativeImport(File file) throws ServiceException, IOException {
 		Map<String, String> columnMapping;
-		int errors = 0;
+		int rowCount = 0;
 		Person person;
 		Donation donation;
 		Address address;
+		List<Donation> donationList;
+		List<Address> addresses;
+		
 		Import imp;
 		List<ImportRow> importRows = null;
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		
+		// set up formats for date and amount parsing
+		NumberFormat f = NumberFormat.getInstance(Locale.GERMAN);
+		if (!(f instanceof DecimalFormat)) {
+			String msg = "Number format used for importing native CSV data is not applicable for decimal amounts";
+			log.error(msg);
+			throw new ServiceException(msg);
+		}
+		DecimalFormat df = (DecimalFormat) f;
+		df.setParseBigDecimal(true);
+
+		DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy",
+				Locale.GERMAN);
 
 		log.debug("Native import with CSV: " + file);
 
+		//Read mapping config and read CSV
 		columnMapping = readMappingConfig("native_import_config.properties");
 		importRows = CSVImport.readCSVWithMapping(file, columnMapping);
+		
+		donationList = new ArrayList<Donation>(importRows.size());
+		
+		//Create import (domain)
 		imp = new Import();
 		imp.setImportDate(new Date());
 		imp.setSource("native");
@@ -74,8 +94,11 @@ public class ImportServiceImplemented implements IImportService {
 
 		createImport(imp);
 
+		//Read all rows
 		for (ImportRow row : importRows) {
 			try {
+				rowCount++;
+				
 				// Person
 				person = new Person();
 				person.setGivenName(row.getGivenName());
@@ -94,12 +117,17 @@ public class ImportServiceImplemented implements IImportService {
 				// Donation
 				donation = new Donation();
 				try {
-					donation.setDate(df.parse(row.getDate()));
+					donation.setDate(dateFormat.parse(row.getDate()));
 				} catch (ParseException e) {
-					e.printStackTrace(); // TODO seriously?
+					String msg = "An error occurred during date parsing in row "+rowCount+". The date has to be in dd.MM.yyyy format";
+					log.warn(msg);
+					throw new ServiceException(msg, e);
 				}
-				donation.setAmount(Long.valueOf((long) (Double.valueOf(row
-						.getAmount()) * 100)));
+				
+				BigDecimal n = (BigDecimal) df.parse(row.getAmount(),
+						new ParsePosition(0));
+				n = n.multiply(new BigDecimal(100));
+				donation.setAmount(n.toBigInteger().longValue());
 				donation.setDedication(row.getDedication());
 				donation.setNote(row.getDonationNote());
 				donation.setType(DonationType.getByName(row.getType()));
@@ -111,27 +139,47 @@ public class ImportServiceImplemented implements IImportService {
 				address.setPostalCode(row.getPostcode());
 				address.setCountry(row.getCountry());
 
-				// Connect Domains
-				address = addressService.create(address);
-				List<Address> addresses = person.getAddresses();
-				addresses.add(address);
-
-				person.setAddresses(addresses);
+				//Connect domains
 				person.setMainAddress(address);
-				person = personService.create(person);
-
+				
 				donation.setDonator(person);
 				donation.setSource(imp);
-				donationService.create(donation);
-			} catch (IllegalArgumentException e) {
-				log.error("Error during native CSV Import: " + e.getMessage());
-				errors++;
+				
+				donationList.add(donation);
+				
+			} catch (IllegalArgumentException | NullPointerException e) {
+				String msg = "Error during native CSV Import in row " + rowCount;
+				log.error(msg);
+				throw new ServiceException(msg, e);
+			}
+			
+			//Save data
+			for(Donation d : donationList){
+				person = d.getDonator();
+				
+				//Address
+				address = person.getMainAddress();
+				if(address.getId()==null){
+					address = addressService.create(address);
+				}
+				addresses = person.getAddresses();
+				addresses.add(address);
+				person.setAddresses(addresses);
+				person.setMainAddress(address);
+
+				log.debug("Person: "+person.getGivenName()+" "+person.getSurname()+" "+person.getEmail()+" id:"+person.getId()+" mainaddressid:"+person.getMainAddress().getId());
+				//Person
+				if(person.getId()==null){
+					person = personService.create(person);
+				}
+				d.setDonator(person);
+				
+				//Donation
+				donationService.create(d);
 			}
 		}
 
-		log.debug("Imported " + (importRows.size() - errors) + " donations. "
-				+ errors + " errors");
-		return errors;
+		log.debug("Successfully imported " + importRows.size() + " donations. ");
 	}
 
 	public Map<String, String> readMappingConfig(String configName)

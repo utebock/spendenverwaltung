@@ -109,13 +109,11 @@ public class ImportData extends JPanel {
 			} catch (ServiceException e) {
 				JOptionPane.showMessageDialog(
 						this,
-						"An error occured during import.\nDescription:\n"
-								+ e.getMessage(), "Error",
+						e.getMessage(), "Error",
 						JOptionPane.ERROR_MESSAGE);
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(this,
-						"An error occured while reading the file.\nDescription:\n"
-								+ e.getMessage(), "Error",
+						e.getMessage(), "Error",
 						JOptionPane.ERROR_MESSAGE);
 			}
 		}

@@ -21,7 +21,7 @@ public interface IImportService {
 	 *             if an error occurs while reading the given file
 	 * @throws ServiceException
 	 */
-	public int nativeImport(File file) throws ServiceException, IOException;
+	public void nativeImport(File file) throws ServiceException, IOException;
 
 	/**
 	 * Reads a mapping config file and returns a Map<String, String> with the
