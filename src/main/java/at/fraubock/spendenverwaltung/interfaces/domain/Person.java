@@ -32,6 +32,21 @@ public class Person {
 				throw new IllegalArgumentException("No such Sex");
 			}
 		}
+
+		public static String getDisplayableName(Sex sex) {
+			switch (sex) {
+			case MALE:
+				return "m\u00E4nnlich";
+			case FEMALE:
+				return "weiblich";
+			case FAMILY:
+				return "Familie";
+			case COMPANY:
+				return "Unternehmen";
+			default:
+				throw new IllegalArgumentException("No such Sex");
+			}
+		}
 	}
 
 	private Integer id;

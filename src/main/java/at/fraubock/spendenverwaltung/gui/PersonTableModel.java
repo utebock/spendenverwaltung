@@ -1,8 +1,10 @@
 package at.fraubock.spendenverwaltung.gui;
 
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
+
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 
 public class PersonTableModel extends AbstractTableModel {
@@ -81,5 +83,9 @@ public class PersonTableModel extends AbstractTableModel {
 	@Override
 	public boolean isCellEditable(int row, int col) {
 		return false;
+	}
+	
+	public List<Person> getPersons() {
+		return persons;
 	}
 }

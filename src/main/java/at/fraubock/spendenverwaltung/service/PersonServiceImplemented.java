@@ -128,5 +128,34 @@ public class PersonServiceImplemented implements IPersonService {
 		}
 		return list;
 	}
+	
+	public String convertToCSV(List<Person> persons) {
+		if(persons==null) {
+			throw new IllegalArgumentException("Argument must not be null.");
+		}
+		
+		String csv = "Vorname;Nachname;E-Mail;Geschlecht;Titel;Unternehmen;Telephon;Empfängt E-Mail;Empfängt Post;Notiz;Land;Stadt;PLZ;Strasse\n";
+		
+		for(Person p: persons) {
+			csv+=p.getGivenName()+";";
+			csv+=p.getSurname()+";";
+			csv+=p.getEmail()+";";
+			csv+=Person.Sex.getDisplayableName(p.getSex())+";";
+			csv+=p.getTitle()+";";
+			csv+=p.getCompany()+";";
+			csv+=p.getTelephone()+";";
+			csv+=(p.isEmailNotification()?"ja":"nein")+";";
+			csv+=(p.isPostalNotification()?"ja":"nein")+";";
+			csv+=p.getNote();
+			Address a = p.getMainAddress();
+			String nA = "n.v.;";
+			csv+=";"+(a==null?nA:(a.getCountry()+";"));
+			csv+=a==null?nA:(a.getCity()+";");
+			csv+=a==null?nA:(a.getPostalCode()+";");
+			csv+=a==null?nA:(a.getStreet()+";");
+			csv+="\n";
+		}
+		return csv;
+	}
 
 }

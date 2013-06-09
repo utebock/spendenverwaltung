@@ -63,4 +63,12 @@ public interface IPersonService {
 	 */
 	public List<Person> getByAttributes(Person p) throws ServiceException;
 	
+	/**
+	 * converts a list of persons to a CSV string.
+	 * 
+	 * @param persons
+	 * @return CSV representation of the persons
+	 */
+	public String convertToCSV(List<Person> persons);
+	
 }
