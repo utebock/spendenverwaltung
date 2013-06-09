@@ -233,7 +233,7 @@ public class FindPersonsView extends JPanel {
 		private static final long serialVersionUID = 1L;
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			Person p;
+	/*		Person p;
 			int row = showTable.getSelectedRow();
 			if (row == -1) {
 				JOptionPane.showMessageDialog(overviewPanel, "Bitte Person ausw\u00E4hlen.");
@@ -259,7 +259,7 @@ public class FindPersonsView extends JPanel {
 			repaint();
 		//	add(sp);
 			
-		}
+	*/	}
 		
 	}
 	
@@ -269,7 +269,7 @@ public class FindPersonsView extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			Person p;
+	/*		Person p;
 			int row = showTable.getSelectedRow();
 			if (row == -1) {
 				JOptionPane.showMessageDialog(overviewPanel,
@@ -297,7 +297,7 @@ public class FindPersonsView extends JPanel {
 			repaint();
 		//	add(ep);
 			
-		}		
+		*/}		
 	}
 	
 	private final class DeleteAction extends AbstractAction{
