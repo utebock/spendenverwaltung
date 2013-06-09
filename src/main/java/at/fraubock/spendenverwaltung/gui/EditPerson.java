@@ -21,6 +21,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
+import at.fraubock.spendenverwaltung.gui.views.FindPersonsView;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
@@ -73,7 +74,7 @@ public class EditPerson extends JPanel{
 	private Person person = new Person();
 	private Address addr = new Address();
 	private Overview overview;
-	private ShowPersons filterPersons;
+	private FindPersonsView filterPersons;
 	private JLabel editPerson;
 	private JTextField companyField;
 	private JTextField givenField;
@@ -97,7 +98,7 @@ public class EditPerson extends JPanel{
 	private JLabel setAsMainAddress;
 	private JCheckBox mainAddress;
 
-	public EditPerson(Person person, IPersonService personService, IAddressService addressService, ShowPersons filterPersons, Overview overview) {
+	public EditPerson(Person person, IPersonService personService, IAddressService addressService, FindPersonsView filterPersons, Overview overview) {
 		super(new MigLayout());
 		
 		this.person = person;

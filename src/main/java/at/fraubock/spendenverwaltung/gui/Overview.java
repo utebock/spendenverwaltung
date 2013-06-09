@@ -18,6 +18,7 @@ import net.miginfocom.swing.MigLayout;
 
 import org.apache.log4j.Logger;
 
+import at.fraubock.spendenverwaltung.gui.views.FindPersonsView;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
@@ -302,7 +303,7 @@ public class Overview extends JPanel{
 	}
 	
 	public void goToShow(){
-		ShowPersons filter = new ShowPersons(personService, addressService, donationService, filterService, this);
+	//	FindPersonsView filter = new FindPersonsView(personService, addressService, donationService, filterService, this);
 		removeAll();
 		revalidate();
 		repaint();

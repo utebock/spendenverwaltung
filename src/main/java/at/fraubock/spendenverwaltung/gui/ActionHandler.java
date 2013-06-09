@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
+import at.fraubock.spendenverwaltung.gui.views.FindPersonsView;
 
 public class ActionHandler implements ActionListener{
 
@@ -14,7 +15,7 @@ public class ActionHandler implements ActionListener{
 		// TODO Auto-generated constructor stub
 	}
 
-	public ActionHandler(ShowPersons filterPersons) {
+	public ActionHandler(FindPersonsView filterPersons) {
 		// TODO Auto-generated constructor stub
 	}
 	public ActionHandler(MainFilterView filterOverview) {

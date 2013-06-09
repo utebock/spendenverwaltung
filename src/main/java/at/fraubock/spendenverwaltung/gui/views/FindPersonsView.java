@@ -1,4 +1,4 @@
-package at.fraubock.spendenverwaltung.gui;
+package at.fraubock.spendenverwaltung.gui.views;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -7,6 +7,8 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -21,6 +23,15 @@ import net.miginfocom.swing.MigLayout;
 
 import org.apache.log4j.Logger;
 
+import at.fraubock.spendenverwaltung.gui.ActionHandler;
+import at.fraubock.spendenverwaltung.gui.AddAttributes;
+import at.fraubock.spendenverwaltung.gui.ButtonListener;
+import at.fraubock.spendenverwaltung.gui.ComponentBuilder;
+import at.fraubock.spendenverwaltung.gui.EditPerson;
+import at.fraubock.spendenverwaltung.gui.Overview;
+import at.fraubock.spendenverwaltung.gui.PersonTableModel;
+import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
+import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
@@ -30,17 +41,15 @@ import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.FilterType;
 
-public class ShowPersons extends JPanel {
+public class FindPersonsView extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private static final Logger log = Logger.getLogger(ShowPersons.class);
+	private static final Logger log = Logger.getLogger(FindPersonsView.class);
 	private IPersonService personService;
 	private IAddressService addressService;
 	private IDonationService donationService;
 	private IFilterService filterService;
 	private Overview overview;
-	private ComponentBuilder builder;
-	private ButtonListener buttonListener;
 	private PersonTableModel personModel;
 	private JTable showTable;
 	private JScrollPane scrollPane;
@@ -49,28 +58,54 @@ public class ShowPersons extends JPanel {
 	private JButton editButton;
 	private JButton deleteButton;
 	private JButton addAttribute;
-	private ActionHandler handler;
 	private JComboBox<Filter> filterCombo;
 	private JButton backButton;
 	private JPanel overviewPanel;
 	private JLabel label;
 	private JLabel empty;
 	private Filter showAllFilter;
+	private ComponentFactory componentFactory;
+	private ViewActionFactory viewActionFactory;
+	private ComponentBuilder builder;
 
-	public ShowPersons(IPersonService personService,
+	public FindPersonsView(IPersonService personService,
 			IAddressService addressService, IDonationService donationService,
-			IFilterService filterService, Overview overview) {
+			IFilterService filterService, ComponentFactory componentFactory, 
+			ViewActionFactory viewActionFactory, PersonTableModel personModel) {
 		super(new MigLayout());
 
+		this.componentFactory = componentFactory;
+		this.viewActionFactory = viewActionFactory;
 		this.personService = personService;
 		this.addressService = addressService;
 		this.donationService = donationService;
-		this.filterService = filterService;
-		this.overview = overview;
+		this.personModel = personModel;
 		initTable();
 		setUp();
 	}
+	public void setPersonService(IPersonService personService) {
+		this.personService = personService;
+	}
 
+	public void setAddressService(IAddressService addressService) {
+		this.addressService = addressService;
+	}
+
+	public void setDonationService(IDonationService donationService) {
+		this.donationService = donationService;
+	}
+
+	public void setComponentFactory(ComponentFactory componentFactory) {
+		this.componentFactory = componentFactory;
+	}
+	
+	public void setViewActionFactory(ViewActionFactory viewActionFactory) {
+		this.viewActionFactory = viewActionFactory;
+	}
+
+	public void setPersonModel(PersonTableModel personModel) {
+		this.personModel = personModel;
+	}
 	public void initTable() {
 		personModel = new PersonTableModel();
 		showAllFilter = new Filter(FilterType.PERSON, null, "Alle anzeigen");
@@ -84,28 +119,15 @@ public class ShowPersons extends JPanel {
 	}
 
 	public void setUp() {
-		handler = new ActionHandler(this);
-		buttonListener = new ButtonListener(this);
-		builder = new ComponentBuilder();
-
-		overviewPanel = builder.createPanel(800, 850);
-		// JScrollPane pane = new JScrollPane(overviewPanel,
-		// JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-		// JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		overviewPanel = componentFactory.createPanel(800, 850);
 		this.add(overviewPanel);
 
-		toolbar = builder.createToolbar();
-		toolbar.setFloatable(false);
-		toolbar.setRollover(true);
-		addComponentsToToolbar(toolbar);
-
-		overviewPanel.add(toolbar, "growx, span, wrap");
-
-		label = builder.createLabel("Filter ausw\u00E4hlen: ");
+		label = componentFactory.createLabel("Filter ausw\u00E4hlen: ");
 		overviewPanel.add(label, "split2");
 
 		List<Filter> personFilters = new ArrayList<Filter>();
 		personFilters.add(showAllFilter);
+		log.info("PersonFilter-List: "+personFilters.size());
 		try {
 			personFilters.addAll(filterService
 					.getAllByFilter(FilterType.PERSON));
@@ -130,28 +152,41 @@ public class ShowPersons extends JPanel {
 		});
 
 		overviewPanel.add(filterCombo, "growx, wrap");
-		empty = builder.createLabel("			");
+		empty = componentFactory.createLabel("			");
 		overviewPanel.add(empty, "wrap");
 		overviewPanel.add(scrollPane);
 	}
 
+	public void init(){
+		toolbar = new JToolBar();
+		toolbar.setFloatable(false);
+		toolbar.setRollover(true);
+		addComponentsToToolbar(toolbar);
+		overviewPanel.add(toolbar, "growx, span, wrap");
+	}
 	private void addComponentsToToolbar(JToolBar toolbar) {
 
-		addAttribute = builder.createButton(
-				"<html>&nbsp;Attribute hinzuf\u00FCgen&nbsp;</html>",
-				buttonListener, "add_donation_address");
+		addAttribute = new JButton();
+				//builder.createButton(
+				//"<html>&nbsp;Attribute hinzuf\u00FCgen&nbsp;</html>",
+				//buttonListener, "add_donation_address");
 		addAttribute.setFont(new Font("Bigger", Font.PLAIN, 13));
-		editButton = builder.createButton(
-				"<html>&nbsp;Person bearbeiten</html>", buttonListener,
-				"edit_person");
+		editButton = new JButton();
+				//builder.createButton(
+				//"<html>&nbsp;Person bearbeiten</html>", buttonListener,
+				//"edit_person");
 		editButton.setFont(new Font("Bigger", Font.PLAIN, 13));
-		deleteButton = builder.createButton(
-				"<html>&nbsp;Person l\u00F6schen</html>", buttonListener,
-				"delete_person_from_db");
+		deleteButton = new JButton();
 		deleteButton.setFont(new Font("Bigger", Font.PLAIN, 13));
-		backButton = builder.createButton("<html>&nbsp;Zur\u00FCck</html>",
-				buttonListener, "return_to_personOverview");
+		DeleteAction deleteAction = new DeleteAction();
+		deleteAction.putValue(Action.NAME, "<html>&nbsp;Person l\u00F6schen</html>");
+		deleteButton.setAction(deleteAction);
+		backButton = new JButton();
 		backButton.setFont(new Font("Bigger", Font.PLAIN, 13));
+		Action getBack = viewActionFactory.getMainMenuViewAction();
+		getBack.putValue(Action.NAME, "<html>&nbsp;Zur\u00FCck</html>");
+		backButton.setAction(getBack);
+		
 		toolbar.add(addAttribute, "split 4, growx");
 		toolbar.add(editButton, "growx");
 		toolbar.add(deleteButton, "growx");
@@ -221,57 +256,6 @@ public class ShowPersons extends JPanel {
 		add(sp);
 	}
 
-	public void deletePerson() {
-		Person p;
-		int row = showTable.getSelectedRow();
-		if (row == -1) {
-			JOptionPane.showMessageDialog(this,
-					"Bitte Person zum L\u00F6schen ausw\u00E4hlen.");
-			return;
-		}
-
-		int id = (Integer) personModel.getValueAt(row, 3);
-
-		try {
-			p = personService.getById(id);
-		} catch (ServiceException e) {
-			JOptionPane
-					.showMessageDialog(
-							this,
-							"An error occured. Please see console for further information",
-							"Error", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
-			return;
-		}
-
-		Object[] options = { "Abbrechen", "L\u00F6schen" };
-		int ok = JOptionPane.showOptionDialog(this,
-				"Diese Person sicher l\u00F6schen?", "Loeschen",
-				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null,
-				options, options[1]);
-
-		if (ok == 1) {
-			try {
-				personService.delete(p);
-			} catch (ServiceException e) {
-				JOptionPane
-						.showMessageDialog(
-								this,
-								"An error occured. Please see console for further information",
-								"Error", JOptionPane.ERROR_MESSAGE);
-				e.printStackTrace();
-				return;
-			}
-
-			personModel.removePerson(row);
-			JOptionPane.showMessageDialog(this, "Person wurde gel\u00F6scht.",
-					"Information", JOptionPane.INFORMATION_MESSAGE);
-
-		} else {
-			return;
-		}
-	}
-
 	public void editPerson() {
 		Person p;
 		int row = showTable.getSelectedRow();
@@ -313,4 +297,59 @@ public class ShowPersons extends JPanel {
 		overview.setUp();
 	}
 
+	private final class DeleteAction extends AbstractAction{
+		private static final long serialVersionUID = 1L;
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Person p;
+			int row = showTable.getSelectedRow();
+			if (row == -1) {
+				JOptionPane.showMessageDialog(overviewPanel, "Bitte Person zum L\u00F6schen ausw\u00E4hlen.");
+				return;
+			}
+
+			int id = (Integer) personModel.getValueAt(row, 3);
+
+			try {
+				p = personService.getById(id);
+			} catch (ServiceException ex) {
+				JOptionPane
+						.showMessageDialog(
+								overviewPanel,
+								"An error occured. Please see console for further information",
+								"Error", JOptionPane.ERROR_MESSAGE);
+				ex.printStackTrace();
+				return;
+			}
+
+			Object[] options = { "Abbrechen", "L\u00F6schen" };
+			int ok = JOptionPane.showOptionDialog(overviewPanel,
+					"Diese Person sicher l\u00F6schen?", "Loeschen",
+					JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null,
+					options, options[1]);
+
+			if (ok == 1) {
+				try {
+					personService.delete(p);
+				} catch (ServiceException ex) {
+					JOptionPane
+							.showMessageDialog(
+									overviewPanel,
+									"An error occured. Please see console for further information",
+									"Error", JOptionPane.ERROR_MESSAGE);
+					ex.printStackTrace();
+					return;
+				}
+
+				personModel.removePerson(row);
+				JOptionPane.showMessageDialog(overviewPanel, "Person wurde gel\u00F6scht.",
+						"Information", JOptionPane.INFORMATION_MESSAGE);
+
+			} else {
+				return;
+			}
+			
+		}
+		
+	}
 }

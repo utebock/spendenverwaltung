@@ -36,7 +36,7 @@ public class ViewActionFactory {
  * rename them if you want, as long as it stays consistent
  */
 	
-//	private FindPersonsView findPersonsView;
+	private FindPersonsView findPersonsView;
 //  private MainFilterView mainFilterView;
 //	private DonationImportView donationImportView;
 //	private ImportValidationView importValidationView;
@@ -82,6 +82,10 @@ public class ViewActionFactory {
 	
 	public void setDonationProgressStatsView(DonationProgressStatsView donationProgressStatsView){
 		this.donationProgressStatsView = donationProgressStatsView;
+	}
+	
+	public void setFindPersonsView(FindPersonsView findPersonsView){
+		this.findPersonsView = findPersonsView;
 	}
 	
 	public Action getCreatePersonsViewAction() {

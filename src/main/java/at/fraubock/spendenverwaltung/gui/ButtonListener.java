@@ -6,13 +6,14 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 
 import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
+import at.fraubock.spendenverwaltung.gui.views.FindPersonsView;
 
 public class ButtonListener implements ActionListener{
 
 	private Overview overview;
 	private CreatePerson createPerson;
 	private AddAttributes showPerson;
-	private ShowPersons filterPersons;
+	private FindPersonsView filterPersons;
 	private MainFilterView filterOverview;
 	private CreateFilter createFilter;
 	private EditPerson editPerson;
@@ -31,7 +32,7 @@ public class ButtonListener implements ActionListener{
 		this.showPerson = showPerson;
 	}
 	
-	public ButtonListener(ShowPersons filterPersons) {
+	public ButtonListener(FindPersonsView filterPersons) {
 		this.filterPersons = filterPersons;
 	}
 	

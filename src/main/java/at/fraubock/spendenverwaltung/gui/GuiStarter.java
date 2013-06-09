@@ -8,6 +8,7 @@ import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
 import at.fraubock.spendenverwaltung.gui.views.CreatePersonView;
 import at.fraubock.spendenverwaltung.gui.views.DonationProgressStatsView;
+import at.fraubock.spendenverwaltung.gui.views.FindPersonsView;
 import at.fraubock.spendenverwaltung.gui.views.MainMenuView;
 import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
@@ -49,7 +50,7 @@ public class GuiStarter {
 		//layout code is called from constructor, button initialization code is called from init()
 		MainMenuView mainMenu = new MainMenuView(viewActionFactory, componentFactory);
 		CreatePersonView createPerson = new CreatePersonView(componentFactory, viewActionFactory, personService, addressService, donationService, new PersonTableModel());
-
+		FindPersonsView findPersonsView = new FindPersonsView(personService, addressService, donationService, filterService, componentFactory, viewActionFactory, new PersonTableModel());
 		DonationProgressStatsView donationProgressStatsView = new DonationProgressStatsView(componentFactory, viewActionFactory, donationService, filterService);
 		MainFilterView mainFilterView = new MainFilterView(componentFactory, viewActionFactory,filterService);
 		//populate viewActionFactory

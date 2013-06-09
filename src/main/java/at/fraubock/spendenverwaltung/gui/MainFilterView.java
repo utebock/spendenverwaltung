@@ -209,7 +209,7 @@ public class MainFilterView extends JPanel {
 		Filter filter = filterModel.getFilterRow(showTable.getSelectedRow());
 		int answer = JOptionPane.showConfirmDialog(this,
 				"Wollen Sie den Filter " + filter.getName()
-						+ " wirklich löschen?");
+						+ " wirklich l\u00F6schen?");
 
 		if (answer != 0) {
 			return;
@@ -225,8 +225,8 @@ public class MainFilterView extends JPanel {
 			log.error(e);
 		} catch (FilterInUseException e) {
 			JOptionPane.showMessageDialog(this,
-					"Dieser Filter ist mit einem anderen verknüpft. "
-							+ "Bitte löschen Sie die Verknüpfung zuerst.",
+					"Dieser Filter ist mit einem anderen verkn\u00FCpft. "
+							+ "Bitte l\u00F6schen Sie die Verkn\u00FCpfung zuerst.",
 					"Fehler", JOptionPane.ERROR_MESSAGE);
 		}
 	}

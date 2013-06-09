@@ -16,6 +16,7 @@ import javax.swing.ListSelectionModel;
 import org.apache.log4j.Logger;
 
 import net.miginfocom.swing.MigLayout;
+import at.fraubock.spendenverwaltung.gui.views.FindPersonsView;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
@@ -27,7 +28,7 @@ import at.fraubock.spendenverwaltung.util.ValidatedData;
 
 public class ImportValidation extends JPanel {
 	private static final long serialVersionUID = 1L;
-	private static final Logger log = Logger.getLogger(ShowPersons.class);
+	private static final Logger log = Logger.getLogger(FindPersonsView.class);
 	private IPersonService personService;
 	private IAddressService addressService;
 	private IDonationService donationService;

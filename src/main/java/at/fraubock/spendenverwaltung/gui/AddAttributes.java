@@ -19,6 +19,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
+import at.fraubock.spendenverwaltung.gui.views.FindPersonsView;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
@@ -102,7 +103,7 @@ public class AddAttributes extends JPanel{
 
 	private JLabel donationNoteLabel;
 	private JTextArea donationNote;
-	private ShowPersons filterPersons;
+	private FindPersonsView filterPersons;
 	private Component mainLabel;
 	private JLabel mainLabelAddress;
 	private JLabel mainLabelDonation;
@@ -112,7 +113,7 @@ public class AddAttributes extends JPanel{
 	private JLabel salutationLabel;
 	private JLabel salutation;
 
-	public AddAttributes(Person person, IPersonService personService, IAddressService addressService, IDonationService donationService, ShowPersons filterPersons) {
+	public AddAttributes(Person person, IPersonService personService, IAddressService addressService, IDonationService donationService, FindPersonsView filterPersons) {
 		super(new MigLayout());
 		
 		this.person = person;
