@@ -63,7 +63,9 @@ public class FilterDAOImplemented implements IFilterDAO {
 
 		jdbcTemplate.update(deleteFilters, params, types);
 
-		abstractCritDAO.delete(f.getCriterion());
+		if(f.getCriterion()!=null) {
+			abstractCritDAO.delete(f.getCriterion());
+		}
 	}
 
 	@Override

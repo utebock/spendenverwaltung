@@ -7,6 +7,7 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
+import at.fraubock.spendenverwaltung.gui.MainFilterView;
 import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
 
 /**
@@ -29,6 +30,7 @@ public class ViewActionFactory {
 	//views
 	private CreatePersonView createPersonView;
 	private MainMenuView mainMenuView;
+	private MainFilterView mainFilterView;
 
 /* TODO: add setters for other views & uncomment the relevant methods
  * rename them if you want, as long as it stays consistent
@@ -74,6 +76,10 @@ public class ViewActionFactory {
 		this.mainMenuView = mainMenuView;
 	}
 	
+	public void setMainFilterView(MainFilterView mainFilterView) {
+		this.mainFilterView = mainFilterView;
+	}
+	
 	public Action getCreatePersonsViewAction() {
 		return new DisplayViewAction(createPersonView,"/images/createPerson.jpg");
 	}
@@ -87,7 +93,7 @@ public class ViewActionFactory {
 	}
 	
 	public Action getMainFilterViewAction() {
-		return new DisplayViewAction(new JPanel(), "/images/filter.jpg");
+		return new DisplayViewAction(mainFilterView, "/images/filter.jpg");
 	}
 	
 	public Action getDonationImportViewAction() {

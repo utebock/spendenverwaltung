@@ -23,25 +23,21 @@ import net.miginfocom.swing.MigLayout;
 
 import org.apache.log4j.Logger;
 
+import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
+import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.FilterInUseException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
-import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
-import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
-import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.FilterType;
 
-public class FilterOverview extends JPanel {
+public class MainFilterView extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private static final Logger log = Logger.getLogger(FilterOverview.class);
-	private IPersonService personService;
-	private IAddressService addressService;
-	private IDonationService donationService;
+	private static final Logger log = Logger.getLogger(MainFilterView.class);
+
 	private IFilterService filterService;
-	private Overview overview;
 	private ComponentBuilder builder;
 	private ButtonListener buttonListener;
 
@@ -64,21 +60,20 @@ public class FilterOverview extends JPanel {
 	private JButton edit;
 	private JButton delete;
 	private JLabel empty;
+	private ComponentFactory componentFactory;
+	private ViewActionFactory viewActionFactory;
 
-	public FilterOverview(IFilterService filterService,
-			IPersonService personService, IAddressService addressService,
-			IDonationService donationService, Overview overview) {
+	public MainFilterView(IFilterService filterService,
+			ComponentFactory componentFactory,
+			ViewActionFactory viewActionFactory) {
 		super(new MigLayout());
-
+		this.componentFactory = componentFactory;
+		this.viewActionFactory = viewActionFactory;
 		this.filterService = filterService;
-		this.personService = personService;
-		this.addressService = addressService;
-		this.donationService = donationService;
-		this.overview = overview;
 		setUp();
 	}
 
-	public void initTable() {
+	public void init() {
 		filterModel = new FilterTableModel();
 		getFilter();
 		showTable = new JTable(filterModel);
@@ -91,8 +86,8 @@ public class FilterOverview extends JPanel {
 	}
 
 	public void setUp() {
-//		new ActionHandler(this);
-		buttonListener = new ButtonListener(this);
+		new ActionHandler(this);
+//		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
 		panel = builder.createPanel(800, 850);
 		this.add(panel);
@@ -104,7 +99,7 @@ public class FilterOverview extends JPanel {
 		panel.add(toolbar, "growx, wrap");
 		empty = builder.createLabel("		 ");
 		panel.add(empty, "wrap");
-		initTable();
+		init();
 		panel.add(scrollPane);
 	}
 
@@ -123,12 +118,13 @@ public class FilterOverview extends JPanel {
 		donationFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
 		edit = builder.createButton("<html>&nbsp;Filter bearbeiten</html>",
 				buttonListener, "edit_filter");
-		edit.setFont(new Font("Bigger", Font.PLAIN, 13));
 		delete = builder.createButton("<html>&nbsp;Filter l\u00F6schen</html>",
 				buttonListener, "delete_filter");
 		delete.setFont(new Font("Bigger", Font.PLAIN, 13));
-		backButton = builder.createButton("<html>&nbsp;Zur\u00FCck</html>",
-				buttonListener, "return_to_overview");
+		backButton = new JButton("Zur\u00FCck");
+		backButton.setAction(viewActionFactory.getMainMenuViewAction());
+		// builder.createButton("<html>&nbsp;Zur\u00FCck</html>",
+		// buttonListener, "return_to_overview");
 		backButton.setFont(new Font("Bigger", Font.PLAIN, 13));
 		toolbar.add(personFilter);
 		toolbar.add(donationFilter);
@@ -187,7 +183,7 @@ public class FilterOverview extends JPanel {
 			type = filter.getType();
 		}
 
-		CreateFilter cf = new CreateFilter(type, filterService, this, filter);
+		CreateFilter cf =null;// new CreateFilter(type, filterService, this, filter);
 		removeAll();
 		revalidate();
 		repaint();
@@ -226,14 +222,14 @@ public class FilterOverview extends JPanel {
 		}
 	}
 
-	public void returnTo() {
-		this.removeAll();
-		this.revalidate();
-		this.repaint();
-		overview.removeAll();
-		overview.revalidate();
-		overview.repaint();
-		overview.setUp();
-	}
+//	public void returnTo() {
+//		this.removeAll();
+//		this.revalidate();
+//		this.repaint();
+//		overview.removeAll();
+//		overview.revalidate();
+//		overview.repaint();
+//		overview.setUp();
+//	}
 
 }

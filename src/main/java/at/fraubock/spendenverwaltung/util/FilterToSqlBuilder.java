@@ -84,16 +84,17 @@ public class FilterToSqlBuilder {
 			stmt += prop.getBoolValue();
 		} else if (prop.getDaysBack() != null) {
 			// switch relational operator to fulfill the 'days back' condition
-			if(operator==RelationalOperator.GREATER) {
-				operator=RelationalOperator.LESS;
-			} else if(operator==RelationalOperator.GREATER_EQ) {
-				operator=RelationalOperator.LESS_EQ;
-			} else if(operator==RelationalOperator.LESS_EQ) {
-				operator=RelationalOperator.GREATER_EQ;
-			} else if(operator==RelationalOperator.LESS) {
-				operator=RelationalOperator.GREATER;
+			if (operator == RelationalOperator.GREATER) {
+				operator = RelationalOperator.LESS;
+			} else if (operator == RelationalOperator.GREATER_EQ) {
+				operator = RelationalOperator.LESS_EQ;
+			} else if (operator == RelationalOperator.LESS_EQ) {
+				operator = RelationalOperator.GREATER_EQ;
+			} else if (operator == RelationalOperator.LESS) {
+				operator = RelationalOperator.GREATER;
 			}
-			stmt = prop.getProperty() + " " + operator.toExpression() + " DATE_SUB(DATE(NOW()),INTERVAL " + prop.getDaysBack()
+			stmt = prop.getProperty() + " " + operator.toExpression()
+					+ " DATE_SUB(DATE(NOW()),INTERVAL " + prop.getDaysBack()
 					+ " DAY)";
 		} else {
 			throw new IllegalArgumentException(
@@ -112,16 +113,18 @@ public class FilterToSqlBuilder {
 
 		if (op == LogicalOperator.AND_NOT || op == LogicalOperator.OR_NOT) {
 			// operator involves NOT, therefore some modifications are needed
-			return "("+createConditionalStatement(con.getOperand1(), mountLevel)
+			return "("
+					+ createConditionalStatement(con.getOperand1(), mountLevel)
 					+ " " + (op == LogicalOperator.AND_NOT ? "AND" : "OR")
 					+ " NOT ("
 					+ createConditionalStatement(con.getOperand2(), mountLevel)
 					+ "))";
 		}
 
-		return "("+createConditionalStatement(con.getOperand1(), mountLevel) + " "
-				+ op + " "
-				+ createConditionalStatement(con.getOperand2(), mountLevel) + ")";
+		return "(" + createConditionalStatement(con.getOperand1(), mountLevel)
+				+ " " + op + " "
+				+ createConditionalStatement(con.getOperand2(), mountLevel)
+				+ ")";
 	}
 
 	private String createMountedCritSqlStmt(MountedFilterCriterion criterion,
@@ -157,71 +160,50 @@ public class FilterToSqlBuilder {
 		 * entry from the top select will be considered in this sub select.
 		 * therefore, we'll have to add a constraint to the where-part of the
 		 * sub select, telling it which entries to consider exclusively
-		 * (regardless of all other clauses in the where-part). this will be
+		 * (regardless of all other constraints in the where-part). this will be
 		 * determined by the combination of the types of both selects. some
 		 * combinations are easy to handle (like same types), some will need
-		 * special handling (mostly address and person).
+		 * special handling (like address and person).
 		 */
 
 		FilterType mountedType = criterion.getMount().getType();
 		FilterType thisType = criterion.getType();
-		// will need special treatment
-		FilterType personType = FilterType.PERSON;
-		FilterType addressType = FilterType.ADDRESS;
 
 		if (thisType == mountedType) {
-			// types are the same. only consider entries with same id as top
-			// select
-			statement += " where mount" + (mountLevel) + ".id=mount"
-					+ (mountLevel - 1) + ".id";
+			statement = mountSameTypes(mountLevel, statement);
 
-		}
-
-		else if (thisType != personType && thisType != addressType) {
-			// this type is donation or mailing
-			if (mountedType != personType) {
-				// they can only be combined with same type or person
-				throw new IllegalArgumentException(
-						"Mounting failed due to invalid combination of types. This type='"
-								+ thisType + "', mounted type='" + mountedType
-								+ "'");
+		} else if (thisType == FilterType.PERSON) {
+			
+			if (mountedType == FilterType.DONATION) {
+				statement = mountDonationToPerson(mountLevel, statement);
+			} else if (mountedType == FilterType.MAILING) {
+				statement = mountMailingToPerson(mountLevel, statement);
+			} else if (mountedType == FilterType.ADDRESS) {
+				statement = mountAddressToPerson(mountLevel, statement);
 			}
-
-			// at this point we'll have to mount person to donation or
-			// mailing. therefore only select persons with the same id as the
-			// donation's/mailing's personid
-			statement += " where mount" + (mountLevel) + ".id=mount"
-					+ (mountLevel - 1) + ".personid";
-		}
-
-		else if (thisType == personType) {
-			if (mountedType == addressType) {
-				// person mounts address. therefore, we have to join addresses
-				// with livesAt on id=aid.
-				// from this join we have to keep only the addresses where pid
-				// is the id of the top select's id
-				// (since top select is type person)
-				statement = statement.replaceAll("as mount.+",
-						"join livesat on id=aid where pid=mount0.id");
+			
+		} else if (thisType == FilterType.DONATION) {
+			
+			if (mountedType == FilterType.PERSON) {
+				statement = mountPersonToDonation(mountLevel, statement);
 			} else {
-				// donation or mailing. only consider those where their personid
-				// is the same as the top selects' id
-				statement += " where mount" + (mountLevel - 1) + ".id=mount"
-						+ (mountLevel) + ".personid";
+				illegalMounting(thisType, mountedType);
 			}
 		}
 
-		else if (thisType == addressType) {
-			if (mountedType != personType) {
-				// address can only mount person
-				throw new IllegalArgumentException(
-						"Mounting failed due to invalid combination of types. This type='"
-								+ thisType + "', mounted type='" + mountedType
-								+ "'");
+		else if (thisType == FilterType.MAILING) {
+			
+			if (mountedType == FilterType.PERSON) {
+				statement = mountPersonToMailing(mountLevel, statement);
+			} else {
+				illegalMounting(thisType, mountedType);
 			}
-			// same way as person mounts address, only with switched ids.
-			// TODO: persons join livesat on id=pid where aid=mount0.id
 		}
+
+		/*
+		 * NOTE that the GUI doesn't provide mounting into an address filter.
+		 * therefore there is no handling for that case
+		 */
 
 		/* all necessary default constraints are set now */
 
@@ -236,6 +218,61 @@ public class FilterToSqlBuilder {
 		statement += ") " + constraint;
 
 		return statement;
+	}
+
+	private String mountSameTypes(int mountLevel, String statement) {
+		// types are the same. only consider entries with same id as top
+		// select
+		return statement += " where mount" + (mountLevel) + ".id=mount" + (mountLevel - 1)
+				+ ".id";
+	}
+
+	private String mountDonationToPerson(int mountLevel, String statement) {
+		// donation. only consider those where their personid
+		// is equal to the top selects' id
+		return statement += " where mount" + (mountLevel - 1) + ".id=mount" + (mountLevel)
+				+ ".personid";
+	}
+
+	private String mountMailingToPerson(int mountLevel, String statement) {
+		// person mounts mailing. therefore, we have to join addresses
+		// with sent_mailings on id=mailing_id.
+		// from this join we have to keep only the mailings where person_id
+		// is the id of the top select's id
+		// (since top select is type person)
+		return statement +=
+				" join sent_mailings as sent on mount"+mountLevel+".id=sent.mailing_id where sent.person_id=mount"
+						+ (mountLevel-1) + ".id";
+	}
+
+	private String mountAddressToPerson(int mountLevel, String statement) {
+		// person mounts address. therefore, we have to join addresses
+		// with livesAt on id=aid.
+		// from this join we have to keep only the addresses where pid
+		// is the id of the top select's id
+		// (since top select is type person)
+		return statement += " join livesat on mount"+mountLevel+".id=aid where pid=mount" + (mountLevel-1) + ".id";
+	}
+
+	private String mountPersonToDonation(int mountLevel, String statement) {
+		// at this point we'll have to mount person to donation.
+		// therefore only select persons with the same id as the
+		// donation's personid
+		return statement += " where mount" + (mountLevel) + ".id=mount"
+				+ (mountLevel - 1) + ".personid";
+	}
+
+	private String mountPersonToMailing(int mountLevel, String statement) {
+		// see mountMailingToPerson (just with switched ids)
+		return statement +=	" join sent_mailings as sent on mount"+mountLevel+".id=sent.person_id where sent.mailing_id=mount"
+						+ (mountLevel-1) + ".id";
+	}
+	
+	private void illegalMounting(FilterType thisType, FilterType mountedType) {
+		throw new IllegalArgumentException(
+				"Mounting failed due to invalid combination of types. This type='"
+						+ thisType + "', mounted type='" + mountedType
+						+ "'");
 	}
 
 	public FilterValidator getValidator() {

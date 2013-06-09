@@ -55,8 +55,8 @@ public class CreateFilter extends JPanel {
 	private List<JButton> minusButtons = new ArrayList<JButton>();
 
 	public CreateFilter(FilterType type, IFilterService filterService,
-			FilterOverview filterOverview) {
-		this(type, filterService, filterOverview, null);
+			FilterOverview overview) {
+		this(type, filterService, overview, null);
 	}
 
 	public CreateFilter(FilterType type, IFilterService filterService,
@@ -136,6 +136,7 @@ public class CreateFilter extends JPanel {
 				} else if(con.getLogicalOperator()==LogicalOperator.OR) {
 					operatorCombo.setSelectedItem("ein");
 					andOperator = false;
+					operatorLabel.setText(" Kriterium erf\u00FCllt ist:");
 				}
 			}
 		}
@@ -267,6 +268,9 @@ public class CreateFilter extends JPanel {
 	}
 	
 	private void renderCriterion(Criterion crit) {
+		if(crit==null) {
+			return;
+		}
 		if (crit instanceof ConnectedCriterion) {
 			ConnectedCriterion con = (ConnectedCriterion) crit;
 			renderCriterion(con.getOperand1());

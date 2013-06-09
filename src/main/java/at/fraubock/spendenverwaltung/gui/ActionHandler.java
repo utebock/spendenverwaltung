@@ -17,7 +17,7 @@ public class ActionHandler implements ActionListener{
 	public ActionHandler(ShowPersons filterPersons) {
 		// TODO Auto-generated constructor stub
 	}
-	public ActionHandler(FilterOverview filterOverview) {
+	public ActionHandler(MainFilterView filterOverview) {
 		// TODO Auto-generated constructor stub
 	}
 	public ActionHandler(CreateFilter createFilter) {

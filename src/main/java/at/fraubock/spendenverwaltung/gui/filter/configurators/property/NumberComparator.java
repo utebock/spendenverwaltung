@@ -1,6 +1,7 @@
 package at.fraubock.spendenverwaltung.gui.filter.configurators.property;
 
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import at.fraubock.spendenverwaltung.gui.CustomTextField;
@@ -34,11 +35,12 @@ public class NumberComparator extends JPanel implements ICriterionConfigurator {
 		add(picker = new RelationalOperatorPicker(
 				RelationType.FOR_NUMBER_AND_DATE));
 		add(textField = new CustomTextField(5));
+		add(new JLabel("\u20AC"));
 	}
 
 	private Double getNumber() throws InvalidInputException {
 		try {
-			return Double.valueOf(textField.getText());
+			return Double.valueOf(textField.getText())*100;
 		} catch (NumberFormatException e) {
 			textField.invalidateInput();
 			throw new InvalidInputException(
@@ -74,7 +76,7 @@ public class NumberComparator extends JPanel implements ICriterionConfigurator {
 						RelationalOperatorGuiWrapper.getForOperator(prop
 								.getRelationalOperator()));
 
-				this.textField.setText(""+prop.getNumValue());
+				this.textField.setText(""+(prop.getNumValue()/100));
 
 				return true;
 			}

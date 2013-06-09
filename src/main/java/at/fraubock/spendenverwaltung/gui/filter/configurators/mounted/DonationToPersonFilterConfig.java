@@ -130,7 +130,7 @@ public class DonationToPersonFilterConfig extends JPanel implements
 
 		if (euro) {
 			crit.setProperty(FilterProperty.DONATION_AMOUNT);
-			crit.setSum(number);
+			crit.setSum(number*100);
 		} else {
 			if ((int) ((double) number) == number) {
 				crit.setCount(number.intValue());
@@ -167,7 +167,7 @@ public class DonationToPersonFilterConfig extends JPanel implements
 					euro = false;
 					euroLabel.setText("mal");
 				} else {
-					this.amount.setText("" + crit.getSum());
+					this.amount.setText("" + (crit.getSum()/100));
 					euro = true;
 					euroLabel.setText("\u20AC");
 				}

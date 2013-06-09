@@ -107,9 +107,16 @@ public class ShowPersons extends JPanel {
 		List<Filter> personFilters = new ArrayList<Filter>();
 		personFilters.add(showAllFilter);
 		try {
-			personFilters.addAll(filterService.getAllByFilter(FilterType.PERSON));
+			personFilters.addAll(filterService
+					.getAllByFilter(FilterType.PERSON));
 		} catch (ServiceException e) {
-			// TODO log,errormsg
+			JOptionPane
+					.showMessageDialog(
+							this,
+							"Ein unerwarteter Fehler ist aufgetreten.",
+							"Error", JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+			return;
 		}
 		filterCombo = builder.createComboBox(new SimpleComboBoxModel<Filter>(
 				personFilters), new ActionListener() {

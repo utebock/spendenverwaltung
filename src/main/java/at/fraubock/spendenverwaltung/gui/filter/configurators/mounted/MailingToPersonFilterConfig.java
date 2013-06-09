@@ -60,9 +60,34 @@ public class MailingToPersonFilterConfig extends JPanel implements
 		add(secondLine);
 	}
 
+	private Double getNumber() throws InvalidInputException {
+		try {
+			return Double.valueOf(amount.getText());
+		} catch (NumberFormatException e) {
+			amount.invalidateInput();
+			throw new InvalidInputException(
+					"Bitte geben Sie eine g\u00FCltige Zahl ein!");
+		}
+	}
+
 	@Override
 	public Criterion createCriterion() throws InvalidInputException {
-		return null;
+		Filter filter = (Filter) filterBox.getModel().getSelectedItem();
+
+		MountedFilterCriterion crit = new MountedFilterCriterion();
+		crit.setMount(filter);
+		crit.setRelationalOperator(picker.getPickedOperator());
+		Double number = getNumber();
+
+		if ((int) ((double) number) == number) {
+			crit.setCount(number.intValue());
+		} else {
+			amount.invalidateInput();
+			throw new InvalidInputException(
+					"Bitte geben Sie eine ganze Zahl ein!");
+		}
+
+		return crit;
 	}
 
 	@Override
