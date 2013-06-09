@@ -64,6 +64,7 @@ public class GuiStarter {
 		createPerson.init();
 		mainFilterView.init();
 		donationProgressStatsView.init();
+		findPersonsView.init();
 		mainMenu.init();
 		
 		//display initial main menu

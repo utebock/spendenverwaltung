@@ -100,7 +100,7 @@ public class ButtonListener implements ActionListener{
 		}
 		
 		if(cmd.equals("delete_person_from_db")){
-			filterPersons.deletePerson();
+		//	filterPersons.deletePerson();
 		}
 		if(cmd.equals("donation_validation")){
 			overview.goToValidation();

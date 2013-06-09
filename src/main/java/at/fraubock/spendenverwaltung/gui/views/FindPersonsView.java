@@ -79,6 +79,7 @@ public class FindPersonsView extends JPanel {
 		this.personService = personService;
 		this.addressService = addressService;
 		this.donationService = donationService;
+		this.filterService = filterService;
 		this.personModel = personModel;
 		initTable();
 		setUp();
@@ -121,7 +122,8 @@ public class FindPersonsView extends JPanel {
 	public void setUp() {
 		overviewPanel = componentFactory.createPanel(800, 850);
 		this.add(overviewPanel);
-
+		builder = new ComponentBuilder();
+		
 		label = componentFactory.createLabel("Filter ausw\u00E4hlen: ");
 		overviewPanel.add(label, "split2");
 
@@ -167,15 +169,15 @@ public class FindPersonsView extends JPanel {
 	private void addComponentsToToolbar(JToolBar toolbar) {
 
 		addAttribute = new JButton();
-				//builder.createButton(
-				//"<html>&nbsp;Attribute hinzuf\u00FCgen&nbsp;</html>",
-				//buttonListener, "add_donation_address");
 		addAttribute.setFont(new Font("Bigger", Font.PLAIN, 13));
+		AddAction addAction = new AddAction();
+		addAction.putValue(Action.NAME, "<html>&nbsp;Attribute hinzuf\u00FCgen&nbsp;</html>");
+		
 		editButton = new JButton();
-				//builder.createButton(
-				//"<html>&nbsp;Person bearbeiten</html>", buttonListener,
-				//"edit_person");
 		editButton.setFont(new Font("Bigger", Font.PLAIN, 13));
+		EditAction editAction = new EditAction();
+		editAction.putValue(Action.NAME, "<html>&nbsp;Person bearbeiten</html>");
+		
 		deleteButton = new JButton();
 		deleteButton.setFont(new Font("Bigger", Font.PLAIN, 13));
 		DeleteAction deleteAction = new DeleteAction();
@@ -297,6 +299,28 @@ public class FindPersonsView extends JPanel {
 		overview.setUp();
 	}
 
+	private final class AddAction extends AbstractAction{
+		private static final long serialVersionUID = 1L;
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
+	
+	private final class EditAction extends AbstractAction{
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
+	
 	private final class DeleteAction extends AbstractAction{
 		private static final long serialVersionUID = 1L;
 		@Override
