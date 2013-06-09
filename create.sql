@@ -119,7 +119,7 @@ CREATE TABLE mountedfilter_criterion ( # a criterion which applies another filte
 #mailings
 
 CREATE TABLE mailings (
-	mailing_id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+	id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
         mailing_date DATE NOT NULL,
 	mailing_type ENUM('allgemeiner Dankesbrief', 'Dankesbrief', 'Dauerspender Dankesbrief',
 		'Einzelspenden Dankesbrief', 'Erlagscheinversand', 'Infomaterial',
