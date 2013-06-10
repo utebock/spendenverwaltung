@@ -1,18 +1,18 @@
 package at.fraubock.spendenverwaltung.interfaces.exceptions;
 
-public class ServiceException extends Throwable {
+public class ServiceException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
-	public ServiceException(){
+	public ServiceException() {
 		super();
 	}
 
-	public ServiceException(String failureNotice){
+	public ServiceException(String failureNotice) {
 		super(failureNotice);
 	}
 
-	public ServiceException(Throwable e){
-        super(e);
+	public ServiceException(Throwable e) {
+		super(e);
 	}
 }
