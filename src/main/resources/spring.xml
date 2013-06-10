@@ -53,6 +53,9 @@
 	<bean id="importDao" class="at.fraubock.spendenverwaltung.dao.ImportDAOImplemented">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 	</bean>
+	<bean id="userDao" class="at.fraubock.spendenverwaltung.dao.UserDAOImplemented">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+	</bean>
 	<bean id="abstractCritDao"
 		class="at.fraubock.spendenverwaltung.dao.criterion.AbstractCriterionDAO">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
@@ -110,6 +113,10 @@
 	</bean>
 	<bean id="mailingService" class="at.fraubock.spendenverwaltung.service.MailingServiceImplemented">
 		<property name="mailingDAO" ref="mailingDao" />
+	</bean>
+	<bean id="userService"
+		class="at.fraubock.spendenverwaltung.service.UserServiceImplemented">
+		<property name="userDAO" ref="userDao" />
 	</bean>
 	<bean id="filterService"
 		class="at.fraubock.spendenverwaltung.service.FilterServiceImplemented">

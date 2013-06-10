@@ -1,6 +1,7 @@
 package at.fraubock.spendenverwaltung.gui;
 
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -11,6 +12,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
+import at.fraubock.spendenverwaltung.interfaces.service.IUserService;
 
 
 public class MainFrame extends JFrame{
@@ -21,6 +23,7 @@ public class MainFrame extends JFrame{
 	private IDonationService donationService;
 	private IFilterService filterService;
 	private IImportService importService;
+	private IUserService userService;
 	
 	public MainFrame(){
 		super("Ute Bock Spendenverwaltungssystem");
@@ -42,9 +45,12 @@ public class MainFrame extends JFrame{
 	public void setImportService(IImportService importService){
 		this.importService = importService;
 	}
+	public void setUserService(IUserService userService){
+		this.userService = userService;
+	}
 	
 	public void openMainWindow(){
-		setUpGUI();
+		setUpLogin();
 		
 		Runnable run = new Runnable(){
 			public void run() {
@@ -59,8 +65,13 @@ public class MainFrame extends JFrame{
 		javax.swing.SwingUtilities.invokeLater(run);
 	}
 
+	private void setUpLogin(){
+		JDialog loginDialog = new Login(this, userService);
+		
+		//setUpGUI();
+	}
 	
-	private void setUpGUI() {
+	public void setUpGUI() {
 		
 		MainFrame frame = new MainFrame();
 		JPanel panel = new JPanel();
