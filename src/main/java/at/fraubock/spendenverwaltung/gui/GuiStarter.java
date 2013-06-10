@@ -6,10 +6,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
-import at.fraubock.spendenverwaltung.gui.views.CreateMailingsView;
-import at.fraubock.spendenverwaltung.gui.views.CreatePersonView;
-import at.fraubock.spendenverwaltung.gui.views.DonationProgressStatsView;
-import at.fraubock.spendenverwaltung.gui.views.FindPersonsView;
 import at.fraubock.spendenverwaltung.gui.views.MainMenuView;
 import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;

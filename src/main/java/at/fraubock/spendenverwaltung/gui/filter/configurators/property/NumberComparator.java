@@ -34,15 +34,14 @@ public class NumberComparator extends JPanel implements ICriterionConfigurator {
 		this.property = property;
 		add(picker = new RelationalOperatorPicker(
 				RelationType.FOR_NUMBER_AND_DATE));
-		add(textField = new NumericTextField());
+		add(textField = new NumericTextField(false));
 		add(new JLabel("\u20AC"));
 	}
 
 	private Double getNumber() throws InvalidInputException {
-		try {
-			return Double.valueOf(textField.getText())*100;
-		} catch (NumberFormatException e) {
-			textField.invalidateInput();
+		if(textField.validateContents()) {
+			return Double.valueOf(textField.getHundredths());
+		} else {
 			throw new InvalidInputException(
 					"Bitte geben Sie eine g\u00FCltige Zahl ein!");
 		}

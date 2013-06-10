@@ -5,9 +5,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
-import javax.swing.JPanel;
 
-import at.fraubock.spendenverwaltung.gui.AddAttributes;
 import at.fraubock.spendenverwaltung.gui.MainFilterView;
 import at.fraubock.spendenverwaltung.gui.PersonTableModel;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;

@@ -25,11 +25,11 @@ public class NumericTextField extends CustomTextField implements
 	private ComponentConstants length;
 
 	public NumericTextField() {
-		this(ComponentConstants.NUMERIC_TEXT, true);
+		this(ComponentConstants.SHORT_TEXT, true);
 	}
 
 	public NumericTextField(boolean nullAllowed) {
-		this(ComponentConstants.NUMERIC_TEXT, nullAllowed);
+		this(ComponentConstants.SHORT_TEXT, nullAllowed);
 	}
 
 	public NumericTextField(ComponentConstants length) {
@@ -37,7 +37,7 @@ public class NumericTextField extends CustomTextField implements
 	}
 
 	public NumericTextField(ComponentConstants length, boolean nullAllowed) {
-		super(length.getValue(length));
+		super(5);
 		this.nullAllowed = nullAllowed;
 		this.length = length;
 	}
@@ -51,7 +51,7 @@ public class NumericTextField extends CustomTextField implements
 				return false;
 			}
 		} else {
-			char separator = DecimalFormatSymbols.getInstance()
+			char separator = DecimalFormatSymbols.getInstance(Locale.GERMAN)
 					.getDecimalSeparator();
 
 			if (getText().length() > length.getValue(length)) {
@@ -75,12 +75,7 @@ public class NumericTextField extends CustomTextField implements
 	 *         100.
 	 */
 	public long getHundredths() {
-		DecimalFormat format = new DecimalFormat();
-		format.setParseBigDecimal(true);
-		BigDecimal n = (BigDecimal) format.parse(getText(),
-				new ParsePosition(0));
-		n = n.multiply(new BigDecimal(100));
-		return n.toBigInteger().longValue();
+		return (long)(getNumericValue()*100);
 
 	}
 
@@ -93,19 +88,25 @@ public class NumericTextField extends CustomTextField implements
 	 */
 	public void setNumericValue(Double value) {
 		NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
-		this.setText(nf.format(value));
+		this.setText(nf.format(value).replace(".", ""));
 	}
 
 	/**
+	 * Precondition: {@link #validateContents()} must have been called and
+	 * returned true prior to calling this method.
+	 * 
 	 * converts and returns the value of this text field. the user's input is
 	 * interpreted as a DE-localized numerical string, which means decimal
 	 * separators are represented as comma and hundredth separators as dots.
 	 * 
 	 * @param value
 	 */
-//	public Double getNumericValue() {
-//		NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
-//		if(validateContents())
-//		return nf.parse(this.getText());
-//	}
+	public Double getNumericValue() {
+		DecimalFormat format = (DecimalFormat) DecimalFormat
+				.getInstance(Locale.GERMAN);
+		format.setParseBigDecimal(true);
+		BigDecimal n = (BigDecimal) format.parse(getText(),
+				new ParsePosition(0));
+		return n.doubleValue();
+	}
 }
