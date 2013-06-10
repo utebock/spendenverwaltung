@@ -71,11 +71,11 @@ public class FilterToSqlBuilder {
 
 		// determine the value the property will be compared to
 		if (prop.getNumValue() != null) {
-			stmt += prop.getNumValue();
+			stmt += escapeSQL(""+prop.getNumValue());
 		} else if (prop.getStrValue() != null) {
 			String percent = prop.getRelationalOperator() == RelationalOperator.LIKE ? "%"
 					: "";
-			stmt += "'" + percent + prop.getStrValue() + percent + "'";
+			stmt += "'" + percent + escapeSQL(prop.getStrValue()) + percent + "'";
 		} else if (prop.getDateValue() != null) {
 			stmt += "DATE('"
 					+ new SimpleDateFormat("yyyy-MM-dd").format(prop
@@ -94,7 +94,7 @@ public class FilterToSqlBuilder {
 				operator = RelationalOperator.GREATER;
 			}
 			stmt = prop.getProperty() + " " + operator.toExpression()
-					+ " DATE_SUB(DATE(NOW()),INTERVAL " + prop.getDaysBack()
+					+ " DATE_SUB(DATE(NOW()),INTERVAL " + escapeSQL(""+prop.getDaysBack())
 					+ " DAY)";
 		} else {
 			throw new IllegalArgumentException(
@@ -139,14 +139,14 @@ public class FilterToSqlBuilder {
 		// set wanted result for comparison
 		if (criterion.getCount() != null) {
 			select += "count(*) from ";
-			constraint += " " + criterion.getCount();
+			constraint += " " + escapeSQL(""+criterion.getCount());
 		} else if (criterion.getProperty() != null) {
 			if (criterion.getSum() != null) {
 				select += "sum(" + criterion.getProperty() + ") from ";
-				constraint += criterion.getSum();
+				constraint += escapeSQL(""+criterion.getSum());
 			} else if (criterion.getAvg() != null) {
 				select += "avg(" + criterion.getProperty() + ") from ";
-				constraint += criterion.getAvg();
+				constraint += escapeSQL(""+criterion.getAvg());
 			}
 		}
 
@@ -281,6 +281,13 @@ public class FilterToSqlBuilder {
 
 	public void setValidator(FilterValidator validator) {
 		this.validator = validator;
+	}
+	
+	public static String escapeSQL(String value) {
+		String escaped = value;
+		escaped = value.replace("\\","\\\\"); // replace \ with \\
+		escaped = escaped.replace("'","\\'"); // replace ' with \'
+		return escaped;
 	}
 
 }
