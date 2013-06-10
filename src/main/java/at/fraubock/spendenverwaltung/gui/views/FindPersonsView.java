@@ -308,7 +308,7 @@ public class FindPersonsView extends JPanel {
 				  log.error(ex);
 				  return; 
 			}
-			AddAttributes sp = new AddAttributes(p,personService, addressService, donationService, findPersonsView);
+			AddAttributes sp = new AddAttributes(p,personService, addressService, donationService, findPersonsView, componentFactory, viewActionFactory);
 			removeAll(); 
 			revalidate(); 
 			repaint(); 

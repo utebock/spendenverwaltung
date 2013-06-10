@@ -271,7 +271,6 @@ public class EditPerson extends JPanel{
 		cancel = new JButton();
 		Action getBack = viewActionFactory.getFindPersonsView();
 		getBack.putValue(Action.NAME, "Abbrechen");
-		getBack.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
 		cancel.setAction(getBack);
 		panel.add(cancel, "wrap");
 		

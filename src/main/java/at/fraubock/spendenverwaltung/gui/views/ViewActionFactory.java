@@ -7,6 +7,7 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
+import at.fraubock.spendenverwaltung.gui.AddAttributes;
 import at.fraubock.spendenverwaltung.gui.MainFilterView;
 import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
 
@@ -38,6 +39,7 @@ public class ViewActionFactory {
  */
 	
 	private FindPersonsView findPersonsView;
+	private AddAttributes addAttributes;
 //  private MainFilterView mainFilterView;
 //	private DonationImportView donationImportView;
 //	private ImportValidationView importValidationView;
@@ -90,6 +92,9 @@ public class ViewActionFactory {
 	public void setFindPersonsView(FindPersonsView findPersonsView){
 		this.findPersonsView = findPersonsView;
 	}
+	public void setAddAttributesView(AddAttributes addAttributes){
+		this.addAttributes = addAttributes;
+	}
 	
 	public Action getCreatePersonsViewAction() {
 		return new DisplayViewAction(createPersonView,"/images/createPerson.jpg");
@@ -102,8 +107,13 @@ public class ViewActionFactory {
 	public Action getFindPersonsViewAction() {
 		return new DisplayViewAction(findPersonsView, "/images/getPersons.jpg");
 	}
+	
 	public Action getFindPersonsView() {
 		return new DisplayViewAction(findPersonsView);
+	}
+	
+	public Action getAddAttributesView() {
+		return new DisplayViewAction(addAttributes);
 	}
 	
 	public Action getMainFilterViewAction() {
