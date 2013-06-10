@@ -17,8 +17,6 @@ import javax.swing.JToolBar;
 
 import org.apache.log4j.Logger;
 
-import at.fraubock.spendenverwaltung.gui.Overview;
-
 import net.miginfocom.swing.MigLayout;
 
 public class ComponentFactory {

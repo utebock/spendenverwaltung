@@ -6,6 +6,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
+import at.fraubock.spendenverwaltung.gui.views.CreateMailingsView;
 import at.fraubock.spendenverwaltung.gui.views.CreatePersonView;
 import at.fraubock.spendenverwaltung.gui.views.DonationProgressStatsView;
 import at.fraubock.spendenverwaltung.gui.views.FindPersonsView;
@@ -48,14 +49,19 @@ public class GuiStarter {
 		
 		//need to call mainMenu.init() after all views are set in the viewActionFactory
 		//layout code is called from constructor, button initialization code is called from init()
+		
+		PersonTableModel personTableModel = new PersonTableModel();
+		
 		MainMenuView mainMenu = new MainMenuView(viewActionFactory, componentFactory);
-		CreatePersonView createPerson = new CreatePersonView(componentFactory, viewActionFactory, personService, addressService, donationService, new PersonTableModel());
-		FindPersonsView findPersonsView = new FindPersonsView(personService, addressService, donationService, filterService, componentFactory, viewActionFactory, new PersonTableModel());
+		CreatePersonView createPerson = new CreatePersonView(componentFactory, viewActionFactory, personService, addressService, donationService, personTableModel);
+		FindPersonsView findPersonsView = new FindPersonsView(personService, addressService, donationService, filterService, componentFactory, viewActionFactory, personTableModel);
 		DonationProgressStatsView donationProgressStatsView = new DonationProgressStatsView(componentFactory, viewActionFactory, donationService, filterService);
 		MainFilterView mainFilterView = new MainFilterView(componentFactory, viewActionFactory,filterService);
+		CreateMailingsView createMailingsView = new CreateMailingsView(viewActionFactory, componentFactory, mailingService, filterService);
 		//populate viewActionFactory
 		viewActionFactory.setMainMenuView(mainMenu);
 		viewActionFactory.setCreatePersonView(createPerson);
+		viewActionFactory.setCreateMailingsView(createMailingsView);
 		viewActionFactory.setMainFilterView(mainFilterView);
 		viewActionFactory.setFindPersonsView(findPersonsView);
 		viewActionFactory.setDonationProgressStatsView(donationProgressStatsView);
@@ -63,6 +69,7 @@ public class GuiStarter {
 		
 		//finish view initialization after viewActionFactory is populated (for button wiring)
 		createPerson.init();
+		createMailingsView.initButtons();
 		mainFilterView.init();
 		donationProgressStatsView.init();
 		findPersonsView.init();

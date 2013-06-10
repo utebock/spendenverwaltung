@@ -38,11 +38,9 @@ public class MainMenuView extends JPanel {
 	private JLabel obtainConfirmLabel;
 	private JSeparator confirmSeparator;
 	private JPanel sendPanel;
-	private JButton eSending;
+	private JButton mailings;
 	private JLabel sending;
-	private JButton postalSending;
 	private JLabel eSendingLabel;
-	private JLabel postalSendingLabel;
 	private JSeparator sendSeparator;
 	private JButton showSendings;
 	private JButton confirmSendings;
@@ -61,10 +59,6 @@ public class MainMenuView extends JPanel {
 	private JButton search;
 	private JLabel searchLabel;
 	private JPanel overviewPanel;
-	
-	public MainMenuView() {
-		componentFactory = new ComponentFactory();
-	}
 	
 	public MainMenuView(ViewActionFactory viewActionFactory, ComponentFactory componentFactory) {
 		/**
@@ -189,10 +183,8 @@ public class MainMenuView extends JPanel {
 		sending.setFont(new Font("Headline", Font.PLAIN, 14));
 		sendPanel.add(sending, "wrap 0px");
 		//importPanel.add(empty, "wrap");
-		eSending = new JButton();;
-		sendPanel.add(eSending, "split 3");
-		postalSending = new JButton();;
-		sendPanel.add(postalSending, "gap 55");
+		mailings = new JButton();;
+		sendPanel.add(mailings, "split 3");
 		showSendings = new JButton();;
 		sendPanel.add(showSendings, "gap 55");
 		confirmSendings = new JButton();;
@@ -200,10 +192,8 @@ public class MainMenuView extends JPanel {
 		deleteSendings = new JButton();;
 		sendPanel.add(deleteSendings, "wrap 0px, gap 40");
 		
-		eSendingLabel = componentFactory.createLabel("<html><center>E-Aussendung<br>erstellen");
+		eSendingLabel = componentFactory.createLabel("<html><center>Aussendung<br>erstellen");
 		sendPanel.add(eSendingLabel, "split 3");
-		postalSendingLabel = componentFactory.createLabel("<html><center>Briefaussendung<br>erstellen</html>");
-		sendPanel.add(postalSendingLabel, "gap 33");
 		
 		showSendingsLabel = componentFactory.createLabel("<html><center>Aussendungen<br>anzeigen");
 		sendPanel.add(showSendingsLabel, "gap 37");
@@ -252,8 +242,7 @@ public class MainMenuView extends JPanel {
 		validation.setAction(viewActionFactory.getImportValidationViewAction());
 		createConfirm.setAction(viewActionFactory.getCreateDonationConfirmationViewAction());
 		obtainConfirm.setAction( viewActionFactory.getFindDonationConfirmationViewAction());
-		eSending.setAction(viewActionFactory.getCreateEMailingViewAction());
-		postalSending.setAction(viewActionFactory.getCreatePostalMailingViewAction());
+		mailings.setAction(viewActionFactory.getCreateMailingsViewAction());
 		showSendings.setAction(viewActionFactory.getFindMailingsViewAction());
 		confirmSendings.setAction(viewActionFactory.getConfirmMailingsViewAction());
 		deleteSendings.setAction(viewActionFactory.getDeleteMailingsViewAction());
