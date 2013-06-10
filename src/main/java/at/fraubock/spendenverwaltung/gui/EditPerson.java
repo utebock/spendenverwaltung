@@ -73,7 +73,6 @@ public class EditPerson extends JPanel{
 	private PersonTableModel personModel;
 	private Person person = new Person();
 	private Address addr = new Address();
-	private Overview overview;
 	private FindPersonsView filterPersons;
 	private JLabel editPerson;
 	private JTextField companyField;
@@ -98,15 +97,14 @@ public class EditPerson extends JPanel{
 	private JLabel setAsMainAddress;
 	private JCheckBox mainAddress;
 
-	public EditPerson(Person person, IPersonService personService, IAddressService addressService, FindPersonsView filterPersons, Overview overview) {
+	public EditPerson(Person person, IPersonService personService, IAddressService addressService, FindPersonsView filterPersons, PersonTableModel personModel) {
 		super(new MigLayout());
 		
 		this.person = person;
 		this.personService = personService;
 		this.addressService = addressService;
 		this.filterPersons = filterPersons;
-		this.overview = overview;
-		this.personModel = this.overview.getPersonModel();
+		this.personModel = personModel;
 		buttonListener = new ButtonListener(this);
 		actionHandler = new ActionHandler(this);
 		builder = new ComponentBuilder();

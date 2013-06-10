@@ -28,7 +28,9 @@ import net.miginfocom.swing.MigLayout;
 
 import org.apache.log4j.Logger;
 
+import at.fraubock.spendenverwaltung.gui.AddAttributes;
 import at.fraubock.spendenverwaltung.gui.ComponentBuilder;
+import at.fraubock.spendenverwaltung.gui.EditPerson;
 import at.fraubock.spendenverwaltung.gui.Overview;
 import at.fraubock.spendenverwaltung.gui.PersonTableModel;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
@@ -50,7 +52,6 @@ public class FindPersonsView extends JPanel {
 	private IAddressService addressService;
 	private IDonationService donationService;
 	private IFilterService filterService;
-	private Overview overview;
 	private PersonTableModel personModel;
 	private JTable showTable;
 	private JScrollPane scrollPane;
@@ -67,7 +68,6 @@ public class FindPersonsView extends JPanel {
 	private Filter showAllFilter;
 	private ComponentFactory componentFactory;
 	private ViewActionFactory viewActionFactory;
-	private ComponentBuilder builder;
 
 	public FindPersonsView(IPersonService personService,
 			IAddressService addressService, IDonationService donationService,
@@ -82,8 +82,6 @@ public class FindPersonsView extends JPanel {
 		this.donationService = donationService;
 		this.filterService = filterService;
 		this.personModel = personModel;
-		// initTable();
-		// setUp();
 	}
 
 	public void setPersonService(IPersonService personService) {
@@ -151,7 +149,6 @@ public class FindPersonsView extends JPanel {
 	public void init() {
 		overviewPanel = componentFactory.createPanel(800, 800);
 		this.add(overviewPanel);
-		builder = new ComponentBuilder();
 		toolbar = new JToolBar();
 		toolbar.setFloatable(false);
 		toolbar.setRollover(true);
@@ -289,21 +286,30 @@ public class FindPersonsView extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			/*
-			 * Person p; int row = showTable.getSelectedRow(); if (row == -1) {
-			 * JOptionPane.showMessageDialog(overviewPanel,
-			 * "Bitte Person ausw\u00E4hlen."); return; }
-			 * 
-			 * int id = (Integer) personModel.getValueAt(row, 3);
-			 * 
-			 * try { p = personService.getById(id); } catch (ServiceException
-			 * ex) { JOptionPane .showMessageDialog( overviewPanel,
-			 * "An error occured. Please see console for further information",
-			 * "Error", JOptionPane.ERROR_MESSAGE); ex.printStackTrace();
-			 * return; } // AddAttributes sp = new AddAttributes(p,
-			 * personService, addressService, donationService, this);
-			 * removeAll(); revalidate(); repaint(); // add(sp);
-			 */}
+			FindPersonsView findPersonsView = new FindPersonsView(personService, addressService, donationService, filterService, componentFactory, viewActionFactory, personModel);	
+			Person p; 
+			int row = showTable.getSelectedRow(); 
+			if (row == -1) {
+				JOptionPane.showMessageDialog(overviewPanel,
+						  "Bitte Person ausw\u00E4hlen."); 
+			return; 
+			}
+			int id = (Integer) personModel.getValueAt(row, 3);
+			
+			try { 
+				p = personService.getById(id); 
+			  } catch (ServiceException ex) { 
+				  JOptionPane .showMessageDialog( overviewPanel,
+						  "An error occured. Please see console for further information",
+						  "Error", JOptionPane.ERROR_MESSAGE); ex.printStackTrace();
+						  return; 
+			}
+			AddAttributes sp = new AddAttributes(p,personService, addressService, donationService, findPersonsView);
+			removeAll(); 
+			revalidate(); 
+			repaint(); 
+			add(sp);
+		}
 
 	}
 
@@ -313,23 +319,29 @@ public class FindPersonsView extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			/*
-			 * Person p; int row = showTable.getSelectedRow(); if (row == -1) {
-			 * JOptionPane.showMessageDialog(overviewPanel,
-			 * "Bitte Person zum Bearbeiten ausw\u00E4hlen."); return; }
-			 * 
-			 * int id = (Integer) personModel.getValueAt(row, 3);
-			 * 
-			 * try { p = personService.getById(id); } catch (ServiceException
-			 * ex) { JOptionPane .showMessageDialog( overviewPanel,
-			 * "An error occured. Please see console for further information",
-			 * "Error", JOptionPane.ERROR_MESSAGE); ex.printStackTrace();
-			 * return; }
-			 * 
-			 * // EditPerson ep = new EditPerson(p, personService,
-			 * addressService, this, overview); removeAll(); revalidate();
-			 * repaint(); // add(ep);
-			 */}
+			FindPersonsView findPersonsView = new FindPersonsView(personService, addressService, donationService, filterService, componentFactory, viewActionFactory, personModel);
+			Person p; int row = showTable.getSelectedRow(); 
+			if (row == -1) {
+				JOptionPane.showMessageDialog(overviewPanel,
+						"Bitte Person zum Bearbeiten ausw\u00E4hlen."); return; }
+			
+			int id = (Integer) personModel.getValueAt(row, 3);
+			
+			try { 
+				p = personService.getById(id); 
+			} catch (ServiceException ex) { 
+				JOptionPane .showMessageDialog( overviewPanel,
+						"An error occured. Please see console for further information",
+						"Error", JOptionPane.ERROR_MESSAGE); ex.printStackTrace();
+			 return; 
+			 }
+			  
+			 EditPerson ep = new EditPerson(p, personService, addressService, findPersonsView, personModel); 
+			 removeAll(); 
+			 revalidate();
+			 repaint(); 
+			 add(ep);
+			 }
 	}
 
 	private final class DeleteAction extends AbstractAction {

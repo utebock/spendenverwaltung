@@ -112,7 +112,6 @@ public class CreatePersonView extends JPanel {
 	private StringTextField dedicationNoteField;
 	private JLabel dateLabel;
 	private JXDatePicker datePicker;
-	private JLabel dateInstruction;
 	private JPanel overviewPanel;
 
 	public CreatePersonView(ComponentFactory componentFactory, ViewActionFactory viewActionFactory, 
