@@ -25,7 +25,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.statistics.DonationStats;
 
-public class DonationProgressStatsView extends JPanel {
+public class DonationProgressStatsView extends InitializableView {
 	
 	private static final Logger log = Logger.getLogger(DonationProgressStatsView.class);
 

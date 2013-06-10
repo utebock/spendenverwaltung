@@ -38,7 +38,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
  * @author Cornelia Hasil, Chris Steele
  *
  */
-public class CreatePersonView extends JPanel {
+public class CreatePersonView extends InitializableView {
 	
 	private static final Logger log = Logger.getLogger(CreatePersonView.class);
 
@@ -298,6 +298,7 @@ public class CreatePersonView extends JPanel {
 		
 		donationPanel.add(submit, "split 2");
 		donationPanel.add(cancel, "wrap");
+		init();
 	}
 	
 	public void init() {
@@ -373,7 +374,7 @@ public class CreatePersonView extends JPanel {
 				//this ONLY happens if something has been entered in the donation field
 				if(!comp.validateContents()) {
 					donationValidated = false;
-					JOptionPane.showMessageDialog(null, "Konnte Spendenhöhe nicht feststellen");
+					JOptionPane.showMessageDialog(null, "Konnte Spendenh��he nicht feststellen");
 				}
 					
 			}

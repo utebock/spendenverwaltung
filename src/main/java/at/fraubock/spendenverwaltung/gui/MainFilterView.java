@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
+import at.fraubock.spendenverwaltung.gui.views.InitializableView;
 import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.FilterInUseException;
@@ -35,7 +36,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.FilterType;
 
-public class MainFilterView extends JPanel {
+public class MainFilterView extends InitializableView {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = Logger.getLogger(MainFilterView.class);
@@ -72,8 +73,8 @@ public class MainFilterView extends JPanel {
 
 	public MainFilterView(ComponentFactory componentFactory,
 			ViewActionFactory viewActionFactory, IFilterService filterService) {
-		super(new MigLayout());
 
+		this.setLayout(new MigLayout());
 		this.filterService = filterService;
 		this.viewActionFactory = viewActionFactory;
 		this.componentFactory = componentFactory;

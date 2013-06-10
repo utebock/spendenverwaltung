@@ -22,7 +22,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
  *
  */
 
-public class CreateMailingsView extends JPanel {
+public class CreateMailingsView extends InitializableView{
 
 	private static final long serialVersionUID = 1L;
 
@@ -97,7 +97,7 @@ public class CreateMailingsView extends JPanel {
 	}
 	
 	//adds actions to the buttons
-	public void initButtons() {
+	public void init() {
 		createEMailingButton.setAction(new CreateEMailingAction());
 		createPostalMailingButton.setAction(new CreatePostalMailingAction());
 		

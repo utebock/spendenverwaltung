@@ -269,9 +269,8 @@ public class EditPerson extends JPanel{
 		panel.add(ok, "split 2");
 		
 		cancel = new JButton();
-		Action getBack = viewActionFactory.getFindPersonsView();
+		Action getBack = viewActionFactory.getFindPersonsViewAction();
 		getBack.putValue(Action.NAME, "Abbrechen");
-		getBack.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
 		cancel.setAction(getBack);
 		panel.add(cancel, "wrap");
 		
@@ -398,7 +397,7 @@ public class EditPerson extends JPanel{
 		    		return;
 			}
 			JOptionPane.showMessageDialog(overviewPanel, "Person erfolgreich bearbeitet.", "Information", JOptionPane.INFORMATION_MESSAGE);
-			Action switchToMenu = viewActionFactory.getFindPersonsView();
+			Action switchToMenu = viewActionFactory.getFindPersonsViewAction();
 			switchToMenu.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
 			
 		}

@@ -7,8 +7,16 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
+import at.fraubock.spendenverwaltung.gui.AddAttributes;
 import at.fraubock.spendenverwaltung.gui.MainFilterView;
+import at.fraubock.spendenverwaltung.gui.PersonTableModel;
+import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
+import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
+import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
+import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
+import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
+import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 /**
  * 
@@ -27,37 +35,22 @@ public class ViewActionFactory {
 //	private static final Logger log = Logger.getLogger(MainMenuView.class);
 	private ViewDisplayer viewDisplayer;
 	
-	//views
-	private CreatePersonView createPersonView;
-	private MainMenuView mainMenuView;
-	private MainFilterView mainFilterView;
-	private CreateMailingsView createMailingsView;
+	//services
+	IPersonService personService;
+	IDonationService donationService;
+	IFilterService filterService;
+	IAddressService addressService;
+	IMailingService mailingService;
 
-/* TODO: add setters for other views & uncomment the relevant methods
- * rename them if you want, as long as it stays consistent
- */
-	
-	private FindPersonsView findPersonsView;
-//  private MainFilterView mainFilterView;
-//	private DonationImportView donationImportView;
-//	private ImportValidationView importValidationView;
-//	private CreateDonationConfirmationView createDonationConfirmationView;
-// 	private FindDonationConfirmationView findDonationConfirmationView;
-//	private	FindMailingsView findMailingsView;
-//	private	ConfirmMailingsView confirmMailingsView;
-//	private	DeleteMailingsView - is this necessary? wouldn't this be done over find? -Chris
-	private DonationProgressStatsView donationProgressStatsView;
-//	private MailingStatsView mailingStatsView;
-//	private PersonStatsView personStatsView;
-	
-	public ViewActionFactory(ViewDisplayer viewDisplayer) {
+	public ViewActionFactory(ViewDisplayer viewDisplayer, IPersonService personService, IDonationService donationService,
+			IFilterService filterService, IAddressService addressService, IMailingService mailingService) {
+		
 		this.viewDisplayer = viewDisplayer;
-	}
-	
-	public ViewActionFactory(ViewDisplayer viewDisplayer, MainMenuView mainMenuView, CreatePersonView createPersonView) {
-		this.viewDisplayer = viewDisplayer;
-		this.mainMenuView = mainMenuView;
-		this.createPersonView = createPersonView;
+		this.personService = personService;
+		this.addressService = addressService;
+		this.donationService = donationService;
+		this.mailingService = mailingService;
+		this.filterService = filterService;
 	}
 	
 	/**
@@ -66,103 +59,85 @@ public class ViewActionFactory {
 	public void setViewDisplayer(ViewDisplayer viewDisplayer) {
 		this.viewDisplayer = viewDisplayer;
 	}
-
-	public void setCreatePersonView(CreatePersonView createPersonView) {
-		this.createPersonView = createPersonView;
-	}
-	
-	public void setCreateMailingsView(CreateMailingsView createMailingsView) {
-		this.createMailingsView = createMailingsView;
-	}
-
-	public void setMainMenuView(MainMenuView mainMenuView) {
-		this.mainMenuView = mainMenuView;
-	}
-	
-	public void setMainFilterView(MainFilterView mainFilterView) {
-		this.mainFilterView = mainFilterView;
-	}
-	
-	public void setDonationProgressStatsView(DonationProgressStatsView donationProgressStatsView){
-		this.donationProgressStatsView = donationProgressStatsView;
-	}
-	
-	public void setFindPersonsView(FindPersonsView findPersonsView){
-		this.findPersonsView = findPersonsView;
-	}
 	
 	public Action getCreatePersonsViewAction() {
-		return new DisplayViewAction(createPersonView,"/images/createPerson.jpg");
+		return new DisplayViewAction(new CreatePersonView(new ComponentFactory(), this, personService, addressService, donationService, new PersonTableModel()),"/images/createPerson.jpg");
 	}
 	
 	public Action getMainMenuViewAction() {
-		return new DisplayViewAction(mainMenuView);
+		return new DisplayViewAction(new MainMenuView(this, new ComponentFactory()));
 	}
 	
 	public Action getFindPersonsViewAction() {
-		return new DisplayViewAction(findPersonsView, "/images/getPersons.jpg");
-	}
-	public Action getFindPersonsView() {
-		return new DisplayViewAction(findPersonsView);
+		return new DisplayViewAction(new FindPersonsView(personService, addressService, donationService, filterService, new ComponentFactory(), this, new PersonTableModel()), "/images/getPersons.jpg");
 	}
 	
 	public Action getMainFilterViewAction() {
-		return new DisplayViewAction(mainFilterView, "/images/filter.jpg");
+		return new DisplayViewAction(new MainFilterView(new ComponentFactory(), this, filterService), "/images/filter.jpg");
 	}
 	
+	//TODO richtige view returnen!
 	public Action getDonationImportViewAction() {
-		return new DisplayViewAction(new JPanel(), "/images/importOverview.jpg" );
+		return new DisplayViewAction(new CreatePersonView(new ComponentFactory(), this, personService, addressService, donationService, new PersonTableModel()), "/images/importOverview.jpg" );
 	}
 	
+	//TODO richtige view returnen!
 	public Action getImportValidationViewAction() {
-		return new DisplayViewAction(new JPanel(), "/images/importValidate.jpg");
+		return new DisplayViewAction(new CreatePersonView(new ComponentFactory(), this, personService, addressService, donationService, new PersonTableModel()), "/images/importValidate.jpg");
 	}
 	
+	//TODO richtige view returnen!
 	public Action getCreateDonationConfirmationViewAction() {
-		return new DisplayViewAction(new JPanel(), "/images/createDonationConfirmation.jpg");
+		return new DisplayViewAction(new CreatePersonView(new ComponentFactory(), this, personService, addressService, donationService, new PersonTableModel()), "/images/createDonationConfirmation.jpg");
 	}
 	
+	//TODO richtige view returnen!
 	public Action getFindDonationConfirmationViewAction() {
-		return new DisplayViewAction(new JPanel(), "/images/obtainDonationConfirmation.jpg");
+		return new DisplayViewAction(new CreatePersonView(new ComponentFactory(), this, personService, addressService, donationService, new PersonTableModel()), "/images/obtainDonationConfirmation.jpg");
 	}
 	
 	public Action getCreateMailingsViewAction() {
-		return new DisplayViewAction(createMailingsView, "/images/eNotification.jpg");
+		return new DisplayViewAction(new CreateMailingsView(this, new ComponentFactory(), mailingService, filterService), "/images/eNotification.jpg");
 	}
 
+	//TODO richtige view returnen!
 	public Action getFindMailingsViewAction() {
-		return new DisplayViewAction(new JPanel(), "/images/showNotifications.jpg");
+		return new DisplayViewAction(new CreatePersonView(new ComponentFactory(), this, personService, addressService, donationService, new PersonTableModel()), "/images/showNotifications.jpg");
 	}
 	
+	//TODO richtige view returnen!
 	public Action getConfirmMailingsViewAction() {
-		return new DisplayViewAction(new JPanel(), "/images/confirmSendings.jpg");
+		return new DisplayViewAction(new CreatePersonView(new ComponentFactory(), this, personService, addressService, donationService, new PersonTableModel()), "/images/confirmSendings.jpg");
 	}
 	
+	//TODO richtige view returnen!
 	public Action getDeleteMailingsViewAction() {
-		return new DisplayViewAction(new JPanel(), "/images/deleteNotifications.jpg");
+		return new DisplayViewAction(new CreatePersonView(new ComponentFactory(), this, personService, addressService, donationService, new PersonTableModel()), "/images/deleteNotifications.jpg");
 	}
 	
 	public Action getDonationProgressStatsViewAction() {
-		return new DisplayViewAction(donationProgressStatsView, "/images/statisticsDonation.jpg");
+		return new DisplayViewAction(new DonationProgressStatsView(new ComponentFactory(), this, donationService, filterService), "/images/statisticsDonation.jpg");
 	}
 	
+	//TODO richtige view returnen!
 	public Action getShowMailingStatsViewAction() {
-		return new DisplayViewAction(new JPanel(), "/images/statisticsNotification.jpg");
+		return new DisplayViewAction(new CreatePersonView(new ComponentFactory(), this, personService, addressService, donationService, new PersonTableModel()), "/images/statisticsNotification.jpg");
 	}
 	
+	//TODO richtige view returnen!
 	public Action getShowPersonStatsViewAction() {
-		return new DisplayViewAction(new JPanel(), "/images/statisticsPerson.jpg");
+		return new DisplayViewAction(new CreatePersonView(new ComponentFactory(), this, personService, addressService, donationService, new PersonTableModel()), "/images/statisticsPerson.jpg");
 	}
 
 	private final class DisplayViewAction extends AbstractAction {
 
-		private JPanel view;
+		private InitializableView view;
 		
-		public DisplayViewAction(JPanel view) {
+		public DisplayViewAction(InitializableView view) {
 			this.view = view;
 		}
 		
-		public DisplayViewAction(JPanel view, String path) {
+		public DisplayViewAction(InitializableView view, String path) {
 			this.view = view;
 			java.net.URL url = getClass().getResource(path);
 			this.putValue(Action.SMALL_ICON, new ImageIcon(url));
@@ -174,6 +149,7 @@ public class ViewActionFactory {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			view.init();
 			viewDisplayer.changeView(view);
 		}
 	}

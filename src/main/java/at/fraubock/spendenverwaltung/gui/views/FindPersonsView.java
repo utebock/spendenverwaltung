@@ -44,7 +44,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.FilterType;
 
-public class FindPersonsView extends JPanel {
+public class FindPersonsView extends InitializableView {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = Logger.getLogger(FindPersonsView.class);
@@ -73,7 +73,6 @@ public class FindPersonsView extends JPanel {
 			IAddressService addressService, IDonationService donationService,
 			IFilterService filterService, ComponentFactory componentFactory,
 			ViewActionFactory viewActionFactory, PersonTableModel personModel) {
-		super(new MigLayout());
 
 		this.componentFactory = componentFactory;
 		this.viewActionFactory = viewActionFactory;
@@ -148,6 +147,7 @@ public class FindPersonsView extends JPanel {
 	}
 
 	public void init() {
+		this.setLayout(new MigLayout());
 		overviewPanel = componentFactory.createPanel(800, 800);
 		this.add(overviewPanel);
 		toolbar = new JToolBar();
@@ -308,7 +308,7 @@ public class FindPersonsView extends JPanel {
 				  log.error(ex);
 				  return; 
 			}
-			AddAttributes sp = new AddAttributes(p,personService, addressService, donationService, findPersonsView);
+			AddAttributes sp = new AddAttributes(p,personService, addressService, donationService, findPersonsView, componentFactory, viewActionFactory);
 			removeAll(); 
 			revalidate(); 
 			repaint(); 
