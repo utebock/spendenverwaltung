@@ -116,7 +116,7 @@ public class ImportValidator {
 		return validatedData;
 	}
 	
-	private Person getExistingPerson(Person p) throws ServiceException{
+	public Person getExistingPerson(Person p) throws ServiceException{
 		List<Person> matchedPersons = new ArrayList<Person>();
 		
 		matchedPersons = personService.getByAttributes(p);

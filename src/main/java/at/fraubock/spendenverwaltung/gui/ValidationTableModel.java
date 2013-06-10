@@ -27,6 +27,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.ImportValidator;
 import at.fraubock.spendenverwaltung.util.ImportValidator.ValidationType;
+import at.fraubock.spendenverwaltung.util.ValidatedData;
 
 /**
  * 
@@ -47,6 +48,8 @@ public class ValidationTableModel extends AbstractTableModel{
 	private JPanel parent;
 	private Vector<JComboBox> comboBoxes = new Vector<JComboBox>();
 	private boolean editable;
+	private ImportValidator importValidator;
+	private ValidatedData validatedData;
 	
 	
 	public static enum comboBoxOptions{ 
@@ -56,22 +59,27 @@ public class ValidationTableModel extends AbstractTableModel{
 		ASSIGN
 	};
 	
-	public ValidationTableModel(JPanel parent, IDonationService donationService, IPersonService personService, IAddressService addressService){
+	public ValidationTableModel(JPanel parent, IDonationService donationService, IPersonService personService, IAddressService addressService, ValidatedData validatedData){
 		this.parent = parent;
 		this.personService = personService;
 		this.donationService = donationService;
 		this.addressService = addressService;
 		this.editable = false;
+		this.importValidator = new ImportValidator(personService, donationService);
+		this.validatedData = validatedData;
 	}
 	
 	public void addEntry (Donation donation, Person person){
 		JComboBox cb = new JComboBox(ImportValidator.ValidationType.toArray());
 		donations.add(donation);
-		persons.add(person);
-		if(person.getMainAddress() == null)
+		
+		if(person == null){
+			persons.add(null);
 			addresses.add(null);
-		else
+		}else{
 			addresses.add(person.getMainAddress());
+			persons.add(person);
+		}
 		comboBoxes.add(cb);
 	}
 	
@@ -214,14 +222,21 @@ public class ValidationTableModel extends AbstractTableModel{
         	if(selectedType == ValidationType.EDIT){
         		editable = true;
         	} else if(selectedType == ValidationType.ANONYM){
+        		this.removeDonation(rowIndex);
         		selectedDonation.setDonator(null);
 				try {
+					if(importValidator.getExistingPerson(selectedPerson) == null){
+						personService.delete(selectedPerson);
+						validatedData.removeEntryFromList(selectedPerson, selectedDonation);
+					}
 					donationService.update(selectedDonation);
 				} catch (ServiceException e) {
 					JOptionPane.showMessageDialog(parent, "Updating Row failed", "Error", JOptionPane.ERROR_MESSAGE);
 			        e.printStackTrace();
 			        return;
 				}
+				
+				fireTableDataChanged();
         	} else if(selectedType == ValidationType.NEW_DONATOR){
         			//JDialog assignPerson = new AssignPerson(personService, addressService, donationService, this.p.parent);
         	} else{

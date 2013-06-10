@@ -102,7 +102,7 @@ public class DonationDAOImplemented implements IDonationDAO {
 		} else {
 			// update
 			if(d.getDonator() != null){
-				String updateStatement = "update donations set personid = ?, amount = ?, donationdate = ?, dedication = ?, type = ?, note = ? where id = ?";
+				String updateStatement = "update donations set personid = ?, amount = ?, donationdate = ?, dedication = ?, type = ?, note = ?, import = null where id = ?";
 	
 				Object[] params = new Object[] { d.getDonator().getId(),
 						d.getAmount(), d.getDate(), d.getDedication(),
@@ -114,7 +114,7 @@ public class DonationDAOImplemented implements IDonationDAO {
 
 				jdbcTemplate.update(updateStatement, params, types);
 			} else{
-				String updateStatement = "update donations set personid = NULL, amount = ?, donationdate = ?, dedication = ?, type = ?, note = ? where id = ?";
+				String updateStatement = "update donations set personid = NULL, amount = ?, donationdate = ?, dedication = ?, type = ?, note = ?, import = null where id = ?";
 	
 				Object[] params = new Object[] {
 						d.getAmount(), d.getDate(), d.getDedication(),

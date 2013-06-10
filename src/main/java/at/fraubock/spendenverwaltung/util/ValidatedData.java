@@ -116,4 +116,44 @@ public class ValidatedData {
 		
 		return doublePerson;
 	}
+	
+	public void removeEntryFromList(Person person, Donation donation){
+		for(Person p : personListNew){
+			if(person == p){
+				personsToDelete.add(person);
+				personListNew.remove(person);
+			}
+		}
+		for(Person p : personListMatch){
+			if(person == p){
+				personsToDelete.add(person);
+				personListMatch.remove(person);
+			}
+		}
+		for(Person p : personListConflict){
+			if(person == p){
+				personsToDelete.add(person);
+				personListConflict.remove(person);
+			}
+		}
+
+		for(Donation d : donationListNew){
+			if(donation == d){
+				donationsToDelete.add(donation);
+				donationListNew.remove(donation);
+			}
+		}
+		for(Donation d : donationListMatch){
+			if(donation == d){
+				donationsToDelete.add(donation);
+				donationListMatch.remove(donation);
+			}
+		}
+		for(Donation d : donationListConflict){
+			if(donation == d){
+				donationsToDelete.add(donation);
+				donationListConflict.remove(donation);
+			}
+		}
+	}
 }
