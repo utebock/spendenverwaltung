@@ -31,6 +31,7 @@ public class ViewActionFactory {
 	private CreatePersonView createPersonView;
 	private MainMenuView mainMenuView;
 	private MainFilterView mainFilterView;
+	private CreateMailingsView createMailingsView;
 
 /* TODO: add setters for other views & uncomment the relevant methods
  * rename them if you want, as long as it stays consistent
@@ -42,8 +43,6 @@ public class ViewActionFactory {
 //	private ImportValidationView importValidationView;
 //	private CreateDonationConfirmationView createDonationConfirmationView;
 // 	private FindDonationConfirmationView findDonationConfirmationView;
-//	private CreateEMailingView createEMailingView;
-//	private CreatePostalMailingView createPostalMailingView;
 //	private	FindMailingsView findMailingsView;
 //	private	ConfirmMailingsView confirmMailingsView;
 //	private	DeleteMailingsView - is this necessary? wouldn't this be done over find? -Chris
@@ -62,7 +61,7 @@ public class ViewActionFactory {
 	}
 	
 	/**
-	 * constructors
+	 * setters
 	 */
 	public void setViewDisplayer(ViewDisplayer viewDisplayer) {
 		this.viewDisplayer = viewDisplayer;
@@ -70,6 +69,10 @@ public class ViewActionFactory {
 
 	public void setCreatePersonView(CreatePersonView createPersonView) {
 		this.createPersonView = createPersonView;
+	}
+	
+	public void setCreateMailingsView(CreateMailingsView createMailingsView) {
+		this.createMailingsView = createMailingsView;
 	}
 
 	public void setMainMenuView(MainMenuView mainMenuView) {
@@ -99,6 +102,9 @@ public class ViewActionFactory {
 	public Action getFindPersonsViewAction() {
 		return new DisplayViewAction(findPersonsView, "/images/getPersons.jpg");
 	}
+	public Action getFindPersonsView() {
+		return new DisplayViewAction(findPersonsView);
+	}
 	
 	public Action getMainFilterViewAction() {
 		return new DisplayViewAction(mainFilterView, "/images/filter.jpg");
@@ -120,12 +126,8 @@ public class ViewActionFactory {
 		return new DisplayViewAction(new JPanel(), "/images/obtainDonationConfirmation.jpg");
 	}
 	
-	public Action getCreateEMailingViewAction() {
-		return new DisplayViewAction(new JPanel(), "/images/eNotification.jpg");
-	}
-	
-	public Action getCreatePostalMailingViewAction() {
-		return new DisplayViewAction(new JPanel(), "/images/postalNotification.jpg");
+	public Action getCreateMailingsViewAction() {
+		return new DisplayViewAction(createMailingsView, "/images/eNotification.jpg");
 	}
 
 	public Action getFindMailingsViewAction() {
@@ -151,7 +153,7 @@ public class ViewActionFactory {
 	public Action getShowPersonStatsViewAction() {
 		return new DisplayViewAction(new JPanel(), "/images/statisticsPerson.jpg");
 	}
-	
+
 	private final class DisplayViewAction extends AbstractAction {
 
 		private JPanel view;

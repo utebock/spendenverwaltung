@@ -33,6 +33,11 @@ import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
+/**
+ * 
+ * @author Cornelia Hasil, Chris Steele
+ *
+ */
 public class CreatePersonView extends JPanel {
 	
 	private static final Logger log = Logger.getLogger(CreatePersonView.class);
@@ -313,14 +318,19 @@ public class CreatePersonView extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			
 			boolean personValidated = true;
+			boolean donationValidated = true;
 			
 			for(ValidateableComponent comp : validateablePersonComponents) {
 				if(!comp.validateContents())
 					personValidated = false;
 			}
 			
-			if(personValidated) {
+			if(!personValidated) {
+				JOptionPane.showMessageDialog(null, "Personenfelder konnten nicht validiert werden");
+				return;
+			} else {
 				person = new Person();
+				
 				address = new Address();
 				
 				person.setSex(Person.Sex.values()[salutation.getSelectedIndex()]);
@@ -332,12 +342,20 @@ public class CreatePersonView extends JPanel {
 				person.setTelephone(telephoneField.getText());
 				person.setEmail(emailField.getText());
 				
-				address.setStreet(streetField.getText());
-				address.setPostalCode(postalField.getText());
-				address.setCity(cityField.getText());
-				address.setCountry(countryField.getText());
-	
-				person.setMainAddress(address);
+				if(streetField.getText().equals("") && postalField.getText().equals("")
+						&& cityField.getText().equals("") && countryField.getText().equals("")) {
+					address = null;
+				} else if(streetField.getText().equals("") || postalField.getText().equals("")
+						|| cityField.getText().equals("") || countryField.getText().equals("")) {
+					JOptionPane.showMessageDialog(null, "Eine Adresse darf entweder ganz oder garnicht gesetzt sein.");
+					return;
+				} else {
+					address.setStreet(streetField.getText());
+					address.setPostalCode(postalField.getText());
+					address.setCity(cityField.getText());
+					address.setCountry(countryField.getText());
+					person.setMainAddress(address);
+				}
 				
 				if(notifyMail.isSelected()){
 					person.setEmailNotification(true);
@@ -349,15 +367,18 @@ public class CreatePersonView extends JPanel {
 				String note = noteText.getText();
 				person.setNote(note);
 			}
-			
-			boolean donationValidated = true;
-			
+						
 			for(ValidateableComponent comp : validateableDonationComponents) {
-				if(!comp.validateContents())
+				
+				//this ONLY happens if something has been entered in the donation field
+				if(!comp.validateContents()) {
 					donationValidated = false;
+					JOptionPane.showMessageDialog(null, "Konnte Spendenhöhe nicht feststellen");
+				}
+					
 			}
 			
-			if(donationValidated && personValidated) {
+			if(donationValidated) {
 				donation = new Donation();
 				
 				donation.setType(Donation.DonationType.values()[donationCombo.getSelectedIndex()]);
@@ -366,25 +387,24 @@ public class CreatePersonView extends JPanel {
 				
 				if(!amount.getText().isEmpty()) { 
 					d_amount = amount.getHundredths();
+					donation.setAmount(d_amount);
+					donation.setDate(datePicker.getDate());
+					donation.setDedication(dedicationField.getText());	
+					donation.setNote(dedicationNoteField.getText());
+				} else {
+					donation = null;
 				}
-			
-				donation.setAmount(d_amount);
-			
-				donation.setDate(datePicker.getDate());
-				
-				donation.setDedication(dedicationField.getText());
-				
-				donation.setNote(dedicationNoteField.getText());
 			}
 			
 			if(personValidated) {
 				if(person != null) {
 					try {
-						Address createdAddress = addressService.create(address); // will now be created when person is created - p
-						List<Address> addresses = new ArrayList<Address>();
-						addresses.add(createdAddress);
-						person.setAddresses(addresses);
-					
+						if(address != null) {
+							Address createdAddress = addressService.create(address); // will now be created when person is created - p
+							List<Address> addresses = new ArrayList<Address>();
+							addresses.add(createdAddress);
+							person.setAddresses(addresses);
+						}
 					
 						personService.create(person);
 						personModel.addPerson(person);
@@ -399,7 +419,7 @@ public class CreatePersonView extends JPanel {
 						switchToMenu.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
 
 					} catch (ServiceException e1) {
-						JOptionPane.showConfirmDialog(null, "An error occured while trying to create a person. Message was "+e1.getMessage());
+						JOptionPane.showConfirmDialog(null, "Ein fehler ist beim erstellen der Person aufgetreten");
 					}
 				}
 			}

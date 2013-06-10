@@ -17,6 +17,7 @@ public class PersonTableModel extends AbstractTableModel {
 
 	public void addPerson(Person person) {
 		persons.add(person);
+		fireTableDataChanged();
 	}
 
 	public void removePerson(int row) {
