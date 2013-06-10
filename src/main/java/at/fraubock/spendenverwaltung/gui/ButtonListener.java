@@ -84,19 +84,19 @@ public class ButtonListener implements ActionListener{
 		}
 		
 		if(cmd.equals("create_person")){
-			overview.goToCreate();
+		//	overview.goToCreate();
 		}
 		
 		if(cmd.equals("create_person_in_db")){
-			createPerson.createPersonInDb();
+			//createPerson.createPersonInDb();
 		}
 		
 		if(cmd.equals("cancel_person_in_db")){
-			createPerson.returnTo();
+		//	createPerson.returnTo();
 		}
 		
 		if(cmd.equals("search_person")){
-			overview.goToShow();
+			//overview.goToShow();
 		}
 		
 		if(cmd.equals("delete_person_from_db")){
@@ -110,16 +110,16 @@ public class ButtonListener implements ActionListener{
 		//	filterPersons.editPerson();
 		}
 		if(cmd.equals("edit_person_in_db")){
-			editPerson.editPerson();
+		//	editPerson.editPerson();
 		}
 		if(cmd.equals("edit_address_in_db")){
-			editPerson.editAddress();
+			//editPerson.editAddress();
 		}
 		if(cmd.equals("delete_address_in_db")){
-			editPerson.deleteAddress();
+		//	editPerson.deleteAddress();
 		}
 		if(cmd.equals("cancel_edit")){
-			editPerson.returnTo();
+		//	editPerson.returnTo();
 		}
 		
 		if(cmd.equals("add_donation_address")){
@@ -135,14 +135,14 @@ public class ButtonListener implements ActionListener{
 			filterOverview.createFilter((JButton)e.getSource());
 		}
 		if(cmd.equals("open_create_donation_in_show_person")){
-			showPerson.addDonation();
+		//	showPerson.addDonation();
 		}
 		if(cmd.equals("open_create_address_in_show_person")){
-			showPerson.addAddress();
+		//	showPerson.addAddress();
 		}
 		
 		if(cmd.equals("go_from_show_person_to_person_overview")){
-			showPerson.returnTo();
+		//	showPerson.returnTo();
 		}
 		
 		if(cmd.equals("filter_overview")){

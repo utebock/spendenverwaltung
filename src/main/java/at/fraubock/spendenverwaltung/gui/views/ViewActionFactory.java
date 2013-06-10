@@ -7,6 +7,7 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
+import at.fraubock.spendenverwaltung.gui.AddAttributes;
 import at.fraubock.spendenverwaltung.gui.MainFilterView;
 import at.fraubock.spendenverwaltung.gui.PersonTableModel;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
@@ -40,10 +41,6 @@ public class ViewActionFactory {
 	IFilterService filterService;
 	IAddressService addressService;
 	IMailingService mailingService;
-
-	public ViewActionFactory(ViewDisplayer viewDisplayer) {
-		this.viewDisplayer = viewDisplayer;
-	}
 
 	public ViewActionFactory(ViewDisplayer viewDisplayer, IPersonService personService, IDonationService donationService,
 			IFilterService filterService, IAddressService addressService, IMailingService mailingService) {
