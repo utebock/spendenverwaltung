@@ -121,7 +121,7 @@ public class FindPersonsView extends JPanel {
 		showTable.setFillsViewportHeight(true);
 		showTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		scrollPane = new JScrollPane(showTable);
-		scrollPane.setPreferredSize(new Dimension(800, 800));
+		scrollPane.setPreferredSize(new Dimension(700, 550));
 
 		List<Filter> personFilters = new ArrayList<Filter>();
 		personFilters.add(showAllFilter);
@@ -134,6 +134,7 @@ public class FindPersonsView extends JPanel {
 					"Ein unerwarteter Fehler ist aufgetreten.", "Error",
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
+			log.error(e);
 			return;
 		}
 		filterCombo = new JComboBox<Filter>(new SimpleComboBoxModel<Filter>(
@@ -265,8 +266,9 @@ public class FindPersonsView extends JPanel {
 			JOptionPane
 					.showMessageDialog(
 							this,
-							"An error occured. Please see console for further information",
-							"Error", JOptionPane.ERROR_MESSAGE);
+							"Ein unerwarter Fehler ist aufgetreten! Bitte kontaktieren Sie Ihren Administrator.",
+							"Fehler", JOptionPane.ERROR_MESSAGE);
+			log.error(e);
 			e.printStackTrace();
 			return;
 		}
@@ -299,10 +301,12 @@ public class FindPersonsView extends JPanel {
 			try { 
 				p = personService.getById(id); 
 			  } catch (ServiceException ex) { 
-				  JOptionPane .showMessageDialog( overviewPanel,
-						  "An error occured. Please see console for further information",
-						  "Error", JOptionPane.ERROR_MESSAGE); ex.printStackTrace();
-						  return; 
+				  JOptionPane.showMessageDialog( overviewPanel,
+						  "Ein unerwarter Fehler ist aufgetreten! Bitte kontaktieren Sie Ihren Administrator.",
+						  "Fehler", JOptionPane.ERROR_MESSAGE); 
+				  ex.printStackTrace();
+				  log.error(ex);
+				  return; 
 			}
 			AddAttributes sp = new AddAttributes(p,personService, addressService, donationService, findPersonsView);
 			removeAll(); 
@@ -330,13 +334,14 @@ public class FindPersonsView extends JPanel {
 			try { 
 				p = personService.getById(id); 
 			} catch (ServiceException ex) { 
-				JOptionPane .showMessageDialog( overviewPanel,
-						"An error occured. Please see console for further information",
-						"Error", JOptionPane.ERROR_MESSAGE); ex.printStackTrace();
+				JOptionPane.showMessageDialog( overviewPanel,
+						"Ein unerwarter Fehler ist aufgetreten! Bitte kontaktieren Sie Ihren Administrator.",
+						"Fehler", JOptionPane.ERROR_MESSAGE); ex.printStackTrace();
+						log.error(ex);
 			 return; 
 			 }
 			  
-			 EditPerson ep = new EditPerson(p, personService, addressService, findPersonsView, personModel); 
+			 EditPerson ep = new EditPerson(componentFactory, viewActionFactory, p, personService, addressService, findPersonsView, personModel); 
 			 removeAll(); 
 			 revalidate();
 			 repaint(); 
@@ -365,8 +370,9 @@ public class FindPersonsView extends JPanel {
 				JOptionPane
 						.showMessageDialog(
 								overviewPanel,
-								"An error occured. Please see console for further information",
-								"Error", JOptionPane.ERROR_MESSAGE);
+								"Ein unerwarter Fehler ist aufgetreten! Bitte kontaktieren Sie Ihren Administrator.",
+								"Fehler", JOptionPane.ERROR_MESSAGE);
+				log.error(ex);
 				ex.printStackTrace();
 				return;
 			}
@@ -384,8 +390,9 @@ public class FindPersonsView extends JPanel {
 					JOptionPane
 							.showMessageDialog(
 									overviewPanel,
-									"An error occured. Please see console for further information",
-									"Error", JOptionPane.ERROR_MESSAGE);
+									"Ein unerwarter Fehler ist aufgetreten! Bitte kontaktieren Sie Ihren Administrator.",
+									"Fehler", JOptionPane.ERROR_MESSAGE);
+					log.error(ex);
 					ex.printStackTrace();
 					return;
 				}

@@ -22,8 +22,7 @@ public class ViewDisplayer {
 	
 	public ViewDisplayer() {
 		
-		scrollPane = new JScrollPane();
-		
+		scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		frame = new JFrame("Ute Bock Spendenverwaltung");
 		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

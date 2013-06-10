@@ -102,6 +102,9 @@ public class ViewActionFactory {
 	public Action getFindPersonsViewAction() {
 		return new DisplayViewAction(findPersonsView, "/images/getPersons.jpg");
 	}
+	public Action getFindPersonsView() {
+		return new DisplayViewAction(findPersonsView);
+	}
 	
 	public Action getMainFilterViewAction() {
 		return new DisplayViewAction(mainFilterView, "/images/filter.jpg");
