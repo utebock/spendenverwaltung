@@ -1,14 +1,16 @@
 package at.fraubock.spendenverwaltung.service;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IDonationDAO;
+import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
-import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
+import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
@@ -115,10 +117,42 @@ public class DonationServiceImplemented implements IDonationService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Donation> getByFilter(Filter filter) throws ServiceException {
-		try{
+		try {
 			return donationDAO.getByFilter(filter);
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
+	}
+
+	@Override
+	public String convertToCSV(List<Donation> donations) {
+		if (donations == null) {
+			throw new IllegalArgumentException("Argument must not be null.");
+		}
+
+		String csv = "Betrag;Datum;Widmung;Art;Notiz;Vorname;Nachname;E-Mail;Unternehmen;Land;Stadt;PLZ;Strasse\n";
+
+		for (Donation d : donations) {
+			csv+=d.getAmount()+";";
+			csv+=new SimpleDateFormat("dd.MM.yyyy").format(d.getDate()) + ";";
+			csv+=d.getDedication()+";";
+			csv += d.getType() + ";";
+			csv += d.getNote() + ";";
+
+			String nA = "n.v.";
+			Person p = d.getDonator();
+			Address a = p.getMainAddress();
+			
+			csv+=(p==null?nA:p.getGivenName())+";";
+			csv+=(p==null?nA:p.getSurname())+";";
+			csv+=(p==null?nA:p.getEmail())+";";
+			csv+=(p==null?nA:p.getCompany())+";";
+			
+			csv+=(a==null?nA:a.getCountry())+";";
+			csv+=(a==null?nA:a.getCity())+";";
+			csv+=(a==null?nA:a.getPostalCode())+";";
+			csv+=(a==null?nA:a.getStreet())+";\n";
+		}
+		return csv;
 	}
 }

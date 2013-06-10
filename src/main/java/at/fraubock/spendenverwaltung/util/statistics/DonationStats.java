@@ -18,18 +18,10 @@ public class DonationStats {
 	 */
 	public double getMean(List<Donation> donationList){
 		DescriptiveStatistics stat = new DescriptiveStatistics();
-		List<Double> statsList = new ArrayList<Double>();
-		for(int i = 0; i < donationList.size(); i++){
-			statsList.add((donationList.get(i).getAmount()).doubleValue());
+		for (Donation d : donationList){
+			stat.addValue(d.getAmount().doubleValue());
 		}
-		
-		double[] array = new double[statsList.size()];
-		
-		for(int i = 0; i < statsList.size(); i++){
-			array[i] = statsList.get(i);
-			stat.addValue(array[i]);
-		}
-		log.info("Mean: "+stat.getMean()+"\n");
+		log.info("Mean: "+stat.getMean());
 		return stat.getMean();
 	}
 	
@@ -39,20 +31,10 @@ public class DonationStats {
 	 */
 	public double getSum(List<Donation> donationList){
 		DescriptiveStatistics stat = new DescriptiveStatistics();
-		List<Double> statsList = new ArrayList<Double>();
-		
-		for(int i = 0; i < donationList.size(); i++){
-			statsList.add((donationList.get(i).getAmount()).doubleValue());
+		for (Donation d : donationList){
+			stat.addValue(d.getAmount().doubleValue());
 		}
-		
-		double[] array = new double[statsList.size()];
-		
-		for(int i = 0; i < statsList.size(); i++){
-			array[i] = statsList.get(i);
-			stat.addValue(array[i]);
-		}
-		
-		log.info("Sum: "+stat.getSum()+"\n");
+		log.info("Sum: "+stat.getSum());
 		return stat.getSum();
 	}
 	
@@ -62,18 +44,10 @@ public class DonationStats {
 	 */
 	public double getMin(List<Donation> donationList){
 		DescriptiveStatistics stat = new DescriptiveStatistics();
-		List<Double> statsList = new ArrayList<Double>();
-		for(int i = 0; i < donationList.size(); i++){
-			statsList.add((donationList.get(i).getAmount()).doubleValue());
+		for (Donation d : donationList){
+			stat.addValue(d.getAmount().doubleValue());
 		}
-		
-		double[] array = new double[statsList.size()];
-		
-		for(int i = 0; i < statsList.size(); i++){
-			array[i] = statsList.get(i);
-			stat.addValue(array[i]);
-		}
-		log.info("Minimum: "+stat.getMin()+"\n");
+		log.info("Min: "+stat.getMin());
 		return stat.getMin();
 	}
 	
@@ -83,18 +57,10 @@ public class DonationStats {
 	 */
 	public double getMax(List<Donation> donationList){
 		DescriptiveStatistics stat = new DescriptiveStatistics();
-		List<Double> statsList = new ArrayList<Double>();
-		for(int i = 0; i < donationList.size(); i++){
-			statsList.add((donationList.get(i).getAmount()).doubleValue());
+		for (Donation d : donationList){
+			stat.addValue(d.getAmount().doubleValue());
 		}
-		
-		double[] array = new double[statsList.size()];
-		
-		for(int i = 0; i < statsList.size(); i++){
-			array[i] = statsList.get(i);
-			stat.addValue(array[i]);
-		}
-		log.info("Maximum: "+stat.getMax()+"\n");
+		log.info("Max: "+stat.getMax());
 		return stat.getMax();
 	}
 	
@@ -113,18 +79,10 @@ public class DonationStats {
 	 */
 	public double getMedian(List<Donation> donationList){
 		DescriptiveStatistics stat = new DescriptiveStatistics();
-		List<Double> statsList = new ArrayList<Double>();
-		for(int i = 0; i < donationList.size(); i++){
-			statsList.add((donationList.get(i).getAmount()).doubleValue());
+		for (Donation d : donationList){
+			stat.addValue(d.getAmount().doubleValue());
 		}
-		
-		double[] array = new double[statsList.size()];
-		
-		for(int i = 0; i < statsList.size(); i++){
-			array[i] = statsList.get(i);
-			stat.addValue(array[i]);
-		}
-		log.info("Median: "+stat.getPercentile(50)+"\n");
+		log.info("Mean: "+stat.getPercentile(50));
 		return stat.getPercentile(50);
 	}
 }

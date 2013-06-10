@@ -129,6 +129,7 @@ public class PersonServiceImplemented implements IPersonService {
 		return list;
 	}
 	
+	@Override
 	public String convertToCSV(List<Person> persons) {
 		if(persons==null) {
 			throw new IllegalArgumentException("Argument must not be null.");
@@ -146,14 +147,13 @@ public class PersonServiceImplemented implements IPersonService {
 			csv+=p.getTelephone()+";";
 			csv+=(p.isEmailNotification()?"ja":"nein")+";";
 			csv+=(p.isPostalNotification()?"ja":"nein")+";";
-			csv+=p.getNote();
+			csv+=p.getNote()+";";
 			Address a = p.getMainAddress();
 			String nA = "n.v.;";
-			csv+=";"+(a==null?nA:(a.getCountry()+";"));
+			csv+=a==null?nA:(a.getCountry()+";");
 			csv+=a==null?nA:(a.getCity()+";");
 			csv+=a==null?nA:(a.getPostalCode()+";");
-			csv+=a==null?nA:(a.getStreet()+";");
-			csv+="\n";
+			csv+=(a==null?nA:(a.getStreet()+";"))+"\n";
 		}
 		return csv;
 	}
