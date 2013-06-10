@@ -45,34 +45,23 @@ public class GuiStarter {
 		/**
 		 * 
 		 */
-		ViewActionFactory viewActionFactory = new ViewActionFactory(viewDisplayer);
+		ViewActionFactory viewActionFactory = new ViewActionFactory(viewDisplayer, personService,
+				donationService, filterService, addressService, mailingService);
+		
 		
 		//need to call mainMenu.init() after all views are set in the viewActionFactory
 		//layout code is called from constructor, button initialization code is called from init()
-		
-		PersonTableModel personTableModel = new PersonTableModel();
-		
+				
 		MainMenuView mainMenu = new MainMenuView(viewActionFactory, componentFactory);
-		CreatePersonView createPerson = new CreatePersonView(componentFactory, viewActionFactory, personService, addressService, donationService, personTableModel);
-		FindPersonsView findPersonsView = new FindPersonsView(personService, addressService, donationService, filterService, componentFactory, viewActionFactory, personTableModel);
-		DonationProgressStatsView donationProgressStatsView = new DonationProgressStatsView(componentFactory, viewActionFactory, donationService, filterService);
-		MainFilterView mainFilterView = new MainFilterView(componentFactory, viewActionFactory,filterService);
-		CreateMailingsView createMailingsView = new CreateMailingsView(viewActionFactory, componentFactory, mailingService, filterService);
 		//populate viewActionFactory
-		viewActionFactory.setMainMenuView(mainMenu);
-		viewActionFactory.setCreatePersonView(createPerson);
-		viewActionFactory.setCreateMailingsView(createMailingsView);
-		viewActionFactory.setMainFilterView(mainFilterView);
-		viewActionFactory.setFindPersonsView(findPersonsView);
-		viewActionFactory.setDonationProgressStatsView(donationProgressStatsView);
 		
 		
 		//finish view initialization after viewActionFactory is populated (for button wiring)
-		createPerson.init();
-		createMailingsView.initButtons();
-		mainFilterView.init();
-		donationProgressStatsView.init();
-		findPersonsView.init();
+//		createPerson.init();
+//		createMailingsView.initButtons();
+//		mainFilterView.init();
+//		donationProgressStatsView.init();
+//		findPersonsView.init();
 		mainMenu.init();
 		
 		//display initial main menu

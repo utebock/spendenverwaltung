@@ -10,7 +10,7 @@ import javax.swing.JSeparator;
 import net.miginfocom.swing.MigLayout;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 
-public class MainMenuView extends JPanel {
+public class MainMenuView extends InitializableView {
 //	private static final Logger log = Logger.getLogger(MainMenuView.class);
 	private static final long serialVersionUID = 1L;
 	
@@ -64,8 +64,6 @@ public class MainMenuView extends JPanel {
 		/**
 		 * good to know: basic font is 13pt
 		 */
-		super(new MigLayout());
-
 		this.viewActionFactory = viewActionFactory;
 		this.componentFactory = componentFactory;
 		setUp();
@@ -80,6 +78,7 @@ public class MainMenuView extends JPanel {
 	}
 
 	public void setUp() {
+		this.setLayout(new MigLayout());
 		overviewPanel = componentFactory.createPanel(800, 850);
 		this.add(overviewPanel);
 		/**
@@ -229,8 +228,7 @@ public class MainMenuView extends JPanel {
 		statsPanel.add(statsSendingsLabel, "gap 55");
 		statsPersonsLabel = componentFactory.createLabel("Personen");
 		statsPanel.add(statsPersonsLabel, "gap 55");
-
-	}
+			}
 	
 	//call when viewActionFactory is fully populated
 	public void init() {

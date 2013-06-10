@@ -9,5 +9,4 @@ public class Main {
 		GuiStarter starter = new GuiStarter();
 		starter.startGui();
 	}
-
 }
