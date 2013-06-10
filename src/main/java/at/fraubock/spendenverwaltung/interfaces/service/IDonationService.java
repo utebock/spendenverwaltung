@@ -4,17 +4,16 @@ import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
-import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
-
 
 /**
  * service providing functionality for {@link Donation}
  * 
  * @author Thomas
- *
+ * 
  */
 public interface IDonationService {
 
@@ -66,24 +65,23 @@ public interface IDonationService {
 	 * @return List of all unconfirmed donations
 	 */
 	public List<Donation> getUnconfirmed() throws ServiceException;
-	
+
 	/**
 	 * Puts all Donation Types in a String Array
 	 * 
 	 * @return Returns a String Array including all Donation Types
 	 */
 	public String[] getDonationTypes();
-	
+
 	/**
 	 * Returns the DonationType by a given index
 	 * 
 	 * @param index
-	 * 			Index of the selected Donationtype
+	 *            Index of the selected Donationtype
 	 * @return DonationType with index "index"
 	 */
 	public DonationType getDonationTypeByIndex(int index);
-	
-	
+
 	/**
 	 * Retrieves donations matching the given filter
 	 * 
@@ -94,5 +92,13 @@ public interface IDonationService {
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
-	 public List<Donation> getByFilter(Filter filter) throws ServiceException;
+	public List<Donation> getByFilter(Filter filter) throws ServiceException;
+
+	/**
+	 * converts a list of donations to a CSV string.
+	 * 
+	 * @param donations
+	 * @return CSV representation of the donations
+	 */
+	public String convertToCSV(List<Donation> donations);
 }

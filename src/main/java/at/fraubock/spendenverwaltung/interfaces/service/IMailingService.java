@@ -63,4 +63,13 @@ public interface IMailingService {
 	public List<Mailing> getMailingsByPerson(Person person)
 				throws ServiceException;
 
+	
+	/**
+	 * converts a list of mailings to a CSV string.
+	 * 
+	 * @param mailings
+	 * @return CSV representation of the mailings
+	 */
+	public String convertToCSV(List<Mailing> mailings);
+	
 }

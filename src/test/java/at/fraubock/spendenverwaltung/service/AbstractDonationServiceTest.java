@@ -1,6 +1,9 @@
 package at.fraubock.spendenverwaltung.service;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -29,37 +32,38 @@ import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/testspring.xml")
-@TransactionConfiguration(defaultRollback=true)
-
+@TransactionConfiguration(defaultRollback = true)
 public abstract class AbstractDonationServiceTest {
 
 	protected static IDonationService donationService;
 	protected static IPersonService personService;
-	
+
 	protected static IPersonDAO personDAO;
 	protected static Person person;
 	protected static Person person2;
 	protected static Person person3;
-	
+
 	protected static IDonationDAO donationDAO;
 	protected static Address testAddress;
-	
+
 	protected static Donation donation;
 	protected static Donation donation2;
 	protected static Donation donation3;
 	protected static Donation donationCreated;
 	protected static Donation nullDonation;
-	
+
 	public static void setDonationService(IDonationService donationService) {
 		AbstractDonationServiceTest.donationService = donationService;
 	}
-	
+
 	@Test(expected = ServiceException.class)
 	@Transactional
-	public void createWithNullParameterShouldThrowException() throws ServiceException {
+	public void createWithNullParameterShouldThrowException()
+			throws ServiceException {
 		try {
-			doThrow(new PersistenceException()).when(donationDAO).insertOrUpdate(null);
-			
+			doThrow(new PersistenceException()).when(donationDAO)
+					.insertOrUpdate(null);
+
 			donationService.create(null);
 		} catch (PersistenceException e) {
 			fail();
@@ -71,7 +75,7 @@ public abstract class AbstractDonationServiceTest {
 	public void createWithValidParameterShouldReturnDonation() {
 		try {
 			Donation returned = donationService.create(donation);
-			assertEquals(returned,donationCreated);
+			assertEquals(returned, donationCreated);
 			verify(donationDAO).insertOrUpdate(donation);
 		} catch (ServiceException e) {
 			fail();
@@ -86,10 +90,12 @@ public abstract class AbstractDonationServiceTest {
 
 	@Test(expected = ServiceException.class)
 	@Transactional
-	public void updateWithNullParameterShouldThrowException() throws ServiceException {
+	public void updateWithNullParameterShouldThrowException()
+			throws ServiceException {
 		try {
-			doThrow(new PersistenceException()).when(donationDAO).insertOrUpdate(null);
-			
+			doThrow(new PersistenceException()).when(donationDAO)
+					.insertOrUpdate(null);
+
 			donationService.update(null);
 		} catch (PersistenceException e) {
 			fail();
@@ -98,9 +104,11 @@ public abstract class AbstractDonationServiceTest {
 
 	@Test(expected = ServiceException.class)
 	@Transactional
-	public void updateWithInvalidParameterShouldThrowException() throws ServiceException {
+	public void updateWithInvalidParameterShouldThrowException()
+			throws ServiceException {
 		try {
-			doThrow(new PersistenceException()).when(donationDAO).insertOrUpdate(nullDonation);
+			doThrow(new PersistenceException()).when(donationDAO)
+					.insertOrUpdate(nullDonation);
 
 			donationService.update(nullDonation);
 		} catch (PersistenceException e) {
@@ -128,10 +136,11 @@ public abstract class AbstractDonationServiceTest {
 
 	@Test(expected = ServiceException.class)
 	@Transactional
-	public void deleteWithNullParameterShouldThrowException() throws ServiceException {
+	public void deleteWithNullParameterShouldThrowException()
+			throws ServiceException {
 		try {
 			doThrow(new PersistenceException()).when(donationDAO).delete(null);
-			
+
 			donationService.delete(null);
 		} catch (PersistenceException e) {
 			fail();
@@ -166,8 +175,8 @@ public abstract class AbstractDonationServiceTest {
 
 			List<Donation> list = donationService.getByPerson(person);
 			assert (list != null && list.size() == 2);
-			assert (list.get(0).equals(donation) && list
-					.get(1).equals(donation2));
+			assert (list.get(0).equals(donation) && list.get(1).equals(
+					donation2));
 		} catch (ServiceException e) {
 			fail();
 		} catch (PersistenceException e) {
@@ -212,31 +221,27 @@ public abstract class AbstractDonationServiceTest {
 			when(donationDAO.getByID(donationCreated.getId())).thenReturn(
 					donationCreated);
 
-			Donation found = donationService.getByID(donationCreated
-					.getId());
+			Donation found = donationService.getByID(donationCreated.getId());
 
-			assertEquals(donationCreated,found);
+			assertEquals(donationCreated, found);
 		} catch (ServiceException e) {
 			fail();
 		} catch (PersistenceException e) {
 			fail();
 		}
 	}
-	
-	
-	
-	
+
 	protected static void init() throws PersistenceException {
 		testAddress = new Address();
 		testAddress.setStreet("Teststreet 1/1");
 		testAddress.setPostalCode("00000");
 		testAddress.setCity("Testcity");
 		testAddress.setCountry("Testcountry");
-		
-		//testAddress = addressDAO.create(testAddress);
+
+		// testAddress = addressDAO.create(testAddress);
 		List<Address> listTest = new ArrayList<Address>();
 		listTest.add(testAddress);
-		
+
 		person = new Person();
 		person.setSex(Person.Sex.MALE);
 		person.setCompany("IBM");
@@ -247,9 +252,9 @@ public abstract class AbstractDonationServiceTest {
 		person.setTelephone("01234567889");
 		person.setEmailNotification(true);
 		person.setNote("");
-		//person.setAddresses(listTest);
-		//person.setMailingAddress(testAddress);
-		
+		// person.setAddresses(listTest);
+		// person.setMailingAddress(testAddress);
+
 		person2 = new Person();
 		person2.setSex(Person.Sex.MALE);
 		person2.setCompany("IBM");
@@ -260,9 +265,9 @@ public abstract class AbstractDonationServiceTest {
 		person2.setTelephone("02234567889");
 		person2.setEmailNotification(true);
 		person2.setNote("");
-		//person2.setAddresses(listTest2);
-		//person2.setMailingAddress(testAddress2);
-		
+		// person2.setAddresses(listTest2);
+		// person2.setMailingAddress(testAddress2);
+
 		person3 = new Person();
 		person3.setSex(Person.Sex.MALE);
 		person3.setCompany("asfd");
@@ -273,9 +278,9 @@ public abstract class AbstractDonationServiceTest {
 		person3.setTelephone("111");
 		person2.setEmailNotification(true);
 		person3.setNote("");
-		//person2.setAddresses(listTest2);
-		//person2.setMailingAddress(testAddress2);
-		
+		// person2.setAddresses(listTest2);
+		// person2.setMailingAddress(testAddress2);
+
 		donation = new Donation();
 		donation.setAmount(new Long(100));
 		donation.setDate(new Date());
@@ -283,7 +288,7 @@ public abstract class AbstractDonationServiceTest {
 		donation.setNote("test");
 		donation.setDonator(person);
 		donation.setType(Donation.DonationType.BANK_TRANSFER);
-		
+
 		donation2 = new Donation();
 		donation2.setAmount(new Long(200));
 		donation2.setDate(new Date());
@@ -291,7 +296,7 @@ public abstract class AbstractDonationServiceTest {
 		donation2.setNote("test2");
 		donation2.setDonator(person);
 		donation2.setType(Donation.DonationType.SMS);
-		
+
 		donation3 = new Donation();
 		donation3.setAmount(new Long(300));
 		donation3.setDate(new Date());
@@ -299,12 +304,45 @@ public abstract class AbstractDonationServiceTest {
 		donation3.setNote("test3");
 		donation3.setDonator(person3);
 		donation3.setType(Donation.DonationType.MERCHANDISE);
-		
+
 		donationCreated = donation;
 		donationCreated.setId(1);
-		
+
 		nullDonation = null;
-		
+
 	}
-	
+
+	@Test(expected = IllegalArgumentException.class)
+	public void createCSVWithNullArgument_ThrowsException() {
+		donationService.convertToCSV(null);
+	}
+
+	@Test
+	public void createCSVWithValidArgument_ReturnsCSVString() {
+		List<Donation> list = new ArrayList<Donation>();
+		donation.setDate(new Date());
+		donation2.setDate(new Date());
+		donation3.setDate(new Date());
+		list.add(donation);
+		list.add(donation2);
+		list.add(donation3);
+		String csv = donationService.convertToCSV(list);
+		assertThat(csv.equals(csvExpected), is(true));
+	}
+
+	@Test
+	public void createCSVWithEmptyList_ReturnsCSVString() {
+		List<Donation> list = new ArrayList<Donation>();
+		String csv = donationService.convertToCSV(list);
+		assertThat(
+				csv.equals("Betrag;Datum;Widmung;Art;Notiz;Vorname;Nachname;" +
+						"E-Mail;Unternehmen;Land;Stadt;PLZ;Strasse\n"),
+				is(true));
+	}
+
+	private String csvExpected = "Betrag;Datum;Widmung;Art;Notiz;Vorname;Nachname;E-Mail;Unternehmen;Land;Stadt;PLZ;Strasse\n"
+			+ "100;10.06.2013;test;BANK_TRANSFER;test;Test;Test;test@test.at;IBM;n.v.;n.v.;n.v.;n.v.;\n"
+			+ "200;10.06.2013;test2;SMS;test2;Test;Test;test@test.at;IBM;n.v.;n.v.;n.v.;n.v.;\n"
+			+ "300;10.06.2013;test3;MERCHANDISE;test3;dfdasd;ffff;test2@ff.at;asfd;n.v.;n.v.;n.v.;n.v.;\n";
+
 }
