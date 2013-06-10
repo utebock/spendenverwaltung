@@ -4,8 +4,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import at.fraubock.spendenverwaltung.gui.CustomTextField;
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
+import at.fraubock.spendenverwaltung.gui.components.NumericTextField;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationType;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationalOperatorGuiWrapper;
@@ -25,7 +25,7 @@ public class NumberComparator extends JPanel implements ICriterionConfigurator {
 	private static final long serialVersionUID = 5674883209607705490L;
 
 	private RelationalOperatorPicker picker;
-	private CustomTextField textField;
+	private NumericTextField textField;
 	private FilterProperty property;
 	private String display;
 
@@ -34,7 +34,7 @@ public class NumberComparator extends JPanel implements ICriterionConfigurator {
 		this.property = property;
 		add(picker = new RelationalOperatorPicker(
 				RelationType.FOR_NUMBER_AND_DATE));
-		add(textField = new CustomTextField(5));
+		add(textField = new NumericTextField());
 		add(new JLabel("\u20AC"));
 	}
 
@@ -76,7 +76,7 @@ public class NumberComparator extends JPanel implements ICriterionConfigurator {
 						RelationalOperatorGuiWrapper.getForOperator(prop
 								.getRelationalOperator()));
 
-				this.textField.setText(""+(prop.getNumValue()/100));
+				this.textField.setNumericValue(prop.getNumValue()/100);
 
 				return true;
 			}

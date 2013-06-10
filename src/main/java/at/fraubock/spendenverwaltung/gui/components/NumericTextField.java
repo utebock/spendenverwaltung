@@ -3,7 +3,9 @@ package at.fraubock.spendenverwaltung.gui.components;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.text.ParsePosition;
+import java.util.Locale;
 
 import at.fraubock.spendenverwaltung.gui.components.interfaces.ValidateableComponent;
 
@@ -22,6 +24,14 @@ public class NumericTextField extends CustomTextField implements
 	private boolean nullAllowed = true;
 	private ComponentConstants length;
 
+	public NumericTextField() {
+		this(ComponentConstants.NUMERIC_TEXT, true);
+	}
+
+	public NumericTextField(boolean nullAllowed) {
+		this(ComponentConstants.NUMERIC_TEXT, nullAllowed);
+	}
+
 	public NumericTextField(ComponentConstants length) {
 		this(length, true);
 	}
@@ -37,7 +47,7 @@ public class NumericTextField extends CustomTextField implements
 	public boolean validateContents() {
 		if (getText().equals("")) {
 			if (!nullAllowed) {
-				 invalidateInput();
+				invalidateInput();
 				return false;
 			}
 		} else {
@@ -73,4 +83,29 @@ public class NumericTextField extends CustomTextField implements
 		return n.toBigInteger().longValue();
 
 	}
+
+	/**
+	 * sets the value of this text field. takes a numeric value and converts it
+	 * into a DE-localized numerical string, which means decimal separators are
+	 * represented as comma and hundredth separators as dots.
+	 * 
+	 * @param value
+	 */
+	public void setNumericValue(Double value) {
+		NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
+		this.setText(nf.format(value));
+	}
+
+	/**
+	 * converts and returns the value of this text field. the user's input is
+	 * interpreted as a DE-localized numerical string, which means decimal
+	 * separators are represented as comma and hundredth separators as dots.
+	 * 
+	 * @param value
+	 */
+//	public Double getNumericValue() {
+//		NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
+//		if(validateContents())
+//		return nf.parse(this.getText());
+//	}
 }
