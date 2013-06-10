@@ -38,7 +38,7 @@ public class DateComparator extends JPanel implements ICriterionConfigurator {
 		this.display = display;
 		this.property = property;
 		add(picker = new RelationalOperatorPicker(
-				RelationType.FOR_NUMBER_AND_DATE));
+				RelationType.FOR_DATE));
 		add(textField = new CustomTextField(12));
 		JLabel format = new JLabel("(dd.MM.yyyy)");
 		format.setFont(new Font("Headline", Font.PLAIN, 11));
@@ -81,7 +81,7 @@ public class DateComparator extends JPanel implements ICriterionConfigurator {
 			PropertyCriterion prop = (PropertyCriterion) criterion;
 			if (prop.getProperty() == this.property && prop.getDateValue()!=null) {
 				this.picker.setSelectedItem(
-						RelationalOperatorGuiWrapper.getForOperator(prop
+						RelationalOperatorGuiWrapper.getForDateOperator(prop
 								.getRelationalOperator()));
 				this.textField.setText(new SimpleDateFormat("dd.MM.yyyy")
 						.format(prop.getDateValue()));

@@ -33,7 +33,7 @@ public class NumberComparator extends JPanel implements ICriterionConfigurator {
 		this.display = display;
 		this.property = property;
 		add(picker = new RelationalOperatorPicker(
-				RelationType.FOR_NUMBER_AND_DATE));
+				RelationType.FOR_NUMBER));
 		add(textField = new NumericTextField(false));
 		add(new JLabel("\u20AC"));
 	}

@@ -82,7 +82,7 @@ public class NumericTextField extends CustomTextField implements
 	/**
 	 * sets the value of this text field. takes a numeric value and converts it
 	 * into a DE-localized numerical string, which means decimal separators are
-	 * represented as comma and hundredth separators as dots.
+	 * represented as comma.
 	 * 
 	 * @param value
 	 */
@@ -95,9 +95,9 @@ public class NumericTextField extends CustomTextField implements
 	 * Precondition: {@link #validateContents()} must have been called and
 	 * returned true prior to calling this method.
 	 * 
-	 * converts and returns the value of this text field. the user's input is
+	 * returns the numeric value of this text field. the user's input is
 	 * interpreted as a DE-localized numerical string, which means decimal
-	 * separators are represented as comma and hundredth separators as dots.
+	 * separators are represented as comma.
 	 * 
 	 * @param value
 	 */

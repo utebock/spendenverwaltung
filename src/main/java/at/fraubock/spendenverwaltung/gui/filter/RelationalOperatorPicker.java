@@ -1,14 +1,12 @@
 package at.fraubock.spendenverwaltung.gui.filter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JComboBox;
 
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationalOperatorGuiWrapper;
-import at.fraubock.spendenverwaltung.util.LogicalOperator;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
 /**
@@ -19,72 +17,93 @@ import at.fraubock.spendenverwaltung.util.RelationalOperator;
  * @author philipp muhoray
  * 
  */
-public class RelationalOperatorPicker extends
-		JComboBox<RelationalOperatorGuiWrapper> {
+public class RelationalOperatorPicker extends JComboBox<RelationalOperatorGuiWrapper> {
 	private static final long serialVersionUID = 6985601580458540392L;
 
 	public RelationalOperatorPicker(RelationType type) {
-		super(new SimpleComboBoxModel<RelationalOperatorGuiWrapper>(
-				type.getOperators()));
+		super(new SimpleComboBoxModel<RelationalOperatorGuiWrapper>(type.getOperators()));
 	}
 
 	/**
 	 * @return the selected {@link RelationalOperator}
 	 */
 	public RelationalOperator getPickedOperator() {
-		return ((RelationalOperatorGuiWrapper) getModel().getSelectedItem())
-				.getOperator();
+		return ((RelationalOperatorGuiWrapper) getModel().getSelectedItem()).getOperator();
 	}
 
 	public enum RelationType {
-		FOR_STRING, FOR_NUMBER_AND_DATE, FOR_ENUM;
+		FOR_STRING, FOR_NUMBER, FOR_ENUM, FOR_DATE;
 
 		public List<RelationalOperatorGuiWrapper> getOperators() {
 			if (this == FOR_STRING) {
-				return Arrays.asList(new RelationalOperatorGuiWrapper[] {
-						RelationalOperatorGuiWrapper.EQUALS,
-						RelationalOperatorGuiWrapper.UNEQUAL,
-						RelationalOperatorGuiWrapper.LIKE });
-			} else if (this == FOR_NUMBER_AND_DATE) {
-				List<RelationalOperatorGuiWrapper> ops = new ArrayList<RelationalOperatorGuiWrapper>();
-				ops.addAll(Arrays.asList(RelationalOperatorGuiWrapper.values()));
-				ops.remove(RelationalOperatorGuiWrapper.LIKE);
-				// TODO make this work
-				ops.remove(RelationalOperatorGuiWrapper.NOT_NULL);
-				ops.remove(RelationalOperatorGuiWrapper.IS_NULL);
-				return ops;
+				return getStringOperators();
+			} else if (this == FOR_NUMBER) {
+				return getNumberOperators();
+			} else if (this == FOR_DATE) {
+				return getDateOperators();
 			} else if (this == FOR_ENUM) {
-				return Arrays.asList(new RelationalOperatorGuiWrapper[] {
-						RelationalOperatorGuiWrapper.EQUALS,
-						RelationalOperatorGuiWrapper.UNEQUAL });
+				return getEnumOperators();
 			}
 			return null;
 		}
 	}
 
-	/**
-	 * used to map representative labels to {@link RelationalOperator}s
-	 * 
-	 * @author philipp muhoray
-	 * 
-	 */
-	public enum RelationalOperatorGuiWrapper {
-		LESS(RelationalOperator.LESS, "weniger als"), LESS_EQ(
-				RelationalOperator.LESS_EQ, "weniger oder gleich als"), EQUALS(
-				RelationalOperator.EQUALS, "gleich"), UNEQUAL(
-				RelationalOperator.UNEQUAL, "ungleich"), LIKE(
-				RelationalOperator.LIKE, "enth\u00E4lt"), GREATER_EQ(
-				RelationalOperator.GREATER_EQ, "mehr oder gleich als"), GREATER(
-				RelationalOperator.GREATER, "mehr als"), NOT_NULL(
-				RelationalOperator.NOT_NULL, "ist vorhanden"), IS_NULL(
-				RelationalOperator.IS_NULL, "ist nicht vorhanden");
+	private static List<RelationalOperatorGuiWrapper> getNumberOperators() {
+		List<RelationalOperatorGuiWrapper> list = new ArrayList<RelationalOperatorGuiWrapper>();
+
+		list.add(new RelationalOperatorGuiWrapper(RelationalOperator.LESS, "weniger als"));
+		list.add(new RelationalOperatorGuiWrapper(RelationalOperator.LESS_EQ,
+				"weniger als oder gleich"));
+		list.add(new RelationalOperatorGuiWrapper(RelationalOperator.EQUALS, "gleich"));
+		list.add(new RelationalOperatorGuiWrapper(RelationalOperator.UNEQUAL, "ungleich"));
+		list.add(new RelationalOperatorGuiWrapper(RelationalOperator.GREATER_EQ,
+				"mehr als oder gleich"));
+		list.add(new RelationalOperatorGuiWrapper(RelationalOperator.GREATER, "mehr als"));
+
+		return list;
+	}
+
+	private static List<RelationalOperatorGuiWrapper> getDateOperators() {
+		List<RelationalOperatorGuiWrapper> list = new ArrayList<RelationalOperatorGuiWrapper>();
+
+		list.add(new RelationalOperatorGuiWrapper(RelationalOperator.LESS, "liegt vor"));
+		list.add(new RelationalOperatorGuiWrapper(RelationalOperator.LESS_EQ, "liegt vor oder am"));
+		list.add(new RelationalOperatorGuiWrapper(RelationalOperator.EQUALS, "liegt am"));
+		list.add(new RelationalOperatorGuiWrapper(RelationalOperator.UNEQUAL, "liegt nicht am"));
+		list.add(new RelationalOperatorGuiWrapper(RelationalOperator.GREATER_EQ,
+				"liegt nach oder am"));
+		list.add(new RelationalOperatorGuiWrapper(RelationalOperator.GREATER, "liegt nach"));
+
+		return list;
+	}
+
+	private static List<RelationalOperatorGuiWrapper> getStringOperators() {
+		List<RelationalOperatorGuiWrapper> list = new ArrayList<RelationalOperatorGuiWrapper>();
+
+		list.add(new RelationalOperatorGuiWrapper(RelationalOperator.EQUALS, "gleich"));
+		list.add(new RelationalOperatorGuiWrapper(RelationalOperator.UNEQUAL, "ungleich"));
+		list.add(new RelationalOperatorGuiWrapper(RelationalOperator.LIKE, "enth\u00E4lt"));
+
+		return list;
+	}
+
+	private static List<RelationalOperatorGuiWrapper> getEnumOperators() {
+		List<RelationalOperatorGuiWrapper> list = new ArrayList<RelationalOperatorGuiWrapper>();
+
+		list.add(new RelationalOperatorGuiWrapper(RelationalOperator.EQUALS, "gleich"));
+		list.add(new RelationalOperatorGuiWrapper(RelationalOperator.UNEQUAL, "ungleich"));
+
+		return list;
+	}
+
+	public static class RelationalOperatorGuiWrapper {
 
 		private String text;
-		private RelationalOperator op;
+		private RelationalOperator operator;
 
-		private RelationalOperatorGuiWrapper(RelationalOperator op, String text) {
-			this.op = op;
+		public RelationalOperatorGuiWrapper(RelationalOperator operator, String text) {
 			this.text = text;
+			this.operator = operator;
 		}
 
 		@Override
@@ -92,19 +111,55 @@ public class RelationalOperatorPicker extends
 			return text;
 		}
 
-		public RelationalOperator getOperator() {
-			return op;
+		public void setText(String text) {
+			this.text = text;
 		}
 
-		public static RelationalOperatorGuiWrapper getForOperator(
-				RelationalOperator op) {
-			for (RelationalOperatorGuiWrapper wrapper : RelationalOperatorGuiWrapper
-					.values()) {
+		public RelationalOperator getOperator() {
+			return operator;
+		}
+
+		public void setOperator(RelationalOperator operator) {
+			this.operator = operator;
+		}
+
+		public static RelationalOperatorGuiWrapper getForOperator(RelationalOperator op) {
+			
+			for (RelationalOperatorGuiWrapper wrapper : getNumberOperators()) {
+				if (wrapper.getOperator() == op) {
+					return wrapper;
+				}
+			}
+
+			for (RelationalOperatorGuiWrapper wrapper : getStringOperators()) {
 				if (wrapper.getOperator() == op) {
 					return wrapper;
 				}
 			}
 			return null;
+		}
+		
+		public static RelationalOperatorGuiWrapper getForDateOperator(RelationalOperator op) {
+			
+			for (RelationalOperatorGuiWrapper wrapper : getDateOperators()) {
+				if (wrapper.getOperator() == op) {
+					return wrapper;
+				}
+			}
+			return null;
+		}
+		
+		@Override
+		public boolean equals(Object other) {
+			if(other==this) return true;
+			if(other==null) return false;
+			if(other.getClass()!=RelationalOperatorGuiWrapper.class) return false;
+			
+			RelationalOperatorGuiWrapper wrap = (RelationalOperatorGuiWrapper)other;
+			if(this.getOperator()==wrap.getOperator() && this.toString().equals(wrap.toString())) {
+				return true;
+			}
+			return false;
 		}
 
 	}

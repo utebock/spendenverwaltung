@@ -7,9 +7,9 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import at.fraubock.spendenverwaltung.gui.CustomTextField;
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
+import at.fraubock.spendenverwaltung.gui.components.NumericTextField;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationType;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationalOperatorGuiWrapper;
@@ -31,7 +31,7 @@ public class DaysBackComparator extends JPanel implements
 	private static final long serialVersionUID = 5674883209607705490L;
 
 	private RelationalOperatorPicker picker;
-	private CustomTextField textField;
+	private NumericTextField textField;
 	private JComboBox<String> timeUnit;
 	private FilterProperty property;
 	private String display;
@@ -45,20 +45,25 @@ public class DaysBackComparator extends JPanel implements
 		this.property = property;
 
 		add(picker = new RelationalOperatorPicker(
-				RelationType.FOR_NUMBER_AND_DATE));
-		add(textField = new CustomTextField(5));
-		add(timeUnit = new JComboBox<String>(new SimpleComboBoxModel<String>(Arrays.asList(new String[]{DAYS,WEEKS,MONTHS,YEARS}))));
+				RelationType.FOR_NUMBER));
+		add(textField = new NumericTextField());
+		add(timeUnit = new JComboBox<String>(new SimpleComboBoxModel<String>(
+				Arrays.asList(new String[] { DAYS, WEEKS, MONTHS, YEARS }))));
 	}
 
 	private Integer getNumber() throws InvalidInputException {
 		Integer num = null;
-		try {
-			num = Integer.valueOf(textField.getText());
-		} catch (NumberFormatException e) {
-			textField.invalidateInput();
+		if (textField.validateContents()) {
+			num = textField.getNumericValue().intValue();
+			if (textField.getNumericValue() - num > 0) {
+				throw new InvalidInputException(
+						"Bitte geben Sie eine ganze Zahl ein!");
+			}
+		} else {
 			throw new InvalidInputException(
 					"Bitte geben Sie eine g\u00FCltige Zahl ein!");
 		}
+
 		String sel = (String) timeUnit.getModel().getSelectedItem();
 
 		if (sel.equals(WEEKS)) {
@@ -94,23 +99,23 @@ public class DaysBackComparator extends JPanel implements
 	public boolean applyCriterion(Criterion criterion) {
 		if (criterion instanceof PropertyCriterion) {
 			PropertyCriterion prop = (PropertyCriterion) criterion;
-			if (prop.getProperty() == this.property && prop.getDaysBack()!=null) {
+			if (prop.getProperty() == this.property
+					&& prop.getDaysBack() != null) {
 				int daysBack = prop.getDaysBack();
-				this.picker.setSelectedItem(
-						RelationalOperatorGuiWrapper.getForOperator(prop
-								.getRelationalOperator()));
+				this.picker.setSelectedItem(RelationalOperatorGuiWrapper
+						.getForOperator(prop.getRelationalOperator()));
 
 				if (daysBack % 365 == 0) {
-					this.textField.setText("" + (daysBack / 365));
+					this.textField.setNumericValue((double) (daysBack / 365));
 					timeUnit.setSelectedItem(YEARS);
 				} else if (daysBack % 30 == 0) {
-					this.textField.setText("" + (daysBack / 30));
+					this.textField.setNumericValue((double) (daysBack / 30));
 					timeUnit.setSelectedItem(MONTHS);
 				} else if (daysBack % 7 == 0) {
-					this.textField.setText("" + (daysBack / 7));
+					this.textField.setNumericValue((double) (daysBack / 7));
 					timeUnit.setSelectedItem(WEEKS);
 				} else {
-					this.textField.setText("" + daysBack);
+					this.textField.setNumericValue((double) daysBack);
 					timeUnit.setSelectedItem(DAYS);
 				}
 				return true;

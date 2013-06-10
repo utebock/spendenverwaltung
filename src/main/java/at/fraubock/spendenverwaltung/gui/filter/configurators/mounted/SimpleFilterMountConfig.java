@@ -19,8 +19,7 @@ import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
 /**
  * implements {@link ICriterionConfigurator} for {@link MountedFilterCriterion}s
- * which are added to the same type of filter that they are mounting (e.g.
- * Person to Person).
+ * where no comparison is needed
  * 
  * @author philipp muhoray
  * 

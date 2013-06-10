@@ -28,7 +28,7 @@ import at.fraubock.spendenverwaltung.util.FilterType;
  * @author philipp muhoray
  * 
  */
-public class MailingToPersonFilterConfig extends JPanel implements
+public class PersonToMailingFilterConfig extends JPanel implements
 		ICriterionConfigurator {
 	private static final long serialVersionUID = -8507188088817762907L;
 
@@ -39,11 +39,11 @@ public class MailingToPersonFilterConfig extends JPanel implements
 	private JPanel firstLine = new JPanel();
 	private JPanel secondLine = new JPanel();
 
-	public MailingToPersonFilterConfig(String display, List<Filter> filters) {
+	public PersonToMailingFilterConfig(String display, List<Filter> filters) {
 		super(new MigLayout());
 		this.display = display;
 
-		JLabel descr = new JLabel("Die Person hat von diesen Aussendungen: ");
+		JLabel descr = new JLabel("Die Aussendung ist an diese Personen: ");
 		descr.setFont(new Font("Headline", Font.PLAIN, 14));
 		firstLine.add(descr);
 		firstLine.add(filterBox = new JComboBox<Filter>(
@@ -54,9 +54,9 @@ public class MailingToPersonFilterConfig extends JPanel implements
 		secondLine.add(amount = new NumericTextField());
 		amount.setText("10");
 
-		JLabel gespendet = new JLabel("erhalten");
-		gespendet.setFont(new Font("Headline", Font.PLAIN, 14));
-		secondLine.add(gespendet);
+		JLabel gesendet = new JLabel("mal verschickt worden");
+		gesendet.setFont(new Font("Headline", Font.PLAIN, 14));
+		secondLine.add(gesendet);
 		add(secondLine);
 	}
 
@@ -103,7 +103,7 @@ public class MailingToPersonFilterConfig extends JPanel implements
 	public boolean applyCriterion(Criterion criterion) {
 		if (criterion instanceof MountedFilterCriterion) {
 			MountedFilterCriterion crit = (MountedFilterCriterion) criterion;
-			if (crit.getMount().getType() == FilterType.MAILING) {
+			if (crit.getMount().getType() == FilterType.PERSON) {
 				this.picker.setSelectedItem(RelationalOperatorGuiWrapper
 						.getForOperator(crit.getRelationalOperator()));
 				this.filterBox.setSelectedItem(crit.getMount());

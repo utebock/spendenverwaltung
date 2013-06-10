@@ -13,9 +13,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
-import at.fraubock.spendenverwaltung.gui.CustomTextField;
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
+import at.fraubock.spendenverwaltung.gui.components.NumericTextField;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationType;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationalOperatorGuiWrapper;
@@ -40,7 +40,7 @@ public class DonationToPersonFilterConfig extends JPanel implements
 	private JComboBox<Filter> filterBox;
 	private String display;
 	private RelationalOperatorPicker picker;
-	private CustomTextField amount;
+	private NumericTextField amount;
 	private boolean euro = true;
 	private JPanel firstLine = new JPanel();
 	private JPanel secondLine = new JPanel();
@@ -60,8 +60,8 @@ public class DonationToPersonFilterConfig extends JPanel implements
 					new SimpleComboBoxModel<Filter>(filters)), "wrap");
 			add(firstLine, "wrap");
 			secondLine.add(picker = new RelationalOperatorPicker(
-					RelationType.FOR_NUMBER_AND_DATE));
-			secondLine.add(amount = new CustomTextField(5));
+					RelationType.FOR_NUMBER));
+			secondLine.add(amount = new NumericTextField());
 			amount.setText("10");
 
 			euroLabel = new JLabel("\u20AC", JLabel.CENTER);
@@ -110,10 +110,9 @@ public class DonationToPersonFilterConfig extends JPanel implements
 	}
 
 	private Double getNumber() throws InvalidInputException {
-		try {
-			return Double.valueOf(amount.getText());
-		} catch (NumberFormatException e) {
-			amount.invalidateInput();
+		if (amount.validateContents()) {
+			return Double.valueOf(amount.getHundredths());
+		} else {
 			throw new InvalidInputException(
 					"Bitte geben Sie eine g\u00FCltige Zahl ein!");
 		}
@@ -130,7 +129,7 @@ public class DonationToPersonFilterConfig extends JPanel implements
 
 		if (euro) {
 			crit.setProperty(FilterProperty.DONATION_AMOUNT);
-			crit.setSum(number*100);
+			crit.setSum(number * 100);
 		} else {
 			if ((int) ((double) number) == number) {
 				crit.setCount(number.intValue());
@@ -163,11 +162,11 @@ public class DonationToPersonFilterConfig extends JPanel implements
 						.getForOperator(crit.getRelationalOperator()));
 				this.filterBox.setSelectedItem(crit.getMount());
 				if (crit.getCount() != null) {
-					this.amount.setText("" + crit.getCount());
+					this.amount.setNumericValue((double) crit.getCount());
 					euro = false;
 					euroLabel.setText("mal");
 				} else {
-					this.amount.setText("" + (crit.getSum()/100));
+					this.amount.setNumericValue((crit.getSum() / 100));
 					euro = true;
 					euroLabel.setText("\u20AC");
 				}

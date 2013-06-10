@@ -11,6 +11,7 @@ import at.fraubock.spendenverwaltung.gui.filter.configurators.ICriterionConfigur
 import at.fraubock.spendenverwaltung.gui.filter.configurators.mounted.AddressConfigurator;
 import at.fraubock.spendenverwaltung.gui.filter.configurators.mounted.DonationToPersonFilterConfig;
 import at.fraubock.spendenverwaltung.gui.filter.configurators.mounted.MailingToPersonFilterConfig;
+import at.fraubock.spendenverwaltung.gui.filter.configurators.mounted.PersonToMailingFilterConfig;
 import at.fraubock.spendenverwaltung.gui.filter.configurators.mounted.SimpleFilterMountConfig;
 import at.fraubock.spendenverwaltung.gui.filter.configurators.property.BooleanComparator;
 import at.fraubock.spendenverwaltung.gui.filter.configurators.property.DateComparator;
@@ -189,10 +190,8 @@ public class ConfiguratorFactory {
 					FilterProperty.MAILING_TYPE, "Art der Aussendung"));
 
 			if (!personFilters.isEmpty()) {
-				configurators
-						.add(new SimpleFilterMountConfig("Empf\u00E4nger",
-								personFilters, FilterType.PERSON,
-								"Der Empf\u00E4nger erf\u00FCllt diesen Personenfilter:"));
+				configurators.add(new PersonToMailingFilterConfig(
+						"Empf\u00E4nger", personFilters));
 			}
 
 			if (!mailingFilters.isEmpty()) {
