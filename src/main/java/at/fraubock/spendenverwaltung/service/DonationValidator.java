@@ -9,8 +9,6 @@ public class DonationValidator {
 		
 		if(d == null)
 			throw new IllegalArgumentException("Donation must not be null");
-		if(d.getDonator() == null)
-			throw new IllegalArgumentException("Person must not be null");
 		if(d.getAmount() < 0)
 			throw new IllegalArgumentException("Amount must not be less than 0");
 		if(d.getDate() == null)

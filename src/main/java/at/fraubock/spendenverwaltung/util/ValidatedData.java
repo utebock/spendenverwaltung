@@ -105,11 +105,11 @@ public class ValidatedData {
 			
 			if(donator.getSurname().equals(p.getSurname())
 					&& donator.getGivenName().equals(p.getGivenName())
-					&& (donator.getEmail().equals(p.getEmail()))
+					&& (donator.getEmail().equals(p.getEmail())
 						|| (!donator.getTelephone().equals("") && donator.getTelephone().equals(p.getTelephone()))
 						|| (donator.getMainAddress() != null && donator.getMainAddress().getCity().equals(p.getMainAddress().getCity())
 								&& donator.getMainAddress().getPostalCode().equals(p.getMainAddress().getPostalCode())
-								&& donator.getMainAddress().getStreet().equals(p.getMainAddress().getStreet()))){
+								&& donator.getMainAddress().getStreet().equals(p.getMainAddress().getStreet())))){
 				return donator;
 			}
 		}

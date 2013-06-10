@@ -101,17 +101,31 @@ public class DonationDAOImplemented implements IDonationDAO {
 
 		} else {
 			// update
-			String updateStatement = "update donations set personid = ?, amount = ?, donationdate = ?, dedication = ?, type = ?, note = ? where id = ?";
+			if(d.getDonator() != null){
+				String updateStatement = "update donations set personid = ?, amount = ?, donationdate = ?, dedication = ?, type = ?, note = ? where id = ?";
+	
+				Object[] params = new Object[] { d.getDonator().getId(),
+						d.getAmount(), d.getDate(), d.getDedication(),
+						d.getType().getName(), d.getNote(), d.getId() };
+	
+				int[] types = new int[] { Types.INTEGER, Types.BIGINT,
+						Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR,
+						Types.VARCHAR, Types.INTEGER };
 
-			Object[] params = new Object[] { d.getDonator().getId(),
-					d.getAmount(), d.getDate(), d.getDedication(),
-					d.getType().getName(), d.getNote(), d.getId() };
+				jdbcTemplate.update(updateStatement, params, types);
+			} else{
+				String updateStatement = "update donations set personid = NULL, amount = ?, donationdate = ?, dedication = ?, type = ?, note = ? where id = ?";
+	
+				Object[] params = new Object[] {
+						d.getAmount(), d.getDate(), d.getDedication(),
+						d.getType().getName(), d.getNote(), d.getId() };
+	
+				int[] types = new int[] { Types.BIGINT,
+						Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR,
+						Types.VARCHAR, Types.INTEGER };
 
-			int[] types = new int[] { Types.INTEGER, Types.BIGINT,
-					Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR,
-					Types.VARCHAR, Types.INTEGER };
-
-			jdbcTemplate.update(updateStatement, params, types);
+				jdbcTemplate.update(updateStatement, params, types);
+			}
 		}
 	}
 

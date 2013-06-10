@@ -1,23 +1,45 @@
 package at.fraubock.spendenverwaltung.gui;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.EventObject;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.AbstractCellEditor;
+import javax.swing.DefaultCellEditor;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import org.apache.log4j.Logger;
 
 import net.miginfocom.swing.MigLayout;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
@@ -52,6 +74,10 @@ public class ImportValidation extends JPanel {
 	private List<Person> personList;
 	private ImportValidator importValidator;
 	private ValidatedData validatedData;
+	private JLabel newLabel;
+	private JLabel conflictLabel;
+	private JLabel matchLabel;
+	private JComboBox conflictComboBox;
 
 	public ImportValidation(IPersonService personService, IAddressService addressService, IDonationService donationService, Overview overview){
 		super(new MigLayout());
@@ -64,9 +90,12 @@ public class ImportValidation extends JPanel {
 		this.addressService = addressService;
 		this.donationService = donationService;
 		this.overview = overview;
-		this.conflictModel = new ValidationTableModel(this, this.donationService, this.personService);
-		this.newModel = new ValidationTableModel(this, this.donationService, this.personService);
-		this.matchModel = new ValidationTableModel(this, this.donationService, this.personService);
+		
+		conflictComboBox = new JComboBox(ImportValidator.ValidationType.toArray());
+		
+		this.conflictModel = new ValidationTableModel(this, this.donationService, this.personService, this.addressService);
+		this.newModel = new ValidationTableModel(this, this.donationService, this.personService, this.addressService);
+		this.matchModel = new ValidationTableModel(this, this.donationService, this.personService, this.addressService);
 		
 		setUp();
 	}
@@ -80,6 +109,11 @@ public class ImportValidation extends JPanel {
 		conflictTable = new JTable(conflictModel);
 		newTable = new JTable(newModel);
 		matchTable = new JTable(matchModel);
+		
+		conflictTable.getColumnModel().getColumn(13).setCellEditor(new DefaultCellEditor(conflictComboBox));
+		newTable.getColumnModel().getColumn(13).setCellEditor(new DefaultCellEditor(conflictComboBox));
+		matchTable.getColumnModel().getColumn(13).setCellEditor(new DefaultCellEditor(conflictComboBox));
+		
 		
 		conflictTable.setFillsViewportHeight(true);
 		newTable.setFillsViewportHeight(true);
@@ -96,6 +130,15 @@ public class ImportValidation extends JPanel {
 		conflictPane.setPreferredSize(new Dimension(1200, 200));
 		newPane.setPreferredSize(new Dimension(1200, 200));
 		matchPane.setPreferredSize(new Dimension(1200, 200));
+		
+		conflictLabel = builder.createLabel("Konflikte:");
+		conflictPanel.add(conflictLabel, "wrap");
+		
+		newLabel = builder.createLabel("Liste neuer Spender:");
+		newPanel.add(newLabel, "wrap");
+		
+		matchLabel = builder.createLabel("Liste zugewiesener Spender:");
+		matchPanel.add(matchLabel, "wrap");
 		
 		conflictPanel.add(conflictPane, "wrap, growx");
 		newPanel.add(newPane, "wrap, growx");
@@ -202,5 +245,4 @@ public class ImportValidation extends JPanel {
 		overview.repaint();
 		overview.setUp();
 	}
-	
 }

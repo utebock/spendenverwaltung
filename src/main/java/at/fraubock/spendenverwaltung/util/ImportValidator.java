@@ -26,6 +26,44 @@ public class ImportValidator {
 		ANONYM
 	};
 	
+
+
+	public static enum ValidationType {
+		DONE("fertig"), ANONYM("anonym"), NEW_DONATOR("Spender zuweisen"), NOT_IMPORT("nicht importieren"), EDIT("bearbeiten");
+
+		private final String name;
+
+		private ValidationType(String name) {
+			this.name = name;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public static ValidationType getByName(String name) {
+			switch (name) {
+			case "anonym":
+				return ANONYM;
+			case "Spender zuweisen":
+				return NEW_DONATOR;
+			case "nicht importieren":
+				return NOT_IMPORT;
+			case "bearbeiten":
+				return EDIT;
+			case "fertig":
+				return DONE;
+			default:
+				throw new IllegalArgumentException(
+						"No validation type for name: " + name);
+			}
+		}
+		
+		public static String[] toArray(){
+			return new String[]{ "fertig", "anonym", "Spender zuweisen", "nicht importieren", "bearbeiten" };
+		}
+	};
+	
 	public IPersonService getPersonService() {
 		return personService;
 	}
