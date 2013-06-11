@@ -22,6 +22,7 @@ public class FilterTO {
 
 	private String name;
 	private boolean anonymous;
+	private boolean isPrivate;
 	private FilterType type;
 	private List<Criterion> criterions;
 	private LogicalOperator operator;
@@ -65,5 +66,12 @@ public class FilterTO {
 	public void setOperator(LogicalOperator operator) {
 		this.operator = operator;
 	}
+	
+	public boolean getPrivate(){
+		return isPrivate;
+	}
 
+	public void setPrivate(boolean isPrivate){
+		this.isPrivate = isPrivate;
+	}
 }
