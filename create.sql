@@ -133,6 +133,13 @@ CREATE TABLE sent_mailings (
 	PRIMARY KEY(mailing_id, person_id)
 );
 
+CREATE TABLE mailing_templates (
+	id INTEGER UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	file_name VARCHAR(120) NOT NULL,
+	file_size INTEGER UNSIGNED NOT NULL,
+	file BLOB NOT NULL
+);
+
 -- views for validated data:
 
 CREATE VIEW validated_donations AS SELECT * FROM donations WHERE import IS NULL; --only validated donations (i.e. no pending imports)

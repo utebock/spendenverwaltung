@@ -35,7 +35,7 @@ public abstract class AbstractMailingTemplateTest {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void nullArgumentShouldThrowException() throws IOException, ServiceException{
-		MailingTemplate.createMailingWithDocxTemplate(null, null, null);
+		MailingTemplateUtil.createMailingWithDocxTemplate(null, null, null);
 	}
 	
 	/* Just to test Mailing template without GUI 
@@ -49,7 +49,7 @@ public abstract class AbstractMailingTemplateTest {
 	
 	@Test(expected=IOException.class)
 	public void invalidFileShouldThrowIOException() throws ServiceException, IOException{
-		MailingTemplate.createMailingWithDocxTemplate(new File("INVALID FILE"), persons, "invalid.pdf");
+		MailingTemplateUtil.createMailingWithDocxTemplate(new File("INVALID FILE"), persons, "invalid.pdf");
 	}
 	
 	protected static void init() throws PersistenceException{

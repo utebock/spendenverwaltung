@@ -9,6 +9,7 @@ import java.sql.Types;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -436,6 +437,11 @@ public class PersonDAOImplemented implements IPersonDAO {
 	@Override
 	public List<Person> getByFilter(Filter filter) throws PersistenceException {
 		String select = filterToSqlBuilder.createSqlStatement(filter);
+		try {
+			
+		
+	
+		
 		List<Person> personList = jdbcTemplate
 				.query(select, new PersonMapper());
 		log.info(personList.size() + " list size");
@@ -445,7 +451,10 @@ public class PersonDAOImplemented implements IPersonDAO {
 			fetchAddresses(entry);
 		}
 
-		return personList;
+		return personList; 
+	}catch (DataAccessException e) {
+		throw new PersistenceException(e);	
+		}
 	}
 
 	private class AddressMapper implements RowMapper<Address> {
