@@ -83,6 +83,8 @@ CREATE TABLE filter ( # defines a filter for a specific entity
 	type ENUM('persons','donations','mailings','addresses') NOT NULL, # the entity this filter is applicable to
 	name VARCHAR(120), # a name for this filter. can be null when anonymous
 	anonymous BOOLEAN NOT NULL DEFAULT FALSE, # anonymous filters are created inside other filters and only exist there
+    private BOOLEAN NOT NULL DEFAULT TRUE, # have all users access to this filter?!
+    owner VARCHAR(50) UNSIGNED REFERENCES mysql.user(user), # name of the user who created this filter
 	FOREIGN KEY(criterion) REFERENCES criterion(id)
 );
 
@@ -144,7 +146,7 @@ CREATE TABLE mailing_templates (
 
 -- views for validated data:
 
-CREATE VIEW validated_donations AS SELECT * FROM donations WHERE import IS NULL; --only validated donations (i.e. no pending imports)
+CREATE VIEW validated_donations AS SELECT * FROM donations WHERE import IS NULL; -- only validated donations (i.e. no pending imports)
 
 CREATE VIEW validated_persons AS SELECT * FROM persons p WHERE NOT EXISTS (SELECT id FROM donations d WHERE d.import IS NOT NULL AND d.personid = p.id); -- only validated persons (i.e. no pending imports)
 
