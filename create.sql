@@ -82,7 +82,7 @@ CREATE TABLE filter ( # defines a filter for a specific entity
 	name VARCHAR(120), # a name for this filter. can be null when anonymous
 	anonymous BOOLEAN NOT NULL DEFAULT FALSE, # anonymous filters are created inside other filters and only exist there
     private BOOLEAN NOT NULL DEFAULT TRUE, # have all users access to this filter?!
-    owner VARCHAR(50) UNSIGNED REFERENCES mysql.user(user), # name of the user who created this filter
+    owner VARCHAR(50) REFERENCES mysql.user(user), # name of the user who created this filter
 	FOREIGN KEY(criterion) REFERENCES criterion(id)
 );
 
