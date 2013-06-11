@@ -79,7 +79,7 @@ CREATE TABLE filter ( # defines a filter for a specific entity
 	id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 	criterion INTEGER UNSIGNED, # the criterion for this filter
 	type ENUM('persons','donations','mailings','addresses') NOT NULL, # the entity this filter is applicable to
-	name VARCHAR(100), # a name for this filter. can be null when anonymous
+	name VARCHAR(120), # a name for this filter. can be null when anonymous
 	anonymous BOOLEAN NOT NULL DEFAULT FALSE, # anonymous filters are created inside other filters and only exist there
 	FOREIGN KEY(criterion) REFERENCES criterion(id)
 );
@@ -95,7 +95,7 @@ CREATE TABLE connected_criterion ( # a concrete criterion that logically connect
 
 CREATE TABLE property_criterion ( # a concrete criterion that compares an entities property with a given value
 	id INTEGER UNSIGNED PRIMARY KEY REFERENCES criterion(id),
-	property VARCHAR(50) NOT NULL, # the property of the entity to be compared
+	property VARCHAR(120) NOT NULL, # the property of the entity to be compared
 	relational_operator ENUM('EQUALS','GREATER','LESS','GREATER_EQ','LESS_EQ','LIKE','UNEQUAL','IS_NULL','IS_NOT_NULL') NOT NULL,
 	# the value the property is compared to (only either one is set)
 	numValue DOUBLE, 
@@ -110,10 +110,10 @@ CREATE TABLE mountedfilter_criterion ( # a criterion which applies another filte
 	mount INTEGER UNSIGNED NOT NULL, # the filter that will be applied to a set of entities related to this entity
 	relational_operator ENUM('EQUALS','GREATER','LESS','GREATER_EQ','LESS_EQ','LIKE','UNEQUAL','IS_NULL','IS_NOT_NULL') NOT NULL,
 	count INT, # if set, the number of the filter result will be compared with this value
-	property VARCHAR(50), # if set, either the sum or the average of this property will be compared with the given value
+	property VARCHAR(120), # if set, either the sum or the average of this property will be compared with the given value
 	sum DOUBLE,
 	avg DOUBLE,
-	FOREIGN KEY(mount) REFERENCES filter(id) ON DELETE CASCADE
+	FOREIGN KEY(mount) REFERENCES filter(id)
 );
 
 #mailings
