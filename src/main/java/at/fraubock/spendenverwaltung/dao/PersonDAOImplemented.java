@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -390,18 +391,18 @@ public class PersonDAOImplemented implements IPersonDAO {
 	@Override
 	public List<Person> getByAttributes(Person p) throws PersistenceException {
 		if (p == null) {
-			throw new IllegalArgumentException("Person must not be null");
+			return new ArrayList<Person>();
 		}
 		
 		List<Person> selectedPersons;
 		
 		
 		if(p.getMainAddress() != null){
-			String select = "select * from persons p, addresses a, livesat l WHERE (l.pid = p.id AND l.aid = a.id) AND ((p.surname LIKE ? AND p.givenname LIKE ?) AND (p.email LIKE ? OR p.telephone LIKE ? OR (a.street LIKE ? AND a.postcode LIKE ? AND a.city LIKE ?)))";
+			String select = "select * from persons p, addresses a, livesat l, validated_persons vp WHERE (l.pid = p.id AND l.aid = a.id AND vp.id = p.id) AND ((p.surname LIKE ? AND p.givenname LIKE ?) AND (p.email LIKE ? OR p.telephone LIKE ? OR (a.street LIKE ? AND a.postcode LIKE ? AND a.city LIKE ?)))";
 			selectedPersons = jdbcTemplate.query(select,
 				new Object[] { p.getSurname(), p.getGivenName(), p.getEmail(), p.getTelephone(), p.getMainAddress().getStreet(), p.getMainAddress().getPostalCode(), p.getMainAddress().getCity() }, new PersonMapper());
 		} else{
-			String select = "select * from persons p, addresses a, livesat l WHERE (l.pid = p.id AND l.aid = a.id) AND ((p.surname LIKE ? AND p.givenname LIKE ?) AND (p.email LIKE ? OR p.telephone LIKE ?))";
+			String select = "select * from persons p, addresses a, livesat l WHERE (l.pid = p.id AND l.aid = a.id AND vp.id = p.id) AND ((p.surname LIKE ? AND p.givenname LIKE ?) AND (p.email LIKE ? OR p.telephone LIKE ?))";
 			selectedPersons = jdbcTemplate.query(select,
 					new Object[] { p.getSurname(), p.getGivenName(), p.getEmail(), p.getTelephone() }, new PersonMapper());
 		}

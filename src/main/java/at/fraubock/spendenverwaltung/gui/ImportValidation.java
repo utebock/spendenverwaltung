@@ -47,6 +47,7 @@ public class ImportValidation extends JPanel {
 	private JPanel matchPanel;
 	private ComponentBuilder builder;
 	private JButton backBtn;
+	private JButton saveBtn;
 	private ButtonListener buttonListener;
 	private List<Donation> donationList;
 	private List<Person> personList;
@@ -58,8 +59,8 @@ public class ImportValidation extends JPanel {
 		
 		this.builder = new ComponentBuilder();
 		this.buttonListener = new ButtonListener(this);
-		this.importValidator = new ImportValidator(personService);
-		this.validatedData = validatedData;
+		this.importValidator = new ImportValidator(personService, donationService);
+		this.validatedData = new ValidatedData();
 		this.personService = personService;
 		this.addressService = addressService;
 		this.donationService = donationService;
@@ -99,7 +100,10 @@ public class ImportValidation extends JPanel {
 		
 		conflictPanel.add(conflictPane, "wrap, growx");
 		newPanel.add(newPane, "wrap, growx");
-		matchPanel.add(matchPane, "wrap, growx");
+		matchPanel.add(matchPane, "wrap, growx, span 2");
+
+		saveBtn = builder.createButton("Speichern", buttonListener, "save_validation");
+		matchPanel.add(saveBtn, "");
 
 		backBtn = builder.createButton("Abbrechen", buttonListener, "return_from_import_validation_to_overview");
 		matchPanel.add(backBtn, "");
@@ -147,6 +151,49 @@ public class ImportValidation extends JPanel {
 		matchTable.revalidate();
 	}
 
+	public void saveValidation(){
+		try {
+			
+			validatedData.checkPersonDoublesInNewEntries();
+			
+			donationService.setImportToNull(validatedData.getDonationListNew());
+			donationService.setImportToNull(validatedData.getDonationListMatch());
+			
+			updateDonationList(validatedData.getDonationListNew());
+			updateDonationList(validatedData.getDonationListMatch());
+			
+			deletePersonList(validatedData.getPersonsToDelete());
+		} catch (ServiceException e) {
+			JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+		    e.printStackTrace();
+		    return;
+		}
+	}
+	
+	private void updateDonationList(List<Donation> donations){
+		for(Donation d : donations){
+			try {
+				donationService.update(d);
+			} catch (ServiceException e) {
+				JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+			    e.printStackTrace();
+			    return;
+			}
+		}
+	}
+	
+	private void deletePersonList(List<Person> persons){
+		for(Person p : persons){
+			try {
+				personService.delete(p);
+			} catch (ServiceException e) {
+				JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+			    e.printStackTrace();
+			    return;
+			}
+		}
+	}
+	
 	public void returnTo() {
 		this.removeAll();
 		this.revalidate();
@@ -156,4 +203,5 @@ public class ImportValidation extends JPanel {
 		overview.repaint();
 		overview.setUp();
 	}
+	
 }

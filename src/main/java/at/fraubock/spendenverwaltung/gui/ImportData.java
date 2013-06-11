@@ -2,6 +2,7 @@ package at.fraubock.spendenverwaltung.gui;
 
 import java.awt.Font;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -12,10 +13,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
-
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
-
 
 public class ImportData extends JPanel {
 	/**
@@ -37,17 +36,16 @@ public class ImportData extends JPanel {
 	private JButton backBtn;
 	private JLabel headline;
 
-	
-	public ImportData(IImportService importService, Overview overview){
+	public ImportData(IImportService importService, Overview overview) {
 		super(new MigLayout());
-		
+
 		this.importService = importService;
 		this.overview = overview;
 		this.actionHandler = new ActionHandler(this);
 		this.builder = new ComponentBuilder();
 		this.buttonListener = new ButtonListener(this);
 		this.chooser = new JFileChooser();
-		
+
 		setUp();
 	}
 	
@@ -90,32 +88,44 @@ public class ImportData extends JPanel {
 		overview.revalidate();
 		overview.repaint();
 		overview.setUp();
-		
+
 	}
 
 	public void chooseFile() {
 		int chooserReturn = chooser.showOpenDialog(this);
-		
-		if(chooserReturn == JFileChooser.APPROVE_OPTION){
+
+		if (chooserReturn == JFileChooser.APPROVE_OPTION) {
 			pathField.setText(chooser.getSelectedFile().getAbsolutePath());
 		}
 	}
 
 	public void importData() {
-		if(pathField.getText().length()>0){
-			switch(importType.getSelectedItem().toString()){
-			case "native import":
-				try {
-					importService.nativeImport(new File(pathField.getText()));
-				} catch (ServiceException e) {
-					JOptionPane.showMessageDialog(this, "An error occured during import", "Error", JOptionPane.ERROR_MESSAGE);
-					e.printStackTrace();
+		if (pathField.getText().length() > 0) {
+			File selectedFile = new File(pathField.getText());
+			try {
+				switch (importType.getSelectedItem().toString()) {
+				case "native import":
+					importService.nativeImport(selectedFile);
+					break;
+				case "Hypo import":
+					importService.hypoImport(selectedFile);
+					break;
+				default:
+					break;
 				}
-				break;
-			default:
+				JOptionPane.showMessageDialog(this, "All rows imported",
+						"Import", JOptionPane.INFORMATION_MESSAGE);
+			} catch (ServiceException e) {
+				JOptionPane.showMessageDialog(
+						this,
+						e.getMessage(), "Error",
+						JOptionPane.ERROR_MESSAGE);
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(this,
+						e.getMessage(), "Error",
+						JOptionPane.ERROR_MESSAGE);
 			}
 		}
-		
+
 	}
-	
 }

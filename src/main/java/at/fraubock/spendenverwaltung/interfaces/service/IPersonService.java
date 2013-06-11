@@ -42,6 +42,12 @@ public interface IPersonService {
 	 * @return List of all persons
 	 */
 	public List<Person> getAll() throws ServiceException;
+
+	/**
+	 * Retrieves all confirmed Persons
+	 * @return List of all confirmed persons
+	 */
+	public List<Person> getConfirmed() throws ServiceException;
 	
 	/**
 	 * Retrieves {@link Person}s matching the given {@link Filter}

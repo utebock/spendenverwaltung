@@ -89,7 +89,10 @@ public class DonationDAOImplemented implements IDonationDAO {
 				throws SQLException {
 			PreparedStatement ps = connection.prepareStatement(createDonations,
 					Statement.RETURN_GENERATED_KEYS);
-			ps.setInt(1, donation.getDonator().getId());
+			if (donation.getDonator() == null)
+				ps.setNull(1, Types.INTEGER);
+			else
+				ps.setInt(1, donation.getDonator().getId());
 			ps.setDouble(2, donation.getAmount());
 			ps.setTimestamp(3, new Timestamp(donation.getDate().getTime()));
 			ps.setString(4, donation.getDedication());
@@ -125,7 +128,8 @@ public class DonationDAOImplemented implements IDonationDAO {
 			// update
 			String updateStatement = "update donations set personid = ?, amount = ?, donationdate = ?, dedication = ?, type = ?, note = ? where id = ?";
 
-			Object[] params = new Object[] { d.getDonator().getId(),
+			Object[] params = new Object[] {
+					d.getDonator() == null ? null : d.getDonator().getId(),
 					d.getAmount(), d.getDate(), d.getDedication(),
 					d.getType().getName(), d.getNote(), d.getId() };
 
@@ -224,7 +228,9 @@ public class DonationDAOImplemented implements IDonationDAO {
 			Donation donation = new Donation();
 			donation.setId(rs.getInt("id"));
 			try {
-				donation.setDonator(personDAO.getById(rs.getInt("personid")));
+				int personId = rs.getInt("personid");
+				if (!rs.wasNull())
+					donation.setDonator(personDAO.getById(personId));
 				donation.setSource(importDAO.getByID(rs.getInt("import")));
 			} catch (PersistenceException e) {
 				throw new SQLException(e);
@@ -269,6 +275,34 @@ public class DonationDAOImplemented implements IDonationDAO {
 		log.info(DonationList.size() + " list size");
 
 		return DonationList;
+	}
+
+	@Override
+	public void setImportToNull(List<Donation> donationList)
+			throws PersistenceException {
+		String updateStmt = "UPDATE donations SET import=null WHERE id=?";
+
+		for (Donation d : donationList) {
+			jdbcTemplate.update(updateStmt, new Object[] { d.getId() },
+					new int[] { Types.INTEGER });
+		}
+	}
+
+	@Override
+	public boolean donationExists(Donation d) throws PersistenceException {
+		String select = "SELECT * FROM validated_donations WHERE personid=? AND amount=? AND donationdate=? AND dedication=? AND type=? AND note=?";
+
+		Object[] params = new Object[] { d.getDonator().getId(), d.getAmount(),
+				d.getDate(), d.getDedication(), d.getType().getName(),
+				d.getNote() };
+
+		List<Donation> donations = jdbcTemplate.query(select, params,
+				new DonationMapper());
+
+		if (donations.size() == 0)
+			return false;
+		else
+			return true;
 	}
 
 }
