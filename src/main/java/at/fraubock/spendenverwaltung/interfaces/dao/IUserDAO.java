@@ -18,5 +18,5 @@ public interface IUserDAO {
 	 * 			false if password, username or both is wrong
 	 * @throws PersistenceException 
 	 */
-	public boolean isUserValid(String user, String pwd) throws PersistenceException;
+	public String isUserValid(String user, String pwd) throws PersistenceException;
 }

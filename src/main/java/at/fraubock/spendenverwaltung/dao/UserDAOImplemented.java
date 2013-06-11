@@ -3,6 +3,7 @@ package at.fraubock.spendenverwaltung.dao;
 import java.sql.Types;
 import java.util.List;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -23,15 +24,17 @@ public class UserDAOImplemented implements IUserDAO{
 	}
 	
 	@Override
-	public boolean isUserValid(String user, String pwd) throws PersistenceException{
+	public String isUserValid(String user, String pwd) throws PersistenceException{
 		if(user.equals("") || pwd.equals(""))
-			return false;
+			return null;
 		
-		String selectStmt = "SELECT count(*) FROM mysql.user where user=? AND password=password(?)";
+		String selectStmt = "SELECT user FROM mysql.user where user=? AND password=password(?)";
 		
-		int total = jdbcTemplate.queryForObject(selectStmt, new Object[] { user, pwd }, Integer.class);
-		
-		return (total >= 1);
+		try{
+			return jdbcTemplate.queryForObject(selectStmt, new Object[] { user, pwd }, String.class);
+		} catch(EmptyResultDataAccessException e){
+			return null;
+		}
 	}
 
 }

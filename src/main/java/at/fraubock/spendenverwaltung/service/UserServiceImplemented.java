@@ -22,15 +22,15 @@ public class UserServiceImplemented implements IUserService {
 	}
 
 	@Override
-	public boolean isUserValid(String user, String pwd) throws ServiceException {
-		boolean valid = false;
+	public String isUserValid(String user, String pwd) throws ServiceException {
+		String userName;
 		
 		try {
-			valid = userDAO.isUserValid(user, pwd);
+			userName = userDAO.isUserValid(user, pwd);
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
-		return valid;
+		return userName;
 	}
 
 }
