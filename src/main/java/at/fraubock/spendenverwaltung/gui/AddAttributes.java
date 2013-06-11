@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +18,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
 import org.jdesktop.swingx.JXDatePicker;
@@ -103,8 +101,6 @@ public class AddAttributes extends JPanel{
 	private NumericTextField amount;
 	
 	private JLabel donationDateLabel;
-	private JXDatePicker donationDate;
-	
 	private JLabel dedicationLabel;
 	private StringTextField dedication;
 	
@@ -252,7 +248,7 @@ public class AddAttributes extends JPanel{
 			addressPostalLabel = componentFactory.createLabel("PLZ: ");
 			postalField = new NumericTextField(ComponentConstants.SHORT_TEXT, false);
 			addAddressPanel.add(addressPostalLabel, "");
-			addAddressPanel.add(postalField, "wrap 0px");
+			addAddressPanel.add(postalField, "wrap 0px, growx");
 
 			addressCityLabel = componentFactory.createLabel("Ort: ");
 			cityField = new StringTextField(ComponentConstants.MEDIUM_TEXT, false);
@@ -273,9 +269,28 @@ public class AddAttributes extends JPanel{
 			if(go == 1){
 				// create new address
 				Address addr = new Address();
+				if(streetField.validateContents()==false){
+					JOptionPane.showMessageDialog(overviewPanel, "Bitte korrigieren Sie Ihre Eingabe: Stra\u00DFe", "Warnung", JOptionPane.WARNING_MESSAGE);
+					AddAddressAction action = new AddAddressAction();
+					action.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+				}
+				if(postalField.validateContents()==false){
+					JOptionPane.showMessageDialog(overviewPanel, "Bitte \u00FCberpr\u00FCfen Sie Ihre Eingabe: PLZ", "Warnung", JOptionPane.WARNING_MESSAGE);
+					AddAddressAction action = new AddAddressAction();
+					action.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+				}
+				if(cityField.validateContents()==false){
+					JOptionPane.showMessageDialog(overviewPanel, "Bitte \u00FCberpr\u00FCfen Sie Ihre Eingabe: Ort", "Warnung", JOptionPane.WARNING_MESSAGE);
+					AddAddressAction action = new AddAddressAction();
+					action.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+				}
+				if(countryField.validateContents()==false){
+					JOptionPane.showMessageDialog(overviewPanel, "Bitte \u00FCberpr\u00FCfen Sie Ihre Eingabe: Land", "Warnung", JOptionPane.WARNING_MESSAGE);
+					AddAddressAction action = new AddAddressAction();
+					action.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+				}
 				
-				if(streetField.validateContents()==true && postalField.validateContents()==true
-						&& cityField.validateContents()==true && countryField.validateContents()==true){
+				else{
 					addr.setStreet(streetField.getText());
 					addr.setPostalCode(postalField.getText());
 					addr.setCity(cityField.getText());
@@ -299,6 +314,9 @@ public class AddAttributes extends JPanel{
 					JOptionPane.showMessageDialog(overviewPanel, "Adresse erfolgreich angelegt.", "Information", JOptionPane.INFORMATION_MESSAGE);
 					addressTable.revalidate();
 				}
+			}
+			else{
+				return;
 			}
 		}
 	}
@@ -345,10 +363,16 @@ public class AddAttributes extends JPanel{
 			int go = JOptionPane.showOptionDialog(overviewPanel, addDonation, "Spende anlegen", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[1]);
 			
 			if(go == 1){
-				if(amount.validateContents()==true){
+				if(amount.validateContents()==false){
+					JOptionPane.showMessageDialog(overviewPanel, "Bitte korrigieren Sie Ihre Eingabe: Spendenbetrag", "Warnung", JOptionPane.WARNING_MESSAGE);
+					AddAddressAction action = new AddAddressAction();
+					action.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+				}
+				
+				else{
 					donation.setDonator(person);
 					donation.setAmount(Long.parseLong(amount.getText()));
-					donation.setDate(donationDate.getDate());
+					donation.setDate(datePicker.getDate());
 					donation.setType(Donation.DonationType.values()[type.getSelectedIndex()]);
 					donation.setDedication(dedication.getText());
 					donation.setNote(donationNote.getText());
@@ -364,10 +388,8 @@ public class AddAttributes extends JPanel{
 				    		return;
 					}
 					JOptionPane.showMessageDialog(overviewPanel, "Spende erfolgreich angelegt", "Information", JOptionPane.INFORMATION_MESSAGE);
-					
 				}
-			}
-			
+			}	
 		}
 	}
 	
