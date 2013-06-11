@@ -15,6 +15,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
+import at.fraubock.spendenverwaltung.interfaces.service.IUserService;
 
 /**
  * 
@@ -39,6 +40,7 @@ public class ViewActionFactory {
 	IFilterService filterService;
 	IAddressService addressService;
 	IMailingService mailingService;
+	IUserService userService;
 
 	public ViewActionFactory(ViewDisplayer viewDisplayer, IPersonService personService, IDonationService donationService,
 			IFilterService filterService, IAddressService addressService, IMailingService mailingService) {
@@ -49,6 +51,7 @@ public class ViewActionFactory {
 		this.donationService = donationService;
 		this.mailingService = mailingService;
 		this.filterService = filterService;
+		this.userService = userService;
 	}
 	
 	/**

@@ -1,6 +1,7 @@
 package at.fraubock.spendenverwaltung.gui;
 
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
@@ -29,10 +30,11 @@ public class Login extends JDialog {
 	private JButton cancelBtn;
 	private MainFrame parent;
 	private IUserService userService;
+	private GuiStarter guiStarter;
 	
-	public Login(MainFrame mainFrame, IUserService userService){
-		this.parent = mainFrame;
+	public Login(IUserService userService, GuiStarter guiStarter){
 		this.userService = userService;
+		this.guiStarter = guiStarter;
 		setUp();
 	}
 	
@@ -57,6 +59,11 @@ public class Login extends JDialog {
 		loginBtn.addActionListener(new LoginAction(this));
 		
 		pack();
+		final Toolkit toolkit = Toolkit.getDefaultToolkit();
+		final Dimension screenSize = toolkit.getScreenSize();
+		final int x = (screenSize.width - getWidth()) / 2;
+		final int y = (screenSize.height - getHeight()) / 2;
+		setLocation(x, y);
 		setVisible(true);
 	}
 	
@@ -75,8 +82,8 @@ public class Login extends JDialog {
 		}
 		
 		if(isValid){
+			guiStarter.startGui();
 			this.dispose();
-			parent.setUpGUI();
 		} else{
 			JOptionPane.showMessageDialog(parent, "Benutzername oder Passwort ist falsch. Bitte probieren Sie es erneut",
 					  "Benutzer/Passwort Falsch", JOptionPane.INFORMATION_MESSAGE);
@@ -110,7 +117,6 @@ public class Login extends JDialog {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			dialog.dispose();
-			parent.dispose();
 		}
 	}
 }

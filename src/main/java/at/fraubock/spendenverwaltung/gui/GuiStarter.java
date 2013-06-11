@@ -1,5 +1,7 @@
 package at.fraubock.spendenverwaltung.gui;
 
+import javax.swing.JDialog;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -13,21 +15,14 @@ import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
+import at.fraubock.spendenverwaltung.interfaces.service.IUserService;
 
 public class GuiStarter {
 	
 //	private static final Logger log = Logger.getLogger(GuiStarter.class);
+	private ApplicationContext context;
 	
 	public void startGui() {
-		
-		//warning is unnecessary in this case, the resource is in fact closed on exit
-		@SuppressWarnings("resource")
-		ApplicationContext context = new ClassPathXmlApplicationContext("/spring.xml");
-		/**
-		 * when the GUI is closed, SYSTEM_EXIT is called. this shutdown hook ensures 
-		 * the graceful shutdown of the context.
-		 */
-		((AbstractApplicationContext) context).registerShutdownHook();
 		
 		IPersonService personService = context.getBean("personService", IPersonService.class);
 		IDonationService donationService = context.getBean("donationService", IDonationService.class);
@@ -64,4 +59,18 @@ public class GuiStarter {
 		viewDisplayer.changeView(mainMenu);
 	}
 
+	public void login(){
+		//warning is unnecessary in this case, the resource is in fact closed on exit
+		this.context = new ClassPathXmlApplicationContext("/spring.xml");
+		/**
+		 * when the GUI is closed, SYSTEM_EXIT is called. this shutdown hook ensures 
+		 * the graceful shutdown of the context.
+		 */
+		((AbstractApplicationContext) context).registerShutdownHook();
+
+		IUserService userService = context.getBean("userService", IUserService.class);
+		
+		JDialog loginDialog = new Login(userService, this);
+	}
+	
 }
