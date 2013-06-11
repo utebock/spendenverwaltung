@@ -3,11 +3,10 @@ package at.fraubock.spendenverwaltung.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
-
 import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
 import at.fraubock.spendenverwaltung.gui.views.FindPersonsView;
 
+@Deprecated
 public class ButtonListener implements ActionListener{
 
 	private Overview overview;
@@ -60,7 +59,7 @@ public class ButtonListener implements ActionListener{
 		String cmd = e.getActionCommand();		
 		
 		if(cmd.equals("edit_filter")){
-			filterOverview.createFilter((JButton)e.getSource());
+//			filterOverview.createFilter((JButton)e.getSource());
 		}
 		
 		if(cmd.equals("delete_filter")){
@@ -68,20 +67,20 @@ public class ButtonListener implements ActionListener{
 		}
 		
 		if(cmd.equals("plusButton_create_filter")){
-			createFilter.gainMore();
+//			createFilter.gainMore();
 		}
 		
 		if(cmd.equals("minusButton_create_filter")){
-			createFilter.removeSelector(e.getSource());
+//			createFilter.removeSelector(e.getSource());
 		}
 		
 		if(cmd.equals("cancel_filter_in_db")){
-			createFilter.returnTo();
+//			createFilter.returnTo();
 		}
 		
-		if(cmd.equals("create_filter_in_db")){
-			createFilter.createFilter();
-		}
+//		if(cmd.equals("create_filter_in_db")){
+//			createFilter.createFilter();
+//		}
 		
 		if(cmd.equals("create_person")){
 		//	overview.goToCreate();
@@ -132,7 +131,7 @@ public class ButtonListener implements ActionListener{
 			filterOverview.returnTo();
 		}
 		if(cmd.equals("add_filter")){
-			filterOverview.createFilter((JButton)e.getSource());
+//			filterOverview.createFilter((JButton)e.getSource());
 		}
 		if(cmd.equals("open_create_donation_in_show_person")){
 		//	showPerson.addDonation();
