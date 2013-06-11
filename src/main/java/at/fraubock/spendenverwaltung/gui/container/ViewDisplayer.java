@@ -43,6 +43,10 @@ public class ViewDisplayer {
 		scrollPane.getViewport().add(newView);
 	}
 	
+	public void closeView(){
+		frame.dispose();
+	}
+	
 //	/**
 //	 * small test method to make sure view switching works
 //	 * @throws InterruptedException

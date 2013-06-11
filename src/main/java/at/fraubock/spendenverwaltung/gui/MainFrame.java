@@ -66,7 +66,7 @@ public class MainFrame extends JFrame{
 	}
 
 	private void setUpLogin(){
-		JDialog loginDialog = new Login(this, userService);
+		//JDialog loginDialog = new LoginView(this, userService);
 		
 		//setUpGUI();
 	}

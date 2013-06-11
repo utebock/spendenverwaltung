@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.JTextField;
 
 import org.apache.log4j.Logger;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
@@ -47,7 +48,7 @@ public class DonationProgressStatsView extends InitializableView {
 	private JLabel chooseOperation;
 	private JComboBox<String> operationBox;
 	private JLabel resultLabel;
-	private JLabel result;
+	private JTextField result;
 
 	public DonationProgressStatsView(ComponentFactory componentFactory, ViewActionFactory viewActionFactory, 
 			IDonationService donationService, IFilterService filterService) {
@@ -75,7 +76,7 @@ public class DonationProgressStatsView extends InitializableView {
 	}
 
 	private void setUpCreate() {
-		overviewPanel = componentFactory.createPanel(800, 800);
+		overviewPanel = componentFactory.createPanel(700, 800);
 		this.add(overviewPanel);
 		doSingleStat = componentFactory.createLabel("Statistische Berechnungen durchf\u00FChren ");
 		doSingleStat.setFont(new Font("Headline", Font.PLAIN, 14));
@@ -99,7 +100,7 @@ public class DonationProgressStatsView extends InitializableView {
 		chooseFilter = componentFactory.createLabel("Filter ausw\u00E4hlen: ");
 		overviewPanel.add(chooseFilter, "split2");
 		choooseSingleFilter = new JComboBox<Filter>(new SimpleComboBoxModel<Filter>(donationFilters));
-		overviewPanel.add(choooseSingleFilter, "wrap, growx");
+		overviewPanel.add(choooseSingleFilter, "gap 33, wrap, growx");
 		
 		chooseOperation = componentFactory.createLabel("Operation ausw\u00E4hlen: ");
 		overviewPanel.add(chooseOperation, "split2");
@@ -110,9 +111,9 @@ public class DonationProgressStatsView extends InitializableView {
 		overviewPanel.add(operationBox, "growx, wrap");
 		
 		resultLabel = componentFactory.createLabel("Ergebnis: ");
-		result = componentFactory.createLabel(""); //get calculated result here
+		result = componentFactory.createTextField(150); //get calculated result here
 		overviewPanel.add(resultLabel, "split2");
-		overviewPanel.add(result, "wrap 20px");
+		overviewPanel.add(result, "gap 82, growx, wrap 30px");
 		
 		submit = new JButton();
 		cancel = new JButton();

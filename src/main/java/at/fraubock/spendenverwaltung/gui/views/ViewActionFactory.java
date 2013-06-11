@@ -15,6 +15,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
+import at.fraubock.spendenverwaltung.interfaces.service.IUserService;
 
 /**
  * 
@@ -39,9 +40,10 @@ public class ViewActionFactory {
 	IFilterService filterService;
 	IAddressService addressService;
 	IMailingService mailingService;
+	IUserService userService;
 
 	public ViewActionFactory(ViewDisplayer viewDisplayer, IPersonService personService, IDonationService donationService,
-			IFilterService filterService, IAddressService addressService, IMailingService mailingService) {
+			IFilterService filterService, IAddressService addressService, IMailingService mailingService, IUserService userService) {
 		
 		this.viewDisplayer = viewDisplayer;
 		this.personService = personService;
@@ -49,6 +51,7 @@ public class ViewActionFactory {
 		this.donationService = donationService;
 		this.mailingService = mailingService;
 		this.filterService = filterService;
+		this.userService = userService;
 	}
 	
 	/**
@@ -68,6 +71,10 @@ public class ViewActionFactory {
 	
 	public Action getFindPersonsViewAction() {
 		return new DisplayViewAction(new FindPersonsView(personService, addressService, donationService, filterService, new ComponentFactory(), this, new PersonTableModel()), "/images/getPersons.jpg");
+	}
+	
+	public Action getFindPersonsView() {
+		return new DisplayViewAction(new FindPersonsView(personService, addressService, donationService, filterService, new ComponentFactory(), this, new PersonTableModel()));
 	}
 	
 	public Action getMainFilterViewAction() {

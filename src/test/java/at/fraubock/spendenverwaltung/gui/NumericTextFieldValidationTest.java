@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +16,7 @@ import at.fraubock.spendenverwaltung.gui.components.NumericTextField;
 public class NumericTextFieldValidationTest {
 
 	private NumericTextField field;
-	private static char separator = DecimalFormatSymbols.getInstance().getDecimalSeparator();
+	private static char separator = DecimalFormatSymbols.getInstance(Locale.GERMAN).getDecimalSeparator();
 	
 	@Before
 	public void initialize() {

@@ -6,6 +6,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
+import at.fraubock.spendenverwaltung.gui.views.LoginView;
 import at.fraubock.spendenverwaltung.gui.views.MainMenuView;
 import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
@@ -13,6 +14,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
+import at.fraubock.spendenverwaltung.interfaces.service.IUserService;
 
 public class GuiStarter {
 	
@@ -34,6 +36,7 @@ public class GuiStarter {
 		IFilterService filterService = context.getBean("filterService", IFilterService.class);
 		IAddressService addressService = context.getBean("addressService", IAddressService.class);
 		IMailingService mailingService = context.getBean("mailingService", IMailingService.class);
+		IUserService userService = context.getBean("userService", IUserService.class);
 		
 		ViewDisplayer viewDisplayer = new ViewDisplayer();
 		ComponentFactory componentFactory = new ComponentFactory();
@@ -42,13 +45,12 @@ public class GuiStarter {
 		 * 
 		 */
 		ViewActionFactory viewActionFactory = new ViewActionFactory(viewDisplayer, personService,
-				donationService, filterService, addressService, mailingService);
+				donationService, filterService, addressService, mailingService, userService);
 		
 		
 		//need to call mainMenu.init() after all views are set in the viewActionFactory
 		//layout code is called from constructor, button initialization code is called from init()
 				
-		MainMenuView mainMenu = new MainMenuView(viewActionFactory, componentFactory);
 		//populate viewActionFactory
 		
 		
@@ -58,10 +60,15 @@ public class GuiStarter {
 //		mainFilterView.init();
 //		donationProgressStatsView.init();
 //		findPersonsView.init();
-		mainMenu.init();
-		
+		//mainMenu.init();
+
 		//display initial main menu
-		viewDisplayer.changeView(mainMenu);
+		//viewDisplayer.changeView(mainMenu);
+
+		//switch to login view
+		LoginView login = new LoginView(userService, componentFactory, viewActionFactory, viewDisplayer);
+		login.init();
+		viewDisplayer.changeView(login);
 	}
 
 }
