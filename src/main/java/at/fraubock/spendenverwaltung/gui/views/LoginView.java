@@ -115,6 +115,10 @@ public class LoginView extends InitializableView {
 		pwd = new JPasswordField();
 		loginBtn = new JButton("Login");
 		cancelBtn = new JButton("Abbrechen");
+		
+		//just for testing
+		user.setText("ubadministrative");
+		pwd.setText("ubadmin");
 
 		add(userLabel, "gaptop 270, gapleft 200");
 		add(user, "wrap, w 200!, gapleft 30");
