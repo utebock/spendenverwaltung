@@ -138,7 +138,7 @@ public abstract class AbstractStatsTest {
 		filter.setType(FilterType.DONATION);
 		
 		try{
-			filterDAO.insertOrUpdate(filter);
+			filterDAO.insert(filter);
 		}catch(PersistenceException e){
 			fail();
 		}
@@ -153,7 +153,7 @@ public abstract class AbstractStatsTest {
 		filter2.setType(FilterType.DONATION);
 		
 		try{
-			filterDAO.insertOrUpdate(filter2);
+			filterDAO.insert(filter2);
 		}catch(PersistenceException e){
 			fail();
 		}

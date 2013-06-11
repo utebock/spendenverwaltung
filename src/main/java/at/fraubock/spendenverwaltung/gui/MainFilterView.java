@@ -4,9 +4,12 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -30,23 +33,16 @@ import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.FilterInUseException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
-import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
-import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
-import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.FilterType;
 
 public class MainFilterView extends InitializableView {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = Logger.getLogger(MainFilterView.class);
-	private IPersonService personService;
-	private IAddressService addressService;
-	private IDonationService donationService;
 	private IFilterService filterService;
 	private Overview overview;
 	private ComponentBuilder builder;
-	private ButtonListener buttonListener;
 	private ViewActionFactory viewActionFactory;
 	private ComponentFactory componentFactory;
 	
@@ -93,8 +89,6 @@ public class MainFilterView extends InitializableView {
 	}
 
 	public void init() {
-		// new ActionHandler(this);
-		buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
 		panel = builder.createPanel(800, 850);
 		this.add(panel);
@@ -111,31 +105,78 @@ public class MainFilterView extends InitializableView {
 	}
 
 	private void addComponentsToToolbar(JToolBar toolbar) {
-		personFilter = builder.createButton(
-				"<html>&nbsp;Personenfilter erstellen</html>", buttonListener,
-				"add_filter");
-		personFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
-		sendingsFilter = builder.createButton(
-				"<html>&nbsp;Aussendungsfilter erstellen</html>",
-				buttonListener, "add_filter");
-		sendingsFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
-		donationFilter = builder.createButton(
-				"<html>&nbsp;Spendenfilter erstellen</html>", buttonListener,
-				"add_filter");
-		donationFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
-		edit = builder.createButton("<html>&nbsp;Filter bearbeiten</html>",
-				buttonListener, "edit_filter");
-		edit.setFont(new Font("Bigger", Font.PLAIN, 13));
-		delete = builder.createButton("<html>&nbsp;Filter l\u00F6schen</html>",
-				buttonListener, "delete_filter");
-		delete.setFont(new Font("Bigger", Font.PLAIN, 13));
-//		backButton = builder.createButton("<html>&nbsp;Zur\u00FCck</html>",
-//				buttonListener, "return_to_overview");
-//		backButton.setFont(new Font("Bigger", Font.PLAIN, 13));
+		personFilter = new JButton();
+		personFilter.setAction(new AbstractAction("Personenfilter erstellen") {
+			private static final long serialVersionUID = 7948990257221071839L;
 
-		backButton = new JButton("Zur\u00FCck");
+			@Override
+			public void actionPerformed(ActionEvent a) {
+				createFilter(FilterType.PERSON,null);
+			}
+			
+		});
+		personFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
+		
+		sendingsFilter = new JButton();
+		sendingsFilter.setAction(new AbstractAction("Aussendungsfilter erstellen") {
+			private static final long serialVersionUID = 7948990257221071839L;
+
+			@Override
+			public void actionPerformed(ActionEvent a) {
+				createFilter(FilterType.MAILING,null);
+			}
+			
+		});
+		sendingsFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
+		
+		donationFilter = new JButton();
+		donationFilter.setAction(new AbstractAction("Spendenfilter erstellen") {
+			private static final long serialVersionUID = 7948990257221071839L;
+
+			@Override
+			public void actionPerformed(ActionEvent a) {
+				createFilter(FilterType.DONATION,null);
+			}
+			
+		});
+		donationFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
+		
+		edit = new JButton();
+		edit.setAction(new AbstractAction("Filter bearbeiten") {
+			private static final long serialVersionUID = 7948990257221071839L;
+
+			@Override
+			public void actionPerformed(ActionEvent a) {
+				if (showTable.getSelectedRow() == -1) {
+					JOptionPane.showMessageDialog(MainFilterView.this,
+							"Bitte Filter zum Bearbeiten ausw\u00E4hlen.");
+					return;
+				}
+				Filter filter = filterModel.getFilterRow(showTable.getSelectedRow());
+				createFilter(filter.getType(),filter);
+			}
+			
+		});
+		edit.setFont(new Font("Bigger", Font.PLAIN, 13));
+		
+		delete = new JButton();
+		delete.setAction(new AbstractAction("Filter l\u00F6schen") {
+			private static final long serialVersionUID = 7948990257221071839L;
+
+			@Override
+			public void actionPerformed(ActionEvent a) {
+				deleteFilter();
+			}
+			
+		});
+		delete.setFont(new Font("Bigger", Font.PLAIN, 13));
+
+		backButton = new JButton();
 		backButton.setFont(new Font("Bigger", Font.PLAIN, 13));
-		backButton.setAction(viewActionFactory.getMainMenuViewAction());
+		Action act = viewActionFactory.getMainMenuViewAction();
+		act.putValue(Action.NAME, "<html>&nbsp;Zur\u00FCck</html>");
+		backButton.setAction(act);
+		
 		toolbar.add(personFilter);
 		toolbar.add(donationFilter);
 		toolbar.add(sendingsFilter);
@@ -174,26 +215,8 @@ public class MainFilterView extends InitializableView {
 		}
 	}
 
-	public void createFilter(JButton button) {
-		FilterType type = null;
-		Filter filter = null;
-		if (button == personFilter) {
-			type = FilterType.PERSON;
-		} else if (button == donationFilter) {
-			type = FilterType.DONATION;
-		} else if (button == sendingsFilter) {
-			type = FilterType.MAILING;
-		} else if (button == edit) {
-			if (showTable.getSelectedRow() == -1) {
-				JOptionPane.showMessageDialog(this,
-						"Bitte Filter zum Bearbeiten ausw\u00E4hlen.");
-				return;
-			}
-			filter = filterModel.getFilterRow(showTable.getSelectedRow());
-			type = filter.getType();
-		}
-
-		CreateFilter cf = new CreateFilter(type, filterService, this, filter);
+	public void createFilter(FilterType type, Filter filter) {
+		CreateFilter cf = new CreateFilter(type, filterService, this, filter,viewActionFactory);
 		removeAll();
 		revalidate();
 		repaint();

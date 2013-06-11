@@ -6,7 +6,10 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
+import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -15,12 +18,12 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import net.miginfocom.swing.MigLayout;
-import at.fraubock.spendenverwaltung.gui.ButtonListener;
 import at.fraubock.spendenverwaltung.gui.ComponentBuilder;
 import at.fraubock.spendenverwaltung.gui.CustomTextField;
-import at.fraubock.spendenverwaltung.gui.MainFilterView;
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
+import at.fraubock.spendenverwaltung.gui.MainFilterView;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
+import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.ConnectedCriterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
@@ -39,7 +42,6 @@ public class CreateFilter extends JPanel {
 
 	private MainFilterView filterOverview;
 	private ComponentBuilder builder;
-	private ButtonListener buttonListener;
 
 	private IFilterService filterService;
 	private FilterType type;
@@ -49,6 +51,8 @@ public class CreateFilter extends JPanel {
 
 	private CustomTextField nameField;
 	private JButton plusButton;
+
+	private ViewActionFactory viewActionFactory;
 
 	private JLabel headline;
 	private JPanel operatorPicker;
@@ -62,25 +66,38 @@ public class CreateFilter extends JPanel {
 	JRadioButton radioPublic;
 	
 	public CreateFilter(FilterType type, IFilterService filterService,
-			MainFilterView overview) {
-		this(type, filterService, overview, null);
+			MainFilterView overview, ViewActionFactory viewActionFactory) {
+		this(type, filterService, overview, null, viewActionFactory);
 	}
 
 	public CreateFilter(FilterType type, IFilterService filterService,
-			MainFilterView filterOverview, Filter editFilter) {
+			MainFilterView filterOverview, Filter editFilter,
+			ViewActionFactory viewActionFactory) {
 		super(new MigLayout());
 
 		// set attributes
+		this.viewActionFactory = viewActionFactory;
 		this.editFilter = editFilter;
 		this.filterService = filterService;
 		this.filterOverview = filterOverview;
-		this.buttonListener = new ButtonListener(this);
 		this.builder = new ComponentBuilder();
 		this.type = type;
 		this.factory = new ConfiguratorFactory(type, editFilter);
 		this.criterionSelectorPanel = builder.createPanel(800, 500);
-		this.plusButton = builder.createImageButton("/images/plusButton.gif",
-				buttonListener, "plusButton_create_filter");
+
+		this.plusButton = new JButton();
+		AbstractAction plusAct = new AbstractAction() {
+			private static final long serialVersionUID = 5503627241676586871L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				gainMore();
+			}
+
+		};
+		plusAct.putValue(Action.SMALL_ICON, new ImageIcon(getClass()
+				.getResource("/images/plusButton.gif")));
+		plusButton.setAction(plusAct);
 
 		// set up GUI
 		setUpCreate();
@@ -91,12 +108,25 @@ public class CreateFilter extends JPanel {
 		criterionSelectorPanel.add(plusButton, "wrap, gapleft 7, gaptop 10");
 
 		// add controls
-		this.controlButtonPanel = new JPanel();
-		controlButtonPanel.add(builder.createButton("Speichern", buttonListener,
-				"create_filter_in_db"));
+		JButton saveButton = new JButton();
+		saveButton.setAction(new AbstractAction("Speichern") {
+			private static final long serialVersionUID = 1L;
 
-		controlButtonPanel.add(builder.createButton("Abbrechen",
-				buttonListener, "cancel_filter_in_db"));
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				createFilter();
+			}
+
+		});
+
+		JButton cancelButton = new JButton();
+		Action cancelAction = this.viewActionFactory.getMainFilterViewAction();
+		cancelAction.putValue(Action.NAME, "<html>Abbrechen</html>");
+		cancelAction.putValue(Action.SMALL_ICON, null);
+		cancelButton.setAction(cancelAction);
+		this.controlButtonPanel = new JPanel();
+		controlButtonPanel.add(saveButton);
+		controlButtonPanel.add(cancelButton);
 
 		add(controlButtonPanel);
 	}
@@ -104,11 +134,12 @@ public class CreateFilter extends JPanel {
 	private void setUpCreate() {
 
 		// create headline
-		if(editFilter==null) {
+		if (editFilter == null) {
 			headline = builder.createLabel("Neuen Filter f\u00FCr "
 					+ type.getDisplayName() + " anlegen");
 		} else {
-			headline = builder.createLabel("Filter " + editFilter.getName() + " bearbeiten");
+			headline = builder.createLabel("Filter " + editFilter.getName()
+					+ " bearbeiten");
 		}
 		headline.setFont(new Font("Headline", Font.PLAIN, 14));
 		this.add(headline, "wrap, gapbottom 20");
@@ -119,7 +150,7 @@ public class CreateFilter extends JPanel {
 		// nameField is not usable, since height is ~1px - ch
 		// filterNamePanel.setPreferredSize(new Dimension(800,250));
 		nameField = new CustomTextField(100);
-		if(editFilter!=null) {
+		if (editFilter != null) {
 			nameField.setText(editFilter.getName());
 		}
 		this.add(builder.createLabel("Filtername: "), "split 2");
@@ -154,22 +185,22 @@ public class CreateFilter extends JPanel {
 		operatorPicker.add(new JLabel("G\u00FCltig, wenn"));
 		final JComboBox<String> operatorCombo = new JComboBox<String>(
 				new SimpleComboBoxModel<String>("alle", "ein"));
-		
-		if(editFilter!=null) {
+
+		if (editFilter != null) {
 			Criterion crit = editFilter.getCriterion();
-			if(crit instanceof ConnectedCriterion) {
-				ConnectedCriterion con = (ConnectedCriterion)crit;
-				if(con.getLogicalOperator()==LogicalOperator.AND) {
+			if (crit instanceof ConnectedCriterion) {
+				ConnectedCriterion con = (ConnectedCriterion) crit;
+				if (con.getLogicalOperator() == LogicalOperator.AND) {
 					operatorCombo.setSelectedItem("alle");
 					andOperator = true;
-				} else if(con.getLogicalOperator()==LogicalOperator.OR) {
+				} else if (con.getLogicalOperator() == LogicalOperator.OR) {
 					operatorCombo.setSelectedItem("ein");
 					andOperator = false;
 					operatorLabel.setText(" Kriterium erf\u00FCllt ist:");
 				}
 			}
 		}
-		
+
 		operatorCombo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String operator = (String) operatorCombo.getModel()
@@ -206,9 +237,20 @@ public class CreateFilter extends JPanel {
 		// add selector to panel and list
 		selectors.add(selectorComp);
 
-		JButton minusButton = builder.createImageButton(
-				"/images/minusButton.gif", buttonListener,
-				"minusButton_create_filter");
+		JButton minusButton = new JButton();
+		AbstractAction minusAct = new AbstractAction() {
+			private static final long serialVersionUID = 5503627241676586871L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				removeSelector(e.getSource());
+			}
+
+		};
+		minusAct.putValue(Action.SMALL_ICON, new ImageIcon(getClass()
+				.getResource("/images/minusButton.gif")));
+		minusButton.setAction(minusAct);
+		
 		minusButtons.add(minusButton);
 		criterionSelectorPanel.add(selectorComp, "w 800");
 		criterionSelectorPanel.add(minusButton, "wrap");
@@ -267,14 +309,15 @@ public class CreateFilter extends JPanel {
 
 			filter.setCriterions(crits);
 
-			if(editFilter!=null) {
+			if (editFilter != null) {
 				filterService.update(editFilter, filter);
 			} else {
 				filterService.create(filter);
 			}
 
-			JOptionPane.showMessageDialog(this, "Filter erfolgreich gespeichert!",
-					"Info", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(this,
+					"Filter erfolgreich gespeichert!", "Info",
+					JOptionPane.INFORMATION_MESSAGE);
 			returnTo();
 		} catch (ServiceException e) {
 			JOptionPane.showMessageDialog(this,
@@ -287,7 +330,7 @@ public class CreateFilter extends JPanel {
 		}
 	}
 
-	public void returnTo() {
+	private void returnTo() {
 		this.removeAll();
 		this.revalidate();
 		this.repaint();
@@ -296,9 +339,9 @@ public class CreateFilter extends JPanel {
 		filterOverview.repaint();
 		filterOverview.init();
 	}
-	
+
 	private void renderCriterion(Criterion crit) {
-		if(crit==null) {
+		if (crit == null) {
 			return;
 		}
 		if (crit instanceof ConnectedCriterion) {

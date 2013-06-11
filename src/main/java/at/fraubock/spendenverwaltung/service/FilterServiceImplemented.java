@@ -38,7 +38,7 @@ public class FilterServiceImplemented implements IFilterService {
 	public Filter create(FilterTO f) throws ServiceException {
 		try {
 			Filter filter = createFilterFromTransferObject(f);
-			filterDAO.insertOrUpdate(filter);
+			filterDAO.insert(filter);
 			return filter;
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);

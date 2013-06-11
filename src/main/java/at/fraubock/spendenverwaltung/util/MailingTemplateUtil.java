@@ -33,9 +33,9 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
  * @author romanvoglhuber
  *
  */
-public class MailingTemplate {
+public class MailingTemplateUtil {
 
-	private static final Logger log = Logger.getLogger(MailingTemplate.class);
+	private static final Logger log = Logger.getLogger(MailingTemplateUtil.class);
 	
 	/**
 	 * Takes a docx template and a person list and creates a pdf file.

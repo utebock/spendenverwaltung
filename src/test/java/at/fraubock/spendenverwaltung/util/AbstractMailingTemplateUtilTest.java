@@ -22,7 +22,7 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/testspring.xml")
 @TransactionConfiguration(defaultRollback=true)
-public abstract class AbstractMailingTemplateTest {
+public abstract class AbstractMailingTemplateUtilTest {
 
 
 	protected static IPersonDAO personDAO;
@@ -30,12 +30,12 @@ public abstract class AbstractMailingTemplateTest {
 	
 	
 	public static void setPersonDAO(IPersonDAO personDAO) {
-		AbstractMailingTemplateTest.personDAO = personDAO;
+		AbstractMailingTemplateUtilTest.personDAO = personDAO;
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void nullArgumentShouldThrowException() throws IOException, ServiceException{
-		MailingTemplate.createMailingWithDocxTemplate(null, null, null);
+		MailingTemplateUtil.createMailingWithDocxTemplate(null, null, null);
 	}
 	
 	/* Just to test Mailing template without GUI 
@@ -49,7 +49,7 @@ public abstract class AbstractMailingTemplateTest {
 	
 	@Test(expected=IOException.class)
 	public void invalidFileShouldThrowIOException() throws ServiceException, IOException{
-		MailingTemplate.createMailingWithDocxTemplate(new File("INVALID FILE"), persons, "invalid.pdf");
+		MailingTemplateUtil.createMailingWithDocxTemplate(new File("INVALID FILE"), persons, "invalid.pdf");
 	}
 	
 	protected static void init() throws PersistenceException{

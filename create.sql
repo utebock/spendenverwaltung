@@ -20,6 +20,8 @@ drop table if exists imports;
 drop table if exists persons;
 drop table if exists addresses;
 
+drop table if exists mailing_templates;
+
 CREATE TABLE addresses ( -- for querying, you may want to use validated_addresses
 	id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 	street VARCHAR(1024) NOT NULL, -- including all address lines, e.g. 'Karlsplatz 14/5'
@@ -82,7 +84,7 @@ CREATE TABLE filter ( # defines a filter for a specific entity
 	name VARCHAR(120), # a name for this filter. can be null when anonymous
 	anonymous BOOLEAN NOT NULL DEFAULT FALSE, # anonymous filters are created inside other filters and only exist there
     private BOOLEAN NOT NULL DEFAULT TRUE, # have all users access to this filter?!
-    owner VARCHAR(50) UNSIGNED REFERENCES mysql.user(user), # name of the user who created this filter
+    owner VARCHAR(50) REFERENCES mysql.user(user), # name of the user who created this filter
 	FOREIGN KEY(criterion) REFERENCES criterion(id)
 );
 
@@ -133,6 +135,13 @@ CREATE TABLE sent_mailings (
 	mailing_id INTEGER UNSIGNED REFERENCES mailings(id) ON DELETE CASCADE,
 	person_id INTEGER UNSIGNED REFERENCES persons(id) ON DELETE CASCADE,
 	PRIMARY KEY(mailing_id, person_id)
+);
+
+CREATE TABLE mailing_templates (
+	id INTEGER UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	file_name VARCHAR(120) NOT NULL,
+	file_size INTEGER UNSIGNED NOT NULL,
+	file BLOB NOT NULL
 );
 
 -- views for validated data:
