@@ -43,7 +43,7 @@ public class ViewActionFactory {
 	IUserService userService;
 
 	public ViewActionFactory(ViewDisplayer viewDisplayer, IPersonService personService, IDonationService donationService,
-			IFilterService filterService, IAddressService addressService, IMailingService mailingService) {
+			IFilterService filterService, IAddressService addressService, IMailingService mailingService, IUserService userService) {
 		
 		this.viewDisplayer = viewDisplayer;
 		this.personService = personService;

@@ -1,13 +1,12 @@
 package at.fraubock.spendenverwaltung.gui;
 
-import javax.swing.JDialog;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
+import at.fraubock.spendenverwaltung.gui.views.LoginView;
 import at.fraubock.spendenverwaltung.gui.views.MainMenuView;
 import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
@@ -20,15 +19,24 @@ import at.fraubock.spendenverwaltung.interfaces.service.IUserService;
 public class GuiStarter {
 	
 //	private static final Logger log = Logger.getLogger(GuiStarter.class);
-	private ApplicationContext context;
 	
 	public void startGui() {
+		
+		//warning is unnecessary in this case, the resource is in fact closed on exit
+		@SuppressWarnings("resource")
+		ApplicationContext context = new ClassPathXmlApplicationContext("/spring.xml");
+		/**
+		 * when the GUI is closed, SYSTEM_EXIT is called. this shutdown hook ensures 
+		 * the graceful shutdown of the context.
+		 */
+		((AbstractApplicationContext) context).registerShutdownHook();
 		
 		IPersonService personService = context.getBean("personService", IPersonService.class);
 		IDonationService donationService = context.getBean("donationService", IDonationService.class);
 		IFilterService filterService = context.getBean("filterService", IFilterService.class);
 		IAddressService addressService = context.getBean("addressService", IAddressService.class);
 		IMailingService mailingService = context.getBean("mailingService", IMailingService.class);
+		IUserService userService = context.getBean("userService", IUserService.class);
 		
 		ViewDisplayer viewDisplayer = new ViewDisplayer();
 		ComponentFactory componentFactory = new ComponentFactory();
@@ -37,13 +45,12 @@ public class GuiStarter {
 		 * 
 		 */
 		ViewActionFactory viewActionFactory = new ViewActionFactory(viewDisplayer, personService,
-				donationService, filterService, addressService, mailingService);
+				donationService, filterService, addressService, mailingService, userService);
 		
 		
 		//need to call mainMenu.init() after all views are set in the viewActionFactory
 		//layout code is called from constructor, button initialization code is called from init()
 				
-		MainMenuView mainMenu = new MainMenuView(viewActionFactory, componentFactory);
 		//populate viewActionFactory
 		
 		
@@ -53,24 +60,15 @@ public class GuiStarter {
 //		mainFilterView.init();
 //		donationProgressStatsView.init();
 //		findPersonsView.init();
-		mainMenu.init();
-		
+		//mainMenu.init();
+
 		//display initial main menu
-		viewDisplayer.changeView(mainMenu);
+		//viewDisplayer.changeView(mainMenu);
+
+		//switch to login view
+		LoginView login = new LoginView(userService, componentFactory, viewActionFactory, viewDisplayer);
+		login.init();
+		viewDisplayer.changeView(login);
 	}
 
-	public void login(){
-		//warning is unnecessary in this case, the resource is in fact closed on exit
-		this.context = new ClassPathXmlApplicationContext("/spring.xml");
-		/**
-		 * when the GUI is closed, SYSTEM_EXIT is called. this shutdown hook ensures 
-		 * the graceful shutdown of the context.
-		 */
-		((AbstractApplicationContext) context).registerShutdownHook();
-
-		IUserService userService = context.getBean("userService", IUserService.class);
-		
-		JDialog loginDialog = new Login(userService, this);
-	}
-	
 }
