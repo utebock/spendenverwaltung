@@ -20,7 +20,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import at.fraubock.spendenverwaltung.dao.criterion.AbstractCriterionDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IFilterDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
-import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.service.FilterValidator;
 import at.fraubock.spendenverwaltung.util.CurrentUser;
@@ -33,24 +32,20 @@ public class FilterDAOImplemented implements IFilterDAO {
 	private FilterValidator validator;
 
 	@Override
-	public void insertOrUpdate(Filter f) throws PersistenceException {
+	public void insert(Filter f) throws PersistenceException {
 		validator.validate(f);
 
-		if (f.getId() == null) {
-			if (f.getCriterion() != null) {
-				abstractCritDAO.insert(f.getCriterion());
-			}
-
-			// new filter to be inserted
-			KeyHolder keyHolder = new GeneratedKeyHolder();
-
-			jdbcTemplate.update(new CreateFilterStatementCreator(f), keyHolder);
-
-			f.setId(keyHolder.getKey().intValue());
-
-		} else {
-
+		if (f.getCriterion() != null) {
+			abstractCritDAO.insert(f.getCriterion());
 		}
+
+		// new filter to be inserted
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+
+		jdbcTemplate.update(new CreateFilterStatementCreator(f), keyHolder);
+
+		f.setId(keyHolder.getKey().intValue());
+
 	}
 
 	@Override
@@ -64,7 +59,7 @@ public class FilterDAOImplemented implements IFilterDAO {
 
 		jdbcTemplate.update(deleteFilters, params, types);
 
-		if(f.getCriterion()!=null) {
+		if (f.getCriterion() != null) {
 			abstractCritDAO.delete(f.getCriterion());
 		}
 	}
@@ -74,7 +69,8 @@ public class FilterDAOImplemented implements IFilterDAO {
 		// FIXME order alphabetically by name?
 		FilterMapper mapper = new FilterMapper();
 		String select = "SELECT * FROM filter WHERE owner = ? OR private = false ORDER BY id DESC";
-		List<Filter> filterList = jdbcTemplate.query(select, new Object[] { CurrentUser.userName }, mapper);
+		List<Filter> filterList = jdbcTemplate.query(select,
+				new Object[] { CurrentUser.userName }, mapper);
 		for (Filter result : filterList) {
 			Integer critId = mapper.getCriterionId().get(result.getId());
 			if (critId != null) {

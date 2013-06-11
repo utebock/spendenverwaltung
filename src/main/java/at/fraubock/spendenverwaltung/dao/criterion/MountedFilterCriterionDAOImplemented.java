@@ -126,7 +126,7 @@ public class MountedFilterCriterionDAOImplemented implements
 			Filter mount = filter.getMount();
 			try {
 				if (mount.getId() == null) {
-					filterDAO.insertOrUpdate(filter.getMount());
+					filterDAO.insert(filter.getMount());
 				}
 			} catch (PersistenceException e) {
 				throw new SQLException();

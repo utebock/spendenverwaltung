@@ -44,7 +44,7 @@ public class AbstractFilterDAOTest {
 	@Transactional
 	public void createWithNullParameter_ThrowsException() {
 		try {
-			filterDAO.insertOrUpdate(null);
+			filterDAO.insert(null);
 		} catch (PersistenceException e) {
 			fail();
 		}
@@ -54,7 +54,7 @@ public class AbstractFilterDAOTest {
 	@Transactional
 	public void createWithInvalidStateParameter_ThrowsException() {
 		try {
-			filterDAO.insertOrUpdate(new Filter()); // all values are null
+			filterDAO.insert(new Filter()); // all values are null
 		} catch (PersistenceException e) {
 			fail();
 		}
@@ -65,7 +65,7 @@ public class AbstractFilterDAOTest {
 	public void createWithValidParameter_ReturnsSavedFilter() {
 
 		try {
-			filterDAO.insertOrUpdate(testFilter);
+			filterDAO.insert(testFilter);
 
 			Filter savedFilter = filterDAO.getById(testFilter.getId());
 
@@ -96,7 +96,7 @@ public class AbstractFilterDAOTest {
 	public void deleteWithValidParameter_RemovesEntity() {
 
 		try {
-			filterDAO.insertOrUpdate(testFilter);
+			filterDAO.insert(testFilter);
 			filterDAO.delete(testFilter);
 			List<Filter> allFilters = filterDAO.getAll();
 			assert (!allFilters.contains(testFilter));
@@ -115,8 +115,8 @@ public class AbstractFilterDAOTest {
 	public void getAll_ReturnsAllEntities() {
 
 		try {
-			filterDAO.insertOrUpdate(testFilter);
-			filterDAO.insertOrUpdate(testFilter2);
+			filterDAO.insert(testFilter);
+			filterDAO.insert(testFilter2);
 
 			List<Filter> allFilters = filterDAO.getAll();
 			assert (allFilters != null && allFilters.size() == 2);
@@ -146,7 +146,7 @@ public class AbstractFilterDAOTest {
 	public void getWithValidId_ReturnsEntity() {
 
 		try {
-			filterDAO.insertOrUpdate(testFilter);
+			filterDAO.insert(testFilter);
 			Filter foundFilter = filterDAO.getById(testFilter.getId());
 
 			assert (foundFilter != null && foundFilter.getId() == foundFilter
