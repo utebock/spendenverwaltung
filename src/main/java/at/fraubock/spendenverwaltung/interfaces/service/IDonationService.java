@@ -81,7 +81,6 @@ public interface IDonationService {
 	 * @return DonationType with index "index"
 	 */
 	public DonationType getDonationTypeByIndex(int index);
-}
 
 	/**
 	 * Retrieves donations matching the given filter

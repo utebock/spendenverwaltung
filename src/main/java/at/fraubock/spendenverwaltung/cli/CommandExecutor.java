@@ -1,6 +1,7 @@
 package at.fraubock.spendenverwaltung.cli;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
@@ -145,6 +146,11 @@ public class CommandExecutor {
 			new HelpFormatter().printUsage(pw, CMD_WIDTH, APP_NAME, options);
 			pw.close();
 			return SERVICE_ERR;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			// Kommt durch merge vom ImportValidation
+			// Betroffene Zeile importService.nativeImport(importFile);
+			e.printStackTrace();
 		}
 		return 0;
 	}
