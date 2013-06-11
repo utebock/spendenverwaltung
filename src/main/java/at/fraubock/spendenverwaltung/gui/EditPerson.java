@@ -269,7 +269,7 @@ public class EditPerson extends JPanel{
 		panel.add(ok, "split 2");
 		
 		cancel = new JButton();
-		Action getBack = viewActionFactory.getFindPersonsViewAction();
+		Action getBack = viewActionFactory.getFindPersonsView();
 		getBack.putValue(Action.NAME, "Abbrechen");
 		cancel.setAction(getBack);
 		panel.add(cancel, "wrap");

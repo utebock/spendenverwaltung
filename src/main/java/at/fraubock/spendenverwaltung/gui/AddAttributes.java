@@ -19,11 +19,16 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
+import org.jdesktop.swingx.JXDatePicker;
+
+import at.fraubock.spendenverwaltung.gui.components.ComponentConstants;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
+import at.fraubock.spendenverwaltung.gui.components.NumericTextField;
+import at.fraubock.spendenverwaltung.gui.components.StringTextField;
+import at.fraubock.spendenverwaltung.gui.components.interfaces.ValidateableComponent;
 import at.fraubock.spendenverwaltung.gui.views.FindPersonsView;
 import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
@@ -44,7 +49,6 @@ public class AddAttributes extends JPanel{
 	private IPersonService personService;
 	private Person person;
 	private Donation donation;
-	
 	private ViewActionFactory viewActionFactory;
 	private ComponentFactory componentFactory;
 	private JPanel panel;
@@ -61,7 +65,7 @@ public class AddAttributes extends JPanel{
 	private JButton createAddressBtn;
 	private JButton createDonationBtn;
 	private JButton backBtn;
-	
+	private JXDatePicker datePicker;
 	private JLabel titleLabel;
 	private JLabel title;
 
@@ -81,34 +85,35 @@ public class AddAttributes extends JPanel{
 	private JLabel mail;
 	
 	private JLabel addressStreetLabel;
-	private JTextField streetField;
+	private StringTextField streetField;
 	
 	private JLabel addressPostalLabel;
-	private JTextField postalField;
+	private NumericTextField postalField;
 
 	private JLabel addressCityLabel;
-	private JTextField cityField;
+	private StringTextField cityField;
 	
 	private JLabel addressCountryLabel;
-	private JTextField countryField;
+	private StringTextField countryField;
 	
 	private JLabel noteLabel;
 	private JLabel note;
 	
 	private JLabel amountLabel;
-	private JTextField amount;
+	private NumericTextField amount;
 	
 	private JLabel donationDateLabel;
-	private JTextField donationDate;
+	private JXDatePicker donationDate;
 	
 	private JLabel dedicationLabel;
-	private JTextField dedication;
+	private StringTextField dedication;
 	
 	private JLabel typeLabel;
 	private JComboBox<String> type;
 
 	private JLabel donationNoteLabel;
-	private JTextArea donationNote;
+	private StringTextField donationNote;
+	@SuppressWarnings("unused")
 	private FindPersonsView filterPersons;
 	private Component mainLabel;
 	private JLabel mainLabelAddress;
@@ -118,6 +123,7 @@ public class AddAttributes extends JPanel{
 	private JPanel overviewPanel;
 	private JLabel salutationLabel;
 	private JLabel salutation;
+	private List<ValidateableComponent> validateableDonationComponents = new ArrayList<ValidateableComponent>();
 
 	public AddAttributes(Person person, IPersonService personService, IAddressService addressService, 
 			IDonationService donationService, FindPersonsView filterPersons, 
@@ -220,7 +226,7 @@ public class AddAttributes extends JPanel{
 		addressPanel.add(createAddressBtn, "split 2");
 		
 		backBtn = new JButton();
-		Action getBack = viewActionFactory.getFindPersonsViewAction();
+		Action getBack = viewActionFactory.getFindPersonsView();
 		getBack.putValue(Action.NAME, "Abbrechen");
 		backBtn.setAction(getBack);
 		addressPanel.add(backBtn, "wrap");
@@ -238,22 +244,24 @@ public class AddAttributes extends JPanel{
 			addAddressPanel = componentFactory.createPanel(250, 200);
 			
 			addressStreetLabel = componentFactory.createLabel("Stra\u00DFe: ");
-			streetField = componentFactory.createTextField(150);
+			streetField = new StringTextField(ComponentConstants.MEDIUM_TEXT, false);
+			
 			addAddressPanel.add(addressStreetLabel, "");
 			addAddressPanel.add(streetField, "wrap 0px");
 
 			addressPostalLabel = componentFactory.createLabel("PLZ: ");
-			postalField = componentFactory.createTextField(30);
+			postalField = new NumericTextField(ComponentConstants.SHORT_TEXT, false);
 			addAddressPanel.add(addressPostalLabel, "");
 			addAddressPanel.add(postalField, "wrap 0px");
 
 			addressCityLabel = componentFactory.createLabel("Ort: ");
-			cityField = componentFactory.createTextField(150);
+			cityField = new StringTextField(ComponentConstants.MEDIUM_TEXT, false);
 			addAddressPanel.add(addressCityLabel, "");
 			addAddressPanel.add(cityField, "wrap 0px");
 
 			addressCountryLabel = componentFactory.createLabel("Land: ");
-			countryField = componentFactory.createTextField(150);
+			countryField = new StringTextField(ComponentConstants.MEDIUM_TEXT, false);
+			
 			addAddressPanel.add(addressCountryLabel, "");
 			addAddressPanel.add(countryField, "wrap 0px");
 			
@@ -266,77 +274,38 @@ public class AddAttributes extends JPanel{
 				// create new address
 				Address addr = new Address();
 				
-				if(streetField.getText().isEmpty() || streetField.getText().equals(null)){
-					JOptionPane.showMessageDialog(overviewPanel, "Bitte Stra\u00DFe eingeben.", "Warn", JOptionPane.WARNING_MESSAGE);
-					//TODO
-//					Action switchToMenu = viewActionFactory.getAddAttributesView();
-//					switchToMenu.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
-					streetField.requestFocus();
-					return;
-				}
-				else{
+				if(streetField.validateContents()==true && postalField.validateContents()==true
+						&& cityField.validateContents()==true && countryField.validateContents()==true){
 					addr.setStreet(streetField.getText());
-				}
-				
-				if(postalField.getText().isEmpty() || postalField.getText().equals(null)){
-					JOptionPane.showMessageDialog(overviewPanel, "Bitte Postleitzahl eingeben.", "Warn", JOptionPane.WARNING_MESSAGE);
-					//TODO
-//					Action switchToMenu = viewActionFactory.getAddAttributesView();
-//					switchToMenu.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
-					postalField.requestFocus();
-					return;
-				}
-				else{
 					addr.setPostalCode(postalField.getText());
-				}
-				
-				//TODO
-				if(cityField.getText().isEmpty() || cityField.getText().equals(null)){
-					JOptionPane.showMessageDialog(overviewPanel, "Bitte Ort eingeben.", "Warn", JOptionPane.WARNING_MESSAGE);
-//					Action switchToMenu = viewActionFactory.getAddAttributesView();
-//					switchToMenu.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
-					cityField.requestFocus();
-					return;
-				}
-				else{
 					addr.setCity(cityField.getText());
-				}
-				
-				//TODO
-				if(countryField.getText().isEmpty() || countryField.getText().equals(null)){
-					JOptionPane.showMessageDialog(overviewPanel, "Bitte Land eingeben.", "Warn", JOptionPane.WARNING_MESSAGE);
-//					Action switchToMenu = viewActionFactory.getAddAttributesView();
-//					switchToMenu.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
-					countryField.requestFocus();
-					return;
-				}
-				else{
 					addr.setCountry(countryField.getText());
+					
+					try{
+						Address createdAddress = addressService.create(addr);
+						addressModel.addAddress(createdAddress);
+						addressList = person.getAddresses();
+						addressList.add(createdAddress);
+						person.setAddresses(addressList);
+						personService.update(person);
+					}
+					catch(ServiceException ex){
+						 JOptionPane.showMessageDialog(overviewPanel, "Ein unerwarter Fehler ist aufgetreten! Bitte kontaktieren Sie Ihren Administrator.",
+									"Fehler", JOptionPane.ERROR_MESSAGE);
+				            ex.printStackTrace();
+				    		return;
+					}
+					
+					JOptionPane.showMessageDialog(overviewPanel, "Adresse erfolgreich angelegt.", "Information", JOptionPane.INFORMATION_MESSAGE);
+					addressTable.revalidate();
 				}
-				try{
-					Address createdAddress = addressService.create(addr);
-					addressModel.addAddress(createdAddress);
-					addressList = person.getAddresses();
-					addressList.add(createdAddress);
-					person.setAddresses(addressList);
-					personService.update(person);
-				}
-				catch(ServiceException ex){
-					 JOptionPane.showMessageDialog(overviewPanel, "Ein unerwarter Fehler ist aufgetreten! Bitte kontaktieren Sie Ihren Administrator.",
-								"Fehler", JOptionPane.ERROR_MESSAGE);
-			            ex.printStackTrace();
-			    		return;
-				}
-				
-				JOptionPane.showMessageDialog(overviewPanel, "Adresse erfolgreich angelegt.", "Information", JOptionPane.INFORMATION_MESSAGE);
-				addressTable.revalidate();
 			}
-			
 		}
 	}
 	
 	private final class AddDonationAction extends AbstractAction{
 		private static final long serialVersionUID = 1L;
+		
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -350,22 +319,24 @@ public class AddAttributes extends JPanel{
 			addDonationPanel.add(type, "wrap 0px, growx");
 			
 			amountLabel = componentFactory.createLabel("Betrag: ");
-			amount = componentFactory.createTextField(150);
+			amount = new NumericTextField(ComponentConstants.SHORT_TEXT, false);
+			validateableDonationComponents.add(amount);
 			addDonationPanel.add(amountLabel, "");
 			addDonationPanel.add(amount, "wrap 0px, growx");
 			
 			donationDateLabel = componentFactory.createLabel("Datum: ");
-			donationDate = componentFactory.createTextField(150);
+			datePicker = new JXDatePicker(new java.util.Date());
 			addDonationPanel.add(donationDateLabel, "");
-			addDonationPanel.add(donationDate, "wrap 0px, growx");
+			addDonationPanel.add(datePicker, "wrap 0px, growx");
 			
 			dedicationLabel = componentFactory.createLabel("Widmung: ");
-			dedication = componentFactory.createTextField(150);
+			dedication =  new StringTextField(ComponentConstants.MEDIUM_TEXT);
+			validateableDonationComponents.add(dedication);
 			addDonationPanel.add(dedicationLabel, "");
 			addDonationPanel.add(dedication, "wrap 0px, growx");
 			
 			donationNoteLabel = componentFactory.createLabel("Notiz: ");
-			donationNote = componentFactory.createTextArea(10, 150);
+			donationNote = new StringTextField(ComponentConstants.LONG_TEXT);
 			addDonationPanel.add(donationNoteLabel, "");
 			addDonationPanel.add(donationNote, "wrap 0px, growx");
 			
@@ -374,48 +345,27 @@ public class AddAttributes extends JPanel{
 			int go = JOptionPane.showOptionDialog(overviewPanel, addDonation, "Spende anlegen", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[1]);
 			
 			if(go == 1){
-				donation.setDonator(person);
-				
-				//TODO
-				if(amount.getText().isEmpty() || amount.getText().equals(null)){
-					JOptionPane.showMessageDialog(overviewPanel, "Bitte Betrag eingeben.", "Warn", JOptionPane.WARNING_MESSAGE);
-//					Action switchToMenu = viewActionFactory.getAddAttributesView();
-//					switchToMenu.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
-					amount.requestFocus();
-					return;
-				}
-				else{
+				if(amount.validateContents()==true){
+					donation.setDonator(person);
 					donation.setAmount(Long.parseLong(amount.getText()));
+					donation.setDate(donationDate.getDate());
+					donation.setType(Donation.DonationType.values()[type.getSelectedIndex()]);
+					donation.setDedication(dedication.getText());
+					donation.setNote(donationNote.getText());
+					
+					try{
+						Donation createdDonation = donationService.create(donation);
+						donationModel.addDonation(createdDonation);
+					}
+					catch(ServiceException ex){
+						 JOptionPane.showMessageDialog(overviewPanel, "Ein unerwarter Fehler ist aufgetreten! Bitte kontaktieren Sie Ihren Administrator.",
+									"Fehler", JOptionPane.ERROR_MESSAGE);
+				            ex.printStackTrace();
+				    		return;
+					}
+					JOptionPane.showMessageDialog(overviewPanel, "Spende erfolgreich angelegt", "Information", JOptionPane.INFORMATION_MESSAGE);
+					
 				}
-				//TODO
-				
-				if(donationDate.getText().isEmpty() || donationDate.getText().equals(null)){
-					JOptionPane.showMessageDialog(overviewPanel, "Bitte Datum eingeben.", "Warn", JOptionPane.WARNING_MESSAGE);
-//					Action switchToMenu = viewActionFactory.getAddAttributesView();
-//					switchToMenu.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
-					donationDate.requestFocus();
-					return;
-				}
-				else{
-					donation.setDate(Date.valueOf(donationDate.getText()));
-				}
-				
-				donation.setType(Donation.DonationType.values()[type.getSelectedIndex()]);
-				donation.setDedication(dedication.getText());
-				donation.setNote(donationNote.getText());
-				
-				try{
-					Donation createdDonation = donationService.create(donation);
-					donationModel.addDonation(createdDonation);
-				}
-				catch(ServiceException ex){
-					 JOptionPane.showMessageDialog(overviewPanel, "Ein unerwarter Fehler ist aufgetreten! Bitte kontaktieren Sie Ihren Administrator.",
-								"Fehler", JOptionPane.ERROR_MESSAGE);
-			            ex.printStackTrace();
-			    		return;
-				}
-				JOptionPane.showMessageDialog(overviewPanel, "Spende erfolgreich angelegt", "Information", JOptionPane.INFORMATION_MESSAGE);
-				
 			}
 			
 		}
@@ -447,7 +397,7 @@ public class AddAttributes extends JPanel{
 		donationPanel.add(createDonationBtn, "split 2");
 		
 		backBtn = new JButton();
-		Action getBack = viewActionFactory.getFindPersonsViewAction();
+		Action getBack = viewActionFactory.getFindPersonsView();
 		getBack.putValue(Action.NAME, "Abbrechen");
 		backBtn.setAction(getBack);
 		donationPanel.add(backBtn, "");
