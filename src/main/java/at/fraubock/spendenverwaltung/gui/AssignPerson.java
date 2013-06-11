@@ -15,15 +15,20 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
+import javax.swing.WindowConstants;
 
 import net.miginfocom.swing.MigLayout;
 
 import org.apache.log4j.Logger;
 
+import at.fraubock.spendenverwaltung.gui.filter.ConfiguratorFactory;
+import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
@@ -39,7 +44,7 @@ public class AssignPerson extends JDialog {
 	private IAddressService addressService;
 	private IDonationService donationService;
 	private IFilterService filterService;
-	private Overview overview;
+	private ImportValidation overview;
 	private ComponentBuilder builder;
 	private ButtonListener buttonListener;
 	private PersonTableModel personModel;
@@ -50,31 +55,32 @@ public class AssignPerson extends JDialog {
 	private JButton editButton;
 	private JButton deleteButton;
 	private JButton addAttribute;
+	private JButton searchBtn;
 	private ActionHandler handler;
 	private JComboBox<Filter> filterCombo;
 	private JButton backButton;
 	private JPanel overviewPanel;
-	private JLabel label;
+	private JLabel labelSurname;
+	private JLabel labelGivenname;
+	private JTextField tbSurname;
+	private JTextField tbGivenname;
 	private JLabel empty;
 	private Filter showAllFilter;
 
 	public AssignPerson(IPersonService personService,
-			IAddressService addressService, IDonationService donationService,
-			IFilterService filterService, Overview overview) {
+			IAddressService addressService, IDonationService donationService, IFilterService filterService, ImportValidation importValidation) {
 
 		this.personService = personService;
 		this.addressService = addressService;
 		this.donationService = donationService;
 		this.filterService = filterService;
-		this.overview = overview;
+		this.overview = importValidation;
 		initTable();
 		setUp();
 	}
 
 	public void initTable() {
 		personModel = new PersonTableModel();
-		showAllFilter = new Filter(FilterType.PERSON, null, "Alle anzeigen");
-		getPersons(showAllFilter);
 		showTable = new JTable(personModel);
 		showTable.setFillsViewportHeight(true);
 		showTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -88,101 +94,38 @@ public class AssignPerson extends JDialog {
 		//buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
 
-		overviewPanel = builder.createPanel(800, 850);
+		setLayout(new MigLayout());
+		setPreferredSize(new Dimension(800, 850));
 		// JScrollPane pane = new JScrollPane(overviewPanel,
 		// JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 		// JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		this.add(overviewPanel);
 
-		toolbar = builder.createToolbar();
-		toolbar.setFloatable(false);
-		toolbar.setRollover(true);
-		addComponentsToToolbar(toolbar);
 
-		overviewPanel.add(toolbar, "growx, span, wrap");
-
-		label = builder.createLabel("Filter ausw\u00E4hlen: ");
-		overviewPanel.add(label, "split2");
-
-		List<Filter> personFilters = new ArrayList<Filter>();
-		personFilters.add(showAllFilter);
-		try {
-			personFilters.addAll(filterService.getAll(FilterType.PERSON));
-		} catch (ServiceException e) {
-			// TODO log,errormsg
-		}
-		filterCombo = builder.createComboBox(new SimpleComboBoxModel<Filter>(
-				personFilters), new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				getPersons((Filter) filterCombo.getModel().getSelectedItem());
-
-			}
-
-		});
-
-		overviewPanel.add(filterCombo, "growx, wrap");
-		empty = builder.createLabel("			");
-		overviewPanel.add(empty, "wrap");
-		overviewPanel.add(scrollPane);
-	}
-
-	private void addComponentsToToolbar(JToolBar toolbar) {
-
-		addAttribute = builder.createButton(
-				"<html>&nbsp;Attribute hinzuf\u00FCgen&nbsp;</html>",
-				buttonListener, "add_donation_address");
-		addAttribute.setFont(new Font("Bigger", Font.PLAIN, 13));
-		editButton = builder.createButton(
-				"<html>&nbsp;Person bearbeiten</html>", buttonListener,
-				"edit_person");
-		editButton.setFont(new Font("Bigger", Font.PLAIN, 13));
-		deleteButton = builder.createButton(
-				"<html>&nbsp;Person l\u00F6schen</html>", buttonListener,
-				"delete_person_from_db");
-		deleteButton.setFont(new Font("Bigger", Font.PLAIN, 13));
-		backButton = builder.createButton("<html>&nbsp;Zur\u00FCck</html>",
-				buttonListener, "return_to_personOverview");
-		backButton.setFont(new Font("Bigger", Font.PLAIN, 13));
-		toolbar.add(addAttribute, "split 4, growx");
-		toolbar.add(editButton, "growx");
-		toolbar.add(deleteButton, "growx");
-		toolbar.add(backButton, "growx");
+		labelSurname = builder.createLabel("Vorname:");
+		labelGivenname = builder.createLabel("Nachname:");
+		tbSurname = builder.createTextField("");
+		tbGivenname = builder.createTextField("");
+		
+		searchBtn = new JButton("Suche");
+		searchBtn.addActionListener(new SearchListener());
+		
+		add(labelSurname, "");
+		add(tbSurname, "w 130!");
+		add(labelGivenname, "");
+		add(tbGivenname, "w 130!");
+		add(searchBtn, "wrap");
+		
+		add(scrollPane, "span 5");
+		
+		pack();
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		setModal(true);
+		setVisible(true);
+		setAlwaysOnTop(true);
 	}
 
 	public PersonTableModel getPersonModel() {
 		return this.personModel;
-	}
-
-	private void getPersons(Filter filter) {
-		personList = new ArrayList<Person>();
-
-		try {
-			if (filter == null) {
-				personList = personService.getConfirmed();
-			} else {
-				personList = personService.getByFilter(filter);
-			}
-			log.info("List " + personList.size() + " persons");
-		} catch (ServiceException e) {
-			JOptionPane
-					.showMessageDialog(
-							this,
-							"An error occured. Please see console for further information",
-							"Error", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
-			return;
-		}
-		if (personList == null) {
-			JOptionPane.showMessageDialog(this, "GetAll() returns null.",
-					"Error", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		personModel.clear();
-		for (Person p : personList) {
-			personModel.addPerson(p);
-		}
 	}
 
 	public void returnTo() {
@@ -192,7 +135,23 @@ public class AssignPerson extends JDialog {
 		overview.removeAll();
 		overview.revalidate();
 		overview.repaint();
-		overview.setUp();
+		//overview.setUp();
+	}
+	
+	private List<Person> search(){
+		String surname = tbSurname.getText();
+		String givenname = tbGivenname.getText();
+			
+		
+		return new ArrayList<Person>();
 	}
 
+	private class SearchListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			
+		}
+		
+	}
 }

@@ -17,6 +17,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -54,7 +55,7 @@ public class ImportValidation extends JPanel {
 	private IAddressService addressService;
 	private IDonationService donationService;
 	private Overview overview;
-	private ValidationTableModel conflictModel;
+	private ConflictValidationTableModel conflictModel;
 	private ValidationTableModel newModel;
 	private ValidationTableModel matchModel;
 	private JScrollPane conflictPane;
@@ -93,9 +94,9 @@ public class ImportValidation extends JPanel {
 		
 		conflictComboBox = new JComboBox(ImportValidator.ValidationType.toArray());
 		
-		this.conflictModel = new ValidationTableModel(this, this.donationService, this.personService, this.addressService);
-		this.newModel = new ValidationTableModel(this, this.donationService, this.personService, this.addressService);
-		this.matchModel = new ValidationTableModel(this, this.donationService, this.personService, this.addressService);
+		this.conflictModel = new ConflictValidationTableModel(this, this.donationService, this.personService, this.addressService);
+		this.newModel = new ValidationTableModel();
+		this.matchModel = new ValidationTableModel();
 		
 		setUp();
 	}
@@ -111,8 +112,6 @@ public class ImportValidation extends JPanel {
 		matchTable = new JTable(matchModel);
 		
 		conflictTable.getColumnModel().getColumn(13).setCellEditor(new DefaultCellEditor(conflictComboBox));
-		newTable.getColumnModel().getColumn(13).setCellEditor(new DefaultCellEditor(conflictComboBox));
-		matchTable.getColumnModel().getColumn(13).setCellEditor(new DefaultCellEditor(conflictComboBox));
 		
 		
 		conflictTable.setFillsViewportHeight(true);
@@ -234,6 +233,10 @@ public class ImportValidation extends JPanel {
 			    return;
 			}
 		}
+	}
+	
+	public void openPersonDialog(){
+		//JDialog assignPerson = new AssignPerson(personService, addressService, donationService, this);
 	}
 	
 	public void returnTo() {
