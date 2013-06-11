@@ -136,6 +136,7 @@ public class FilterServiceImplemented implements IFilterService {
 		filter.setType(filterTO.getType());
 		filter.setName(filterTO.getName());
 		filter.setAnonymous(filterTO.isAnonymous());
+		filter.setPrivate(filterTO.getPrivate());
 
 		LogicalOperator operator = filterTO.getOperator();
 		List<Criterion> crits = filterTO.getCriterions();

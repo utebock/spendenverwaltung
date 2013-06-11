@@ -37,6 +37,12 @@ public class Filter {
 
 	/* determines whether this filter can exist on it's own */
 	private boolean anonymous = false;
+	
+	/* determines whether this filter is private or public */
+	private boolean privateFilter = true;
+	
+	/* name of the user who created the filter */
+	private String owner;
 
 	public Filter() {
 
@@ -100,6 +106,22 @@ public class Filter {
 
 	public void setAnonymous(boolean anonymous) {
 		this.anonymous = anonymous;
+	}
+	
+	public boolean isPrivate() {
+		return privateFilter;
+	}
+	
+	public void setPrivate(boolean privateFilter) {
+		this.privateFilter = privateFilter;
+	}
+	
+	public String getOwner(){
+		return owner;
+	}
+	
+	public void setOwner(String owner){
+		this.owner = owner;
 	}
 
 	@Override

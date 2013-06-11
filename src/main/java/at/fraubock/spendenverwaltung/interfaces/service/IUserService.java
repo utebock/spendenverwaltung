@@ -17,5 +17,5 @@ public interface IUserService {
 	 * @return true, if user is valid
 	 * 			false if password, username or both is wrong
 	 */
-	public boolean isUserValid(String user, String pwd) throws ServiceException;
+	public String isUserValid(String user, String pwd) throws ServiceException;
 }

@@ -21,6 +21,7 @@ import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IUserService;
+import at.fraubock.spendenverwaltung.util.CurrentUser;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -52,10 +53,10 @@ public class LoginView extends InitializableView {
 	private void login(){
 		String userName = user.getText();
 		String password = String.valueOf(pwd.getPassword());
-		boolean isValid = false;
+		String loggedInUser;
 		
 		try {
-			isValid = userService.isUserValid(userName, password);
+			loggedInUser = userService.isUserValid(userName, password);
 		} catch (ServiceException e) {
 			JOptionPane.showMessageDialog(parent, "Ein unerwarter Fehler ist aufgetreten! Bitte kontaktieren Sie Ihren Administrator.",
 					  "Fehler", JOptionPane.ERROR_MESSAGE);
@@ -63,7 +64,8 @@ public class LoginView extends InitializableView {
 			return;
 		}
 		
-		if(isValid){
+		if(loggedInUser != null){
+			CurrentUser.userName = loggedInUser;
 			MainMenuView mainMenu = new MainMenuView(actionFactory, componentFactory);
 			mainMenu.init();
 			viewDisplayer.changeView(mainMenu);

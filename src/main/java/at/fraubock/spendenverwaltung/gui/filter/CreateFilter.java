@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.ButtonGroup;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -14,6 +15,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 
 import net.miginfocom.swing.MigLayout;
 import at.fraubock.spendenverwaltung.gui.ComponentBuilder;
@@ -28,6 +30,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterio
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.to.FilterTO;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
+import at.fraubock.spendenverwaltung.util.CurrentUser;
 import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
 
@@ -57,7 +60,11 @@ public class CreateFilter extends JPanel {
 	private JPanel controlButtonPanel;
 	private List<CriterionSelector> selectors = new ArrayList<CriterionSelector>();
 	private List<JButton> minusButtons = new ArrayList<JButton>();
-
+	
+	ButtonGroup buttonGroup = new ButtonGroup();
+	JRadioButton radioPrivate;
+	JRadioButton radioPublic;
+	
 	public CreateFilter(FilterType type, IFilterService filterService,
 			MainFilterView overview, ViewActionFactory viewActionFactory) {
 		this(type, filterService, overview, null, viewActionFactory);
@@ -150,6 +157,28 @@ public class CreateFilter extends JPanel {
 		this.add(nameField, "growx, wrap, gapbottom 20");
 		// add(filterNamePanel, "wrap");
 
+		// RadioButtons für setting filter private or public
+		radioPrivate = new JRadioButton("Privat", true);
+		radioPublic = new JRadioButton("Für alle Benutzer freigeben", false);
+		buttonGroup.add (radioPrivate);
+		buttonGroup.add(radioPublic);
+		
+		if(editFilter != null){
+			if (editFilter.isPrivate()){
+				radioPrivate.setSelected(true);
+				radioPublic.setSelected(false);
+			} else{
+				radioPrivate.setSelected(false);
+				radioPublic.setSelected(true);
+			}
+		}
+		
+		if((editFilter != null && CurrentUser.userName.equals(editFilter.getOwner())) || editFilter == null){
+			this.add(radioPrivate, "wrap");
+			this.add(radioPublic, "wrap, gapbottom 10");
+		}
+		
+		
 		// create operator picker panel
 		this.operatorPicker = new JPanel();
 		final JLabel operatorLabel = new JLabel(" Kriterien erf\u00FCllt sind:");
@@ -270,6 +299,7 @@ public class CreateFilter extends JPanel {
 		filter.setOperator(andOperator ? LogicalOperator.AND
 				: LogicalOperator.OR);
 		filter.setName(nameField.getText());
+		filter.setPrivate(radioPrivate.isSelected() ? true : false);
 
 		try {
 			List<Criterion> crits = new ArrayList<Criterion>();
