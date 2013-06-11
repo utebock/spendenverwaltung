@@ -84,7 +84,8 @@ public class MailingTemplateUtil {
 				report.convert(context, options, out);
 				log.info("Created pdf: "+path);
 			}
-		} catch (XDocReportException e) {
+		} catch (XDocReportException | NullPointerException e) {
+			log.error(e.getMessage());
 			throw new ServiceException(e);
 		}
 

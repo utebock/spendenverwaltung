@@ -13,6 +13,7 @@ import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
+import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.interfaces.service.IUserService;
@@ -41,9 +42,10 @@ public class ViewActionFactory {
 	IAddressService addressService;
 	IMailingService mailingService;
 	IUserService userService;
+	IImportService importService;
 
 	public ViewActionFactory(ViewDisplayer viewDisplayer, IPersonService personService, IDonationService donationService,
-			IFilterService filterService, IAddressService addressService, IMailingService mailingService, IUserService userService) {
+			IFilterService filterService, IAddressService addressService, IMailingService mailingService, IUserService userService, IImportService importService) {
 		
 		this.viewDisplayer = viewDisplayer;
 		this.personService = personService;
@@ -52,6 +54,7 @@ public class ViewActionFactory {
 		this.mailingService = mailingService;
 		this.filterService = filterService;
 		this.userService = userService;
+		this.importService = importService;
 	}
 	
 	/**
@@ -83,7 +86,7 @@ public class ViewActionFactory {
 	
 	//TODO richtige view returnen!
 	public Action getDonationImportViewAction() {
-		return new DisplayViewAction(new CreatePersonView(new ComponentFactory(), this, personService, addressService, donationService, new PersonTableModel()), "/images/importOverview.jpg" );
+		return new DisplayViewAction(new ImportDataView(new ComponentFactory(), this, importService), "/images/importOverview.jpg" );
 	}
 	
 	//TODO richtige view returnen!
