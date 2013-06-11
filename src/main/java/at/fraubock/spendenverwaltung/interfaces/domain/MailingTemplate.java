@@ -11,16 +11,16 @@ import java.io.File;
  */
 public class MailingTemplate {
 
-	private int id;
+	private Integer id;
 	private String fileName;
 	private int fileSize;
 	private File file;
 
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -47,5 +47,36 @@ public class MailingTemplate {
 	public void setFile(File file) {
 		this.file = file;
 	}
-
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj==this) return true;
+		if(obj==null) return false;
+		if(obj.getClass()!=this.getClass()) return false;
+		
+		MailingTemplate other = (MailingTemplate)obj;
+		
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		
+		if (fileName == null) {
+			if (other.fileName != null)
+				return false;
+		} else if (!fileName.equals(other.fileName))
+			return false;
+		
+		if (file == null) {
+			if (other.file != null)
+				return false;
+		} else if (!file.equals(other.file))
+			return false;
+		
+		if (fileSize!=other.fileSize) return false;
+		
+		return true;
+	}
+	
 }

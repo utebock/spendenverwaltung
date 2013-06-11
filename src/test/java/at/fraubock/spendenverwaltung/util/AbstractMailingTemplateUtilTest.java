@@ -22,7 +22,7 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/testspring.xml")
 @TransactionConfiguration(defaultRollback=true)
-public abstract class AbstractMailingTemplateTest {
+public abstract class AbstractMailingTemplateUtilTest {
 
 
 	protected static IPersonDAO personDAO;
@@ -30,7 +30,7 @@ public abstract class AbstractMailingTemplateTest {
 	
 	
 	public static void setPersonDAO(IPersonDAO personDAO) {
-		AbstractMailingTemplateTest.personDAO = personDAO;
+		AbstractMailingTemplateUtilTest.personDAO = personDAO;
 	}
 
 	@Test(expected=IllegalArgumentException.class)

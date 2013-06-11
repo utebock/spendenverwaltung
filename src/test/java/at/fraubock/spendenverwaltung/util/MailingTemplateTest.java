@@ -12,7 +12,7 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
  * @author romanvoglhuber
  *
  */
-public class MailingTemplateTest extends AbstractMailingTemplateTest {
+public class MailingTemplateTest extends AbstractMailingTemplateUtilTest {
 
 	private static ApplicationContext context;
 	
