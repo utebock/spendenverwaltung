@@ -16,22 +16,20 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-
+import at.fraubock.spendenverwaltung.gui.components.ComponentConstants;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
+import at.fraubock.spendenverwaltung.gui.components.NumericTextField;
+import at.fraubock.spendenverwaltung.gui.components.StringTextField;
 import at.fraubock.spendenverwaltung.gui.views.FindPersonsView;
 import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
-import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 import net.miginfocom.swing.MigLayout;
@@ -57,34 +55,35 @@ public class EditPerson extends JPanel{
 	private JLabel telephone;
 	
 	private JLabel mail;
-	private JTextField streetField;
+	private StringTextField streetField;
 	
-	private JTextField postalField;
+	private NumericTextField postalField;
 	
-	private JTextField cityField;
+	private StringTextField cityField;
 	
-	private JTextField countryField;
+	private StringTextField countryField;
 	
 	private JLabel notifyType;
 	private JCheckBox notifyMail;
 	private JCheckBox notifyPost;
 	
 	private JLabel note;
-	private JTextArea noteArea; 
+	private StringTextField noteArea; 
 	
 	private JButton ok;
 	private JButton cancel;
 	private PersonTableModel personModel;
 	private Person person = new Person();
 	private Address addr = new Address();
+	@SuppressWarnings("unused")
 	private FindPersonsView filterPersons;
 	private ComponentFactory componentFactory;
 	private JLabel editPerson;
-	private JTextField companyField;
-	private JTextField givenField;
-	private JTextField surnameField;
-	private JTextField telephoneField;
-	private JTextField mailField;
+	private StringTextField companyField;
+	private StringTextField givenField;
+	private StringTextField surnameField;
+	private StringTextField telephoneField;
+	private StringTextField mailField;
 	private JTable addressTable;
 	private JScrollPane addressPane;
 	private JPanel tablePanel;
@@ -218,27 +217,32 @@ public class EditPerson extends JPanel{
 		panel.add(titleBox, "wrap, growx");
 		
 		company = componentFactory.createLabel("Firma: ");
-		companyField = componentFactory.createTextField(person.getCompany());
+		companyField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
+		companyField.setText(person.getCompany());
 		panel.add(company);
 		panel.add(companyField, "wrap, growx");
 		
 		given_name = componentFactory.createLabel("Vorname: ");
-		givenField = componentFactory.createTextField(person.getGivenName());
+		givenField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
+		givenField.setText(person.getGivenName());
 		panel.add(given_name);
 		panel.add(givenField, "wrap, growx");
 		
 		surname = componentFactory.createLabel("Nachname: ");
-		surnameField = componentFactory.createTextField(person.getSurname());
+		surnameField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
+		surnameField.setText(person.getSurname());
 		panel.add(surname);
 		panel.add(surnameField, "wrap, growx");
 		
 		telephone = componentFactory.createLabel("Telefon: ");
-		telephoneField = componentFactory.createTextField(person.getTelephone());
+		telephoneField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
+		telephoneField.setText(person.getTelephone());
 		panel.add(telephone);
 		panel.add(telephoneField, "wrap, growx");
 		
 		mail = componentFactory.createLabel("E-Mail: ");
-		mailField = componentFactory.createTextField(person.getEmail());
+		mailField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
+		mailField.setText(person.getEmail());
 		panel.add(mail);
 		panel.add(mailField, "wrap, growx");
 		
@@ -258,18 +262,18 @@ public class EditPerson extends JPanel{
 		panel.add(notifyPost, "wrap");
 		
 		note = componentFactory.createLabel("Notiz: ");
-		noteArea = componentFactory.createTextArea(person.getNote());
+		noteArea = new StringTextField(ComponentConstants.LONG_TEXT);
 		panel.add(note);
 		panel.add(noteArea, "wrap, growx");
 		
-		OkAction okAction = new OkAction();
+		EditPersonAction okAction = new EditPersonAction();
 		okAction.putValue(Action.NAME, "Bearbeiten");
 		ok = new JButton();
 		ok.setAction(okAction);
 		panel.add(ok, "split 2");
 		
 		cancel = new JButton();
-		Action getBack = viewActionFactory.getFindPersonsViewAction();
+		Action getBack = viewActionFactory.getFindPersonsView();
 		getBack.putValue(Action.NAME, "Abbrechen");
 		cancel.setAction(getBack);
 		panel.add(cancel, "wrap");
@@ -293,7 +297,7 @@ public class EditPerson extends JPanel{
 		addressPane.setPreferredSize(new Dimension(700, 250));
 		tablePanel.add(addressPane, "wrap, growx");
 		
-		OkAddressAction okAddressAction = new OkAddressAction();
+		EditAddressAction okAddressAction = new EditAddressAction();
 		okAddressAction.putValue(Action.NAME, "Bearbeiten");
 		ok_addr = new JButton();
 		ok_addr.setAction(okAddressAction);
@@ -328,7 +332,7 @@ public class EditPerson extends JPanel{
 		}	
 	}
 	
-	private final class OkAction extends AbstractAction{
+	private final class EditPersonAction extends AbstractAction{
 		
 		private static final long serialVersionUID = 1L;
 
@@ -457,7 +461,7 @@ public class EditPerson extends JPanel{
 		}
 	}
 
-	private final class OkAddressAction extends AbstractAction{
+	private final class EditAddressAction extends AbstractAction{
 		
 		private static final long serialVersionUID = 1L;
 
@@ -483,25 +487,25 @@ public class EditPerson extends JPanel{
 			editAddressPanel = componentFactory.createPanel(500, 200);
 			
 			addressStreetLabel = componentFactory.createLabel("Stra\u00DFe: ");
-			streetField = componentFactory.createTextField(150);
+			streetField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
 			streetField.setText(addr.getStreet());
 			editAddressPanel.add(addressStreetLabel, "");
 			editAddressPanel.add(streetField, "wrap 0px, growx");
 
 			addressPostalLabel = componentFactory.createLabel("PLZ: ");
-			postalField = componentFactory.createTextField(30);
+			postalField = new NumericTextField(ComponentConstants.SHORT_TEXT);
 			postalField.setText(addr.getPostalCode());
 			editAddressPanel.add(addressPostalLabel, "");
 			editAddressPanel.add(postalField, "wrap 0px, growx");
 
 			addressCityLabel = componentFactory.createLabel("Ort: ");
-			cityField = componentFactory.createTextField(150);
+			cityField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
 			cityField.setText(addr.getCity());
 			editAddressPanel.add(addressCityLabel, "");
 			editAddressPanel.add(cityField, "wrap 0px, growx");
 
 			addressCountryLabel = componentFactory.createLabel("Land: ");
-			countryField = componentFactory.createTextField(150);
+			countryField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
 			countryField.setText(addr.getCountry());
 			editAddressPanel.add(addressCountryLabel, "");
 			editAddressPanel.add(countryField, "wrap 0px, growx");
@@ -526,27 +530,54 @@ public class EditPerson extends JPanel{
 					addr.setStreet(addr.getStreet());
 				}
 				else{
-					addr.setStreet(streetField.getText());
+					if(streetField.validateContents()==true){
+						addr.setStreet(streetField.getText());
+					}else{
+						JOptionPane.showMessageDialog(overviewPanel, "Bitte korrigieren Sie Ihre Eingabe: Stra\u00DFe", "Warnung", JOptionPane.WARNING_MESSAGE);
+						EditAddressAction action = new EditAddressAction();
+						action.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+					}
 				}
 				if(postalField.getText().isEmpty() || postalField.getText().equals(null)){
 					addr.setPostalCode(addr.getPostalCode());
 				}
 				else{
-					addr.setPostalCode(postalField.getText());
+					if(postalField.validateContents()==true){
+						addr.setPostalCode(postalField.getText());
+					}
+					else{
+						JOptionPane.showMessageDialog(overviewPanel, "Bitte korrigieren Sie Ihre Eingabe: PLZ", "Warnung", JOptionPane.WARNING_MESSAGE);
+						EditAddressAction action = new EditAddressAction();
+						action.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+					}
 				}
 				
 				if(cityField.getText().isEmpty() || cityField.getText().equals(null)){
 					addr.setCity(addr.getCity());
 				}
 				else{
-					addr.setCity(cityField.getText());
+					if(cityField.validateContents()==true){
+						addr.setCity(cityField.getText());
+					}
+					else{
+						JOptionPane.showMessageDialog(overviewPanel, "Bitte korrigieren Sie Ihre Eingabe: Ort", "Warnung", JOptionPane.WARNING_MESSAGE);
+						EditAddressAction action = new EditAddressAction();
+						action.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+					}
 				}
 				
 				if(countryField.getText().isEmpty() || countryField.getText().equals(null)){
 					addr.setCountry(addr.getCountry());
 				}
 				else{
-					addr.setCountry(countryField.getText());
+					if(countryField.validateContents()==true){
+						addr.setCountry(countryField.getText());
+					}else{
+						JOptionPane.showMessageDialog(overviewPanel, "Bitte korrigieren Sie Ihre Eingabe: Land", "Warnung", JOptionPane.WARNING_MESSAGE);
+						EditAddressAction action = new EditAddressAction();
+						action.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+					}
+					
 				}
 				
 				if(mainAddress.isSelected() == false){
@@ -581,7 +612,9 @@ public class EditPerson extends JPanel{
 				JOptionPane.showMessageDialog(overviewPanel, "Adresse erfolgreich bearbeitet.", "Information", JOptionPane.INFORMATION_MESSAGE);
 				addressTable.revalidate();
 				addressTable.repaint();
-			
+		}
+		else{
+			return;
 		}
 	}
 	

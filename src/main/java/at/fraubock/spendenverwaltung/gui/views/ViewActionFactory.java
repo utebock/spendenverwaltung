@@ -73,6 +73,10 @@ public class ViewActionFactory {
 		return new DisplayViewAction(new FindPersonsView(personService, addressService, donationService, filterService, new ComponentFactory(), this, new PersonTableModel()), "/images/getPersons.jpg");
 	}
 	
+	public Action getFindPersonsView() {
+		return new DisplayViewAction(new FindPersonsView(personService, addressService, donationService, filterService, new ComponentFactory(), this, new PersonTableModel()));
+	}
+	
 	public Action getMainFilterViewAction() {
 		return new DisplayViewAction(new MainFilterView(new ComponentFactory(), this, filterService), "/images/filter.jpg");
 	}
