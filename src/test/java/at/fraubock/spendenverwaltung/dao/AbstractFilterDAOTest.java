@@ -23,7 +23,7 @@ import at.fraubock.spendenverwaltung.util.RelationalOperator;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/testspring.xml")
 @TransactionConfiguration(defaultRollback = true)
-public class AbstractFilterDAOTest {
+public abstract class AbstractFilterDAOTest {
 
 	protected static IFilterDAO filterDAO;
 
