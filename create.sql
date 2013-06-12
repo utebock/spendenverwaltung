@@ -74,13 +74,13 @@ CREATE TABLE livesat (
 
 CREATE TABLE criterion ( # an abstract criterion defining a condition
 	id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-	type ENUM('persons','donations','mailings','addresses') NOT NULL # the filter type of the filter this criterion belongs to
+	type ENUM('validated_persons','validated_donations','mailings','validated_addresses') NOT NULL # the filter type of the filter this criterion belongs to
 );
 
 CREATE TABLE filter ( # defines a filter for a specific entity
 	id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 	criterion INTEGER UNSIGNED, # the criterion for this filter
-	type ENUM('persons','donations','mailings','addresses') NOT NULL, # the entity this filter is applicable to
+	type ENUM('validated_persons','validated_donations','mailings','validated_addresses') NOT NULL, # the entity this filter is applicable to
 	name VARCHAR(120), # a name for this filter. can be null when anonymous
 	anonymous BOOLEAN NOT NULL DEFAULT FALSE, # anonymous filters are created inside other filters and only exist there
     private BOOLEAN NOT NULL DEFAULT TRUE, # have all users access to this filter?!
