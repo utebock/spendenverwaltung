@@ -20,13 +20,18 @@ import javax.swing.table.AbstractTableModel;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
+import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
+import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
+import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
+import at.fraubock.spendenverwaltung.util.ImportValidator.ValidationType;
 
 /**
  * 
  * @author thomas
  *
  */
-public class ValidationTableModel extends AbstractTableModel{
+public class NewValidationTableModel extends AbstractTableModel{
 
 	private static final long serialVersionUID = 1L;
 	
@@ -34,7 +39,18 @@ public class ValidationTableModel extends AbstractTableModel{
 	private Vector<Donation> donations = new Vector<Donation>();
 	private Vector<Person> persons = new Vector<Person>();
 	private Vector<Address> addresses = new Vector<Address>();
-	 
+	private IPersonService personService;
+	private IAddressService addressService;
+	private IDonationService donationService;
+	private ImportValidation parent;
+	
+	public NewValidationTableModel(IPersonService personService, IAddressService addressService, IDonationService donationService, ImportValidation parent){
+		this.personService = personService;
+		this.addressService = addressService;
+		this.donationService = donationService;
+		this.parent = parent;
+	}
+	
 	public void addEntry (Donation donation, Person person){
 		donations.add(donation);
 		
@@ -62,6 +78,10 @@ public class ValidationTableModel extends AbstractTableModel{
 		return persons.get(rowIndex);
 	}
 
+	public List<Donation> getDonationList(){
+		return donations;
+	}
+	
 	@Override
 	public int getRowCount() {
 		return donations.size();
@@ -89,6 +109,78 @@ public class ValidationTableModel extends AbstractTableModel{
 			default: return null;
 		}
 	}
+    public void setValueAt(Object value, int rowIndex, int columnIndex) {
+        Donation updateDonation = donations.get(rowIndex);
+        Person updatePerson = persons.get(rowIndex);
+        Address updateAddress = addresses.get(rowIndex);
+        
+        if(columnIndex != 13){
+	        switch(columnIndex){
+	        	case 0: updatePerson.setGivenName((String) value);
+	        			break;
+	        	case 1: updatePerson.setSurname((String) value);
+						break;
+	        	case 2: updatePerson.setTelephone((String) value);
+						break;
+	        	case 3: updatePerson.setEmail((String) value);
+						break;
+	        	case 4: updateAddress.setStreet((String) value);
+						break;
+	        	case 5: updateAddress.setPostalCode((String) value);
+						break;
+	        	case 6: updateAddress.setCity((String) value);
+						break;
+	        	case 7: updateAddress.setCountry((String) value);
+						break;
+	        	case 8: updateDonation.setAmount((Long) value);
+						break;
+	        	case 9: updateDonation.setDate((Date) value);
+						break;
+	        	case 10: updateDonation.setDedication((String) value);
+						break;
+	        	case 11: updateDonation.setType((Donation.DonationType) value);
+						break;
+	        	case 12: updateDonation.setNote((String) value);
+						break;
+	        }
+	        
+	        boolean changedModel = false;
+	        
+			try {
+				List<Person> matchedPersons = personService.getByAttributes(updatePerson);
+				if(matchedPersons.size() != 0)
+					updateDonation.setDonator(matchedPersons.get(0));
+				if(donationService.donationExists(updateDonation)){
+					//add to conflictModel
+					removeDonation(rowIndex);
+					parent.addToConflict(updateDonation);
+					changedModel = true;
+				} else if (matchedPersons.size() != 0){
+					//add to matchModel
+					removeDonation(rowIndex);
+					parent.addToMatch(updateDonation);
+					changedModel = true;
+				}
+				
+				updateDonation = donationService.update(updateDonation);
+				updatePerson = personService.update(updatePerson);
+				updateAddress = addressService.update(updateAddress);
+			} catch (ServiceException e) {
+				JOptionPane.showMessageDialog(parent, "Updating Row failed", "Error", JOptionPane.ERROR_MESSAGE);
+		        e.printStackTrace();
+		        return;
+			}
+		    
+			//if donation didn't change model, update row in this model
+			if(!changedModel){
+				donations.set(rowIndex, updateDonation);
+				addresses.set(rowIndex, updateAddress);
+				persons.set(rowIndex, updatePerson);
+				
+		        fireTableCellUpdated(rowIndex, columnIndex);
+			}
+        }
+    }
 	
 	public Class<?> getColumnClass(int col) {
 		
@@ -122,7 +214,7 @@ public class ValidationTableModel extends AbstractTableModel{
 
 	@Override
 	public boolean isCellEditable(int row, int col) {
-		return false;
+		return true;
 	}
 }
 

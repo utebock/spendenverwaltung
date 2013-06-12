@@ -56,8 +56,8 @@ public class ImportValidation extends JPanel {
 	private IDonationService donationService;
 	private Overview overview;
 	private ConflictValidationTableModel conflictModel;
-	private ValidationTableModel newModel;
-	private ValidationTableModel matchModel;
+	private NewValidationTableModel newModel;
+	private MatchValidationTableModel matchModel;
 	private JScrollPane conflictPane;
 	private JScrollPane newPane;
 	private JScrollPane matchPane;
@@ -95,8 +95,8 @@ public class ImportValidation extends JPanel {
 		conflictComboBox = new JComboBox(ImportValidator.ValidationType.toArray());
 		
 		this.conflictModel = new ConflictValidationTableModel(this, this.donationService, this.personService, this.addressService);
-		this.newModel = new ValidationTableModel();
-		this.matchModel = new ValidationTableModel();
+		this.newModel = new NewValidationTableModel(personService, addressService, donationService, this);
+		this.matchModel = new MatchValidationTableModel(personService, addressService, donationService, this);
 		
 		setUp();
 	}
@@ -193,15 +193,20 @@ public class ImportValidation extends JPanel {
 	}
 
 	public void saveValidation(){
+		List<Donation> newModelDonations = newModel.getDonationList();
+		List<Donation> matchModelDonations = matchModel.getDonationList();
+		
 		try {
 			
-			validatedData.checkPersonDoublesInNewEntries();
+			checkPersonDoublesInNewEntries(newModelDonations);
+			checkPersonDoublesInNewEntries(matchModelDonations);
 			
-			donationService.setImportToNull(validatedData.getDonationListNew());
-			donationService.setImportToNull(validatedData.getDonationListMatch());
+			updateDonationList(newModelDonations);
+			updateDonationList(matchModelDonations);
 			
-			updateDonationList(validatedData.getDonationListNew());
-			updateDonationList(validatedData.getDonationListMatch());
+			donationService.setImportToNull(newModelDonations);
+			donationService.setImportToNull(matchModelDonations);
+			
 			
 			deletePersonList(validatedData.getPersonsToDelete());
 		} catch (ServiceException e) {
@@ -236,7 +241,7 @@ public class ImportValidation extends JPanel {
 	}
 	
 	public void openPersonDialog(){
-		//JDialog assignPerson = new AssignPerson(personService, addressService, donationService, this);
+		JDialog assignPerson = new AssignPerson(personService, addressService, donationService, this);
 	}
 	
 	public void returnTo() {
@@ -247,5 +252,58 @@ public class ImportValidation extends JPanel {
 		overview.revalidate();
 		overview.repaint();
 		overview.setUp();
+	}
+	
+
+	
+	public void checkPersonDoublesInNewEntries(List<Donation> toCheck){
+		List<Person> uniquePersons = new ArrayList<Person>();
+		List<Donation> toUpdate = new ArrayList<Donation>();
+		Person doublePerson;
+		
+		for(Donation d : toCheck){
+			doublePerson = getDoublePersonIdFromList(d.getDonator(), uniquePersons);
+			
+			if(doublePerson == null){
+				uniquePersons.add(d.getDonator());
+				toUpdate.add(d);
+			} else{
+				d.setDonator(doublePerson);
+			}
+		}
+	}
+	
+	private Person getDoublePersonIdFromList(Person p, List<Person> checkList){
+		Person doublePerson = null;
+		
+		for(Person donator : checkList){
+			
+			if(donator.getSurname().equals(p.getSurname())
+					&& donator.getGivenName().equals(p.getGivenName())
+					&& (donator.getEmail().equals(p.getEmail())
+						|| (!donator.getTelephone().equals("") && donator.getTelephone().equals(p.getTelephone()))
+						|| (donator.getMainAddress() != null && donator.getMainAddress().getCity().equals(p.getMainAddress().getCity())
+								&& donator.getMainAddress().getPostalCode().equals(p.getMainAddress().getPostalCode())
+								&& donator.getMainAddress().getStreet().equals(p.getMainAddress().getStreet())))){
+				return donator;
+			}
+		}
+		
+		return doublePerson;
+	}
+	
+	public void addToConflict(Donation donation){
+		conflictModel.addEntry(donation, donation.getDonator());
+		conflictModel.fireTableDataChanged();
+	}
+	
+	public void addToMatch(Donation donation){
+		matchModel.addEntry(donation, donation.getDonator());
+		matchModel.fireTableDataChanged();
+	}
+	
+	public void addToNew(Donation donation){
+		newModel.addEntry(donation, donation.getDonator());
+		newModel.fireTableDataChanged();
 	}
 }

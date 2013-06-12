@@ -68,7 +68,7 @@ public class AssignPerson extends JDialog {
 	private Filter showAllFilter;
 
 	public AssignPerson(IPersonService personService,
-			IAddressService addressService, IDonationService donationService, IFilterService filterService, ImportValidation importValidation) {
+			IAddressService addressService, IDonationService donationService, ImportValidation importValidation) {
 
 		this.personService = personService;
 		this.addressService = addressService;
