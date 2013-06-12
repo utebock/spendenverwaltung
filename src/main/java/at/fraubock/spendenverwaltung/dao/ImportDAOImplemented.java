@@ -10,6 +10,7 @@ import java.sql.Types;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -61,80 +62,106 @@ public class ImportDAOImplemented implements IImportDAO {
 
 	@Override
 	public void insertOrUpdate(final Import i) throws PersistenceException {
-		log.debug("insertOrUpdate " + i);
 		try {
-			validate(i);
-		} catch (ValidationException e) {
+			log.debug("insertOrUpdate " + i);
+			try {
+				validate(i);
+			} catch (ValidationException e) {
+				throw new PersistenceException(e);
+			}
+
+			if (i.getId() == null) {
+				// new entry
+				KeyHolder keyHolder = new GeneratedKeyHolder();
+
+				final String creator = jdbcTemplate.queryForObject(
+						"SELECT SUBSTRING_INDEX(USER(),'@',1)", String.class);
+
+				jdbcTemplate.update(new PreparedStatementCreator() {
+
+					@Override
+					public PreparedStatement createPreparedStatement(
+							Connection con) throws SQLException {
+						PreparedStatement ps = con
+								.prepareStatement(
+										"INSERT INTO imports (creator, import_date, source) VALUES (?,?,?)",
+										Statement.RETURN_GENERATED_KEYS);
+						ps.setString(1, creator);
+						ps.setDate(2, new Date(i.getImportDate().getTime()));
+						ps.setString(3, i.getSource());
+						return ps;
+					}
+				}, keyHolder);
+
+				i.setId(keyHolder.getKey().intValue());
+				i.setCreator(creator);
+			} else {
+				// update
+				jdbcTemplate
+						.update("UPDATE imports SET import_date = ?, source = ? WHERE id = ?",
+								new Object[] { i.getImportDate(),
+										i.getSource(), i.getId() }, new int[] {
+										Types.DATE, Types.VARCHAR,
+										Types.INTEGER });
+				i.setCreator(jdbcTemplate.queryForObject(
+						"SELECT creator FROM imports WHERE id = ?",
+						new Object[] { i.getId() },
+						new int[] { Types.INTEGER }, String.class));
+			}
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
-		}
-
-		if (i.getId() == null) {
-			// new entry
-			KeyHolder keyHolder = new GeneratedKeyHolder();
-
-			final String creator = jdbcTemplate.queryForObject(
-					"SELECT SUBSTRING_INDEX(USER(),'@',1)", String.class);
-
-			jdbcTemplate.update(new PreparedStatementCreator() {
-
-				@Override
-				public PreparedStatement createPreparedStatement(Connection con)
-						throws SQLException {
-					PreparedStatement ps = con
-							.prepareStatement(
-									"INSERT INTO imports (creator, import_date, source) VALUES (?,?,?)",
-									Statement.RETURN_GENERATED_KEYS);
-					ps.setString(1, creator);
-					ps.setDate(2, new Date(i.getImportDate().getTime()));
-					ps.setString(3, i.getSource());
-					return ps;
-				}
-			}, keyHolder);
-
-			i.setId(keyHolder.getKey().intValue());
-			i.setCreator(creator);
-		} else {
-			// update
-			jdbcTemplate
-					.update("UPDATE imports SET import_date = ?, source = ? WHERE id = ?",
-							new Object[] { i.getImportDate(), i.getSource(),
-									i.getId() }, new int[] { Types.DATE,
-									Types.VARCHAR, Types.INTEGER });
-			i.setCreator(jdbcTemplate.queryForObject(
-					"SELECT creator FROM imports WHERE id = ?",
-					new Object[] { i.getId() }, new int[] { Types.INTEGER },
-					String.class));
 		}
 
 	}
 
 	@Override
 	public void delete(Import i) throws PersistenceException {
-		log.debug("delete " + i);
-		if (i.getId() == null || i.getId() < 0)
-			throw new IllegalArgumentException(
-					"id of import to be deleted must be positive");
-		jdbcTemplate.update("DELETE FROM imports WHERE id = ?", i.getId());
+		try {
+			log.debug("delete " + i);
+			if (i.getId() == null || i.getId() < 0)
+				throw new IllegalArgumentException(
+						"id of import to be deleted must be positive");
+			jdbcTemplate.update("DELETE FROM imports WHERE id = ?", i.getId());
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
+
 	}
 
 	@Override
 	public List<Import> getAll() throws PersistenceException {
-		log.debug("getAll");
-		return jdbcTemplate.query("SELECT * FROM imports", new ImportMapper());
+		try {
+			log.debug("getAll");
+			return jdbcTemplate.query("SELECT * FROM imports",
+					new ImportMapper());
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
+
 	}
 
 	@Override
 	public Import getByID(int id) throws PersistenceException {
-		log.debug("getById" + id);
 		try {
-			return jdbcTemplate.queryForObject(
-					"SELECT * FROM imports WHERE id = ?", new Object[] { id },
-					new int[] { Types.INTEGER }, new ImportMapper());
-		} catch (IncorrectResultSizeDataAccessException e) {
-			if (e.getActualSize() == 0)
-				return null;
+			log.debug("getById" + id);
+			try {
+				return jdbcTemplate.queryForObject(
+						"SELECT * FROM imports WHERE id = ?",
+						new Object[] { id }, new int[] { Types.INTEGER },
+						new ImportMapper());
+			} catch (IncorrectResultSizeDataAccessException e) {
+				if (e.getActualSize() == 0)
+					return null;
+				throw new PersistenceException(e);
+			}
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
 		}
+
 	}
 
 	private static class ImportMapper implements RowMapper<Import> {

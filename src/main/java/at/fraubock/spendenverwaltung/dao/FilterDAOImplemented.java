@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -27,84 +29,108 @@ import at.fraubock.spendenverwaltung.util.FilterType;
 
 public class FilterDAOImplemented implements IFilterDAO {
 
+	private static final Logger log = Logger
+			.getLogger(FilterDAOImplemented.class);
+
 	private JdbcTemplate jdbcTemplate;
 	private AbstractCriterionDAO abstractCritDAO;
 	private FilterValidator validator;
 
 	@Override
 	public void insert(Filter f) throws PersistenceException {
-		validator.validate(f);
+		try {
+			validator.validate(f);
 
-		if (f.getCriterion() != null) {
-			abstractCritDAO.insert(f.getCriterion());
+			if (f.getCriterion() != null) {
+				abstractCritDAO.insert(f.getCriterion());
+			}
+
+			// new filter to be inserted
+			KeyHolder keyHolder = new GeneratedKeyHolder();
+
+			jdbcTemplate.update(new CreateFilterStatementCreator(f), keyHolder);
+
+			f.setId(keyHolder.getKey().intValue());
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
 		}
-
-		// new filter to be inserted
-		KeyHolder keyHolder = new GeneratedKeyHolder();
-
-		jdbcTemplate.update(new CreateFilterStatementCreator(f), keyHolder);
-
-		f.setId(keyHolder.getKey().intValue());
 
 	}
 
 	@Override
 	public void delete(Filter f) throws PersistenceException {
-		validator.validate(f);
-		String deleteFilters = "delete from filter where id = ?";
+		try {
+			validator.validate(f);
+			String deleteFilters = "delete from filter where id = ?";
 
-		Object[] params = new Object[] { f.getId() };
+			Object[] params = new Object[] { f.getId() };
 
-		int[] types = new int[] { Types.INTEGER };
+			int[] types = new int[] { Types.INTEGER };
 
-		jdbcTemplate.update(deleteFilters, params, types);
+			jdbcTemplate.update(deleteFilters, params, types);
 
-		if (f.getCriterion() != null) {
-			abstractCritDAO.delete(f.getCriterion());
+			if (f.getCriterion() != null) {
+				abstractCritDAO.delete(f.getCriterion());
+			}
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
 		}
 	}
 
 	@Override
 	public List<Filter> getAll() throws PersistenceException {
-		// FIXME order alphabetically by name?
-		FilterMapper mapper = new FilterMapper();
-		String select = "SELECT * FROM filter WHERE owner = ? OR private = false ORDER BY id DESC";
-		List<Filter> filterList = jdbcTemplate.query(select,
-				new Object[] { CurrentUser.userName }, mapper);
-		for (Filter result : filterList) {
-			Integer critId = mapper.getCriterionId().get(result.getId());
-			if (critId != null) {
-				result.setCriterion(abstractCritDAO.getById(critId));
+		try {
+			// FIXME order alphabetically by name?
+			FilterMapper mapper = new FilterMapper();
+			String select = "SELECT * FROM filter WHERE owner = ? OR private = false ORDER BY id DESC";
+			List<Filter> filterList = jdbcTemplate.query(select,
+					new Object[] { CurrentUser.userName }, mapper);
+			for (Filter result : filterList) {
+				Integer critId = mapper.getCriterionId().get(result.getId());
+				if (critId != null) {
+					result.setCriterion(abstractCritDAO.getById(critId));
+				}
 			}
-		}
 
-		return filterList;
+			return filterList;
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
 	}
 
 	@Override
 	public Filter getById(int id) throws PersistenceException {
-		if (id < 0) {
-			throw new IllegalArgumentException("Id must not be less than 0");
-		}
-
-		String select = "select * from filter where id = ?";
-		Filter result = null;
 		try {
-			FilterMapper mapper = new FilterMapper();
-			result = jdbcTemplate.queryForObject(select, new Object[] { id },
-					mapper);
-
-			Integer criterionId = mapper.getCriterionId().get(result.getId());
-			if (criterionId != null) {
-				result.setCriterion(abstractCritDAO.getById(criterionId));
+			if (id < 0) {
+				throw new IllegalArgumentException("Id must not be less than 0");
 			}
-		} catch (IncorrectResultSizeDataAccessException e) {
-			if (e.getActualSize() == 0)
-				return null;
-			else
-				throw new PersistenceException(e);
+
+			String select = "select * from filter where id = ?";
+			Filter result = null;
+			try {
+				FilterMapper mapper = new FilterMapper();
+				result = jdbcTemplate.queryForObject(select,
+						new Object[] { id }, mapper);
+
+				Integer criterionId = mapper.getCriterionId().get(
+						result.getId());
+				if (criterionId != null) {
+					result.setCriterion(abstractCritDAO.getById(criterionId));
+				}
+			} catch (IncorrectResultSizeDataAccessException e) {
+				if (e.getActualSize() == 0)
+					return null;
+				else
+					throw new PersistenceException(e);
+			}
+			return result;
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
 		}
-		return result;
 	}
 
 	/* mappers for inserting and reading this entity */

@@ -10,6 +10,7 @@ import java.sql.Types;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -60,9 +61,9 @@ public class DonationDAOImplemented implements IDonationDAO {
 			throw new ValidationException("Donation must not be null");
 		if (d.getDonator() == null)
 			throw new ValidationException("Person must not be null");
-		if(d.getAmount() == null) {
+		if (d.getAmount() == null) {
 			throw new ValidationException("Amount must not be null");
-		} else if(d.getAmount() < 0) {
+		} else if (d.getAmount() < 0) {
 			throw new ValidationException("Amount must not be less than 0");
 		}
 		if (d.getDate() == null)
@@ -110,108 +111,138 @@ public class DonationDAOImplemented implements IDonationDAO {
 	@Override
 	public void insertOrUpdate(Donation d) throws PersistenceException {
 		try {
-			validate(d);
-		} catch (ValidationException e) {
+			try {
+				validate(d);
+			} catch (ValidationException e) {
+				throw new PersistenceException(e);
+			}
+
+			if (d.getId() == null) {
+				// insert
+				KeyHolder keyHolder = new GeneratedKeyHolder();
+
+				jdbcTemplate.update(new CreateDonationStatementCreator(d),
+						keyHolder);
+
+				d.setId(keyHolder.getKey().intValue());
+
+			} else {
+				// update
+				String updateStatement = "update donations set personid = ?, amount = ?, donationdate = ?, dedication = ?, type = ?, note = ? where id = ?";
+
+				Object[] params = new Object[] {
+						d.getDonator() == null ? null : d.getDonator().getId(),
+						d.getAmount(), d.getDate(), d.getDedication(),
+						d.getType().getName(), d.getNote(), d.getId() };
+
+				int[] types = new int[] { Types.INTEGER, Types.BIGINT,
+						Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR,
+						Types.VARCHAR, Types.INTEGER };
+
+				jdbcTemplate.update(updateStatement, params, types);
+			}
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
-		}
-
-		if (d.getId() == null) {
-			// insert
-			KeyHolder keyHolder = new GeneratedKeyHolder();
-
-			jdbcTemplate.update(new CreateDonationStatementCreator(d),
-					keyHolder);
-
-			d.setId(keyHolder.getKey().intValue());
-
-		} else {
-			// update
-			String updateStatement = "update donations set personid = ?, amount = ?, donationdate = ?, dedication = ?, type = ?, note = ? where id = ?";
-
-			Object[] params = new Object[] {
-					d.getDonator() == null ? null : d.getDonator().getId(),
-					d.getAmount(), d.getDate(), d.getDedication(),
-					d.getType().getName(), d.getNote(), d.getId() };
-
-			int[] types = new int[] { Types.INTEGER, Types.BIGINT,
-					Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR,
-					Types.VARCHAR, Types.INTEGER };
-
-			jdbcTemplate.update(updateStatement, params, types);
 		}
 	}
 
 	@Override
 	public void delete(Donation d) throws PersistenceException {
 		try {
-			validate(d);
-		} catch (ValidationException e) {
+			try {
+				validate(d);
+			} catch (ValidationException e) {
+				throw new PersistenceException(e);
+			}
+
+			String deleteStatement = "delete from donations where id = ?";
+
+			Object[] params = new Object[] { d.getId() };
+
+			int[] types = new int[] { Types.INTEGER };
+
+			jdbcTemplate.update(deleteStatement, params, types);
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
 		}
-
-		String deleteStatement = "delete from donations where id = ?";
-
-		Object[] params = new Object[] { d.getId() };
-
-		int[] types = new int[] { Types.INTEGER };
-
-		jdbcTemplate.update(deleteStatement, params, types);
 	}
 
 	@Override
 	public List<Donation> getConfirmed() throws PersistenceException {
+		try {
 
-		String select = "SELECT * FROM validated_donations ORDER BY id DESC";
+			String select = "SELECT * FROM validated_donations ORDER BY id DESC";
 
-		List<Donation> donations = jdbcTemplate.query(select,
-				new DonationMapper());
+			List<Donation> donations = jdbcTemplate.query(select,
+					new DonationMapper());
 
-		return donations;
+			return donations;
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
 	}
 
 	@Override
 	public List<Donation> getUnconfirmed() throws PersistenceException {
+		try {
 
-		String select = "SELECT * FROM donations WHERE import IS NOT NULL ORDER BY id DESC";
+			String select = "SELECT * FROM donations WHERE import IS NOT NULL ORDER BY id DESC";
 
-		List<Donation> donations = jdbcTemplate.query(select,
-				new DonationMapper());
+			List<Donation> donations = jdbcTemplate.query(select,
+					new DonationMapper());
 
-		return donations;
+			return donations;
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
 	}
 
 	@Override
 	public Donation getByID(int id) throws PersistenceException {
-
-		if (id < 0) {
-			throw new IllegalArgumentException("Id must not be less than 0");
-		}
-
-		String select = "select * from donations where id = ?";
-
 		try {
-			return jdbcTemplate.queryForObject(select, new Object[] { id },
-					new DonationMapper());
-		} catch (IncorrectResultSizeDataAccessException e) {
-			if (e.getActualSize() == 0)
-				return null;
-			else
-				throw new PersistenceException(e);
+
+			if (id < 0) {
+				throw new IllegalArgumentException("Id must not be less than 0");
+			}
+
+			String select = "select * from donations where id = ?";
+
+			try {
+				return jdbcTemplate.queryForObject(select, new Object[] { id },
+						new DonationMapper());
+			} catch (IncorrectResultSizeDataAccessException e) {
+				if (e.getActualSize() == 0)
+					return null;
+				else
+					throw new PersistenceException(e);
+			}
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
 		}
 	}
 
 	@Override
 	public List<Donation> getByPerson(Person p) throws PersistenceException {
-		if (p == null || p.getId() == null || p.getId() < 1) {
-			throw new IllegalArgumentException("Passed person was invalid");
+		try {
+			if (p == null || p.getId() == null || p.getId() < 1) {
+				throw new IllegalArgumentException("Passed person was invalid");
+			}
+
+			String select = "select * from donations where personid = ? ORDER BY id DESC";
+
+			List<Donation> donations = jdbcTemplate.query(select,
+					new Object[] { p.getId() }, new DonationMapper());
+
+			return donations;
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
 		}
-
-		String select = "select * from donations where personid = ? ORDER BY id DESC";
-
-		List<Donation> donations = jdbcTemplate.query(select,
-				new Object[] { p.getId() }, new DonationMapper());
-
-		return donations;
 	}
 
 	public FilterToSqlBuilder getFilterToSqlBuilder() {
@@ -248,61 +279,86 @@ public class DonationDAOImplemented implements IDonationDAO {
 
 	@Override
 	public List<Donation> getAll() throws PersistenceException {
-		String select = "SELECT * FROM donations ORDER BY id DESC";
+		try {
+			String select = "SELECT * FROM donations ORDER BY id DESC";
 
-		List<Donation> donations = jdbcTemplate.query(select,
-				new DonationMapper());
+			List<Donation> donations = jdbcTemplate.query(select,
+					new DonationMapper());
 
-		return donations;
+			return donations;
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
 	}
 
 	@Override
 	public List<Donation> getByImport(Import i) throws PersistenceException {
-		String select = "SELECT * FROM donations WHERE import = ? ORDER BY id DESC";
+		try {
+			String select = "SELECT * FROM donations WHERE import = ? ORDER BY id DESC";
 
-		List<Donation> donations = jdbcTemplate.query(select,
-				new Object[] { i.getId() }, new DonationMapper());
+			List<Donation> donations = jdbcTemplate.query(select,
+					new Object[] { i.getId() }, new DonationMapper());
 
-		return donations;
+			return donations;
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
 	}
 
 	@Override
 	public List<Donation> getByFilter(Filter filter)
 			throws PersistenceException {
-		String select = filterToSqlBuilder.createSqlStatement(filter);
-		List<Donation> DonationList = jdbcTemplate.query(select,
-				new DonationMapper());
-		log.info(DonationList.size() + " list size");
+		try {
+			String select = filterToSqlBuilder.createSqlStatement(filter);
+			List<Donation> DonationList = jdbcTemplate.query(select,
+					new DonationMapper());
+			log.info(DonationList.size() + " list size");
 
-		return DonationList;
+			return DonationList;
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
 	}
 
 	@Override
 	public void setImportToNull(List<Donation> donationList)
 			throws PersistenceException {
-		String updateStmt = "UPDATE donations SET import=null WHERE id=?";
+		try {
+			String updateStmt = "UPDATE donations SET import=null WHERE id=?";
 
-		for (Donation d : donationList) {
-			jdbcTemplate.update(updateStmt, new Object[] { d.getId() },
-					new int[] { Types.INTEGER });
+			for (Donation d : donationList) {
+				jdbcTemplate.update(updateStmt, new Object[] { d.getId() },
+						new int[] { Types.INTEGER });
+			}
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
 		}
 	}
 
 	@Override
 	public boolean donationExists(Donation d) throws PersistenceException {
-		String select = "SELECT * FROM validated_donations WHERE personid=? AND amount=? AND donationdate=? AND dedication=? AND type=? AND note=?";
+		try {
+			String select = "SELECT * FROM validated_donations WHERE personid=? AND amount=? AND donationdate=? AND dedication=? AND type=? AND note=?";
 
-		Object[] params = new Object[] { d.getDonator().getId(), d.getAmount(),
-				d.getDate(), d.getDedication(), d.getType().getName(),
-				d.getNote() };
+			Object[] params = new Object[] { d.getDonator().getId(),
+					d.getAmount(), d.getDate(), d.getDedication(),
+					d.getType().getName(), d.getNote() };
 
-		List<Donation> donations = jdbcTemplate.query(select, params,
-				new DonationMapper());
+			List<Donation> donations = jdbcTemplate.query(select, params,
+					new DonationMapper());
 
-		if (donations.size() == 0)
-			return false;
-		else
-			return true;
+			if (donations.size() == 0)
+				return false;
+			else
+				return true;
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
 	}
 
 }

@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -42,10 +43,10 @@ public class AddressDAOImplemented implements IAddressDAO {
 	 * checks the integrity of an {@link Address} entity
 	 * 
 	 * @author philipp muhoray
-	 * @throws ValidationException 
+	 * @throws ValidationException
 	 * 
 	 */
-	
+
 	private static void validate(Address address) throws ValidationException {
 		if (address == null) {
 			log.error("Argument was null");
@@ -67,7 +68,7 @@ public class AddressDAOImplemented implements IAddressDAO {
 			throw new ValidationException("Country must not be null");
 		}
 	}
-	
+
 	private class CreateAddressStatementCreator implements
 			PreparedStatementCreator {
 
@@ -122,17 +123,17 @@ public class AddressDAOImplemented implements IAddressDAO {
 	public void insertOrUpdate(final Address a) throws PersistenceException {
 		try {
 			validate(a);
-			
+
 			if (a.getId() == null) {
 				log.info("Inserting Address...");
-	
+
 				KeyHolder keyHolder = new GeneratedKeyHolder();
-				jdbcTemplate
-						.update(new CreateAddressStatementCreator(a), keyHolder);
-	
+				jdbcTemplate.update(new CreateAddressStatementCreator(a),
+						keyHolder);
+
 				// set address id to update result
 				a.setId(keyHolder.getKey().intValue());
-	
+
 				log.info("Address entity successfully created: " + a.toString());
 			} else {
 				log.info("Updating Address...");
@@ -141,58 +142,78 @@ public class AddressDAOImplemented implements IAddressDAO {
 			}
 		} catch (ValidationException e) {
 			throw new PersistenceException(e);
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
 		}
 	}
 
 	@Override
 	public void delete(final Address a) throws PersistenceException {
-		log.info("Deleting Address...");
 		try {
-			validate(a);
-			jdbcTemplate.update(new PreparedStatementCreator() {
-	
-				@Override
-				public PreparedStatement createPreparedStatement(Connection con)
-						throws SQLException {
-					String updateAddress = "delete from addresses where id=?";
-	
-					PreparedStatement ps = con.prepareStatement(updateAddress);
-					ps.setInt(1, a.getId());
-					return ps;
-				}
-	
-			});
-		} catch (ValidationException e) {
+			log.info("Deleting Address...");
+			try {
+				validate(a);
+				jdbcTemplate.update(new PreparedStatementCreator() {
+
+					@Override
+					public PreparedStatement createPreparedStatement(
+							Connection con) throws SQLException {
+						String updateAddress = "delete from addresses where id=?";
+
+						PreparedStatement ps = con
+								.prepareStatement(updateAddress);
+						ps.setInt(1, a.getId());
+						return ps;
+					}
+
+				});
+			} catch (ValidationException e) {
+				throw new PersistenceException(e);
+			}
+			log.info("Address entity successfully deleted:" + a.toString());
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
 		}
-		log.info("Address entity successfully deleted:" + a.toString());
 	}
 
 	@Override
 	public List<Address> getAll() throws PersistenceException {
-		log.info("Reading all Addresses.");
-		return jdbcTemplate.query("select * from addresses ORDER BY id DESC",
-				new AddressMapper());
+		try {
+			log.info("Reading all Addresses.");
+			return jdbcTemplate.query(
+					"select * from addresses ORDER BY id DESC",
+					new AddressMapper());
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
 	}
 
 	@Override
 	public Address getByID(int id) throws PersistenceException {
-		log.info("Reading Address with id='" + id + "'");
-		if (id < 0) {
-			log.info("Error reading Address with id='" + id
-					+ "': Id was less than 0");
-			throw new IllegalArgumentException("Id must not be less than 0");
-		}
-
 		try {
-			return jdbcTemplate.queryForObject(
-					"select * from addresses where id = ?;",
-					new Object[] { id }, new AddressMapper());
-		} catch (IncorrectResultSizeDataAccessException e) {
-			if (e.getActualSize() == 0)
-				return null;
-			else
-				throw new PersistenceException(e);
+			log.info("Reading Address with id='" + id + "'");
+			if (id < 0) {
+				log.info("Error reading Address with id='" + id
+						+ "': Id was less than 0");
+				throw new IllegalArgumentException("Id must not be less than 0");
+			}
+
+			try {
+				return jdbcTemplate.queryForObject(
+						"select * from addresses where id = ?;",
+						new Object[] { id }, new AddressMapper());
+			} catch (IncorrectResultSizeDataAccessException e) {
+				if (e.getActualSize() == 0)
+					return null;
+				else
+					throw new PersistenceException(e);
+			}
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
 		}
 	}
 
@@ -211,10 +232,15 @@ public class AddressDAOImplemented implements IAddressDAO {
 
 	@Override
 	public List<Address> getConfirmed() throws PersistenceException {
-		log.info("Reading confirmed Addresses.");
-		return jdbcTemplate.query(
-				"select * from validated_addresses ORDER BY id DESC",
-				new AddressMapper());
+		try {
+			log.info("Reading confirmed Addresses.");
+			return jdbcTemplate.query(
+					"select * from validated_addresses ORDER BY id DESC",
+					new AddressMapper());
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
 	}
 
 }
