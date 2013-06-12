@@ -3,245 +3,43 @@ package at.fraubock.spendenverwaltung.service;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
-import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
-import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/testspring.xml")
-@TransactionConfiguration(defaultRollback = true)
 public abstract class AbstractPersonServiceTest {
 
-	protected static IAddressService addressService;
-	protected static IPersonService personService;
+	protected IPersonService personService;
 
-	protected static IPersonDAO personDAO;
-	protected static Person person;
-	protected static Person person2;
-	protected static Person nullPerson;
-	protected static Person personCreated;
+	protected final IPersonDAO personDAO = mock(IPersonDAO.class);
+	private Person person;
+	private Person person2;
+	private Person nullPerson;
+	private Person personCreated;
 
-	protected static IAddressDAO addressDAO;
-	protected static Address testAddress;
-	protected static Address testAddress2;
-	protected static Address nullAddress;
-	protected static Address testAddressCreated;
+	private Address testAddress;
+	private Address testAddress2;
+	private Address testAddressCreated;
 
-	public static void setAddressService(IAddressService addressService) {
-		AbstractAddressServiceTest.addressService = addressService;
-	}
-
-	public static void setPersonService(IPersonService personService) {
-		AbstractPersonServiceTest.personService = personService;
-	}
-
-	@Test(expected = ServiceException.class)
-	@Transactional
-	public void createWithNullParameter_ThrowsException()
-			throws ServiceException {
-		try {
-			doThrow(new PersistenceException()).when(personDAO).insertOrUpdate(
-					null);
-			personService.create(null);
-		} catch (PersistenceException e) {
-			fail();
-		}
-	}
-
-	@Test(expected = ServiceException.class)
-	@Transactional
-	public void createWithInvalidStateParameter_ThrowsException()
-			throws ServiceException {
-		try {
-			doThrow(new PersistenceException()).when(personDAO).insertOrUpdate(
-					nullPerson);
-			personService.create(nullPerson); // all values are null
-		} catch (PersistenceException e) {
-			fail();
-		}
-	}
-
-	@Test
-	@Transactional
-	public void createWithValidParameter_ReturnsSavedPerson() {
-		try {
-			person.setId(10);
-			Person returned = personService.create(person);
-
-			assertEquals(returned, personCreated);
-
-			verify(personDAO).insertOrUpdate(person);
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
-	}
-
-	/*
-	 * testing update
-	 */
-
-	@Test(expected = ServiceException.class)
-	@Transactional
-	public void updateWithNullParameter_ThrowsException()
-			throws ServiceException {
-		try {
-			doThrow(new PersistenceException()).when(personDAO).insertOrUpdate(
-					null);
-			personService.update(null);
-		} catch (PersistenceException e) {
-			fail();
-		}
-	}
-
-	@Test(expected = ServiceException.class)
-	@Transactional
-	public void updateWithInvalidStateParameter_ThrowsException()
-			throws ServiceException {
-		try {
-			doThrow(new PersistenceException()).when(personDAO).insertOrUpdate(
-					nullPerson);
-			personService.update(nullPerson);
-		} catch (PersistenceException e) {
-			fail();
-		}
-	}
-
-	@Test
-	@Transactional
-	public void updateWithValidParameters_ReturnsUpdatedPerson() {
-		try {
-			Person returned = personService.update(personCreated);
-
-			assert (returned.equals(personCreated));
-			verify(personDAO).insertOrUpdate(personCreated);
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
-	}
-
-	/*
-	 * testing delete
-	 */
-
-	@Test(expected = ServiceException.class)
-	@Transactional
-	public void deleteWithNullParameter_ThrowsException()
-			throws ServiceException {
-		try {
-			doThrow(new PersistenceException()).when(personDAO).delete(null);
-
-			personService.delete(null);
-		} catch (PersistenceException e) {
-			fail();
-		}
-	}
-
-	@Test
-	@Transactional
-	public void deleteWithValidParameter_RemovesEntity() {
-		try {
-			personService.delete(person);
-			verify(personDAO).delete(person);
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
-	}
-
-	/*
-	 * testing find
-	 */
-
-	@Test
-	@Transactional(readOnly = true)
-	public void getAll_ReturnsAllEntities() {
-		try {
-			List<Person> all = new ArrayList<Person>();
-			all.add(person);
-			all.add(person2);
-			when(personDAO.getAll()).thenReturn(all);
-
-			List<Person> list = personService.getAll();
-			assert (list != null && list.size() == 2);
-			assert (list.get(0).equals(person) && list.get(1).equals(person2));
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
-	}
-
-	@Test(expected = EmptyResultDataAccessException.class)
-	@Transactional(readOnly = true)
-	public void getWithInvalidId_ThrowsException() {
-		try {
-			when(personDAO.getById(10000)).thenThrow(
-					new EmptyResultDataAccessException(0));
-
-			personService.getById(10000);
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
-	}
-
-	@Test(expected = ServiceException.class)
-	@Transactional(readOnly = true)
-	public void getWithNegativeId_ThrowsException() throws ServiceException {
-		try {
-			when(personDAO.getById(-1)).thenThrow(new PersistenceException());
-
-			personService.getById(-1);
-		} catch (PersistenceException e) {
-			fail();
-		}
-	}
-
-	@Test
-	@Transactional(readOnly = true)
-	public void getWithValidId_ReturnsEntity() {
-		try {
-			when(personDAO.getById(personCreated.getId())).thenReturn(
-					personCreated);
-
-			Person found = personService.getById(personCreated.getId());
-
-			assertThat(personCreated, is(found));
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
-	}
-
-	protected static void init() throws PersistenceException {
+	@Before
+	public void init() throws PersistenceException {
 		testAddress = new Address();
 		testAddress.setStreet("Teststreet 1/1");
 		testAddress.setPostalCode("00000");
@@ -296,6 +94,180 @@ public abstract class AbstractPersonServiceTest {
 
 	}
 
+	@Test(expected = ServiceException.class)
+	public void createWithNullParameter_ThrowsException()
+			throws ServiceException {
+		try {
+			doThrow(new PersistenceException()).when(personDAO).insertOrUpdate(
+					null);
+			personService.create(null);
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+
+	@Test(expected = ServiceException.class)
+	public void createWithInvalidStateParameter_ThrowsException()
+			throws ServiceException {
+		try {
+			doThrow(new PersistenceException()).when(personDAO).insertOrUpdate(
+					nullPerson);
+			personService.create(nullPerson); // all values are null
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+
+	@Test
+	public void createWithValidParameter_ReturnsSavedPerson() {
+		try {
+			person.setId(10);
+			Person returned = personService.create(person);
+
+			assertEquals(returned, personCreated);
+
+			verify(personDAO).insertOrUpdate(person);
+		} catch (ServiceException e) {
+			fail();
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+
+	/*
+	 * testing update
+	 */
+
+	@Test(expected = ServiceException.class)
+	public void updateWithNullParameter_ThrowsException()
+			throws ServiceException {
+		try {
+			doThrow(new PersistenceException()).when(personDAO).insertOrUpdate(
+					null);
+			personService.update(null);
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+
+	@Test(expected = ServiceException.class)
+	public void updateWithInvalidStateParameter_ThrowsException()
+			throws ServiceException {
+		try {
+			doThrow(new PersistenceException()).when(personDAO).insertOrUpdate(
+					nullPerson);
+			personService.update(nullPerson);
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+
+	@Test
+	public void updateWithValidParameters_ReturnsUpdatedPerson() {
+		try {
+			Person returned = personService.update(personCreated);
+
+			assert (returned.equals(personCreated));
+			verify(personDAO).insertOrUpdate(personCreated);
+		} catch (ServiceException e) {
+			fail();
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+
+	/*
+	 * testing delete
+	 */
+
+	@Test(expected = ServiceException.class)
+	public void deleteWithNullParameter_ThrowsException()
+			throws ServiceException {
+		try {
+			doThrow(new PersistenceException()).when(personDAO).delete(null);
+
+			personService.delete(null);
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+
+	@Test
+	public void deleteWithValidParameter_RemovesEntity() {
+		try {
+			personService.delete(person);
+			verify(personDAO).delete(person);
+		} catch (ServiceException e) {
+			fail();
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+
+	/*
+	 * testing find
+	 */
+
+	@Test
+	public void getAll_ReturnsAllEntities() {
+		try {
+			List<Person> all = new ArrayList<Person>();
+			all.add(person);
+			all.add(person2);
+			when(personDAO.getAll()).thenReturn(all);
+
+			List<Person> list = personService.getAll();
+			assert (list != null && list.size() == 2);
+			assert (list.get(0).equals(person) && list.get(1).equals(person2));
+		} catch (ServiceException e) {
+			fail();
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+
+	@Test(expected = EmptyResultDataAccessException.class)
+	public void getWithInvalidId_ThrowsException() {
+		try {
+			when(personDAO.getById(10000)).thenThrow(
+					new EmptyResultDataAccessException(0));
+
+			personService.getById(10000);
+		} catch (ServiceException e) {
+			fail();
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+
+	@Test(expected = ServiceException.class)
+	public void getWithNegativeId_ThrowsException() throws ServiceException {
+		try {
+			when(personDAO.getById(-1)).thenThrow(new PersistenceException());
+
+			personService.getById(-1);
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+
+	@Test
+	public void getWithValidId_ReturnsEntity() {
+		try {
+			when(personDAO.getById(personCreated.getId())).thenReturn(
+					personCreated);
+
+			Person found = personService.getById(personCreated.getId());
+
+			assertThat(personCreated, is(found));
+
+		} catch (ServiceException e) {
+			fail();
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+
 	@Test(expected = IllegalArgumentException.class)
 	public void createCSVWithNullArgument_ThrowsException() {
 		personService.convertToCSV(null);
@@ -308,22 +280,21 @@ public abstract class AbstractPersonServiceTest {
 		list.add(person2);
 		list.add(personCreated);
 		String csv = personService.convertToCSV(list);
-		assertThat(csv.equals(csvExpected), is(true));
+		assertTrue(csv.equals(csvExpected));
 	}
 
 	@Test
 	public void createCSVWithEmptyList_ReturnsCSVString() {
 		List<Person> list = new ArrayList<Person>();
 		String csv = personService.convertToCSV(list);
-		assertThat(
-				csv.equals("Vorname;Nachname;E-Mail;Geschlecht;Titel;Unternehmen;Telephon;"
-						+ "Empfängt E-Mail;Empfängt Post;Notiz;Land;Stadt;PLZ;Strasse\n"),
-				is(true));
+		assertTrue(csv
+				.equals("Vorname;Nachname;E-Mail;Geschlecht;Titel;Unternehmen;Telephon;"
+						+ "Empfï¿½ngt E-Mail;Empfï¿½ngt Post;Notiz;Land;Stadt;PLZ;Strasse\n"));
 	}
 
-	private String csvExpected = "Vorname;Nachname;E-Mail;Geschlecht;Titel;Unternehmen;Telephon;Empfängt E-Mail;Empfängt Post;Notiz;Land;Stadt;PLZ;Strasse\n"
-			+ "Test;Test;test@test.at;männlich;Prof. Dr.;IBM;01234567889;ja;ja;;n.v.;n.v.;n.v.;n.v.;\n"
-			+ "Test2;Test2;test2@test2.at;männlich;Prof. Dr.;IBM;02234567889;ja;ja;;n.v.;n.v.;n.v.;n.v.;\n"
-			+ "Test;Test;test@test.at;männlich;Prof. Dr.;IBM;01234567889;ja;ja;;n.v.;n.v.;n.v.;n.v.;\n";
+	private String csvExpected = "Vorname;Nachname;E-Mail;Geschlecht;Titel;Unternehmen;Telephon;Empfï¿½ngt E-Mail;Empfï¿½ngt Post;Notiz;Land;Stadt;PLZ;Strasse\n"
+			+ "Test;Test;test@test.at;mï¿½nnlich;Prof. Dr.;IBM;01234567889;ja;ja;;n.v.;n.v.;n.v.;n.v.;\n"
+			+ "Test2;Test2;test2@test2.at;mï¿½nnlich;Prof. Dr.;IBM;02234567889;ja;ja;;n.v.;n.v.;n.v.;n.v.;\n"
+			+ "Test;Test;test@test.at;mï¿½nnlich;Prof. Dr.;IBM;01234567889;ja;ja;;n.v.;n.v.;n.v.;n.v.;\n";
 
 }
