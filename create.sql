@@ -135,7 +135,7 @@ CREATE TABLE sent_mailings (
 
 -- views for validated data:
 
-CREATE VIEW validated_donations AS SELECT * FROM donations WHERE import IS NULL; --only validated donations (i.e. no pending imports)
+CREATE VIEW validated_donations AS SELECT * FROM donations WHERE import IS NULL; -- only validated donations (i.e. no pending imports)
 
 CREATE VIEW validated_persons AS SELECT * FROM persons p WHERE NOT EXISTS (SELECT id FROM donations d WHERE d.import IS NOT NULL AND d.personid = p.id); -- only validated persons (i.e. no pending imports)
 

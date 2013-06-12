@@ -8,14 +8,18 @@ import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
+import at.fraubock.spendenverwaltung.interfaces.dao.IImportDAO;
 import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
 
 public class ImportServiceTest extends AbstractImportServiceTest {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		IImportService service = new ImportServiceImplemented();
-		setImportService(service);
-	}
+		init();
+		importDAO = mock(IImportDAO.class);
+		ImportServiceImplemented importService = new ImportServiceImplemented();
 
+		importService.setImportDAO(importDAO);
+		setImportService(importService);
+	}
 }

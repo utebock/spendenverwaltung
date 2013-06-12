@@ -38,12 +38,10 @@ public abstract class AbstractImportDAOTest {
 	@Transactional
 	public void setUp() throws PersistenceException {
 		i1 = new Import();
-		i1.setCreator("melanie");
 		i1.setImportDate(new GregorianCalendar(2013, 2, 15).getTime());
 		i1.setSource("CSV");
 		importDAO.insertOrUpdate(i1);
 		i2 = new Import();
-		i2.setCreator("günter");
 		i2.setImportDate(new GregorianCalendar(2013, 4, 18).getTime());
 		i2.setSource("Online-Spenden");
 		importDAO.insertOrUpdate(i2);
@@ -58,38 +56,35 @@ public abstract class AbstractImportDAOTest {
 		assertTrue(i2.getId() >= 0);
 	}
 
+	@Test
+	@Transactional
+	public void createSetsCreator() {
+		assertNotNull(i1.getCreator());
+		assertTrue(i1.getCreator().length() > 0);
+		assertNotNull(i2.getCreator());
+		assertTrue(i2.getCreator().length() > 0);
+		assertEquals(i1.getCreator(), i2.getCreator());
+	}
+
 	@Test(expected = PersistenceException.class)
 	@Transactional
 	public void createWithTooLongString_shouldFail()
 			throws PersistenceException {
 		Import i = new Import();
-		i.setCreator("melanie");
 		i.setImportDate(new GregorianCalendar(2013, 2, 15).getTime());
 		i.setSource("CSVCSVCSVCSVCSVCSVCSVCSVCSVCSVCSV");
 		importDAO.insertOrUpdate(i);
 	}
-	
+
 	@Test(expected = PersistenceException.class)
 	@Transactional
 	public void createWithNullDate_shouldFail() throws PersistenceException {
 		Import i = new Import();
-		i.setCreator("melanie");
 		i.setImportDate(null);
-		i.setSource("CSV");
-		importDAO.insertOrUpdate(i);	
-	}
-
-	@Test(expected = PersistenceException.class)
-	@Transactional
-	public void createWithNullCreator_shouldFail() throws PersistenceException {
-		Import i = new Import();
-		i.setCreator(null);
-		i.setImportDate(new GregorianCalendar(2013, 2, 15).getTime());
 		i.setSource("CSV");
 		importDAO.insertOrUpdate(i);
 	}
 
-	/*
 	@Test
 	@Transactional
 	public void getByIdReturnsValid() throws PersistenceException {
@@ -100,7 +95,7 @@ public abstract class AbstractImportDAOTest {
 		assertEquals(retreived2, i2);
 		assertFalse(retreived2 == i2);
 	}
-*/
+
 	@Test
 	@Transactional
 	public void updateWorks1() throws PersistenceException {
@@ -114,7 +109,18 @@ public abstract class AbstractImportDAOTest {
 	public void updateWorks2() throws PersistenceException {
 		i1.setImportDate(new GregorianCalendar(2010, 1, 1).getTime());
 		importDAO.insertOrUpdate(i1);
-		assertEquals(i1.getImportDate(), importDAO.getByID(i1.getId()).getImportDate());
+		assertEquals(i1.getImportDate(), importDAO.getByID(i1.getId())
+				.getImportDate());
+	}
+
+	@Test
+	@Transactional
+	public void updateRevertsCreator() throws PersistenceException {
+		i1.setSource("native");
+		String formerCreator = i1.getCreator();
+		i1.setCreator("nobody1020");
+		importDAO.insertOrUpdate(i1);
+		assertEquals(formerCreator, importDAO.getByID(i1.getId()).getCreator());
 	}
 
 	@Test
@@ -126,6 +132,8 @@ public abstract class AbstractImportDAOTest {
 		assertEquals(is.get(1).getId(), i2.getId());
 	}
 
+	@Test
+	@Transactional
 	public void deleteWorks() throws PersistenceException {
 		importDAO.delete(i1);
 		List<Import> is = importDAO.getAll();

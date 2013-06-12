@@ -15,8 +15,9 @@ public interface IImportDAO {
 	/**
 	 * Inserts a new import to the persistence layer (if its id is null or not
 	 * yet existent) or updates the import with the already existent id. If the
-	 * import is inserted, its id will and other fields may be set.
-	 * Creator will be ignored and set as current sql user
+	 * import is inserted, its id will be set. In both cases the creator will be
+	 * ignored. When inserting, creator will be set to the current user. When
+	 * updating, creator will not be changed.
 	 * 
 	 * @param i
 	 *            import to be inserted or updated

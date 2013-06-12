@@ -149,19 +149,25 @@ public interface IDonationDAO {
 	// PersistenceException;
 
 	/**
-	 * For the donations in the donation list the import attribute will be updated to null
+	 * For the donations in the donation list the import attribute will be
+	 * updated to null
+	 * 
 	 * @param donationList
-	 * 			List of donations which should be affected
+	 *            List of donations which should be affected
 	 * @throws PersistenceException
-	 *          If communication to the underlying persistence system failed
+	 *             If communication to the underlying persistence system failed
 	 */
-	public void setImportToNull(List<Donation> donationList) throws PersistenceException;
-	
+	public void setImportToNull(List<Donation> donationList)
+			throws PersistenceException;
+
 	/**
-	 * check if donation d exists already
+	 * check if donation d exists already. A donation is considered existent if
+	 * a donation with the same attributes - apart from the id - already exists
+	 * in the underlying persistence layer.
+	 * 
 	 * @param d
-	 * 			Donation which should be proofed
-	 * @return	true, is donation already exists
+	 *            Donation which should be proofed
+	 * @return true, is donation already exists
 	 * @throws PersistenceException
 	 */
 	public boolean donationExists(Donation d) throws PersistenceException;

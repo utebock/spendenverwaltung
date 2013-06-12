@@ -8,8 +8,12 @@ public class DonationValidator {
 
 		if (d == null)
 			throw new IllegalArgumentException("Donation must not be null");
+<<<<<<< HEAD
+		if(d.getAmount() < 0)
+=======
 		// donator may be null. a null donator means anonymous donation.
 		if (d.getAmount() < 0)
+>>>>>>> e7cd85b0523b2f7dd65655ecf8dd621f574376f8
 			throw new IllegalArgumentException("Amount must not be less than 0");
 		if (d.getDate() == null)
 			throw new IllegalArgumentException("Date must not be null");
