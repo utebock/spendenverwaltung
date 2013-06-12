@@ -21,7 +21,7 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/testspring.xml")
 @TransactionConfiguration(defaultRollback = true)
-public class AbstractMailingTemplateDAOTest {
+public abstract class AbstractMailingTemplateDAOTest {
 
 	protected static IMailingTemplateDAO mailingTemplateDAO;
 

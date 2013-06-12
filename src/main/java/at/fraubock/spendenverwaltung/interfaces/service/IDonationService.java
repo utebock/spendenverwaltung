@@ -101,4 +101,22 @@ public interface IDonationService {
 	 * @return CSV representation of the donations
 	 */
 	public String convertToCSV(List<Donation> donations);
+	
+	/**
+	 * For the donations in the donation list the import attribute will be updated to null
+	 * @param donationList
+	 * 			List of donations which should be affected
+	 * @throws PersistenceException
+	 *          If communication to the underlying persistence system failed
+	 */
+	public void setImportToNull(List<Donation> donationList) throws ServiceException;
+	
+	/**
+	 * check if donation d exists already
+	 * @param d
+	 * 			Donation which should be proofed
+	 * @return	true, is donation already exists
+	 * @throws PersistenceException
+	 */
+	public boolean donationExists(Donation d) throws ServiceException;
 }

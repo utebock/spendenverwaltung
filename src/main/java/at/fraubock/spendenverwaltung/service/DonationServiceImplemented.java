@@ -1,6 +1,7 @@
 package at.fraubock.spendenverwaltung.service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Isolation;
@@ -154,5 +155,23 @@ public class DonationServiceImplemented implements IDonationService {
 			csv+=(a==null?nA:a.getStreet())+";\n";
 		}
 		return csv;
+	}
+
+	@Override
+	public void setImportToNull(List<Donation> donationList) throws ServiceException {
+		try {
+			donationDAO.setImportToNull(donationList);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
+
+	@Override
+	public boolean donationExists(Donation donation) throws ServiceException {
+		try {
+			return donationDAO.donationExists(donation);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
 	}
 }

@@ -1,12 +1,7 @@
 package at.fraubock.spendenverwaltung.service;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,26 +26,18 @@ import at.fraubock.spendenverwaltung.util.RelationalOperator;
  * @author Chris Steele
  * 
  */
-public class AbstractMailingServiceTest {
+public abstract class AbstractMailingServiceTest {
 
-	private static IMailingService mailingService;
-	private static IMailingDAO mailingDAO;
+	protected IMailingService mailingService;
+	protected final IMailingDAO mailingDAO = mock(IMailingDAO.class);
 
-	private static Mailing validMailing;
-	private static Mailing validMailingTwo;
-	private static Mailing validMailingThree;
+	private Mailing validMailing;
+	private Mailing validMailingTwo;
+	private Mailing validMailingThree;
 
-	private static Mailing invalidMailing;
+	private Mailing invalidMailing;
 
-	private static Filter validFilter;
-
-	public static void setMailingService(IMailingService mailingService) {
-		AbstractMailingServiceTest.mailingService = mailingService;
-	}
-
-	public static void setMailingDAO(IMailingDAO mailingDAO) {
-		AbstractMailingServiceTest.mailingDAO = mailingDAO;
-	}
+	private Filter validFilter;
 
 	@Before
 	public void init() {
@@ -238,17 +225,17 @@ public class AbstractMailingServiceTest {
 		list.add(validMailingTwo);
 		list.add(validMailingThree);
 		String csv = mailingService.convertToCSV(list);
-		assertThat(csv.equals(csvExpected), is(true));
+		assertTrue(csv.equals(csvExpected));
 	}
 
 	@Test
 	public void createCSVWithEmptyList_ReturnsCSVString() {
 		List<Mailing> list = new ArrayList<Mailing>();
 		String csv = mailingService.convertToCSV(list);
-		assertThat(csv.equals("Datum;Art;Medium;\n"), is(true));
+		assertTrue(csv.equals("Datum;Art;Medium;\n"));
 	}
 
-	private String csvExpected = "Datum;Art;Medium;\n10.06.2013;DANKESBRIEF;EMAIL;\n10.06.2013;INFOMATERIAL;POSTAL;\n" +
-			"10.06.2013;ERLAGSCHEINVERSAND;EMAIL;\n";
+	private String csvExpected = "Datum;Art;Medium;\n10.06.2013;DANKESBRIEF;EMAIL;\n10.06.2013;INFOMATERIAL;POSTAL;\n"
+			+ "10.06.2013;ERLAGSCHEINVERSAND;EMAIL;\n";
 
 }

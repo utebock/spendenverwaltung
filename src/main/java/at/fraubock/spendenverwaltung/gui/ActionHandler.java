@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 
 import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
 import at.fraubock.spendenverwaltung.gui.views.FindPersonsView;
+import at.fraubock.spendenverwaltung.gui.views.ImportDataView;
 
 public class ActionHandler implements ActionListener{
 
@@ -27,7 +28,7 @@ public class ActionHandler implements ActionListener{
 	public ActionHandler(EditPerson editPerson) {
 		// TODO Auto-generated constructor stub
 	}
-	public ActionHandler(ImportData importData) {
+	public ActionHandler(ImportDataView importData) {
 		// TODO Auto-generated constructor stub
 	}
 	@Override

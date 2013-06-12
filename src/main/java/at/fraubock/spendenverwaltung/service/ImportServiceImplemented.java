@@ -2,59 +2,104 @@ package at.fraubock.spendenverwaltung.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
+import at.fraubock.spendenverwaltung.interfaces.dao.IImportDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
-import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
+import at.fraubock.spendenverwaltung.interfaces.domain.Import;
+import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person.Sex;
 import at.fraubock.spendenverwaltung.interfaces.domain.csvimport.ImportRow;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
+import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
+import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
+import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.CSVImport;
 
+/**
+ * 
+ * @author romanvoglhuber
+ * 
+ */
 public class ImportServiceImplemented implements IImportService {
+	private IPersonService personService;
+	private IDonationService donationService;
+	private IAddressService addressService;
 
-	private static final Logger log = Logger.getLogger(ImportServiceImplemented.class);
-	
-	public void nativeImport(File file) throws ServiceException{
-		Map<String, String> columnMapping = new HashMap<String, String>();
-		List<Person> persons;
-		List<Donation> donations;
+	private IImportDAO importDAO;
+
+	private static final Logger log = Logger
+			.getLogger(ImportServiceImplemented.class);
+
+	public void nativeImport(File file) throws ServiceException, IOException {
+		Map<String, String> columnMapping;
+		int rowCount = 0;
 		Person person;
 		Donation donation;
 		Address address;
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		List<Donation> donationList;
+		List<Address> addresses;
 		
-		log.debug("Native import file: "+file);
+		Import imp;
+		List<ImportRow> importRows = null;
 		
-		Properties config = new Properties();
-		try {
-			config.load(getClass().getClassLoader().getResourceAsStream("native_import_config.properties"));
+		// set up formats for date and amount parsing
+		NumberFormat f = NumberFormat.getInstance(Locale.GERMAN);
+		if (!(f instanceof DecimalFormat)) {
+			String msg = "Number format used for importing native CSV data is not applicable for decimal amounts";
+			log.error(msg);
+			throw new ServiceException(msg);
+		}
+		DecimalFormat df = (DecimalFormat) f;
+		df.setParseBigDecimal(true);
 
-			for(Entry<Object, Object> entry : config.entrySet()){
-				if(String.valueOf(entry.getValue()).length()>0){
-					columnMapping.put(String.valueOf(entry.getValue()), String.valueOf(entry.getKey()));
-				}
-			}
+		DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy",
+				Locale.GERMAN);
 
-			List<ImportRow> importRows = CSVImport.readCSVWithMapping(file, columnMapping);
+		log.debug("Native import with CSV: " + file);
+
+		//Read mapping config and read CSV
+		columnMapping = readMappingConfig("native_import_config.properties");
+		importRows = CSVImport.readCSVWithMapping(file, columnMapping);
 		
-			persons = new ArrayList<Person>();
-			donations = new ArrayList<Donation>();
-			for(ImportRow row : importRows){
-				//Person
+		donationList = new ArrayList<Donation>(importRows.size());
+		
+		//Create import (domain)
+		imp = new Import();
+		imp.setImportDate(new Date());
+		imp.setSource("native");
+		imp.setCreator("");
+
+		createImport(imp);
+
+		//Read all rows
+		for (ImportRow row : importRows) {
+			try {
+				rowCount++;
+				
+				// Person
 				person = new Person();
 				person.setGivenName(row.getGivenName());
 				person.setSurname(row.getSurname());
@@ -63,47 +108,226 @@ public class ImportServiceImplemented implements IImportService {
 				person.setTitle(row.getTitle());
 				person.setCompany(row.getCompany());
 				person.setTelephone(row.getTelephone());
-				person.setEmailNotification(Boolean.valueOf(row.getEmailNotification()));
-				person.setPostalNotification(Boolean.valueOf(row.getPostalNotification()));
+				person.setEmailNotification(Boolean.valueOf(row
+						.getEmailNotification()));
+				person.setPostalNotification(Boolean.valueOf(row
+						.getPostalNotification()));
 				person.setNote(row.getPersonNote());
-				
-				//Donation
+
+				// Donation
 				donation = new Donation();
 				try {
-					donation.setDate(df.parse(row.getDate()));
+					donation.setDate(dateFormat.parse(row.getDate()));
 				} catch (ParseException e) {
-					e.printStackTrace();
+					String msg = "An error occurred during date parsing in row "+rowCount+". The date has to be in dd.MM.yyyy format";
+					log.warn(msg);
+					throw new ServiceException(msg, e);
 				}
-				donation.setAmount(Long.valueOf((long) (Double.valueOf(row.getAmount())*100)));
+				
+				BigDecimal n = (BigDecimal) df.parse(row.getAmount(),
+						new ParsePosition(0));
+				n = n.multiply(new BigDecimal(100));
+				donation.setAmount(n.toBigInteger().longValue());
 				donation.setDedication(row.getDedication());
 				donation.setNote(row.getDonationNote());
 				donation.setType(DonationType.getByName(row.getType()));
-				
-				//Address
+
+				// Address
 				address = new Address();
 				address.setStreet(row.getStreet());
 				address.setCity(row.getCity());
 				address.setPostalCode(row.getPostcode());
 				address.setCountry(row.getCountry());
+
+				//Connect domains
+				person.setMainAddress(address);
 				
-				//Connect Domains
-				List<Address> addresses = person.getAddresses();
-				addresses.add(address);
-				person.setAddresses(addresses);
-				if(person.getMainAddress()==null){
-					person.setMainAddress(address);
-				}
 				donation.setDonator(person);
+				donation.setSource(imp);
 				
+				donationList.add(donation);
 				
-				
-				persons.add(person);
-				donations.add(donation);
+			} catch (IllegalArgumentException | NullPointerException e) {
+				String msg = "Error during native CSV Import in row " + rowCount;
+				log.error(msg);
+				throw new ServiceException(msg, e);
 			}
 			
-			log.debug("Could add "+donations.size()+" donations to "+persons.size()+" persons (not implemented)");
+			//Save data
+			for(Donation d : donationList){
+				person = d.getDonator();
+				
+				//Address
+				address = person.getMainAddress();
+				if(address.getId()==null){
+					address = addressService.create(address);
+				}
+				addresses = person.getAddresses();
+				addresses.add(address);
+				person.setAddresses(addresses);
+				person.setMainAddress(address);
+
+				log.debug("Person: "+person.getGivenName()+" "+person.getSurname()+" "+person.getEmail()+" id:"+person.getId()+" mainaddressid:"+person.getMainAddress().getId());
+				//Person
+				if(person.getId()==null){
+					person = personService.create(person);
+				}
+				d.setDonator(person);
+				
+				//Donation
+				donationService.create(d);
+			}
+		}
+
+		log.debug("Successfully imported " + importRows.size() + " donations. ");
+	}
+
+	public Map<String, String> readMappingConfig(String configName)
+			throws ServiceException {
+		Map<String, String> columnMapping = new HashMap<String, String>();
+		InputStream input;
+
+		Properties config = new Properties();
+		try {
+			input = getClass().getClassLoader().getResourceAsStream(configName);
+			if (input == null) {
+				throw new ServiceException("Mapping config file not found: "
+						+ configName);
+			}
+			config.load(input);
 		} catch (IOException e) {
-			throw new ServiceException("IOException "+e.getMessage());
+			throw new ServiceException(e);
+		} catch (IllegalArgumentException e) {
+			throw new ServiceException(e);
+		}
+
+		for (Entry<Object, Object> entry : config.entrySet()) {
+			if (String.valueOf(entry.getValue()).length() > 0) {
+				columnMapping.put(String.valueOf(entry.getValue()),
+						String.valueOf(entry.getKey()));
+			}
+		}
+
+		log.debug("read mapping config " + configName);
+		return columnMapping;
+	}
+
+	@Override
+	public Import createImport(Import i) throws ServiceException {
+		try {
+			importDAO.insertOrUpdate(i);
+			return i;
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
 		}
 	}
+
+	@Override
+	public void hypoImport(File file) throws ServiceException, IOException {
+		List<ImportRow> rowList;
+		try {
+			rowList = CSVImport.readHypoCsv(file);
+		} catch (ValidationException e) {
+			throw new ServiceException(e);
+		}
+
+		Import i = new Import();
+		i.setImportDate(new Date());
+		i.setSource("Hypo-Export");
+
+		List<Donation> donations = new ArrayList<Donation>(rowList.size());
+
+		// set up formats for date and amount parsing
+		NumberFormat f = NumberFormat.getInstance(Locale.GERMAN);
+		if (!(f instanceof DecimalFormat)) {
+			String msg = "Number format used for importing Hypo CSV data is not applicable for decimal amounts";
+			log.error(msg);
+			throw new ServiceException(msg);
+		}
+		DecimalFormat df = (DecimalFormat) f;
+		df.setParseBigDecimal(true);
+
+		DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy",
+				Locale.GERMAN);
+
+		// convert the rows to donation entities
+		for (ImportRow row : rowList) {
+			Donation d = new Donation();
+
+			BigDecimal n = (BigDecimal) df.parse(row.getAmount(),
+					new ParsePosition(0));
+			n = n.multiply(new BigDecimal(100));
+			d.setAmount(n.toBigInteger().longValue());
+
+			try {
+				d.setDate(dateFormat.parse(row.getDate()));
+			} catch (ParseException e) {
+				String msg = "Date in the Hypo CSV file has wrong format";
+				log.warn(msg);
+				throw new ServiceException(msg, e);
+			}
+
+			d.setNote(row.getDonationNote());
+
+			d.setSource(i);
+
+			d.setType(Donation.DonationType.getByName(row.getType()));
+
+			donations.add(d);
+		}
+
+		createImport(i);
+
+		// now, save donations
+		for (Donation d : donations) {
+			try {
+				donationService.create(d);
+			} catch (Throwable t) {
+				log.debug("reverting import...");
+				int last = donations.indexOf(d);
+				for (int index = 0; index < last; ++index) {
+					try {
+						donationService.delete(donations.get(index));
+					} catch (Throwable t2) {
+						log.debug("deletion of previously-inserted donation failed: "
+								+ t2.getMessage());
+					}
+				}
+				throw t;
+			}
+		}
+	}
+
+	public IImportDAO getImportDAO() {
+		return importDAO;
+	}
+
+	public void setImportDAO(IImportDAO importDAO) {
+		this.importDAO = importDAO;
+	}
+
+	public IPersonService getPersonService() {
+		return personService;
+	}
+
+	public IDonationService getDonationService() {
+		return donationService;
+	}
+
+	public IAddressService getAddressService() {
+		return addressService;
+	}
+
+	public void setPersonService(IPersonService personService) {
+		this.personService = personService;
+	}
+
+	public void setDonationService(IDonationService donationService) {
+		this.donationService = donationService;
+	}
+
+	public void setAddressService(IAddressService addressService) {
+		this.addressService = addressService;
+	}
+
 }

@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 
 import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
 import at.fraubock.spendenverwaltung.gui.views.FindPersonsView;
+import at.fraubock.spendenverwaltung.gui.views.ImportDataView;
 
 @Deprecated
 public class ButtonListener implements ActionListener{
@@ -17,7 +18,7 @@ public class ButtonListener implements ActionListener{
 	private CreateFilter createFilter;
 	private EditPerson editPerson;
 	private ImportValidation importValidation;
-	private ImportData importData;
+	private ImportDataView importData;
 	
 	public ButtonListener(Overview overview){
 		this.overview = overview;
@@ -49,7 +50,7 @@ public class ButtonListener implements ActionListener{
 		this.importValidation = importValidation;
 	}
 
-	public ButtonListener(ImportData importData) {
+	public ButtonListener(ImportDataView importData) {
 		this.importData = importData;
 	}
 
@@ -150,17 +151,8 @@ public class ButtonListener implements ActionListener{
 		if(cmd.equals("return_from_import_validation_to_overview")){
 			importValidation.returnTo();
 		}
-		if(cmd.equals("donationImport_overview")){
-			overview.goToImport();
-		}
-		if(cmd.equals("return_from_import_data_to_overview")){
-			importData.returnTo();
-		}
-		if(cmd.equals("open_file_import_data")){
-			importData.chooseFile();
-		}
-		if(cmd.equals("import_import_data")){
-			importData.importData();
+		if(cmd.equals("save_validation")){
+			importValidation.saveValidation();
 		}
 	}
 

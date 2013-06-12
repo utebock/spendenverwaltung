@@ -1,6 +1,7 @@
 package at.fraubock.spendenverwaltung.cli;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
@@ -35,7 +36,8 @@ public class CommandExecutor {
 	private PrintStream out, err;
 
 	public static final int PARSE_ERR = 1;
-	public static final int SERVICE_ERR = 2; // continue with 4, 8 etc.
+	public static final int SERVICE_ERR = 2;
+	public static final int IO_ERR = 4; // continue with 8, 16 etc.
 
 	/**
 	 * width of the command line for help/usage formatting
@@ -121,7 +123,8 @@ public class CommandExecutor {
 					importService.nativeImport(importFile);
 					break;
 				case "hypo":
-					throw new ParseException("hypo import not yet implemented");
+					importService.hypoImport(importFile);
+					break;
 				case "sms":
 					throw new ParseException("sms import not yet implemented");
 				default:
@@ -145,6 +148,13 @@ public class CommandExecutor {
 			new HelpFormatter().printUsage(pw, CMD_WIDTH, APP_NAME, options);
 			pw.close();
 			return SERVICE_ERR;
+		} catch (IOException e) {
+			err.println("Error while trying to handle input/output: "
+					+ e.getLocalizedMessage());
+			PrintWriter pw = new PrintWriter(err);
+			new HelpFormatter().printUsage(pw, CMD_WIDTH, APP_NAME, options);
+			pw.close();
+			return IO_ERR;
 		}
 		return 0;
 	}

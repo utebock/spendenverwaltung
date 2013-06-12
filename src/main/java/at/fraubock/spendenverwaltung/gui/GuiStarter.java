@@ -12,6 +12,7 @@ import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
+import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.interfaces.service.IUserService;
@@ -37,6 +38,7 @@ public class GuiStarter {
 		IAddressService addressService = context.getBean("addressService", IAddressService.class);
 		IMailingService mailingService = context.getBean("mailingService", IMailingService.class);
 		IUserService userService = context.getBean("userService", IUserService.class);
+		IImportService importService = context.getBean("importService", IImportService.class);
 		
 		ViewDisplayer viewDisplayer = new ViewDisplayer();
 		ComponentFactory componentFactory = new ComponentFactory();
@@ -45,7 +47,7 @@ public class GuiStarter {
 		 * 
 		 */
 		ViewActionFactory viewActionFactory = new ViewActionFactory(viewDisplayer, personService,
-				donationService, filterService, addressService, mailingService, userService);
+				donationService, filterService, addressService, mailingService, userService, importService);
 		
 		
 		//need to call mainMenu.init() after all views are set in the viewActionFactory

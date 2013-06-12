@@ -318,13 +318,6 @@ public class Overview extends JPanel{
 		add(validation);
 	}
 
-	public void goToImport() {
-		ImportData importData = new ImportData(importService, this);
-		removeAll();
-		revalidate();
-		repaint();
-		add(importData);
-	}
 	
 
 }

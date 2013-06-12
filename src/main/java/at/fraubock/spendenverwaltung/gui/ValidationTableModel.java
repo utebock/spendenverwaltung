@@ -15,6 +15,11 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
+/**
+ * 
+ * @author thomas
+ *
+ */
 public class ValidationTableModel extends AbstractTableModel{
 
 	private static final long serialVersionUID = 1L;
@@ -66,14 +71,14 @@ public class ValidationTableModel extends AbstractTableModel{
 		Person person = (Person)persons.get(rowIndex);
 		
 		switch(columnIndex){
-			case 0: return person.getGivenName();
-			case 1: return person.getSurname();
-			case 2: return person.getTelephone();
-			case 3: return person.getEmail();
-			case 4: return person.getAddresses()==null ? "-" : person.getMainAddress().getStreet();
-			case 5: return person.getAddresses().isEmpty() ? "-" : person.getMainAddress().getPostalCode();
-			case 6: return person.getAddresses().isEmpty() ? "-" : person.getMainAddress().getCity();
-			case 7: return person.getAddresses().isEmpty() ? "-" : person.getMainAddress().getCountry();
+			case 0: return person == null ? "-" : person.getGivenName();
+			case 1: return person == null ? "-" : person.getSurname();
+			case 2: return person == null ? "-" : person.getTelephone();
+			case 3: return person == null ? "-" : person.getEmail();
+			case 4: return (person == null || person.getAddresses().isEmpty()) ? "-" : person.getMainAddress().getStreet();
+			case 5: return (person == null || person.getAddresses().isEmpty()) ? "-" : person.getMainAddress().getPostalCode();
+			case 6: return (person == null || person.getAddresses().isEmpty()) ? "-" : person.getMainAddress().getCity();
+			case 7: return (person == null || person.getAddresses().isEmpty()) ? "-" : person.getMainAddress().getCountry();
 			case 8: return donation.getAmount();
 			case 9: return donation.getDate();
 			case 10: return donation.getDedication();

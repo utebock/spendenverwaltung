@@ -1,6 +1,7 @@
 package at.fraubock.spendenverwaltung.interfaces.domain;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * domain model representing a mailing template (which is a text file stored in
@@ -78,5 +79,6 @@ public class MailingTemplate {
 		
 		return true;
 	}
+
 	
 }

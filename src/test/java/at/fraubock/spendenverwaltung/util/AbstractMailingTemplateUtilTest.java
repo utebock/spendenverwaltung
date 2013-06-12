@@ -41,11 +41,12 @@ public abstract class AbstractMailingTemplateUtilTest {
 	/* Just to test Mailing template without GUI 
 	 * Test runs, but opens a java window and need some time
 	 * will be removed later
+	 * 
 	@Test
 	public void trySimpleExample() throws ServiceException, IOException {
-		MailingTemplate.template(new File("src/test/resources/examplemailing.docx"), persons, "Output");
-	}
-	*/
+		MailingTemplateUtil.createMailingWithDocxTemplate(new File("src/test/resources/examplemailing.docx"), persons, "Output");
+	}*/
+	
 	
 	@Test(expected=IOException.class)
 	public void invalidFileShouldThrowIOException() throws ServiceException, IOException{
@@ -68,6 +69,7 @@ public abstract class AbstractMailingTemplateUtilTest {
 		person1.setSurname("Maier");
 		person1.setGivenName("Hannes");
 		person1.setSex(Sex.MALE);
+		person1.setCompany("Maier GmbH");
 		person1.setMainAddress(address1);
 		
 		persons.add(person1);
@@ -81,13 +83,31 @@ public abstract class AbstractMailingTemplateUtilTest {
 		
 		Person person2;
 		person2 = new Person();
-		person2.setTitle("Prof.");
+		person2.setTitle("Mag.a");
 		person2.setSurname("Bauer");
 		person2.setGivenName("Sandra");
 		person2.setSex(Sex.FEMALE);
+		person2.setCompany("Bauer GmbH");
 		person2.setMainAddress(address2);
 		
 		persons.add(person2);
+		
+		Address address3 = new Address();
+		address3.setCity("Wien");
+		address3.setStreet("Irgendwasweg 3");
+		address3.setPostalCode("1070");
+		address3.setCountry("Österreich");
+		
+		Person person3;
+		person3 = new Person();
+		person3.setTitle("");
+		person3.setSurname("Huber");
+		person3.setGivenName("Brigitte und Sebastian");
+		person3.setSex(Sex.FAMILY);
+		person3.setCompany("");
+		person3.setMainAddress(address2);
+		
+		persons.add(person3);
 	}
 
 }

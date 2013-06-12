@@ -31,6 +31,7 @@ public class FilterToSqlBuilder {
 		validator.validate(filter);
 
 		String stmt = "select * from " + filter.getType() + " as mount0";
+		// TODO use only confirmed persons/addresses/donations
 
 		if (filter.getCriterion() != null) {
 			stmt += " where "
