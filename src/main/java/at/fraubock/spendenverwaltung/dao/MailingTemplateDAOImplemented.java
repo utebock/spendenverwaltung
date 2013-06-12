@@ -120,10 +120,11 @@ public class MailingTemplateDAOImplemented implements IMailingTemplateDAO {
 			MailingTemplate mt = new MailingTemplate();
 			mt.setId(rs.getInt("id"));
 			mt.setFileName(rs.getString("file_name"));
-			mt.setFileSize(rs.getInt("file_size"));
 
-			File file = new File("C:\\Users\\philipp\\workspace\\qse-sepm-ss13-06\\"
-				+ "src\\test\\resources\\examplemailing.docx"); // TODO path?
+			File file = new File(
+					"C:\\Users\\philipp\\workspace\\qse-sepm-ss13-06\\"
+							+ "src\\test\\resources\\examplemailing.docx"); // TODO
+																			// path?
 			InputStream is = rs.getBinaryStream("file");
 			OutputStream os = null;
 			try {
@@ -181,14 +182,14 @@ public class MailingTemplateDAOImplemented implements IMailingTemplateDAO {
 				throws SQLException {
 			String createAddress = "insert into mailing_templates (file_name,file_size,file)"
 					+ " values (?,?,?)";
-			
+
 			PreparedStatement ps = connection.prepareStatement(createAddress,
 					Statement.RETURN_GENERATED_KEYS);
-			
+
 			ps.setString(1, mt.getFileName());
-			ps.setInt(2, mt.getFileSize());
 			try {
-				ps.setBinaryStream(3, new FileInputStream(mt.getFile()),mt.getFileSize());
+				ps.setBinaryStream(3, new FileInputStream(mt.getFile()), mt
+						.getFile().length());
 			} catch (FileNotFoundException e) {
 				log.error("The file with path='"
 						+ mt.getFile().getAbsolutePath()
