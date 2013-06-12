@@ -36,7 +36,8 @@ public class CommandExecutor {
 	private PrintStream out, err;
 
 	public static final int PARSE_ERR = 1;
-	public static final int SERVICE_ERR = 2; // continue with 4, 8 etc.
+	public static final int SERVICE_ERR = 2;
+	public static final int IO_ERR = 4; // continue with 8, 16 etc.
 
 	/**
 	 * width of the command line for help/usage formatting
@@ -147,10 +148,12 @@ public class CommandExecutor {
 			pw.close();
 			return SERVICE_ERR;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			// Kommt durch merge vom ImportValidation
-			// Betroffene Zeile importService.nativeImport(importFile);
-			e.printStackTrace();
+			err.println("Error while trying to handle input/output: "
+					+ e.getLocalizedMessage());
+			PrintWriter pw = new PrintWriter(err);
+			new HelpFormatter().printUsage(pw, CMD_WIDTH, APP_NAME, options);
+			pw.close();
+			return IO_ERR;
 		}
 		return 0;
 	}

@@ -39,7 +39,7 @@ public class CliAppTest {
 	}
 
 	@Test
-	public void helpWorks() throws Exception, ServiceException {
+	public void helpWorks() throws Exception {
 		CommandExecutor exec = new CommandExecutor(importService,
 				new String[] { "-h" }, new PrintStream(out), new PrintStream(
 						err));
@@ -61,7 +61,7 @@ public class CliAppTest {
 	}
 
 	@Test
-	public void moreThanOneAciton_shouldFail() throws Exception, ServiceException {
+	public void moreThanOneAciton_shouldFail() throws Exception {
 		CommandExecutor exec = new CommandExecutor(importService, new String[] {
 				"-h", "-i" }, new PrintStream(out), new PrintStream(err));
 		int errCode = exec.execute();
@@ -76,7 +76,7 @@ public class CliAppTest {
 	}
 
 	@Test
-	public void notExistentOption_shouldFail() throws Exception, ServiceException {
+	public void notExistentOption_shouldFail() throws Exception {
 		CommandExecutor exec = new CommandExecutor(importService,
 				new String[] { "-ü" }, new PrintStream(out), new PrintStream(
 						err));
@@ -92,7 +92,7 @@ public class CliAppTest {
 	}
 
 	@Test
-	public void importNative() throws Exception, ServiceException {
+	public void importNative() throws Exception {
 		CommandExecutor exec = new CommandExecutor(importService, new String[] {
 				"-i", "test.csv", "--style=native" }, new PrintStream(out),
 				new PrintStream(err));
@@ -109,7 +109,7 @@ public class CliAppTest {
 	}
 
 	@Test
-	public void importWithoutFile_fails() throws Exception, ServiceException {
+	public void importWithoutFile_fails() throws Exception {
 		CommandExecutor exec = new CommandExecutor(importService, new String[] {
 				"-i", "--style=native" }, new PrintStream(out),
 				new PrintStream(err));
@@ -125,7 +125,7 @@ public class CliAppTest {
 	}
 
 	@Test
-	public void importDefaultStyle_isNative() throws Exception, ServiceException {
+	public void importDefaultStyle_isNative() throws Exception {
 		CommandExecutor exec = new CommandExecutor(importService, new String[] {
 				"-i", "test.csv" }, new PrintStream(out), new PrintStream(err));
 		int errCode = exec.execute();
@@ -141,7 +141,7 @@ public class CliAppTest {
 	}
 
 	@Test
-	public void serviceException_fails() throws Exception, ServiceException {
+	public void serviceException_fails() throws Exception {
 		String excMsg = "testBlaBlu";
 		doThrow(new ServiceException(excMsg)).when(importService).nativeImport(
 				any(File.class));
