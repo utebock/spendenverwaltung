@@ -31,14 +31,17 @@ public class CSVImportTest extends AbstractCSVImportTest {
 		row1.setDate("16.04.2013");
 		row1.setAmount("10");
 		row1.setDonationNote("Huber Sabine  Spende Wohnprojekt REF: 18600130415U00010769966D003 ");
+		row1.setType("bank transfer");
 		ImportRow row2 = new ImportRow();
 		row2.setDate("16.04.2013");
 		row2.setAmount("15");
 		row2.setDonationNote("Brigitte Maier 4863 Breitendorf 1 Spende REF: 201111304152AB3-DP1002005994");
+		row2.setType("bank transfer");
 		ImportRow row3 = new ImportRow();
 		row3.setDate("15.04.2013");
 		row3.setAmount("50");
 		row3.setDonationNote("Dipl.-Ing. Michael Milch Spende REF: 203151304122AIG-103615351666 ");
+		row3.setType("bank transfer");
 		assertEquals(row1, rows.get(0));
 		assertEquals(row2, rows.get(1));
 		assertEquals(row3, rows.get(2));
