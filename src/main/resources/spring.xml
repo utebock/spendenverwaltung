@@ -53,6 +53,9 @@
 	<bean id="importDao" class="at.fraubock.spendenverwaltung.dao.ImportDAOImplemented">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 	</bean>
+	<bean id="mailingTemplateDao" class="at.fraubock.spendenverwaltung.dao.MailingTemplateDAOImplemented">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+	</bean>
 	<bean id="userDao" class="at.fraubock.spendenverwaltung.dao.UserDAOImplemented">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 	</bean>

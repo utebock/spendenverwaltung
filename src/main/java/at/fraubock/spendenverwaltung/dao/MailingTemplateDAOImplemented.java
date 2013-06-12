@@ -122,7 +122,8 @@ public class MailingTemplateDAOImplemented implements IMailingTemplateDAO {
 			mt.setFileName(rs.getString("file_name"));
 			mt.setFileSize(rs.getInt("file_size"));
 
-			File file = new File(""); // TODO path?
+			File file = new File("C:\\Users\\philipp\\workspace\\qse-sepm-ss13-06\\"
+				+ "src\\test\\resources\\examplemailing.docx"); // TODO path?
 			InputStream is = rs.getBinaryStream("file");
 			OutputStream os = null;
 			try {
