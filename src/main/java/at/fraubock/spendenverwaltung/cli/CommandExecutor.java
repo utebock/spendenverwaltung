@@ -123,7 +123,8 @@ public class CommandExecutor {
 					importService.nativeImport(importFile);
 					break;
 				case "hypo":
-					throw new ParseException("hypo import not yet implemented");
+					importService.hypoImport(importFile);
+					break;
 				case "sms":
 					throw new ParseException("sms import not yet implemented");
 				default:

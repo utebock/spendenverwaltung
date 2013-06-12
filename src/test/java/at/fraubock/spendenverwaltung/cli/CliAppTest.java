@@ -17,6 +17,8 @@ import java.io.PrintStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.internal.verification.VerificationModeFactory;
+import org.mockito.verification.VerificationMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -106,6 +108,23 @@ public class CliAppTest {
 
 		verify(importService, times(1)).nativeImport(eq(new File("test.csv")));
 		verify(importService, times(1)).nativeImport(any(File.class));
+	}
+
+	@Test
+	public void importHypo() throws Exception {
+		CommandExecutor exec = new CommandExecutor(importService, new String[] {
+				"-i", "test.csv", "--style=hypo" }, new PrintStream(out),
+				new PrintStream(err));
+		int errCode = exec.execute();
+		out.close();
+		err.close();
+
+		assertEquals(0, errCode);
+		assertEquals("", out.toString());
+		assertEquals("", err.toString());
+
+		verify(importService, times(1)).hypoImport(eq(new File("test.csv")));
+		verify(importService, times(1)).hypoImport(any(File.class));
 	}
 
 	@Test
