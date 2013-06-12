@@ -47,7 +47,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 	public void setAddressDao(IAddressDAO addressDAO) {
 		this.addressDAO = addressDAO;
 	}
-	
+
 	public static void validate(Person person) throws ValidationException {
 
 		if (person == null) {
@@ -99,50 +99,49 @@ public class PersonDAOImplemented implements IPersonDAO {
 				throws SQLException {
 			PreparedStatement ps = connection.prepareStatement(createPersons,
 					Statement.RETURN_GENERATED_KEYS);
-			if(person.getGivenName() == null)
+			if (person.getGivenName() == null)
 				ps.setNull(1, Types.NULL);
 			else
 				ps.setString(1, person.getGivenName());
-			
-			if(person.getSurname() == null)
+
+			if (person.getSurname() == null)
 				ps.setNull(2, Types.NULL);
 			else
 				ps.setString(2, person.getSurname());
-			
-			if(person.getEmail() == null) {
+
+			if (person.getEmail() == null) {
 				ps.setNull(3, Types.NULL);
 				ps.setBoolean(8, false);
-			}
-			else {
+			} else {
 				ps.setString(3, person.getEmail());
 				ps.setBoolean(8, person.isEmailNotification());
 			}
-			
+
 			ps.setString(4, person.getSex().getName());
-			
-			if(person.getTitle() == null) 
+
+			if (person.getTitle() == null)
 				ps.setNull(5, Types.NULL);
 			else
 				ps.setString(5, person.getTitle());
-			
-			if(person.getCompany() == null)
+
+			if (person.getCompany() == null)
 				ps.setNull(6, Types.NULL);
 			else
 				ps.setString(6, person.getCompany());
-			
-			if(person.getTelephone() == null)
+
+			if (person.getTelephone() == null)
 				ps.setNull(7, Types.NULL);
 			else
 				ps.setString(7, person.getTelephone());
-			
+
 			ps.setBoolean(8, person.isEmailNotification());
-			
-			if(person.getAddresses().isEmpty())
+
+			if (person.getAddresses().isEmpty())
 				ps.setBoolean(9, false);
 			else
 				ps.setBoolean(9, person.isPostalNotification());
-			
-			if(person.getNote() == null)
+
+			if (person.getNote() == null)
 				ps.setNull(10, Types.NULL);
 			else
 				ps.setString(10, person.getNote());
@@ -153,123 +152,136 @@ public class PersonDAOImplemented implements IPersonDAO {
 
 	@Override
 	public void insertOrUpdate(Person person) throws PersistenceException {
-
 		try {
-			validate(person);
-		} catch (ValidationException e) {
+
+			try {
+				validate(person);
+			} catch (ValidationException e) {
+				throw new PersistenceException(e);
+			}
+
+			if (person.getId() == null) {
+				// new person to be inserted
+				KeyHolder keyHolder = new GeneratedKeyHolder();
+
+				jdbcTemplate.update(new CreatePersonStatementCreator(person),
+						keyHolder);
+
+				person.setId(keyHolder.getKey().intValue());
+
+				insertAddresses(person);
+
+			} else {
+				// person to be updated
+
+				String updatePersons = "update persons set givenname = ?, surname = ?, email = ?, sex = ?, title = ?, "
+						+ "company = ?, telephone = ?, emailnotification = ?, postalnotification = ?, note = ? where id = ?";
+
+				Object[] params = new Object[] { person.getGivenName(),
+						person.getSurname(), person.getEmail(),
+						person.getSex().getName(), person.getTitle(),
+						person.getCompany(), person.getTelephone(),
+						person.isEmailNotification(),
+						person.isPostalNotification(), person.getNote(),
+						person.getId() };
+
+				// TODO check if types is necessary for null values, if not then
+				// we can safely delete this.
+				// int[] types = new int[] { Types.VARCHAR, Types.VARCHAR,
+				// Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
+				// Types.VARCHAR, Types.BOOLEAN, Types.BOOLEAN, Types.VARCHAR,
+				// Types.INTEGER };
+
+				jdbcTemplate.update(updatePersons, params);
+
+				// to update address relationhips, simply delete them and then
+				// insert the new ones
+
+				Person temp = new Person();
+				temp.setId(person.getId());
+				fetchAddresses(temp);
+
+				List<Address> oldAddresses = temp.getAddresses();
+				Address oldMainAddress = temp.getMainAddress();
+
+				// first, check changes to all addresses:
+				for (Address oldAddress : oldAddresses) {
+					if (!person.getAddresses().contains(oldAddress)
+							&& (person.getMainAddress() == null || !person
+									.getMainAddress().equals(oldAddress))) {
+						jdbcTemplate
+								.update("DELETE FROM livesat WHERE pid = ? AND aid = ?",
+										new Object[] { person.getId(),
+												oldAddress.getId() },
+										new int[] { Types.INTEGER,
+												Types.INTEGER, });
+					}
+				}
+				for (Address newAddress : person.getAddresses()) {
+					if (oldAddresses != null
+							&& !oldAddresses.contains(newAddress)) {
+						jdbcTemplate
+								.update("INSERT INTO livesat(pid, aid, ismain) VALUES (?,?,?) ",
+										new Object[] {
+												person.getId(),
+												newAddress.getId(),
+												newAddress.equals(person
+														.getMainAddress()) },
+										new int[] { Types.INTEGER,
+												Types.INTEGER, Types.BOOLEAN });
+					}
+				}
+
+				// now, check changes to mainAddress:
+				if (oldMainAddress == null && person.getMainAddress() != null
+						&& oldAddresses.contains(person.getMainAddress())) {
+					// main address set, was not set before, but address was
+					// already
+					// set to the person
+					jdbcTemplate
+							.update("UPDATE livesat SET ismain = TRUE WHERE pid = ? AND aid = ?",
+									new Object[] { person.getId(),
+											person.getMainAddress().getId() },
+									new int[] { Types.INTEGER, Types.INTEGER });
+				}
+				if (person.getMainAddress() == null && oldMainAddress != null
+						&& person.getAddresses().contains(oldMainAddress)) {
+					// if there is no new main address but one was set
+					// previously
+					// and the
+					// previously set address is still contained in the address
+					// list
+					jdbcTemplate
+							.update("UPDATE livesat SET ismain = FALSE WHERE pid = ? AND aid = ?",
+									new Object[] { person.getId(),
+											oldMainAddress.getId() },
+									new int[] { Types.INTEGER, Types.INTEGER });
+				}
+				if (person.getMainAddress() != null && oldMainAddress != null
+						&& !person.getMainAddress().equals(oldMainAddress)
+						&& person.getAddresses().contains(oldMainAddress)
+						&& oldAddresses.contains(person.getMainAddress())) {
+					// if there is a change in the main address but both
+					// addresses
+					// are still
+					// set to the person
+					jdbcTemplate
+							.update("UPDATE livesat SET ismain = FALSE WHERE pid = ? AND aid = ?",
+									new Object[] { person.getId(),
+											oldMainAddress.getId() },
+									new int[] { Types.INTEGER, Types.INTEGER });
+					jdbcTemplate
+							.update("UPDATE livesat SET ismain = TRUE WHERE pid = ? AND aid = ?",
+									new Object[] { person.getId(),
+											person.getMainAddress().getId() },
+									new int[] { Types.INTEGER, Types.INTEGER });
+				}
+			}
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
 		}
 
-		if (person.getId() == null) {
-			// new person to be inserted
-			KeyHolder keyHolder = new GeneratedKeyHolder();
-
-			jdbcTemplate.update(new CreatePersonStatementCreator(person),
-					keyHolder);
-
-			person.setId(keyHolder.getKey().intValue());
-
-			insertAddresses(person);
-
-		} else {
-			// person to be updated
-
-			String updatePersons = "update persons set givenname = ?, surname = ?, email = ?, sex = ?, title = ?, "
-					+ "company = ?, telephone = ?, emailnotification = ?, postalnotification = ?, note = ? where id = ?";
-
-			Object[] params = new Object[] { person.getGivenName(),
-					person.getSurname(), person.getEmail(),
-					person.getSex().getName(), person.getTitle(),
-					person.getCompany(), person.getTelephone(),
-					person.isEmailNotification(),
-					person.isPostalNotification(), person.getNote(),
-					person.getId() };
-
-//TODO	check if types is necessary for null values, if not then we can safely delete this.	
-//					int[] types = new int[] { Types.VARCHAR, Types.VARCHAR,
-//					Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-//					Types.VARCHAR, Types.BOOLEAN, Types.BOOLEAN, Types.VARCHAR,
-//					Types.INTEGER };
-
-			jdbcTemplate.update(updatePersons, params);
-
-			// to update address relationhips, simply delete them and then
-			// insert the new ones
-
-			Person temp = new Person();
-			temp.setId(person.getId());
-			fetchAddresses(temp);
-
-			List<Address> oldAddresses = temp.getAddresses();
-			Address oldMainAddress = temp.getMainAddress();
-
-			// first, check changes to all addresses:
-			for (Address oldAddress : oldAddresses) {
-				if (!person.getAddresses().contains(oldAddress)
-						&& (person.getMainAddress() == null || !person
-								.getMainAddress().equals(oldAddress))) {
-					jdbcTemplate
-							.update("DELETE FROM livesat WHERE pid = ? AND aid = ?",
-									new Object[] { person.getId(),
-											oldAddress.getId() }, new int[] {
-											Types.INTEGER, Types.INTEGER, });
-				}
-			}
-			for (Address newAddress : person.getAddresses()) {
-				if (oldAddresses != null && !oldAddresses.contains(newAddress)) {
-					jdbcTemplate
-							.update("INSERT INTO livesat(pid, aid, ismain) VALUES (?,?,?) ",
-									new Object[] {
-											person.getId(),
-											newAddress.getId(),
-											newAddress.equals(person
-													.getMainAddress()) },
-									new int[] { Types.INTEGER, Types.INTEGER,
-											Types.BOOLEAN });
-				}
-			}
-
-			// now, check changes to mainAddress:
-			if (oldMainAddress == null && person.getMainAddress() != null
-					&& oldAddresses.contains(person.getMainAddress())) {
-				// main address set, was not set before, but address was already
-				// set to the person
-				jdbcTemplate
-						.update("UPDATE livesat SET ismain = TRUE WHERE pid = ? AND aid = ?",
-								new Object[] { person.getId(),
-										person.getMainAddress().getId() },
-								new int[] { Types.INTEGER, Types.INTEGER });
-			}
-			if (person.getMainAddress() == null && oldMainAddress != null
-					&& person.getAddresses().contains(oldMainAddress)) {
-				// if there is no new main address but one was set previously
-				// and the
-				// previously set address is still contained in the address list
-				jdbcTemplate
-						.update("UPDATE livesat SET ismain = FALSE WHERE pid = ? AND aid = ?",
-								new Object[] { person.getId(),
-										oldMainAddress.getId() }, new int[] {
-										Types.INTEGER, Types.INTEGER });
-			}
-			if (person.getMainAddress() != null && oldMainAddress != null
-					&& !person.getMainAddress().equals(oldMainAddress)
-					&& person.getAddresses().contains(oldMainAddress)
-					&& oldAddresses.contains(person.getMainAddress())) {
-				// if there is a change in the main address but both addresses
-				// are still
-				// set to the person
-				jdbcTemplate
-						.update("UPDATE livesat SET ismain = FALSE WHERE pid = ? AND aid = ?",
-								new Object[] { person.getId(),
-										oldMainAddress.getId() }, new int[] {
-										Types.INTEGER, Types.INTEGER });
-				jdbcTemplate
-						.update("UPDATE livesat SET ismain = TRUE WHERE pid = ? AND aid = ?",
-								new Object[] { person.getId(),
-										person.getMainAddress().getId() },
-								new int[] { Types.INTEGER, Types.INTEGER });
-			}
-		}
 	}
 
 	/**
@@ -279,7 +291,8 @@ public class PersonDAOImplemented implements IPersonDAO {
 	 *            the person whose addresses should be linked to the person
 	 * @throws PersistenceException
 	 */
-	private void insertAddresses(Person person) throws PersistenceException {
+	private void insertAddresses(Person person) throws PersistenceException,
+			DataAccessException {
 		String insertLivesAt = "insert into livesat (pid, aid, ismain) values (?, ?, ?)";
 
 		List<Address> addresses = person.getAddresses();
@@ -304,23 +317,30 @@ public class PersonDAOImplemented implements IPersonDAO {
 
 	@Override
 	public void delete(Person person) throws PersistenceException {
-
-		// we don't need to delete references in 'livesat', since ON DELETE is
-		// set to CASCADE
-
 		try {
-			validate(person);
-		} catch (ValidationException e) {
+
+			// we don't need to delete references in 'livesat', since ON DELETE
+			// is
+			// set to CASCADE
+
+			try {
+				validate(person);
+			} catch (ValidationException e) {
+				throw new PersistenceException(e);
+			}
+
+			String deletePersons = "delete from persons where id = ?";
+
+			Object[] params = new Object[] { person.getId() };
+
+			int[] types = new int[] { Types.INTEGER };
+
+			jdbcTemplate.update(deletePersons, params, types);
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
 		}
 
-		String deletePersons = "delete from persons where id = ?";
-
-		Object[] params = new Object[] { person.getId() };
-
-		int[] types = new int[] { Types.INTEGER };
-
-		jdbcTemplate.update(deletePersons, params, types);
 	}
 
 	/**
@@ -331,7 +351,8 @@ public class PersonDAOImplemented implements IPersonDAO {
 	 *            the person whose addresses to fetch
 	 * @throws PersistenceException
 	 */
-	private void fetchAddresses(Person person) throws PersistenceException {
+	private void fetchAddresses(Person person) throws PersistenceException,
+			DataAccessException {
 		List<Address> addresses = jdbcTemplate.query(
 				"SELECT * FROM livesat l WHERE l.pid = ? ORDER BY aid DESC",
 				new Object[] { person.getId() }, new AddressMapper());
@@ -352,110 +373,144 @@ public class PersonDAOImplemented implements IPersonDAO {
 
 	@Override
 	public List<Person> getAll() throws PersistenceException {
-
-		String select = "SELECT * FROM persons ORDER BY id DESC";
-		List<Person> personList = jdbcTemplate
-				.query(select, new PersonMapper());
-		log.info(personList.size() + " list size");
-
-		// now, load their addresses
-		for (Person entry : personList) {
-			fetchAddresses(entry);
-		}
-
-		return personList;
-	}
-
-	@Override
-	public Person getById(int id) throws PersistenceException {
-
-		if (id < 0) {
-			throw new IllegalArgumentException("Id must not be less than 0");
-		}
-
-		String select = "select * from persons where id = ?;";
 		try {
-			Person person = jdbcTemplate.queryForObject(select,
-					new Object[] { id }, new PersonMapper());
-			fetchAddresses(person);
 
-			return person;
-		} catch (IncorrectResultSizeDataAccessException e) {
-			if (e.getActualSize() == 0)
-				return null;
+			String select = "SELECT * FROM persons ORDER BY id DESC";
+			List<Person> personList = jdbcTemplate.query(select,
+					new PersonMapper());
+			log.info(personList.size() + " list size");
+
+			// now, load their addresses
+			for (Person entry : personList) {
+				fetchAddresses(entry);
+			}
+
+			return personList;
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
 		}
 
 	}
 
+	@Override
+	public Person getById(int id) throws PersistenceException {
+		try {
+
+			if (id < 0) {
+				throw new IllegalArgumentException("Id must not be less than 0");
+			}
+
+			String select = "select * from persons where id = ?;";
+			try {
+				Person person = jdbcTemplate.queryForObject(select,
+						new Object[] { id }, new PersonMapper());
+				fetchAddresses(person);
+
+				return person;
+			} catch (IncorrectResultSizeDataAccessException e) {
+				if (e.getActualSize() == 0)
+					return null;
+				throw new PersistenceException(e);
+			}
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
+
+	}
 
 	@Override
 	public List<Person> getByAttributes(Person p) throws PersistenceException {
-		if (p == null) {
-			return new ArrayList<Person>();
-		}
-		
-		List<Person> selectedPersons;
-		
-		
-		if(p.getMainAddress() != null){
-			String select = "select * from persons p, addresses a, livesat l, validated_persons vp WHERE (l.pid = p.id AND l.aid = a.id AND vp.id = p.id) AND ((p.surname LIKE ? AND p.givenname LIKE ?) AND (p.email LIKE ? OR p.telephone LIKE ? OR (a.street LIKE ? AND a.postcode LIKE ? AND a.city LIKE ?)))";
-			selectedPersons = jdbcTemplate.query(select,
-				new Object[] { p.getSurname(), p.getGivenName(), p.getEmail(), p.getTelephone(), p.getMainAddress().getStreet(), p.getMainAddress().getPostalCode(), p.getMainAddress().getCity() }, new PersonMapper());
-		} else{
-			String select = "select * from persons p, addresses a, livesat l WHERE (l.pid = p.id AND l.aid = a.id AND vp.id = p.id) AND ((p.surname LIKE ? AND p.givenname LIKE ?) AND (p.email LIKE ? OR p.telephone LIKE ?))";
-			selectedPersons = jdbcTemplate.query(select,
-					new Object[] { p.getSurname(), p.getGivenName(), p.getEmail(), p.getTelephone() }, new PersonMapper());
-		}
-		
-		log.info("found " + selectedPersons.size() + " persons by given attributes");
+		try {
+			if (p == null) {
+				return new ArrayList<Person>();
+			}
 
-		// now, load their addresses
-		for (Person entry : selectedPersons) {
-			fetchAddresses(entry);
+			List<Person> selectedPersons;
+
+			if (p.getMainAddress() != null) {
+				String select = "select * from persons p, addresses a, livesat l, validated_persons vp WHERE (l.pid = p.id AND l.aid = a.id AND vp.id = p.id) AND ((p.surname LIKE ? AND p.givenname LIKE ?) AND (p.email LIKE ? OR p.telephone LIKE ? OR (a.street LIKE ? AND a.postcode LIKE ? AND a.city LIKE ?)))";
+				selectedPersons = jdbcTemplate.query(
+						select,
+						new Object[] { p.getSurname(), p.getGivenName(),
+								p.getEmail(), p.getTelephone(),
+								p.getMainAddress().getStreet(),
+								p.getMainAddress().getPostalCode(),
+								p.getMainAddress().getCity() },
+						new PersonMapper());
+			} else {
+				String select = "select * from persons p, addresses a, livesat l WHERE (l.pid = p.id AND l.aid = a.id AND vp.id = p.id) AND ((p.surname LIKE ? AND p.givenname LIKE ?) AND (p.email LIKE ? OR p.telephone LIKE ?))";
+				selectedPersons = jdbcTemplate.query(
+						select,
+						new Object[] { p.getSurname(), p.getGivenName(),
+								p.getEmail(), p.getTelephone() },
+						new PersonMapper());
+			}
+
+			log.info("found " + selectedPersons.size()
+					+ " persons by given attributes");
+
+			// now, load their addresses
+			for (Person entry : selectedPersons) {
+				fetchAddresses(entry);
+			}
+
+			return selectedPersons;
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
 		}
-		
-		return selectedPersons;
+
 	}
-	
+
 	@Override
 	public List<Person> getByAddress(Address address)
 			throws PersistenceException {
+		try {
 
-		String select = "SELECT p.* FROM persons p JOIN livesat l ON p.id = l.pid WHERE l.aid = ? ORDER BY p.id DESC";
-		List<Person> personList = jdbcTemplate.query(select,
-				new Object[] { address.getId() }, new PersonMapper());
-		log.info(personList.size() + " list size");
+			String select = "SELECT p.* FROM persons p JOIN livesat l ON p.id = l.pid WHERE l.aid = ? ORDER BY p.id DESC";
+			List<Person> personList = jdbcTemplate.query(select,
+					new Object[] { address.getId() }, new PersonMapper());
+			log.info(personList.size() + " list size");
 
-		// now, load their addresses
-		for (Person entry : personList) {
-			fetchAddresses(entry);
+			// now, load their addresses
+			for (Person entry : personList) {
+				fetchAddresses(entry);
+			}
+
+			return personList;
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
 		}
 
-		return personList;
 	}
 
 	@Override
 	public List<Person> getByFilter(Filter filter) throws PersistenceException {
-		String select = filterToSqlBuilder.createSqlStatement(filter);
 		try {
-			
-		
-	
-		
-		List<Person> personList = jdbcTemplate
-				.query(select, new PersonMapper());
-		log.info(personList.size() + " list size");
+			String select = filterToSqlBuilder.createSqlStatement(filter);
+			try {
 
-		// now, load their addresses
-		for (Person entry : personList) {
-			fetchAddresses(entry);
+				List<Person> personList = jdbcTemplate.query(select,
+						new PersonMapper());
+				log.info(personList.size() + " list size");
+
+				// now, load their addresses
+				for (Person entry : personList) {
+					fetchAddresses(entry);
+				}
+
+				return personList;
+			} catch (DataAccessException e) {
+				throw new PersistenceException(e);
+			}
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
 		}
 
-		return personList; 
-	}catch (DataAccessException e) {
-		throw new PersistenceException(e);	
-		}
 	}
 
 	private class AddressMapper implements RowMapper<Address> {
@@ -501,17 +556,23 @@ public class PersonDAOImplemented implements IPersonDAO {
 
 	@Override
 	public List<Person> getConfirmed() throws PersistenceException {
-		String select = "SELECT * FROM validated_persons ORDER BY id DESC";
-		List<Person> personList = jdbcTemplate
-				.query(select, new PersonMapper());
-		log.info(personList.size() + " list size");
+		try {
+			String select = "SELECT * FROM validated_persons ORDER BY id DESC";
+			List<Person> personList = jdbcTemplate.query(select,
+					new PersonMapper());
+			log.info(personList.size() + " list size");
 
-		// now, load their addresses
-		for (Person entry : personList) {
-			fetchAddresses(entry);
+			// now, load their addresses
+			for (Person entry : personList) {
+				fetchAddresses(entry);
+			}
+
+			return personList;
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
 		}
 
-		return personList;
 	}
 
 }
