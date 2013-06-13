@@ -29,7 +29,7 @@ public class ImportValidator {
 
 
 	public static enum ValidationType {
-		DONE("fertig"), ANONYM("anonym"), NEW_DONATOR("Spender zuweisen"), NOT_IMPORT("nicht importieren"), EDIT("bearbeiten");
+		EDIT("bearbeiten"), ANONYM("anonym"), NEW_DONATOR("Spender zuweisen"), NOT_IMPORT("nicht importieren");
 
 		private final String name;
 
@@ -51,8 +51,6 @@ public class ImportValidator {
 				return NOT_IMPORT;
 			case "bearbeiten":
 				return EDIT;
-			case "fertig":
-				return DONE;
 			default:
 				throw new IllegalArgumentException(
 						"No validation type for name: " + name);
@@ -60,7 +58,7 @@ public class ImportValidator {
 		}
 		
 		public static String[] toArray(){
-			return new String[]{ "fertig", "anonym", "Spender zuweisen", "nicht importieren", "bearbeiten" };
+			return new String[]{ "bearbeiten", "anonym", "Spender zuweisen", "nicht importieren" };
 		}
 	};
 	
@@ -105,6 +103,7 @@ public class ImportValidator {
 				if(isDuplicate(currentDonation)){
 					validatedData.addConflictEntry(currentPerson, currentDonation, ConflictType.DUPLICATE);
 					validatedData.addDonationToDelete(currentDonation);
+					validatedData.addPersonToDelete(currentPerson);
 					continue;
 				}
 				
