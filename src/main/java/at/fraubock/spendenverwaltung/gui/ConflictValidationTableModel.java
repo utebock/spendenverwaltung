@@ -34,7 +34,7 @@ import at.fraubock.spendenverwaltung.util.ValidatedData;
  * @author thomas
  *
  */
-public class ConflictValidationTableModel extends AbstractTableModel{
+public class ConflictValidationTableModel extends AbstractTableModel implements IValidationTableModel{
 
 	private static final long serialVersionUID = 1L;
 	
@@ -61,7 +61,8 @@ public class ConflictValidationTableModel extends AbstractTableModel{
 		editable = true;
 	}
 	
-	public void addEntry (Donation donation){
+	@Override
+	public void addDonation (Donation donation){
 		JComboBox cb = new JComboBox(ImportValidator.ValidationType.toArray());
 		donations.add(donation);
 		comboBoxes.add(cb);
@@ -69,8 +70,14 @@ public class ConflictValidationTableModel extends AbstractTableModel{
 	
 	public void addList (List<Donation> donationList){
 		for(int i=0; i<donationList.size(); i++){
-			addEntry(donationList.get(i));
+			addDonation(donationList.get(i));
 		}
+	}
+	
+	@Override
+	public void removeDonation (Donation d){
+		donations.remove(d);
+		fireTableDataChanged();
 	}
 	
 	public void removeDonation (int row){
@@ -244,7 +251,7 @@ public class ConflictValidationTableModel extends AbstractTableModel{
         	ValidationType selectedType = ValidationType.getByName((String) selectedBox.getSelectedItem());
         	
         	if(selectedType == ValidationType.NEW_DONATOR){
-        			parent.openPersonDialog();
+        			parent.openPersonDialog(donations.get(rowIndex), this);
         	} else if(selectedType == ValidationType.EDIT){
         		editable = true;
         	} else{

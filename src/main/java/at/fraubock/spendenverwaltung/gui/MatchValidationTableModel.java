@@ -31,7 +31,7 @@ import at.fraubock.spendenverwaltung.util.ImportValidator.ValidationType;
  * @author thomas
  *
  */
-public class MatchValidationTableModel extends AbstractTableModel{
+public class MatchValidationTableModel extends AbstractTableModel implements IValidationTableModel{
 
 	private static final long serialVersionUID = 1L;
 	
@@ -50,13 +50,20 @@ public class MatchValidationTableModel extends AbstractTableModel{
 		this.parent = parent;
 	}
 	
-	public void addEntry (Donation donation, Person person){
+	@Override
+	public void addDonation (Donation donation){
 		donations.add(donation);
+	}
+	
+	@Override
+	public void removeDonation (Donation d){
+		donations.remove(d);
+		fireTableDataChanged();
 	}
 	
 	public void addList (List<Donation> donationList, List<Person> personList){
 		for(int i=0; i<donationList.size(); i++){
-			addEntry(donationList.get(i), personList.get(i));
+			addDonation(donationList.get(i));
 		}
 	}
 	

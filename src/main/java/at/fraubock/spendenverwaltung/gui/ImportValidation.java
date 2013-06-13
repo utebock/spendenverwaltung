@@ -29,6 +29,7 @@ import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
@@ -248,8 +249,8 @@ public class ImportValidation extends JPanel {
 		}
 	}
 	
-	public void openPersonDialog(){
-		JDialog assignPerson = new AssignPerson(personService, addressService, donationService, this);
+	public void openPersonDialog(Donation donationToAssign, IValidationTableModel deleteFromModel){
+		JDialog assignPerson = new AssignPerson(personService, this, donationToAssign, matchModel, deleteFromModel);
 	}
 	
 	public void returnTo() {
@@ -303,17 +304,17 @@ public class ImportValidation extends JPanel {
 	}
 	
 	public void addToConflict(Donation donation){
-		conflictModel.addEntry(donation);
+		conflictModel.addDonation(donation);
 		conflictModel.fireTableDataChanged();
 	}
 	
 	public void addToMatch(Donation donation){
-		matchModel.addEntry(donation, donation.getDonator());
+		matchModel.addDonation(donation);
 		matchModel.fireTableDataChanged();
 	}
 	
 	public void addToNew(Donation donation){
-		newModel.addEntry(donation);
+		newModel.addDonation(donation);
 		newModel.fireTableDataChanged();
 	}
 }

@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,15 +28,22 @@ import org.apache.log4j.Logger;
 
 import at.fraubock.spendenverwaltung.gui.filter.ConfiguratorFactory;
 import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
+import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.ConnectedCriterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.to.FilterTO;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
+import at.fraubock.spendenverwaltung.util.FilterProperty;
 import at.fraubock.spendenverwaltung.util.FilterType;
+import at.fraubock.spendenverwaltung.util.LogicalOperator;
+import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
 public class AssignPerson extends JDialog {
 
@@ -66,15 +75,18 @@ public class AssignPerson extends JDialog {
 	private JTextField tbGivenname;
 	private JLabel empty;
 	private Filter showAllFilter;
+	private Donation donationToAssign;
+	private ImportValidation parent;
+	private MatchValidationTableModel matchModel;
+	private IValidationTableModel deleteFromModel;
 
-	public AssignPerson(IPersonService personService,
-			IAddressService addressService, IDonationService donationService, ImportValidation importValidation) {
+	public AssignPerson(IPersonService personService, ImportValidation parent, Donation donationToAssign, MatchValidationTableModel matchModel, IValidationTableModel deleteFromModel) {
 
 		this.personService = personService;
-		this.addressService = addressService;
-		this.donationService = donationService;
-		this.filterService = filterService;
-		this.overview = importValidation;
+		this.donationToAssign = donationToAssign;
+		this.parent = parent;
+		this.matchModel = matchModel;
+		this.deleteFromModel = deleteFromModel;
 		initTable();
 		setUp();
 	}
@@ -101,18 +113,20 @@ public class AssignPerson extends JDialog {
 		// JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
 
-		labelSurname = builder.createLabel("Vorname:");
-		labelGivenname = builder.createLabel("Nachname:");
+		labelGivenname = builder.createLabel("Vorname:");
+		labelSurname = builder.createLabel("Nachname:");
 		tbSurname = builder.createTextField("");
 		tbGivenname = builder.createTextField("");
 		
 		searchBtn = new JButton("Suche");
 		searchBtn.addActionListener(new SearchListener());
 		
-		add(labelSurname, "");
-		add(tbSurname, "w 130!");
+		showTable.addMouseListener(new DoubleClickListener());
+		
 		add(labelGivenname, "");
 		add(tbGivenname, "w 130!");
+		add(labelSurname, "");
+		add(tbSurname, "w 130!");
 		add(searchBtn, "wrap");
 		
 		add(scrollPane, "span 5");
@@ -138,18 +152,90 @@ public class AssignPerson extends JDialog {
 		//overview.setUp();
 	}
 	
-	private List<Person> search(){
+	private void search(){
+		personModel.clear();
+		
 		String surname = tbSurname.getText();
 		String givenname = tbGivenname.getText();
-			
 		
-		return new ArrayList<Person>();
+		if(surname.equals("") && givenname.equals(""))
+			return;
+		
+		List<Person> returnedList;
+		Filter filter = new Filter();
+		ConnectedCriterion searchCriterion = new ConnectedCriterion();
+		
+		filter.setType(FilterType.PERSON);
+		
+		PropertyCriterion criterionSurName = new PropertyCriterion();
+		criterionSurName.compare(FilterProperty.PERSON_SURNAME, RelationalOperator.LIKE, surname);
+		
+		PropertyCriterion criterionGivenName = new PropertyCriterion();
+		criterionGivenName.compare(FilterProperty.PERSON_GIVENNAME, RelationalOperator.LIKE, givenname);
+		
+		searchCriterion.connect(criterionSurName, LogicalOperator.AND, criterionGivenName);
+		
+		filter.setCriterion(searchCriterion);
+		
+		try {
+			returnedList = personService.getByFilter(filter);
+		} catch (ServiceException e) {
+			JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+		    e.printStackTrace();
+		    return;
+		}
+		
+		for(Person p : returnedList){
+			personModel.addPerson(p);
+		}
+		
+		personModel.fireTableDataChanged();
 	}
 
 	private class SearchListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			search();
+		}
+		
+	}
+	
+	private class DoubleClickListener implements MouseListener{
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if(e.getClickCount() == 2){
+				donationToAssign.setDonator(personModel.getPersonRow(showTable.getSelectedRow()));
+				matchModel.addDonation(donationToAssign);
+				deleteFromModel.removeDonation(donationToAssign);
+				
+				matchModel.fireTableDataChanged();
+				dispose();
+			}
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			// TODO Auto-generated method stub
 			
 		}
 		
