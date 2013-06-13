@@ -49,7 +49,16 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 	private JdbcTemplate jdbcTemplate;
 	private FilterToSqlBuilder filterToSqlBuilder;
-	private IMailingTemplateDAO mailingTemplateDAO;
+
+	public IMailingTemplateDAO getMailingTemplateDao() {
+		return mailingTemplateDao;
+	}
+
+	public void setMailingTemplateDao(IMailingTemplateDAO mailingTemplateDao) {
+		this.mailingTemplateDao = mailingTemplateDao;
+	}
+
+	private IMailingTemplateDAO mailingTemplateDao;
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -264,7 +273,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 			for (Mailing m : mailings) {
 				Integer tmplId = mapper.getTemplateIds().get(m.getId());
-				m.setTemplate(mailingTemplateDAO.getByID(tmplId));
+				m.setTemplate(mailingTemplateDao.getByID(tmplId));
 			}
 
 			log.debug("Returning from getAll");
@@ -288,7 +297,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 						new Object[] { id }, mapper);
 
 				Integer tmplId = mapper.getTemplateIds().get(mailing.getId());
-				mailing.setTemplate(mailingTemplateDAO.getByID(tmplId));
+				mailing.setTemplate(mailingTemplateDao.getByID(tmplId));
 
 				log.debug("Returning from getById with result " + mailing);
 				return mailing;
@@ -324,7 +333,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 			for (Mailing m : mailings) {
 				Integer tmplId = mapper.getTemplateIds().get(m.getId());
-				m.setTemplate(mailingTemplateDAO.getByID(tmplId));
+				m.setTemplate(mailingTemplateDao.getByID(tmplId));
 			}
 
 			log.debug("Returning from getMailingsByPerson");
