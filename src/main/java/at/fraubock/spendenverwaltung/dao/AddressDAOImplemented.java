@@ -40,9 +40,7 @@ public class AddressDAOImplemented implements IAddressDAO {
 	}
 
 	/**
-	 * checks the integrity of any {@link Address} entity TODO not a satisfying
-	 * solution, refactoring needed (program logic implemented by exceptions,
-	 * doesnt propagate errors, etc)
+	 * checks the integrity of an {@link Address} entity
 	 * 
 	 * @author philipp muhoray
 	 * @throws ValidationException

@@ -21,6 +21,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
+import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
@@ -573,6 +574,31 @@ public class PersonDAOImplemented implements IPersonDAO {
 			throw new PersistenceException(e);
 		}
 
+	}
+
+	@Override
+	public List<Person> getPersonsByMailing(Mailing mailing)
+			throws PersistenceException {
+		log.debug("Entering getPersonsByMailing with param " + mailing);
+
+		try {
+			MailingDAOImplemented.validate(mailing);
+
+			List<Person> persons = jdbcTemplate.query(
+					"SELECT ps.* FROM persons ps, sent_mailings se "
+							+ "WHERE ps.id=se.person_id AND se.mailing_id=?",
+					new Object[] { mailing.getId() },
+					new int[] { Types.INTEGER }, new PersonMapper());
+
+			log.debug("Returning from getPersonsByMailing");
+
+			return persons;
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		} catch (ValidationException e) {
+			throw new PersistenceException(e);
+		}
 	}
 
 }

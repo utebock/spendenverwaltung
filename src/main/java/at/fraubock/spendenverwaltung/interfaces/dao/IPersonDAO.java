@@ -3,6 +3,7 @@ package at.fraubock.spendenverwaltung.interfaces.dao;
 import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
+import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
@@ -81,13 +82,13 @@ public interface IPersonDAO {
 	 * Retrieves Person by Person Attributes
 	 * 
 	 * @param p
-	 * 				person with it's attributes
+	 *            person with it's attributes
 	 * @return List of persons where the attributes are equal to Person p
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
 	public List<Person> getByAttributes(Person p) throws PersistenceException;
-	
+
 	/**
 	 * Retrieves all persons having the given address
 	 * 
@@ -114,4 +115,19 @@ public interface IPersonDAO {
 	 *             if communication to the underlying persistence system failed
 	 */
 	public List<Person> getByFilter(Filter filter) throws PersistenceException;
+
+	/**
+	 * Retrieves all persons associated with the given {@link Mailing}
+	 * 
+	 * @param mailing
+	 *            the mailing to retrieve the persons from. must have been
+	 *            persisted or retrieved using an {@link IMailingDAO} prior to
+	 *            calling this method
+	 * @return all persons that have received the specified mailing or an empty
+	 *         list if no such person exists
+	 * @throws PersistenceException
+	 *             if communication to the underlying persistence system failed
+	 */
+	public List<Person> getPersonsByMailing(Mailing mailing)
+			throws PersistenceException;
 }

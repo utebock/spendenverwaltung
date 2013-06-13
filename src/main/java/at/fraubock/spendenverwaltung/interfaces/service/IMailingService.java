@@ -7,11 +7,12 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 
 public interface IMailingService {
-	
+
 	/**
 	 * Persists a new Mailing by calling the Persistence layer
 	 * 
-	 * @param m Mailing to be inserted or updated
+	 * @param m
+	 *            Mailing to be inserted or updated
 	 * @return inserted mailing
 	 * @throws ServiceException
 	 *             if communication to the underlying persistence system failed
@@ -20,7 +21,7 @@ public interface IMailingService {
 
 	/**
 	 * Calls upon the persistence layer to delete a mailing
-	 *
+	 * 
 	 * @param m
 	 *            mailing to be deleted. Its id must be set, i.e. it must be
 	 *            persisted and retrievable by this DAO.
@@ -41,7 +42,8 @@ public interface IMailingService {
 	/**
 	 * Retrieves mailing by ID
 	 * 
-	 * @param id unique mailing identification number
+	 * @param id
+	 *            unique mailing identification number
 	 * 
 	 * @return the mailing stored with the given id, or null if no such mailing
 	 *         exists
@@ -52,18 +54,17 @@ public interface IMailingService {
 
 	/**
 	 * Retrieves all mailings associated with a specific Person
-	 *
+	 * 
 	 * @param person
-	 *           
+	 * 
 	 * @return all mailings returned by the DAO method call
 	 * 
 	 * @throws ServiceException
 	 *             if communication to the underlying persistence system failed
 	 */
 	public List<Mailing> getMailingsByPerson(Person person)
-				throws ServiceException;
+			throws ServiceException;
 
-	
 	/**
 	 * converts a list of mailings to a CSV string.
 	 * 
@@ -71,5 +72,15 @@ public interface IMailingService {
 	 * @return CSV representation of the mailings
 	 */
 	public String convertToCSV(List<Mailing> mailings);
-	
+
+	/**
+	 * reproduces the document that was created by the given mailing. the
+	 * resulting file will be identical to the one that was produced when the
+	 * given mailing was initially created.
+	 * 
+	 * @param destination
+	 * @param mailing
+	 */
+	public void reproduceDocument(Mailing mailing) throws ServiceException;
+
 }
