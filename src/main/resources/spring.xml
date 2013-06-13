@@ -49,6 +49,7 @@
 	<bean id="mailingDao" class="at.fraubock.spendenverwaltung.dao.MailingDAOImplemented">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="filterToSqlBuilder" ref="filterToSqlBuilder" />
+		<property name="mailingTemplateDao" ref="mailingTemplateDao" />
 	</bean>
 	<bean id="importDao" class="at.fraubock.spendenverwaltung.dao.ImportDAOImplemented">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
@@ -118,6 +119,7 @@
 	<bean id="mailingService"
 		class="at.fraubock.spendenverwaltung.service.MailingServiceImplemented">
 		<property name="mailingDAO" ref="mailingDao" />
+		<property name="personDAO" ref="personDao" />
 	</bean>
 	<bean id="userService"
 		class="at.fraubock.spendenverwaltung.service.UserServiceImplemented">

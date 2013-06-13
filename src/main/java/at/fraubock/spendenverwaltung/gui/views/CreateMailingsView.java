@@ -343,7 +343,7 @@ public class CreateMailingsView extends InitializableView {
 			res += new SimpleDateFormat("dd.MM.yyyy").format(mailing.getDate())
 					+ " - ";
 			res += mailing.getType() + " - ";
-			// res += mailing.getTemplate();TODO
+			res += mailing.getTemplate().getFileName();
 
 			return res;
 		}
