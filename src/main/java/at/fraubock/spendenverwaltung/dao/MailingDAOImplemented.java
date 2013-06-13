@@ -49,6 +49,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 	private JdbcTemplate jdbcTemplate;
 	private FilterToSqlBuilder filterToSqlBuilder;
+	private IMailingTemplateDAO mailingTemplateDao;
 
 	public IMailingTemplateDAO getMailingTemplateDao() {
 		return mailingTemplateDao;
@@ -57,8 +58,6 @@ public class MailingDAOImplemented implements IMailingDAO {
 	public void setMailingTemplateDao(IMailingTemplateDAO mailingTemplateDao) {
 		this.mailingTemplateDao = mailingTemplateDao;
 	}
-
-	private IMailingTemplateDAO mailingTemplateDao;
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -119,7 +118,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 			this.mailing = mailing;
 		}
 
-		private String createMailings = "insert into mailings (mailing_date, mailing_type, mailing_medium) values (?,?,?)";
+		private String createMailings = "insert into mailings (mailing_date, mailing_type, mailing_medium, template) values (?,?,?,?)";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
@@ -130,6 +129,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 			ps.setDate(1, new java.sql.Date(mailing.getDate().getTime()));
 			ps.setString(2, mailing.getType().getName());
 			ps.setString(3, mailing.getMedium().getName());
+			ps.setInt(4, mailing.getTemplate().getId());
 
 			return ps;
 		}
@@ -151,7 +151,9 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 			if (mailing.getId() == null) {
 				// create
-
+				
+				mailingTemplateDao.insert(mailing.getTemplate());
+				
 				KeyHolder keyHolder = new GeneratedKeyHolder();
 
 				jdbcTemplate.update(new CreateMailingStatementCreator(mailing),
@@ -219,12 +221,13 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 			} else {
 				jdbcTemplate
-						.update("UPDATE mailings SET mailing_date=?, mailing_type=?, mailing_medium=? WHERE id=?",
+						.update("UPDATE mailings SET mailing_date=?, mailing_type=?, mailing_medium=?, template=? WHERE id=?",
 								new Object[] {
 										new Timestamp(mailing.getDate()
 												.getTime()),
 										mailing.getType().getName(),
 										mailing.getMedium().getName(),
+										mailing.getTemplate().getId(),
 										mailing.getId() });
 			}
 

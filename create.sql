@@ -98,8 +98,9 @@ CREATE TABLE livesat (
 -- filter
 
 CREATE TABLE criterion ( -- an abstract criterion defining a condition. must either refer to a connected_criterion, a property_criterion or a mountedfilter_criterion.
-	id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT
+	id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 	-- a criterion must always be owned by either a filter or a connected_criterion!
+	type ENUM('validated_persons','validated_donations','confirmed_mailings','validated_addresses') NOT NULL -- the entity of the filter this criterion can be added to
 );
 
 CREATE TABLE filter ( -- defines a filter for a specific entity

@@ -143,15 +143,16 @@ public abstract class AbstractMailingTemplateDAOTest {
 
 	@Before
 	public void init() {
+		String fs = File.separator;
 		mt = new MailingTemplate();
 		File f = new File(
-				"C:\\Users\\philipp\\workspace\\qse-sepm-ss13-06\\src\\test\\resources\\examplemailing.docx");
+				"src"+fs+"test"+fs+"resources"+fs+"examplemailing.docx");
 		mt.setFile(f);
 		mt.setFileName(f.getName());
 		
 		mt2 = new MailingTemplate();
 		File f2 = new File(
-				"C:\\Users\\philipp\\workspace\\qse-sepm-ss13-06\\src\\test\\resources\\log4j.properties");
+				"src"+fs+"test"+fs+"resources"+fs+"examplemailing2.docx");
 		mt2.setFile(f2);
 		mt2.setFileName(f2.getName());
 	}
