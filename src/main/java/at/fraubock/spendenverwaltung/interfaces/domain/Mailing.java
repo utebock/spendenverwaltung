@@ -16,6 +16,8 @@ public class Mailing {
 	
 	private Date date;
 	
+	private MailingTemplate template;
+
 	public static enum MailingType {
 		ALLGEMEINER_DANKESBRIEF("allgemeiner Dankesbrief"), 
 		DANKESBRIEF("Dankesbrief"),
@@ -129,6 +131,14 @@ public class Mailing {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public MailingTemplate getTemplate() {
+		return template;
+	}
+
+	public void setTemplate(MailingTemplate template) {
+		this.template = template;
 	}
 	
 	@Override

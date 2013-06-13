@@ -55,7 +55,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 		this.filterToSqlBuilder = filterToSqlBuilder;
 	}
 
-	private static void validate(Mailing mailing) throws ValidationException {
+	public static void validate(Mailing mailing) throws ValidationException {
 		if (mailing == null) {
 			throw new ValidationException("Mailing was null");
 		}
