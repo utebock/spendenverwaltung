@@ -7,7 +7,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
@@ -19,6 +21,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
+import at.fraubock.spendenverwaltung.interfaces.dao.IMailingTemplateDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
@@ -46,6 +49,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 	private JdbcTemplate jdbcTemplate;
 	private FilterToSqlBuilder filterToSqlBuilder;
+	private IMailingTemplateDAO mailingTemplateDAO;
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -254,9 +258,14 @@ public class MailingDAOImplemented implements IMailingDAO {
 	public List<Mailing> getAll() throws PersistenceException {
 		try {
 			log.debug("Entering getAll");
-
+			MailingMapper mapper = new MailingMapper();
 			List<Mailing> mailings = jdbcTemplate.query(
-					"SELECT * FROM mailings", new MailingMapper());
+					"SELECT * FROM mailings", mapper);
+
+			for (Mailing m : mailings) {
+				Integer tmplId = mapper.getTemplateIds().get(m.getId());
+				m.setTemplate(mailingTemplateDAO.getByID(tmplId));
+			}
 
 			log.debug("Returning from getAll");
 			return mailings;
@@ -273,9 +282,13 @@ public class MailingDAOImplemented implements IMailingDAO {
 			log.debug("Entering getById with param " + id);
 
 			try {
+				MailingMapper mapper = new MailingMapper();
 				Mailing mailing = jdbcTemplate.queryForObject(
 						"SELECT * FROM mailings WHERE id=?",
-						new Object[] { id }, new MailingMapper());
+						new Object[] { id }, mapper);
+
+				Integer tmplId = mapper.getTemplateIds().get(mailing.getId());
+				mailing.setTemplate(mailingTemplateDAO.getByID(tmplId));
 
 				log.debug("Returning from getById with result " + mailing);
 				return mailing;
@@ -302,11 +315,17 @@ public class MailingDAOImplemented implements IMailingDAO {
 				throw new PersistenceException(e);
 			}
 
+			MailingMapper mapper = new MailingMapper();
 			List<Mailing> mailings = jdbcTemplate.query(
 					"SELECT ma.* FROM mailings ma, sent_mailings se "
 							+ "WHERE ma.id=se.mailing_id AND se.person_id=?",
 					new Object[] { person.getId() },
-					new int[] { Types.INTEGER }, new MailingMapper());
+					new int[] { Types.INTEGER }, mapper);
+
+			for (Mailing m : mailings) {
+				Integer tmplId = mapper.getTemplateIds().get(m.getId());
+				m.setTemplate(mailingTemplateDAO.getByID(tmplId));
+			}
 
 			log.debug("Returning from getMailingsByPerson");
 
@@ -320,6 +339,8 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 	private class MailingMapper implements RowMapper<Mailing> {
 
+		private Map<Integer, Integer> templateIds = new HashMap<Integer, Integer>();
+
 		@Override
 		public Mailing mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Mailing mailing = new Mailing();
@@ -332,7 +353,13 @@ public class MailingDAOImplemented implements IMailingDAO {
 			mailing.setMedium(Mailing.Medium.getByName(rs
 					.getString("mailing_medium")));
 
+			this.templateIds.put(rs.getInt("id"), rs.getInt("template"));
+
 			return mailing;
+		}
+
+		public Map<Integer, Integer> getTemplateIds() {
+			return templateIds;
 		}
 
 	}

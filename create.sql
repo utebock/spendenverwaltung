@@ -181,7 +181,7 @@ CREATE TABLE sent_mailings (
 
 CREATE TABLE mailing_templates ( -- mailing template files in ODT/DOC format
 	id INTEGER UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-	name VARCHAR(120) NOT NULL UNIQUE, -- name of the template
+	name VARCHAR(120) NOT NULL, -- name of the template
 	data BLOB NOT NULL
 );
 

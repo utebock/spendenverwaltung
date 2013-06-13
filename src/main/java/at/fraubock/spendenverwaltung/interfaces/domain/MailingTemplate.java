@@ -1,7 +1,6 @@
 package at.fraubock.spendenverwaltung.interfaces.domain;
 
 import java.io.File;
-import java.util.List;
 
 /**
  * domain model representing a mailing template (which is a text file stored in
@@ -13,8 +12,7 @@ import java.util.List;
 public class MailingTemplate {
 
 	private Integer id;
-	private String fileName;
-	private int fileSize;
+	private String name;
 	private File file;
 
 	public Integer getId() {
@@ -26,19 +24,11 @@ public class MailingTemplate {
 	}
 
 	public String getFileName() {
-		return fileName;
+		return name;
 	}
 
 	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-
-	public int getFileSize() {
-		return fileSize;
-	}
-
-	public void setFileSize(int fileSize) {
-		this.fileSize = fileSize;
+		this.name = fileName;
 	}
 
 	public File getFile() {
@@ -48,37 +38,37 @@ public class MailingTemplate {
 	public void setFile(File file) {
 		this.file = file;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
-		if(obj==this) return true;
-		if(obj==null) return false;
-		if(obj.getClass()!=this.getClass()) return false;
-		
-		MailingTemplate other = (MailingTemplate)obj;
-		
+		if (obj == this)
+			return true;
+		if (obj == null)
+			return false;
+		if (obj.getClass() != this.getClass())
+			return false;
+
+		MailingTemplate other = (MailingTemplate) obj;
+
 		if (id == null) {
 			if (other.id != null)
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
-		
-		if (fileName == null) {
-			if (other.fileName != null)
+
+		if (name == null) {
+			if (other.name != null)
 				return false;
-		} else if (!fileName.equals(other.fileName))
+		} else if (!name.equals(other.name))
 			return false;
-		
+
 		if (file == null) {
 			if (other.file != null)
 				return false;
 		} else if (!file.equals(other.file))
 			return false;
-		
-		if (fileSize!=other.fileSize) return false;
-		
+
 		return true;
 	}
 
-	
 }

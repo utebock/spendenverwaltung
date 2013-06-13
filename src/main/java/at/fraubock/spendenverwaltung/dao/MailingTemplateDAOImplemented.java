@@ -42,12 +42,7 @@ public class MailingTemplateDAOImplemented implements IMailingTemplateDAO {
 	public void insert(final MailingTemplate mt) throws PersistenceException {
 		try {
 			log.info("Inserting MailingTemplate...");
-
-			try {
-				validate(mt);
-			} catch (ValidationException e) {
-				throw new PersistenceException(e);
-			}
+			validate(mt);
 
 			KeyHolder keyHolder = new GeneratedKeyHolder();
 			jdbcTemplate.update(new MailingTemplateStatementCreator(mt),
@@ -60,6 +55,8 @@ public class MailingTemplateDAOImplemented implements IMailingTemplateDAO {
 		} catch (DataAccessException e) {
 			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
+		} catch (ValidationException e) {
+			throw new PersistenceException(e);
 		}
 
 	}
@@ -68,13 +65,8 @@ public class MailingTemplateDAOImplemented implements IMailingTemplateDAO {
 	public void delete(final MailingTemplate mt) throws PersistenceException {
 		try {
 			log.info("Deleting MailingTemplate...");
-
-			try {
-				validate(mt);
-			} catch (ValidationException e) {
-				throw new PersistenceException(e);
-			}
-
+				
+			validate(mt);
 			jdbcTemplate.update(new PreparedStatementCreator() {
 
 				@Override
@@ -93,6 +85,8 @@ public class MailingTemplateDAOImplemented implements IMailingTemplateDAO {
 					+ mt.getFile().getAbsolutePath());
 		} catch (DataAccessException e) {
 			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		} catch (ValidationException e) {
 			throw new PersistenceException(e);
 		}
 
@@ -146,12 +140,15 @@ public class MailingTemplateDAOImplemented implements IMailingTemplateDAO {
 			MailingTemplate mt = new MailingTemplate();
 			mt.setId(rs.getInt("id"));
 			mt.setFileName(rs.getString("file_name"));
-			mt.setFileSize(rs.getInt("file_size"));
 
-			File file = new File(
-					"C:\\Users\\philipp\\workspace\\qse-sepm-ss13-06\\"
-							+ "src\\test\\resources\\examplemailing.docx"); // TODO
-																			// path?
+			File file = null;
+			try {
+				file = File.createTempFile(mt.getFileName(), null);
+				file.deleteOnExit();
+			} catch (IOException e1) {
+				throw new SQLException(e1);
+			}
+			
 			InputStream is = rs.getBinaryStream("file");
 			OutputStream os = null;
 			try {
@@ -207,17 +204,16 @@ public class MailingTemplateDAOImplemented implements IMailingTemplateDAO {
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
 				throws SQLException {
-			String createAddress = "insert into mailing_templates (file_name,file_size,file)"
-					+ " values (?,?,?)";
+			String createAddress = "insert into mailing_templates (name, data)"
+					+ " values (?,?)";
 
 			PreparedStatement ps = connection.prepareStatement(createAddress,
 					Statement.RETURN_GENERATED_KEYS);
 
 			ps.setString(1, mt.getFileName());
-			ps.setInt(2, mt.getFileSize());
 			try {
-				ps.setBinaryStream(3, new FileInputStream(mt.getFile()),
-						mt.getFileSize());
+				ps.setBinaryStream(2, new FileInputStream(mt.getFile()), mt
+						.getFile().length());
 			} catch (FileNotFoundException e) {
 				log.error("The file with path='"
 						+ mt.getFile().getAbsolutePath()

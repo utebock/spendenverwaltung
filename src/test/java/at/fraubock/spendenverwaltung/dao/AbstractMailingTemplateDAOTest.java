@@ -148,13 +148,11 @@ public abstract class AbstractMailingTemplateDAOTest {
 				"C:\\Users\\philipp\\workspace\\qse-sepm-ss13-06\\src\\test\\resources\\examplemailing.docx");
 		mt.setFile(f);
 		mt.setFileName(f.getName());
-		mt.setFileSize((int) f.length());
 		
 		mt2 = new MailingTemplate();
 		File f2 = new File(
 				"C:\\Users\\philipp\\workspace\\qse-sepm-ss13-06\\src\\test\\resources\\log4j.properties");
 		mt2.setFile(f2);
 		mt2.setFileName(f2.getName());
-		mt2.setFileSize((int) f2.length());
 	}
 }

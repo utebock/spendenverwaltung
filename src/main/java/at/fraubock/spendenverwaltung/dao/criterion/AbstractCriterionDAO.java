@@ -36,7 +36,7 @@ public class AbstractCriterionDAO {
 		}
 
 		KeyHolder criterionKeyHolder = new GeneratedKeyHolder();
-		jdbcTemplate.update(new CreateFilterCriterionStatementCreator(f),
+		jdbcTemplate.update(new CreateFilterCriterionStatementCreator(),
 				criterionKeyHolder);
 		f.setId(criterionKeyHolder.getKey().intValue());
 
@@ -90,20 +90,16 @@ public class AbstractCriterionDAO {
 	private class CreateFilterCriterionStatementCreator implements
 			PreparedStatementCreator {
 
-		private Criterion filter;
-
-		CreateFilterCriterionStatementCreator(Criterion filter) {
-			this.filter = filter;
+		CreateFilterCriterionStatementCreator() {
 		}
 
-		private String createFilter = "insert into criterion (type) values (?)";
+		private String createFilter = "insert into criterion () values ()";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
 				throws SQLException {
 			PreparedStatement ps = connection.prepareStatement(createFilter,
 					Statement.RETURN_GENERATED_KEYS);
-			ps.setString(1, filter.getType().toString());
 			return ps;
 		}
 	}
