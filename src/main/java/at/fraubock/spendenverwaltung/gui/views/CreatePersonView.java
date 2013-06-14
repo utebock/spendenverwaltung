@@ -265,8 +265,7 @@ public class CreatePersonView extends InitializableView {
 		addDonation.setFont(new Font("Headline", Font.PLAIN, 14));
 		donationPanel.add(addDonation, "wrap");
 		
-		String[] donationString = new String[]{"\u00DCberweisung", "Merchandise", "Online-Shop", "Bar", "SMS"};
-		donationCombo = new JComboBox<String>(donationString);
+		donationCombo = new JComboBox<String>(donationService.getDonationTypes());
 		donationLabel = componentFactory.createLabel("Spende durch: ");
 		donationPanel.add(donationLabel);
 		donationPanel.add(donationCombo, "split 2");
@@ -374,7 +373,7 @@ public class CreatePersonView extends InitializableView {
 				//this ONLY happens if something has been entered in the donation field
 				if(!comp.validateContents()) {
 					donationValidated = false;
-					JOptionPane.showMessageDialog(null, "Konnte Spendenh��he nicht feststellen");
+					JOptionPane.showMessageDialog(null, "Konnte Spendenh\u00F6he nicht feststellen");
 				}
 					
 			}
