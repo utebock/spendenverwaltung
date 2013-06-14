@@ -45,16 +45,12 @@ public class StatisticClass implements Comparable<StatisticClass> {
 		return name;
 	}
 
-	public static enum Operation {
-		MIN, MAX, SUM, COUNT, MEAN, MEDIAN;
-	}
-
 	public void addToCategoryDataset(DefaultCategoryDataset dataset,
 			Operation operation) {
 		for (Map.Entry<String, List<Donation>> row : rows.entrySet()) {
 			DescriptiveStatistics stat = new DescriptiveStatistics();
 			for (Donation d : row.getValue()) {
-				stat.addValue(d.getAmount().doubleValue());
+				stat.addValue(d.getAmount().doubleValue() / 100 /*EURO cents*/);
 			}
 			switch (operation) {
 			case COUNT:

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
@@ -16,12 +17,11 @@ import at.fraubock.spendenverwaltung.util.Pair;
 
 public class Statistic {
 
-	public static enum Classification {
-		DAY, WEEK, MONTH, QUARTER, YEAR;
-	};
+	private static final Logger log = Logger.getLogger(Statistic.class);
 
-	private Map<GregorianCalendar, StatisticClass> classes;
-	
+	private Map<GregorianCalendar, StatisticClass> classes; // key: start date
+															// of class
+
 	public Statistic(List<Pair<List<Donation>, String>> dataSets,
 			Classification classfication) {
 
@@ -136,11 +136,42 @@ public class Statistic {
 
 		}
 
-		// add donations to their classifications:TODO
+		// add donations to their classifications:
+		for (Pair<List<Donation>, String> dataSet : dataSets) {
+			for (Donation d : dataSet.a) {
+				GregorianCalendar donDate = new GregorianCalendar();
+				donDate.setTime(d.getDate());
+				switch (classfication) {
+				case DAY:
+					break;
+				case MONTH:
+					donDate.set(Calendar.DAY_OF_MONTH, 1);
+					break;
+				case QUARTER:
+					donDate.set(Calendar.DAY_OF_MONTH, 1);
+					donDate.set(Calendar.MONTH, donDate.get(Calendar.MONTH)
+							- (donDate.get(Calendar.MONTH) - 1) % 3);
+					break;
+				case WEEK:
+					donDate.set(Calendar.DAY_OF_WEEK, 1);
+					break;
+				case YEAR:
+					donDate.set(Calendar.DAY_OF_YEAR, 1);
+					break;
+				default:
+					break;
+				}
+				StatisticClass c = classes.get(donDate);
+				if (c == null) {
+					log.error("Program malfunction: either statistic class not created or calendar comparision fails (because there are hours/minutes/seconds/millis somewhere)");
+				}
+				c.insert(d, dataSet.b);
+			}
+		}
 
 	}
-	
-	public DefaultCategoryDataset createDataset(StatisticClass.Operation operation) {
+
+	public DefaultCategoryDataset createDataset(Operation operation) {
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 		for (StatisticClass c : classes.values()) {
 			c.addToCategoryDataset(dataset, operation);
