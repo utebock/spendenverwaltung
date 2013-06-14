@@ -90,6 +90,12 @@ public class MailingDAOImplemented implements IMailingDAO {
 			throw new ValidationException("Type was null");
 		}
 
+		if (mailing.getTemplate() == null
+				&& mailing.getMedium() == Mailing.Medium.POSTAL) {
+			throw new ValidationException(
+					"Template can not be null when medium is POSTAL");
+		}
+
 		/**
 		 * fails if the mailing filter was not set, or if the type of the
 		 * mailing filter was not set, or if the type of the mailing filter was
@@ -129,7 +135,11 @@ public class MailingDAOImplemented implements IMailingDAO {
 			ps.setDate(1, new java.sql.Date(mailing.getDate().getTime()));
 			ps.setString(2, mailing.getType().getName());
 			ps.setString(3, mailing.getMedium().getName());
-			ps.setInt(4, mailing.getTemplate().getId());
+			if (mailing.getTemplate() == null) {
+				ps.setNull(4, java.sql.Types.INTEGER);
+			} else {
+				ps.setInt(4, mailing.getTemplate().getId());
+			}
 
 			return ps;
 		}
@@ -151,9 +161,11 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 			if (mailing.getId() == null) {
 				// create
-				
-				mailingTemplateDao.insert(mailing.getTemplate());
-				
+
+				if (mailing.getTemplate() != null) {
+					mailingTemplateDao.insert(mailing.getTemplate());
+				}
+
 				KeyHolder keyHolder = new GeneratedKeyHolder();
 
 				jdbcTemplate.update(new CreateMailingStatementCreator(mailing),
@@ -220,15 +232,23 @@ public class MailingDAOImplemented implements IMailingDAO {
 				}
 
 			} else {
-				jdbcTemplate
-						.update("UPDATE mailings SET mailing_date=?, mailing_type=?, mailing_medium=?, template=? WHERE id=?",
-								new Object[] {
-										new Timestamp(mailing.getDate()
-												.getTime()),
-										mailing.getType().getName(),
-										mailing.getMedium().getName(),
-										mailing.getTemplate().getId(),
-										mailing.getId() });
+				String update = "UPDATE mailings SET mailing_date=?, mailing_type=?, "
+						+ "mailing_medium=? WHERE id=?";
+				Object[] values = new Object[] {
+						new Timestamp(mailing.getDate().getTime()),
+						mailing.getType().getName(),
+						mailing.getMedium().getName(), mailing.getId() };
+
+				if (mailing.getMedium() == Mailing.Medium.POSTAL) {
+					update = "UPDATE mailings SET mailing_date=?, mailing_type=?, "
+							+ "mailing_medium=?, template=? WHERE id=?";
+					values = new Object[] {
+							new Timestamp(mailing.getDate().getTime()),
+							mailing.getType().getName(),
+							mailing.getMedium().getName(),
+							mailing.getTemplate().getId(), mailing.getId() };
+				}
+				jdbcTemplate.update(update, values);
 			}
 
 			log.debug("Returning from insertOrUpdate");
@@ -276,7 +296,9 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 			for (Mailing m : mailings) {
 				Integer tmplId = mapper.getTemplateIds().get(m.getId());
-				m.setTemplate(mailingTemplateDao.getByID(tmplId));
+				if (tmplId != null) {
+					m.setTemplate(mailingTemplateDao.getByID(tmplId));
+				}
 			}
 
 			log.debug("Returning from getAll");
@@ -300,7 +322,9 @@ public class MailingDAOImplemented implements IMailingDAO {
 						new Object[] { id }, mapper);
 
 				Integer tmplId = mapper.getTemplateIds().get(mailing.getId());
-				mailing.setTemplate(mailingTemplateDao.getByID(tmplId));
+				if (tmplId != null) {
+					mailing.setTemplate(mailingTemplateDao.getByID(tmplId));
+				}
 
 				log.debug("Returning from getById with result " + mailing);
 				return mailing;
@@ -336,7 +360,9 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 			for (Mailing m : mailings) {
 				Integer tmplId = mapper.getTemplateIds().get(m.getId());
-				m.setTemplate(mailingTemplateDao.getByID(tmplId));
+				if (tmplId != null) {
+					m.setTemplate(mailingTemplateDao.getByID(tmplId));
+				}
 			}
 
 			log.debug("Returning from getMailingsByPerson");
@@ -365,7 +391,9 @@ public class MailingDAOImplemented implements IMailingDAO {
 			mailing.setMedium(Mailing.Medium.getByName(rs
 					.getString("mailing_medium")));
 
-			this.templateIds.put(rs.getInt("id"), rs.getInt("template"));
+			if (mailing.getMedium() == Mailing.Medium.POSTAL) {
+				this.templateIds.put(rs.getInt("id"), rs.getInt("template"));
+			}
 
 			return mailing;
 		}

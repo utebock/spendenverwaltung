@@ -2,6 +2,8 @@ package at.fraubock.spendenverwaltung.interfaces.domain;
 
 import java.util.Date;
 
+import at.fraubock.spendenverwaltung.util.DateComparer;
+
 /**
  * Domain model representing Donation
  * 
@@ -20,6 +22,11 @@ public class Donation {
 		}
 
 		public String getName() {
+			return name;
+		}
+		
+		@Override
+		public String toString() {
 			return name;
 		}
 
@@ -158,6 +165,7 @@ public class Donation {
 		if (getClass() != obj.getClass())
 			return false;
 		Donation other = (Donation) obj;
+
 		if (amount == null) {
 			if (other.amount != null)
 				return false;
@@ -166,7 +174,7 @@ public class Donation {
 		if (date == null) {
 			if (other.date != null)
 				return false;
-		} else if (!date.equals(other.date))
+		} else if (!DateComparer.isSameDay(this.date, other.date))
 			return false;
 		if (dedication == null) {
 			if (other.dedication != null)

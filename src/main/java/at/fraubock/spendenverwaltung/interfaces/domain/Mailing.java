@@ -3,6 +3,7 @@ package at.fraubock.spendenverwaltung.interfaces.domain;
 import java.util.Date;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.util.DateComparer;
 
 public class Mailing {
 
@@ -163,6 +164,11 @@ public class Mailing {
 			if (other.id != null)
 				return false;
 		} else if (!id.equals(other.id))
+			return false;
+		if (date == null) {
+			if (other.date != null)
+				return false;
+		} else if (!DateComparer.isSameDay(this.date, other.date))
 			return false;
 		if (medium != other.medium)
 			return false;

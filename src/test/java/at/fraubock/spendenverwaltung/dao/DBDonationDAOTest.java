@@ -2,13 +2,13 @@ package at.fraubock.spendenverwaltung.dao;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IDonationDAO;
+import at.fraubock.spendenverwaltung.interfaces.dao.IImportDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 
 public class DBDonationDAOTest extends AbstractDonationDAOTest {
@@ -25,6 +25,7 @@ public class DBDonationDAOTest extends AbstractDonationDAOTest {
 		setDonationDao(context.getBean("donationDao", IDonationDAO.class));
 		setAddressDao(context.getBean("addressDao", IAddressDAO.class));
 		setPersonDao(context.getBean("personDao", IPersonDAO.class));
+		setImportDao(context.getBean("importDao", IImportDAO.class));
 	}
 	
 	/**

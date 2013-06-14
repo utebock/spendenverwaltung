@@ -2,6 +2,9 @@ package at.fraubock.spendenverwaltung.dao;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,6 +21,7 @@ import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
+import at.fraubock.spendenverwaltung.interfaces.domain.MailingTemplate;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
@@ -31,7 +35,7 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/testspring.xml")
 @TransactionConfiguration(defaultRollback = true)
-public class AbstractMailingDAOTest {
+public abstract class AbstractMailingDAOTest {
 
 //	private static final Logger log = Logger.getLogger(AbstractMailingDAOTest.class);
 
@@ -60,6 +64,11 @@ public class AbstractMailingDAOTest {
 	protected static Filter filterOnePerson = new Filter();
 	protected static Filter filterTwoPeople = new Filter();
 	protected static Filter filterNoPeople = new Filter();
+
+	protected static MailingTemplate mt;
+	protected static MailingTemplate mt2;
+	
+	protected static Date currentDate;
 	
 	public static void setAddressDAO(IAddressDAO addressDAO) {
 		AbstractMailingDAOTest.addressDAO = addressDAO;
@@ -90,6 +99,25 @@ public class AbstractMailingDAOTest {
 		personDAO.insertOrUpdate(personOne);
 		personDAO.insertOrUpdate(personTwo);
 		personDAO.insertOrUpdate(personThree);
+		
+		String fs = File.separator;
+		mt = new MailingTemplate();
+		File f = new File(
+				"src"+fs+"test"+fs+"resources"+fs+"examplemailing2.docx");
+		mt.setFile(f);
+		mt.setFileName(f.getName());
+		
+		mt2 = new MailingTemplate();
+		File f2 = new File(
+				"src"+fs+"test"+fs+"resources"+fs+"examplemailing2.docx");
+		mt2.setFile(f2);
+		mt2.setFileName(f2.getName());
+		
+		try {
+			currentDate = new SimpleDateFormat("yyyy-MM-dd").parse("2013-06-10");
+		} catch (ParseException e) {
+			currentDate = new Date();
+		}
 	}
 	
 	@Test(expected = PersistenceException.class)
@@ -115,7 +143,7 @@ public class AbstractMailingDAOTest {
 		mailing.setType(Mailing.MailingType.DANKESBRIEF);
 		mailing.setFilter(filterOnePerson);
 		
-		Date currentDate = new Date(System.currentTimeMillis());
+		//Date currentDate = new Date(System.currentTimeMillis());
 		
 		mailing.setDate(currentDate);
 				
@@ -141,8 +169,9 @@ public class AbstractMailingDAOTest {
 		mailing.setMedium(Mailing.Medium.POSTAL);
 		mailing.setType(Mailing.MailingType.DANKESBRIEF);
 		mailing.setFilter(filterTwoPeople);
+		mailing.setTemplate(mt);
 		
-		currentDate = new Date(System.currentTimeMillis());
+//		currentDate = new Date(System.currentTimeMillis());
 		mailing.setDate(currentDate);
 				
 		try {
@@ -173,7 +202,7 @@ public class AbstractMailingDAOTest {
 		mailing.setType(Mailing.MailingType.DANKESBRIEF);
 		mailing.setFilter(filterTwoPeople);
 		
-		Date currentDate = new Date(System.currentTimeMillis());
+		//Date currentDate = new Date(System.currentTimeMillis());
 		
 		mailing.setDate(currentDate);
 				
@@ -258,7 +287,7 @@ public class AbstractMailingDAOTest {
 		initData();
 		
 		Mailing mailing = new Mailing();
-		mailing.setDate(new Date(System.currentTimeMillis()));
+		mailing.setDate(currentDate);
 		mailing.setFilter(filterTwoPeople);
 		mailing.setMedium(Mailing.Medium.EMAIL);
 		mailing.setType(Mailing.MailingType.ERLAGSCHEINVERSAND);
@@ -296,6 +325,7 @@ public class AbstractMailingDAOTest {
 		mailing.setFilter(filterOnePerson);
 		mailing.setMedium(Mailing.Medium.POSTAL);
 		mailing.setType(Mailing.MailingType.DAUERSPENDER_DANKESBRIEF);
+		mailing.setTemplate(mt2);
 		
 		Integer oldId = null;
 		
@@ -332,13 +362,14 @@ public class AbstractMailingDAOTest {
 		
 		mailingOne.setMedium(Mailing.Medium.EMAIL);
 		mailingOne.setType(Mailing.MailingType.DANKESBRIEF);
-		mailingOne.setDate(new Date(System.currentTimeMillis()));
+		mailingOne.setDate(currentDate);
 		mailingOne.setFilter(filterOnePerson);
 		
 		mailingTwo.setMedium(Mailing.Medium.POSTAL);
 		mailingTwo.setType(Mailing.MailingType.DANKESBRIEF);
 		mailingTwo.setDate(new Date(System.currentTimeMillis()));
 		mailingTwo.setFilter(filterOnePerson);
+		mailingTwo.setTemplate(mt2);
 		
 		List<Mailing> mailingList = new ArrayList<Mailing>();
 
