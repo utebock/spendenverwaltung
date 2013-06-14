@@ -290,11 +290,12 @@ public abstract class AbstractMailingDAOTest {
 		mailing.setDate(currentDate);
 		mailing.setFilter(filterTwoPeople);
 		mailing.setMedium(Mailing.Medium.EMAIL);
-		mailing.setType(Mailing.MailingType.ERLAGSCHEINVERSAND);
+		mailing.setType(Mailing.MailingType.ALLGEMEINER_DANKESBRIEF);
 		
 		try {
 			mailingDAO.insertOrUpdate(mailing);
 		} catch (PersistenceException e1) {
+			e1.printStackTrace();
 			fail();
 		}
 		

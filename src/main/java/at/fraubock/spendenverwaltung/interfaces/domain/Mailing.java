@@ -174,7 +174,10 @@ public class Mailing {
 			return false;
 		if (type != other.type)
 			return false;
-		if (template != other.template)
+		if (template == null) {
+			if (other.template != null)
+				return false;
+		} else if (!template.equals(other.template))
 			return false;
 		return true;
 	}

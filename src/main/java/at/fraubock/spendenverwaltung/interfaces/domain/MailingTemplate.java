@@ -62,11 +62,17 @@ public class MailingTemplate {
 		} else if (!name.equals(other.name))
 			return false;
 
+		// don't compare the absolute file path because the files could be on
+		// different places but still match (e.g. tmp files)
 		if (file == null) {
 			if (other.file != null)
 				return false;
-		} else if (!file.equals(other.file))
-			return false;
+		} else {
+			if (other.file == null)
+				return false;
+			if (file.length() != other.file.length())
+				return false;
+		}
 
 		return true;
 	}
