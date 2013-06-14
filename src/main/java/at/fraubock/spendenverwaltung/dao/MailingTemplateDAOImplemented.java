@@ -139,7 +139,7 @@ public class MailingTemplateDAOImplemented implements IMailingTemplateDAO {
 				throws SQLException {
 			MailingTemplate mt = new MailingTemplate();
 			mt.setId(rs.getInt("id"));
-			mt.setFileName(rs.getString("file_name"));
+			mt.setFileName(rs.getString("name"));
 
 			File file = null;
 			try {
@@ -149,7 +149,7 @@ public class MailingTemplateDAOImplemented implements IMailingTemplateDAO {
 				throw new SQLException(e1);
 			}
 			
-			InputStream is = rs.getBinaryStream("file");
+			InputStream is = rs.getBinaryStream("data");
 			OutputStream os = null;
 			try {
 				os = new FileOutputStream(file);
@@ -212,7 +212,7 @@ public class MailingTemplateDAOImplemented implements IMailingTemplateDAO {
 
 			ps.setString(1, mt.getFileName());
 			try {
-				ps.setBinaryStream(2, new FileInputStream(mt.getFile()), mt
+				ps.setBinaryStream(2, new FileInputStream(mt.getFile()),(int) mt
 						.getFile().length());
 			} catch (FileNotFoundException e) {
 				log.error("The file with path='"

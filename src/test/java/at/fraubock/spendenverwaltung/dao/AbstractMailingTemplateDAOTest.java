@@ -60,6 +60,7 @@ public abstract class AbstractMailingTemplateDAOTest {
 			MailingTemplate savedMt = mailingTemplateDAO.getByID(mt.getId());
 			assert (savedMt.equals(mt));
 		} catch (PersistenceException e) {
+			e.printStackTrace();
 			fail();
 		}
 	}
