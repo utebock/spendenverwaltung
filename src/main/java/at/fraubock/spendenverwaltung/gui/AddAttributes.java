@@ -370,8 +370,11 @@ public class AddAttributes extends JPanel{
 				}
 				
 				else{
+					Long d_amount = null;
 					donation.setDonator(person);
-					donation.setAmount(Long.parseLong(amount.getText()));
+					d_amount = amount.getHundredths();
+					donation.setAmount(d_amount);
+					//donation.setAmount(Long.parseLong(amount.getText()));
 					donation.setDate(datePicker.getDate());
 					donation.setType(Donation.DonationType.values()[type.getSelectedIndex()]);
 					donation.setDedication(dedication.getText());

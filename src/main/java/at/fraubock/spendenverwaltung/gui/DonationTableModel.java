@@ -50,7 +50,7 @@ public class DonationTableModel extends AbstractTableModel{
 		Donation donation = (Donation)donations.get(rowIndex);
 		
 		switch(columnIndex){
-			case 0: return donation.getAmount();
+			case 0: return (donation.getAmount()/100);
 			case 1: return donation.getDate();
 			case 2: return donation.getDedication();
 			case 3: return donation.getType();

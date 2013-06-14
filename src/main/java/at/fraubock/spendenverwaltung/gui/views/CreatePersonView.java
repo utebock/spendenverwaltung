@@ -157,11 +157,11 @@ public class CreatePersonView extends InitializableView {
 	}
 	
 	private void setUpCreate() {
-		overviewPanel = componentFactory.createPanel(800, 850);
+		overviewPanel = componentFactory.createPanel(700, 850);
 		//JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		this.add(overviewPanel);
 
-		panel = componentFactory.createPanel(800,500);
+		panel = componentFactory.createPanel(700,500);
 		overviewPanel.add(panel);
 		
 		addPerson = componentFactory.createLabel("Personendaten eintragen");
