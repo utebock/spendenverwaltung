@@ -9,8 +9,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -227,9 +228,17 @@ public abstract class AbstractMailingServiceTest {
 	@Test
 	public void createCSVWithValidArgument_ReturnsCSVString() {
 		List<Mailing> list = new ArrayList<Mailing>();
-		validMailing.setDate(new Date());
-		validMailingTwo.setDate(new Date());
-		validMailingThree.setDate(new Date());
+
+		try {
+			validMailing.setDate(new SimpleDateFormat("dd.MM.yyyy")
+					.parse("12.06.2013"));
+			validMailingTwo.setDate(new SimpleDateFormat("dd.MM.yyyy")
+					.parse("13.06.2013"));
+			validMailingThree.setDate(new SimpleDateFormat("dd.MM.yyyy")
+					.parse("14.06.2013"));
+		} catch (ParseException e) {
+			fail();
+		}
 		list.add(validMailing);
 		list.add(validMailingTwo);
 		list.add(validMailingThree);
@@ -272,7 +281,7 @@ public abstract class AbstractMailingServiceTest {
 		}
 	}
 
-	private String csvExpected = "Datum;Art;Medium;\n10.06.2013;DANKESBRIEF;EMAIL;\n10.06.2013;INFOMATERIAL;POSTAL;\n"
-			+ "10.06.2013;ERLAGSCHEINVERSAND;EMAIL;\n";
+	private String csvExpected = "Datum;Art;Medium;\n12.06.2013;DANKESBRIEF;EMAIL;\n13.06.2013;INFOMATERIAL;POSTAL;\n"
+			+ "14.06.2013;ERLAGSCHEINVERSAND;EMAIL;\n";
 
 }

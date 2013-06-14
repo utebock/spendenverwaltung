@@ -146,7 +146,7 @@ public abstract class AbstractMailingTemplateDAOTest {
 		String fs = File.separator;
 		mt = new MailingTemplate();
 		File f = new File(
-				"src"+fs+"test"+fs+"resources"+fs+"examplemailing.docx");
+				"src"+fs+"test"+fs+"resources"+fs+"examplemailing2.docx");
 		mt.setFile(f);
 		mt.setFileName(f.getName());
 		

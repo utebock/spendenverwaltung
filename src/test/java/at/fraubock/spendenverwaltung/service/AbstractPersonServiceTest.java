@@ -289,12 +289,12 @@ public abstract class AbstractPersonServiceTest {
 		String csv = personService.convertToCSV(list);
 		assertTrue(csv
 				.equals("Vorname;Nachname;E-Mail;Geschlecht;Titel;Unternehmen;Telephon;"
-						+ "Empf�ngt E-Mail;Empf�ngt Post;Notiz;Land;Stadt;PLZ;Strasse\n"));
+						+ "Empf\u00E4ngt E-Mail;Empf\u00E4ngt Post;Notiz;Land;Stadt;PLZ;Strasse\n"));
 	}
 
-	private String csvExpected = "Vorname;Nachname;E-Mail;Geschlecht;Titel;Unternehmen;Telephon;Empf�ngt E-Mail;Empf�ngt Post;Notiz;Land;Stadt;PLZ;Strasse\n"
-			+ "Test;Test;test@test.at;m�nnlich;Prof. Dr.;IBM;01234567889;ja;ja;;n.v.;n.v.;n.v.;n.v.;\n"
-			+ "Test2;Test2;test2@test2.at;m�nnlich;Prof. Dr.;IBM;02234567889;ja;ja;;n.v.;n.v.;n.v.;n.v.;\n"
-			+ "Test;Test;test@test.at;m�nnlich;Prof. Dr.;IBM;01234567889;ja;ja;;n.v.;n.v.;n.v.;n.v.;\n";
+	private String csvExpected = "Vorname;Nachname;E-Mail;Geschlecht;Titel;Unternehmen;Telephon;Empf\u00E4ngt E-Mail;Empf\u00E4ngt Post;Notiz;Land;Stadt;PLZ;Strasse\n"
+			+ "Test;Test;test@test.at;m\u00E4nnlich;Prof. Dr.;IBM;01234567889;ja;ja;;n.v.;n.v.;n.v.;n.v.;\n"
+			+ "Test2;Test2;test2@test2.at;m\u00E4nnlich;Prof. Dr.;IBM;02234567889;ja;ja;;n.v.;n.v.;n.v.;n.v.;\n"
+			+ "Test;Test;test@test.at;m\u00E4nnlich;Prof. Dr.;IBM;01234567889;ja;ja;;n.v.;n.v.;n.v.;n.v.;\n";
 
 }
