@@ -186,9 +186,9 @@ public abstract class AbstractMailingServiceTest {
 			Person mark = new Person();
 			mark.setGivenName("Mark");
 
-			when(mailingDAO.getMailingsByPerson(mark)).thenReturn(mailings);
+			when(mailingDAO.getConfirmedMailingsByPerson(mark)).thenReturn(mailings);
 			List<Mailing> results = mailingService.getMailingsByPerson(mark);
-			verify(mailingDAO).getMailingsByPerson(mark);
+			verify(mailingDAO).getConfirmedMailingsByPerson(mark);
 			assertEquals(results, mailings);
 		} catch (ServiceException e) {
 			fail();
@@ -202,9 +202,9 @@ public abstract class AbstractMailingServiceTest {
 			Person invalidPerson = new Person();
 			invalidPerson.setGivenName("Invalid");
 			doThrow(new PersistenceException()).when(mailingDAO)
-					.getMailingsByPerson(invalidPerson);
+					.getConfirmedMailingsByPerson(invalidPerson);
 			mailingService.getMailingsByPerson(invalidPerson);
-			verify(mailingDAO).getMailingsByPerson(invalidPerson);
+			verify(mailingDAO).getConfirmedMailingsByPerson(invalidPerson);
 		} catch (PersistenceException e) {
 			fail();
 		}

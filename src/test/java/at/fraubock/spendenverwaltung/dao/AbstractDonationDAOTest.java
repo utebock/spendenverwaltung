@@ -849,7 +849,7 @@ public abstract class AbstractDonationDAOTest {
 
 			List<Donation> donations = donationDAO.getByFilter(donationFilter);
 
-			assertThat(donations != null && donations.size() == 2, is(true));
+			assertThat(donations != null && donations.size() == 3, is(true));
 
 		} catch (PersistenceException e) {
 			fail();

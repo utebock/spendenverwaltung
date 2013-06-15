@@ -72,6 +72,32 @@ public interface IMailingDAO {
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
-	public List<Mailing> getMailingsByPerson(Person person)
+	public List<Mailing> getConfirmedMailingsByPerson(Person person)
 				throws PersistenceException;
+
+	/**
+	 * returns all unconfirmed mailings
+	 * 
+	 * @return
+	 * @throws PersistenceException
+	 */
+	List<Mailing> getAllUnconfirmed() throws PersistenceException;
+
+	/**
+	 * returns all confirmed mailings
+	 * 
+	 * @return
+	 * @throws PersistenceException
+	 */
+	List<Mailing> getAllConfirmed() throws PersistenceException;
+	
+	/**
+	 * confirms a mailing
+	 * 
+	 * @throws PersistenceException
+	 */
+	
+	void confirmMailing(Mailing mailing) throws PersistenceException;
+
+
 }

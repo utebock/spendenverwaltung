@@ -7,6 +7,7 @@ drop view if exists validated_donations;
 drop table if exists sentmailings;
 drop table if exists sent_mailings;
 drop table if exists mailings;
+drop table if exists unsent_mailings;
 
 drop table if exists connected_criterion;
 drop table if exists mountedfilter_criterion;
@@ -128,7 +129,8 @@ CREATE TABLE mailings (
 	mailing_type ENUM('allgemeiner Dankesbrief', 'Dankesbrief', 'Dauerspender Dankesbrief',
 		'Einzelspenden Dankesbrief', 'Erlagscheinversand', 'Infomaterial',
 		'Spendenaufruf', 'Spendenbrief', 'T-Shirt Versand'),
-	mailing_medium ENUM('email', 'postal')
+	mailing_medium ENUM('email', 'postal'),
+    unconfirmed INTEGER UNSIGNED DEFAULT NULL REFERENCES unsent_mailings(id) ON DELETE SET NULL -- if NULL, this mailing is considered confirmed/validated.
 );
 
 CREATE TABLE sent_mailings (
@@ -143,6 +145,11 @@ CREATE TABLE mailing_templates (
 	file BLOB NOT NULL
 );
 
+CREATE TABLE unsent_mailings (
+    id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    creator VARCHAR(30) NOT NULL -- user who created the import (database user name)
+);
+
 -- views for validated data:
 
 CREATE VIEW validated_donations AS SELECT * FROM donations WHERE import IS NULL; -- only validated donations (i.e. no pending imports)
@@ -150,5 +157,3 @@ CREATE VIEW validated_donations AS SELECT * FROM donations WHERE import IS NULL;
 CREATE VIEW validated_persons AS SELECT * FROM persons p WHERE NOT EXISTS (SELECT id FROM donations d WHERE d.import IS NOT NULL AND d.personid = p.id); -- only validated persons (i.e. no pending imports)
 
 CREATE VIEW validated_addresses AS SELECT * FROM addresses a WHERE NOT EXISTS (SELECT * FROM livesat l JOIN persons p ON (l.pid = p.id) WHERE l.aid = a.id AND p.id NOT IN (SELECT id FROM validated_persons)); -- only validated addresses (i.e. no pending imports)
-
-

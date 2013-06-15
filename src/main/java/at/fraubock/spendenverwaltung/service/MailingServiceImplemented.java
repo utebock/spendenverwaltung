@@ -68,7 +68,7 @@ public class MailingServiceImplemented implements IMailingService {
 	public List<Mailing> getMailingsByPerson(Person person)
 			throws ServiceException {
 		try {
-			return mailingDAO.getMailingsByPerson(person);
+			return mailingDAO.getConfirmedMailingsByPerson(person);
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
