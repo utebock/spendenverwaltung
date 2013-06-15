@@ -311,7 +311,7 @@ public class Overview extends JPanel{
 	}
 	
 	public void goToValidation(){
-		ImportValidation validation = new ImportValidation(personService, addressService, donationService, this);
+		ImportValidation validation = new ImportValidation(personService, addressService, donationService, importService, this);
 		removeAll();
 		revalidate();
 		repaint();

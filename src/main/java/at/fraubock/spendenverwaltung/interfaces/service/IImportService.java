@@ -2,6 +2,7 @@ package at.fraubock.spendenverwaltung.interfaces.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Import;
@@ -34,6 +35,13 @@ public interface IImportService {
 	 */
 	public Map<String, String> readMappingConfig(String configName)
 			throws ServiceException;
+	
+	/**
+	 * Looks for all unconfirmed Imports in the underlaying persistence layer
+	 * @return List of imports which aren't confirmed yes
+	 * @throws ServiceException
+	 */
+	public List<Import> getAllUnconfirmed() throws ServiceException;
 
 	/**
 	 * Creates a new Import Creator will be overwritten with sql username

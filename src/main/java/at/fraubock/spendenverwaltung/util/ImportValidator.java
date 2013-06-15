@@ -26,6 +26,58 @@ public class ImportValidator {
 		ANONYM
 	};
 	
+
+
+	public static enum ValidationType {
+		EDIT("bearbeiten"), ANONYM("anonym"), NEW_DONATOR("Spender zuweisen"), NOT_IMPORT("nicht importieren");
+
+		private final String name;
+
+		private ValidationType(String name) {
+			this.name = name;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public static ValidationType getByName(String name) {
+			switch (name) {
+			case "anonym":
+				return ANONYM;
+			case "Spender zuweisen":
+				return NEW_DONATOR;
+			case "nicht importieren":
+				return NOT_IMPORT;
+			case "bearbeiten":
+				return EDIT;
+			default:
+				throw new IllegalArgumentException(
+						"No validation type for name: " + name);
+			}
+		}
+		
+		public static int indexOf(ValidationType type){
+			switch(type){
+			case EDIT:
+				return 0;
+			case ANONYM:
+				return 1;
+			case NEW_DONATOR:
+				return 2;
+			case NOT_IMPORT:
+				return 3;
+			default:
+				throw new IllegalArgumentException(
+						"No validation type for name: " + type.toString());
+			}
+		}
+		
+		public static String[] toArray(){
+			return new String[]{ "bearbeiten", "anonym", "Spender zuweisen", "nicht importieren" };
+		}
+	};
+	
 	public IPersonService getPersonService() {
 		return personService;
 	}
@@ -35,6 +87,7 @@ public class ImportValidator {
 	}
 
 	public ValidatedData validate(List<Person> persons, List<Donation> donations) throws ServiceException{
+		validatedData = new ValidatedData();
 		Person matchedPerson;
 		Person currentPerson;
 		Donation currentDonation;
@@ -67,6 +120,7 @@ public class ImportValidator {
 				if(isDuplicate(currentDonation)){
 					validatedData.addConflictEntry(currentPerson, currentDonation, ConflictType.DUPLICATE);
 					validatedData.addDonationToDelete(currentDonation);
+					validatedData.addPersonToDelete(currentPerson);
 					continue;
 				}
 				
@@ -78,7 +132,7 @@ public class ImportValidator {
 		return validatedData;
 	}
 	
-	private Person getExistingPerson(Person p) throws ServiceException{
+	public Person getExistingPerson(Person p) throws ServiceException{
 		List<Person> matchedPersons = new ArrayList<Person>();
 		
 		matchedPersons = personService.getByAttributes(p);
