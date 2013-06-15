@@ -1,5 +1,5 @@
 package at.fraubock.spendenverwaltung.util.statistics;
 
 public enum Operation {
-	MIN, MAX, SUM, COUNT, MEAN, MEDIAN;
+	MAX, MEDIAN, MIN, MEAN, COUNT, SUM;
 }

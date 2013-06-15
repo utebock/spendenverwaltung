@@ -77,10 +77,7 @@ public class ImportDataView extends InitializableView {
 		pathField = componentFactory.createTextField("");
 		panel.add(pathField, "growx");
 		openFileBtn = new JButton("Datei ausw\u00E4hlen");
-		panel.add(openFileBtn, "wrap, growx");
-		
-		JLabel empty2 = componentFactory.createLabel("		");
-		panel.add(empty2, "wrap");
+		panel.add(openFileBtn, "wrap 20px");
 		
 		importBtn = new JButton("Import");
 		panel.add(importBtn, "split2");
@@ -145,7 +142,6 @@ public class ImportDataView extends InitializableView {
 							JOptionPane.ERROR_MESSAGE);
 				}
 			}
-
 		}
 	}
 
