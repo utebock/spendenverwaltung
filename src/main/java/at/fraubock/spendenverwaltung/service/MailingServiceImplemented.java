@@ -54,6 +54,34 @@ public class MailingServiceImplemented implements IMailingService {
 			throw new ServiceException(e);
 		}
 	}
+	
+
+	@Override
+	public List<Mailing> getAllConfirmed() throws ServiceException {
+		try {
+			return mailingDAO.getAllConfirmed();
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
+	
+	@Override
+	public void confirmMailing(Mailing mailing) throws ServiceException {
+		try {
+			mailingDAO.confirmMailing(mailing);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
+
+	@Override
+	public List<Mailing> getAllUnconfirmed() throws ServiceException {
+		try {
+			return mailingDAO.getAllUnconfirmed();
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
 
 	@Override
 	public Mailing getById(int id) throws ServiceException {
@@ -65,7 +93,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
-	public List<Mailing> getMailingsByPerson(Person person)
+	public List<Mailing> getConfirmedMailingsByPerson(Person person)
 			throws ServiceException {
 		try {
 			return mailingDAO.getConfirmedMailingsByPerson(person);

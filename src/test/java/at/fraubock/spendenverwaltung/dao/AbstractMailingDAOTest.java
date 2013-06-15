@@ -318,6 +318,85 @@ public class AbstractMailingDAOTest {
 	}
 	
 	@Test
+	@Transactional
+	public void deleteWithConfirmedMailing() throws PersistenceException {
+		initData();
+		
+		Mailing mailing = new Mailing();
+		mailing.setDate(new Date(System.currentTimeMillis()));
+		mailing.setFilter(filterOnePerson);
+		mailing.setMedium(Mailing.Medium.POSTAL);
+		mailing.setType(Mailing.MailingType.DAUERSPENDER_DANKESBRIEF);
+		
+		Integer oldId = null;
+		
+		try {
+			mailingDAO.insertOrUpdate(mailing);
+			mailingDAO.confirmMailing(mailing);
+			oldId = mailing.getId();
+		} catch (PersistenceException e) {
+			fail();
+		}
+		
+		try {
+			mailingDAO.delete(mailing);
+		} catch (PersistenceException e) {
+			fail();
+		}
+		
+		Mailing result;
+		
+		try {
+			result = mailingDAO.getById(oldId);
+			assertNull(result);
+			
+			List<Mailing> results = mailingDAO.getAllConfirmed();
+			assertTrue(results.isEmpty());
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+	
+	@Test
+	@Transactional
+	public void deleteWithUnconfirmedMailing() throws PersistenceException {
+		initData();
+		
+		Mailing mailing = new Mailing();
+		mailing.setDate(new Date(System.currentTimeMillis()));
+		mailing.setFilter(filterOnePerson);
+		mailing.setMedium(Mailing.Medium.POSTAL);
+		mailing.setType(Mailing.MailingType.DAUERSPENDER_DANKESBRIEF);
+		
+		Integer oldId = null;
+		
+		try {
+			mailingDAO.insertOrUpdate(mailing);
+			oldId = mailing.getId();
+		} catch (PersistenceException e) {
+			fail();
+		}
+		
+		try {
+			mailingDAO.delete(mailing);
+		} catch (PersistenceException e) {
+			fail();
+		}
+		
+		Mailing result;
+		
+		try {
+			result = mailingDAO.getById(oldId);
+			assertNull(result);
+			List<Mailing> results = mailingDAO.getAllUnconfirmed();
+			assertTrue(results.isEmpty());
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+	
+	
+	@Test
 	@Transactional	
 	public void getMailingsByValidPerson() throws PersistenceException {
 		initData();

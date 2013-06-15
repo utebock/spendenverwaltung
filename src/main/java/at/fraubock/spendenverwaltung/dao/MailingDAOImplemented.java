@@ -271,9 +271,27 @@ public class MailingDAOImplemented implements IMailingDAO {
 						"Mailing's id was null in delete");
 			}
 			
+			Integer unconfirmedId;
+			
+			try {
+				unconfirmedId = jdbcTemplate.queryForObject(
+						"SELECT m.unconfirmed FROM mailings m WHERE m.id=? AND m.unconfirmed IS NOT NULL",
+						new Object[] {mailing.getId()}, Integer.class);
+
+				log.debug("Returning from getById with result " + mailing);
+		
+			} catch (EmptyResultDataAccessException e) {
+				log.debug("unconfirmedMailing query had 0 results");
+				unconfirmedId = null;
+			}
+			
 			jdbcTemplate.update("DELETE FROM mailings where id=?",
 					new Object[] { mailing.getId() });
 
+			if(unconfirmedId != null) {
+				jdbcTemplate.update("DELETE FROM unsent_mailings WHERE id=?", new Object[] {unconfirmedId});
+			}
+			
 			log.debug("Returning from delete");
 		} catch (DataAccessException e) {
 			log.warn(e.getLocalizedMessage());

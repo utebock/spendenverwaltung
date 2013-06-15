@@ -62,7 +62,7 @@ public interface IMailingService {
 	 * @throws ServiceException
 	 *             if communication to the underlying persistence system failed
 	 */
-	public List<Mailing> getMailingsByPerson(Person person)
+	public List<Mailing> getConfirmedMailingsByPerson(Person person)
 			throws ServiceException;
 
 	/**
@@ -82,5 +82,29 @@ public interface IMailingService {
 	 * @param mailing
 	 */
 	public void reproduceDocument(Mailing mailing) throws ServiceException;
+
+	/**
+	 * returns all mailings that have been confirmed by a user
+	 * 
+	 * @return
+	 * @throws ServiceException
+	 */
+	public List<Mailing> getAllConfirmed() throws ServiceException;
+
+	/**
+	 * returns all mailings that have yet to be confirmed by a user
+	 * 
+	 * @return
+	 * @throws ServiceException
+	 */
+	public List<Mailing> getAllUnconfirmed() throws ServiceException;
+
+	/**
+	 * confirms a mailing
+	 * 
+	 * @param mailing
+	 * @throws ServiceException
+	 */
+	public void confirmMailing(Mailing mailing) throws ServiceException;
 
 }

@@ -187,7 +187,7 @@ public abstract class AbstractMailingServiceTest {
 			mark.setGivenName("Mark");
 
 			when(mailingDAO.getConfirmedMailingsByPerson(mark)).thenReturn(mailings);
-			List<Mailing> results = mailingService.getMailingsByPerson(mark);
+			List<Mailing> results = mailingService.getConfirmedMailingsByPerson(mark);
 			verify(mailingDAO).getConfirmedMailingsByPerson(mark);
 			assertEquals(results, mailings);
 		} catch (ServiceException e) {
@@ -203,7 +203,7 @@ public abstract class AbstractMailingServiceTest {
 			invalidPerson.setGivenName("Invalid");
 			doThrow(new PersistenceException()).when(mailingDAO)
 					.getConfirmedMailingsByPerson(invalidPerson);
-			mailingService.getMailingsByPerson(invalidPerson);
+			mailingService.getConfirmedMailingsByPerson(invalidPerson);
 			verify(mailingDAO).getConfirmedMailingsByPerson(invalidPerson);
 		} catch (PersistenceException e) {
 			fail();
@@ -225,7 +225,7 @@ public abstract class AbstractMailingServiceTest {
 		list.add(validMailingTwo);
 		list.add(validMailingThree);
 		String csv = mailingService.convertToCSV(list);
-		assertTrue(csv.equals(csvExpected));
+		assertEquals(csvExpected, csv);
 	}
 
 	@Test
