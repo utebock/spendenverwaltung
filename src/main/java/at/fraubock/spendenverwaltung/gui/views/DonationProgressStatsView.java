@@ -253,64 +253,76 @@ public class DonationProgressStatsView extends InitializableView {
 			pairList = new ArrayList<Pair<List<Donation>, String>>();
 			operation = (Operation.values()[operationBox.getSelectedIndex()]);
 			
-			if(chooseTwo.isSelected()){
-				if(firstFilter.getSelectedIndex()!=0 && secondFilter.getSelectedIndex()!=0){
-					donationList = getDonations((Filter)firstFilter.getSelectedItem());
-					name = ((Filter)firstFilter.getSelectedItem()).getName();
+			if (chooseTwo.isSelected() == true) {
+				if (firstFilter.getSelectedIndex() != 0
+						&& secondFilter.getSelectedIndex() != 0) {
+					donationList = getDonations((Filter) firstFilter
+							.getSelectedItem());
+					name = ((Filter) firstFilter.getSelectedItem()).getName();
 					pair = new Pair<List<Donation>, String>(donationList, name);
 					pairList.add(pair);
-					
-					donationList = getDonations((Filter)secondFilter.getSelectedItem());
-					name = ((Filter)secondFilter.getSelectedItem()).getName();
+
+					donationList = getDonations((Filter) secondFilter
+							.getSelectedItem());
+					name = ((Filter) secondFilter.getSelectedItem()).getName();
 					pair = new Pair<List<Donation>, String>(donationList, name);
 					pairList.add(pair);
-				
-					classification = (Classification.values()[classBox.getSelectedIndex()]);
+
+					classification = (Classification.values()[classBox
+							.getSelectedIndex()]);
 					statistic = new Statistic(pairList, classification);
 					dataSet = statistic.createDataset(operation);
-					
+
 					chart = createBarChart(dataSet);
 					chartPanel = new ChartPanel(chart);
 					chartPanel.setPreferredSize(new Dimension(700, 270));
 					operationsPanel.add(chartPanel);
 					operationsPanel.validate();
 				}
-				if(secondFilter.getSelectedIndex()!=0 && thirdFilter.getSelectedIndex()!=0){
-					donationList = getDonations((Filter)secondFilter.getSelectedItem());
-					name = ((Filter)secondFilter.getSelectedItem()).getName();
+				if (secondFilter.getSelectedIndex() != 0
+						&& thirdFilter.getSelectedIndex() != 0) {
+					donationList = getDonations((Filter) secondFilter
+							.getSelectedItem());
+					name = ((Filter) secondFilter.getSelectedItem()).getName();
 					pair = new Pair<List<Donation>, String>(donationList, name);
 					pairList.add(pair);
-					
-					donationList = getDonations((Filter)thirdFilter.getSelectedItem());
-					name = ((Filter)thirdFilter.getSelectedItem()).getName();
+
+					donationList = getDonations((Filter) thirdFilter
+							.getSelectedItem());
+					name = ((Filter) thirdFilter.getSelectedItem()).getName();
 					pair = new Pair<List<Donation>, String>(donationList, name);
 					pairList.add(pair);
-				
-					classification = (Classification.values()[classBox.getSelectedIndex()]);
+
+					classification = (Classification.values()[classBox
+							.getSelectedIndex()]);
 					statistic = new Statistic(pairList, classification);
 					dataSet = statistic.createDataset(operation);
-					
+
 					chart = createBarChart(dataSet);
 					chartPanel = new ChartPanel(chart);
 					chartPanel.setPreferredSize(new Dimension(700, 270));
 					operationsPanel.add(chartPanel);
 					operationsPanel.validate();
 				}
-				if(firstFilter.getSelectedIndex()!=0 && thirdFilter.getSelectedIndex()!=0){
-					donationList = getDonations((Filter)firstFilter.getSelectedItem());
-					name = ((Filter)firstFilter.getSelectedItem()).getName();
+				if (firstFilter.getSelectedIndex() != 0
+						&& thirdFilter.getSelectedIndex() != 0) {
+					donationList = getDonations((Filter) firstFilter
+							.getSelectedItem());
+					name = ((Filter) firstFilter.getSelectedItem()).getName();
 					pair = new Pair<List<Donation>, String>(donationList, name);
 					pairList.add(pair);
-					
-					donationList = getDonations((Filter)thirdFilter.getSelectedItem());
-					name = ((Filter)thirdFilter.getSelectedItem()).getName();
+
+					donationList = getDonations((Filter) thirdFilter
+							.getSelectedItem());
+					name = ((Filter) thirdFilter.getSelectedItem()).getName();
 					pair = new Pair<List<Donation>, String>(donationList, name);
 					pairList.add(pair);
-				
-					classification = (Classification.values()[classBox.getSelectedIndex()]);
+
+					classification = (Classification.values()[classBox
+							.getSelectedIndex()]);
 					statistic = new Statistic(pairList, classification);
 					dataSet = statistic.createDataset(operation);
-					
+
 					chart = createBarChart(dataSet);
 					chartPanel = new ChartPanel(chart);
 					chartPanel.setPreferredSize(new Dimension(700, 270));
@@ -318,34 +330,41 @@ public class DonationProgressStatsView extends InitializableView {
 					operationsPanel.validate();
 				}
 			}
-			else{
-				donationList = getDonations((Filter)firstFilter.getSelectedItem());
-				name = ((Filter)firstFilter.getSelectedItem()).getName();
+			else if(chooseThree.isSelected()==true){
+				donationList = getDonations((Filter) firstFilter
+						.getSelectedItem());
+				name = ((Filter) firstFilter.getSelectedItem()).getName();
 				pair = new Pair<List<Donation>, String>(donationList, name);
 				pairList.add(pair);
-				
-				donationList = getDonations((Filter)secondFilter.getSelectedItem());
-				name = ((Filter)secondFilter.getSelectedItem()).getName();
+
+				donationList = getDonations((Filter) secondFilter
+						.getSelectedItem());
+				name = ((Filter) secondFilter.getSelectedItem()).getName();
 				pair = new Pair<List<Donation>, String>(donationList, name);
 				pairList.add(pair);
-			
-				donationList = getDonations((Filter)thirdFilter.getSelectedItem());
-				name = ((Filter)thirdFilter.getSelectedItem()).getName();
+
+				donationList = getDonations((Filter) thirdFilter
+						.getSelectedItem());
+				name = ((Filter) thirdFilter.getSelectedItem()).getName();
 				pair = new Pair<List<Donation>, String>(donationList, name);
 				pairList.add(pair);
-				
-				classification = (Classification.values()[classBox.getSelectedIndex()]);
+
+				classification = (Classification.values()[classBox
+						.getSelectedIndex()]);
 				statistic = new Statistic(pairList, classification);
 				dataSet = statistic.createDataset(operation);
-				
+
 				chart = createBarChart(dataSet);
 				chartPanel = new ChartPanel(chart);
 				chartPanel.setPreferredSize(new Dimension(700, 270));
 				operationsPanel.add(chartPanel);
 				operationsPanel.validate();
 			}
-			
-		}
+			else{
+				JOptionPane.showMessageDialog(operationsPanel,
+						"Bitte Auswahl an Einstellungen treffen."); return;
+			}
+			}
 	}
 	
 	private JFreeChart createLineChart(DefaultCategoryDataset dataSet) {

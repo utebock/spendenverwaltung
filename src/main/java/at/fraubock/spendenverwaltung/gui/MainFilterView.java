@@ -1,7 +1,5 @@
 package at.fraubock.spendenverwaltung.gui;
 
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -12,9 +10,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -44,20 +39,11 @@ public class MainFilterView extends InitializableView {
 	private Overview overview;
 	private ComponentBuilder builder;
 	private ViewActionFactory viewActionFactory;
-	private ComponentFactory componentFactory;
-	
-
 	private FilterTableModel filterModel;
 	private JTable showTable;
 	private JScrollPane scrollPane;
 	private List<Filter> filterList;
 	private JPanel panel;
-	private JMenuBar menubar;
-	private Container chooseFilter;
-	private JMenu editFilter;
-	private Component chooseMenuItem;
-	private JMenuItem editItem;
-	private JMenuItem deleteItem;
 	private JToolBar toolbar;
 	private JButton personFilter;
 	private JButton sendingsFilter;
@@ -73,7 +59,6 @@ public class MainFilterView extends InitializableView {
 		this.setLayout(new MigLayout());
 		this.filterService = filterService;
 		this.viewActionFactory = viewActionFactory;
-		this.componentFactory = componentFactory;
 	}
 
 	public void initTable() {
@@ -83,14 +68,14 @@ public class MainFilterView extends InitializableView {
 		showTable.setFillsViewportHeight(true);
 		showTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		scrollPane = new JScrollPane(showTable);
-		scrollPane.setPreferredSize(new Dimension(800, 800));
+		scrollPane.setPreferredSize(new Dimension(700, 550));
 		add(scrollPane);
 
 	}
 
 	public void init() {
 		builder = new ComponentBuilder();
-		panel = builder.createPanel(800, 850);
+		panel = builder.createPanel(700, 800);
 		this.add(panel);
 
 		toolbar = builder.createToolbar();
