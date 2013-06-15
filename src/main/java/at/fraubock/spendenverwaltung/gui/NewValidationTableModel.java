@@ -24,6 +24,7 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
+import at.fraubock.spendenverwaltung.util.ImportValidator;
 import at.fraubock.spendenverwaltung.util.ImportValidator.ValidationType;
 
 /**
@@ -35,12 +36,14 @@ public class NewValidationTableModel extends AbstractTableModel implements IVali
 
 	private static final long serialVersionUID = 1L;
 	
-	private String[] columnNames = new String[]{ "Vorname", "Nachname", "Telefonnummer", "E-Mail Adresse", "Straße", "PLZ", "Ort", "Land", "Betrag", "Datum", "Widmung", "Typ", "Notiz" };
+	private String[] columnNames = new String[]{ "Vorname", "Nachname", "Telefonnummer", "E-Mail Adresse", "Straße", "PLZ", "Ort", "Land", "Betrag", "Datum", "Widmung", "Typ", "Notiz", "Option" };
 	private Vector<Donation> donations = new Vector<Donation>();
+	private Vector<JComboBox> comboBoxes = new Vector<JComboBox>();
 	private IPersonService personService;
 	private IAddressService addressService;
 	private IDonationService donationService;
 	private ImportValidation parent;
+	private boolean editable;
 	
 	public NewValidationTableModel(IPersonService personService, IAddressService addressService, IDonationService donationService, ImportValidation parent){
 		this.personService = personService;
@@ -51,7 +54,15 @@ public class NewValidationTableModel extends AbstractTableModel implements IVali
 	
 	@Override
 	public void addDonation (Donation donation){
+		JComboBox cb = new JComboBox(ImportValidator.ValidationType.toArray());
 		donations.add(donation);
+		comboBoxes.add(cb);
+	}
+	
+	public void removeAll(){
+		donations = new Vector<Donation>();
+		comboBoxes = new Vector<JComboBox>();
+		fireTableDataChanged();
 	}
 	
 	public void addList (List<Donation> donationList){
@@ -63,12 +74,14 @@ public class NewValidationTableModel extends AbstractTableModel implements IVali
 	
 	@Override
 	public void removeDonation (Donation d){
+		comboBoxes.remove(donations.indexOf(d));
 		donations.remove(d);
 		fireTableDataChanged();
 	}
 	
 	public void removeDonation (int row){
 		donations.remove(row);
+		comboBoxes.remove(row);
 		fireTableDataChanged();
 	}
 	
@@ -89,31 +102,42 @@ public class NewValidationTableModel extends AbstractTableModel implements IVali
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		Donation donation = (Donation)donations.get(rowIndex);
 		Person person = donation.getDonator();
+		JComboBox cb = (JComboBox)comboBoxes.get(rowIndex);
 		
 		switch(columnIndex){
-			case 0: return person == null ? "-" : person.getGivenName();
-			case 1: return person == null ? "-" : person.getSurname();
-			case 2: return person == null ? "-" : person.getTelephone();
-			case 3: return person == null ? "-" : person.getEmail();
-			case 4: return (person == null || person.getAddresses().isEmpty()) ? "-" : person.getMainAddress().getStreet();
-			case 5: return (person == null || person.getAddresses().isEmpty()) ? "-" : person.getMainAddress().getPostalCode();
-			case 6: return (person == null || person.getAddresses().isEmpty()) ? "-" : person.getMainAddress().getCity();
-			case 7: return (person == null || person.getAddresses().isEmpty()) ? "-" : person.getMainAddress().getCountry();
+			case 0: return person == null ? "" : person.getGivenName();
+			case 1: return person == null ? "" : person.getSurname();
+			case 2: return person == null ? "" : person.getTelephone();
+			case 3: return person == null ? "" : person.getEmail();
+			case 4: return (person == null || person.getAddresses().isEmpty()) ? "" : person.getMainAddress().getStreet();
+			case 5: return (person == null || person.getAddresses().isEmpty()) ? "" : person.getMainAddress().getPostalCode();
+			case 6: return (person == null || person.getAddresses().isEmpty()) ? "" : person.getMainAddress().getCity();
+			case 7: return (person == null || person.getAddresses().isEmpty()) ? "" : person.getMainAddress().getCountry();
 			case 8: return donation.getAmount();
 			case 9: return donation.getDate();
 			case 10: return donation.getDedication();
 			case 11: return donation.getType();
 			case 12: return donation.getNote();
+			case 13: return cb.getSelectedItem();
 			default: return null;
 		}
 	}
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
         Donation updateDonation = donations.get(rowIndex);
         Person updatePerson = updateDonation.getDonator();
+		Person oldDonator = new Person();
         Address updateAddress = updatePerson.getMainAddress();
         
         if(columnIndex != 13){
-	        switch(columnIndex){
+			oldDonator.setId(updatePerson.getId());
+			oldDonator.setAddresses(updatePerson.getAddresses());
+			oldDonator.setCompany(updatePerson.getCompany());
+			oldDonator.setSex(updatePerson.getSex());
+			oldDonator.setSurname(updatePerson.getSurname());
+
+			updateAddress = updatePerson.getMainAddress();
+			
+			switch(columnIndex){
 	        	case 0: updatePerson.setGivenName((String) value);
 	        			break;
 	        	case 1: updatePerson.setSurname((String) value);
@@ -175,6 +199,23 @@ public class NewValidationTableModel extends AbstractTableModel implements IVali
 				
 		        fireTableCellUpdated(rowIndex, columnIndex);
 			}
+        } 
+        else{
+        	JComboBox selectedBox = comboBoxes.get(rowIndex);
+        	
+        	selectedBox.setSelectedItem((String) value);
+        	
+        	ValidationType selectedType = ValidationType.getByName((String) selectedBox.getSelectedItem());
+        	
+        	if(selectedType == ValidationType.NEW_DONATOR){
+        			parent.openPersonDialog(donations.get(rowIndex), this);
+        	} else if(selectedType == ValidationType.EDIT){
+        		editable = true;
+        	} else{
+        		editable = false;
+        	}
+        	
+        	fireTableDataChanged();
         }
     }
 	
@@ -194,6 +235,7 @@ public class NewValidationTableModel extends AbstractTableModel implements IVali
 			case 10: return String.class;
 			case 11: return Donation.DonationType.class;
 			case 12: return String.class;
+			case 13: return ImportValidator.ValidationType.class;
 			default: return null;
 		}
 	}
@@ -210,7 +252,45 @@ public class NewValidationTableModel extends AbstractTableModel implements IVali
 
 	@Override
 	public boolean isCellEditable(int row, int col) {
-		return true;
+		if(editable){
+			return true;
+		} else{
+			return (col == 13);
+		}
+	}
+
+	@Override
+	public void setComboBox(Donation d, ValidationType option) {
+		comboBoxes.get(donations.indexOf(d)).setSelectedIndex(ValidationType.indexOf(option));
+		fireTableDataChanged();
+	}
+	
+	public List<Donation> getAnonymList(){
+		List<Donation> anonymList = new ArrayList<Donation>();
+		String currentType;
+		
+		for(int i=0; i<donations.size(); i++){
+			currentType = (String) comboBoxes.get(i).getSelectedItem();
+			if(ValidationType.getByName(currentType) == ValidationType.ANONYM){
+				anonymList.add(donations.get(i));
+			}
+		}
+		
+		return anonymList;
+	}
+	
+	public List<Donation> getNoImportList(){
+		List<Donation> noImportList = new ArrayList<Donation>();
+		String currentType;
+		
+		for(int i=0; i<donations.size(); i++){
+			currentType = (String) comboBoxes.get(i).getSelectedItem();
+			if(ValidationType.getByName(currentType) == ValidationType.NOT_IMPORT){
+				noImportList.add(donations.get(i));
+			}
+		}
+		
+		return noImportList;
 	}
 }
 

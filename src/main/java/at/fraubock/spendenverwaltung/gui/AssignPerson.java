@@ -44,47 +44,34 @@ import at.fraubock.spendenverwaltung.util.FilterProperty;
 import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
+import at.fraubock.spendenverwaltung.util.ImportValidator.ValidationType;
 
 public class AssignPerson extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = Logger.getLogger(ShowPersons.class);
 	private IPersonService personService;
-	private IAddressService addressService;
 	private IDonationService donationService;
-	private IFilterService filterService;
 	private ImportValidation overview;
 	private ComponentBuilder builder;
-	private ButtonListener buttonListener;
 	private PersonTableModel personModel;
 	private JTable showTable;
 	private JScrollPane scrollPane;
-	private List<Person> personList;
-	private JToolBar toolbar;
-	private JButton editButton;
-	private JButton deleteButton;
-	private JButton addAttribute;
 	private JButton searchBtn;
-	private ActionHandler handler;
-	private JComboBox<Filter> filterCombo;
-	private JButton backButton;
-	private JPanel overviewPanel;
+	private JButton cancelBtn;
 	private JLabel labelSurname;
 	private JLabel labelGivenname;
 	private JTextField tbSurname;
 	private JTextField tbGivenname;
-	private JLabel empty;
-	private Filter showAllFilter;
 	private Donation donationToAssign;
-	private ImportValidation parent;
 	private MatchValidationTableModel matchModel;
 	private IValidationTableModel deleteFromModel;
 
-	public AssignPerson(IPersonService personService, ImportValidation parent, Donation donationToAssign, MatchValidationTableModel matchModel, IValidationTableModel deleteFromModel) {
+	public AssignPerson(IPersonService personService, IDonationService donationService, Donation donationToAssign, MatchValidationTableModel matchModel, IValidationTableModel deleteFromModel) {
 
 		this.personService = personService;
+		this.donationService = donationService;
 		this.donationToAssign = donationToAssign;
-		this.parent = parent;
 		this.matchModel = matchModel;
 		this.deleteFromModel = deleteFromModel;
 		initTable();
@@ -102,15 +89,10 @@ public class AssignPerson extends JDialog {
 	}
 
 	public void setUp() {
-		//handler = new ActionHandler(this);
-		//buttonListener = new ButtonListener(this);
 		builder = new ComponentBuilder();
 
 		setLayout(new MigLayout());
 		setPreferredSize(new Dimension(800, 850));
-		// JScrollPane pane = new JScrollPane(overviewPanel,
-		// JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-		// JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
 
 		labelGivenname = builder.createLabel("Vorname:");
@@ -121,7 +103,10 @@ public class AssignPerson extends JDialog {
 		searchBtn = new JButton("Suche");
 		searchBtn.addActionListener(new SearchListener());
 		
-		showTable.addMouseListener(new DoubleClickListener());
+		cancelBtn = new JButton("Abbrechen");
+		cancelBtn.addActionListener(new CancelListener());
+		
+		showTable.addMouseListener(new DoubleClickListener(this));
 		
 		add(labelGivenname, "");
 		add(tbGivenname, "w 130!");
@@ -129,7 +114,9 @@ public class AssignPerson extends JDialog {
 		add(tbSurname, "w 130!");
 		add(searchBtn, "wrap");
 		
-		add(scrollPane, "span 5");
+		add(scrollPane, "span 5, wrap");
+		
+		add(cancelBtn, "");
 		
 		pack();
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -149,7 +136,6 @@ public class AssignPerson extends JDialog {
 		overview.removeAll();
 		overview.revalidate();
 		overview.repaint();
-		//overview.setUp();
 	}
 	
 	private void search(){
@@ -193,25 +179,58 @@ public class AssignPerson extends JDialog {
 	}
 
 	private class SearchListener implements ActionListener{
-
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			search();
 		}
-		
+	}
+
+	private class CancelListener implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			deleteFromModel.setComboBox(donationToAssign, ValidationType.EDIT);
+			dispose();
+		}
 	}
 	
 	private class DoubleClickListener implements MouseListener{
-
+		private JDialog assignPerson;
+		
+		public DoubleClickListener(JDialog assignPerson){
+			this.assignPerson = assignPerson;
+		}
+		
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(e.getClickCount() == 2){
-				donationToAssign.setDonator(personModel.getPersonRow(showTable.getSelectedRow()));
-				matchModel.addDonation(donationToAssign);
-				deleteFromModel.removeDonation(donationToAssign);
+				Person oldDonator = new Person();
+				oldDonator.setId(donationToAssign.getDonator().getId());
+				oldDonator.setAddresses(donationToAssign.getDonator().getAddresses());
+				oldDonator.setCompany(donationToAssign.getDonator().getCompany());
+				oldDonator.setSex(donationToAssign.getDonator().getSex());
+				oldDonator.setSurname(donationToAssign.getDonator().getSurname());
 				
-				matchModel.fireTableDataChanged();
-				dispose();
+				donationToAssign.setDonator(personModel.getPersonRow(showTable.getSelectedRow()));
+				
+				try{
+					if(donationService.donationExists(donationToAssign)){
+						donationToAssign.setDonator(oldDonator);
+						JOptionPane.showMessageDialog(assignPerson, "Diese Spende existiert für diese Person bereits. Bitte weisen Sie die Spende einer anderen Person zu", "Information", JOptionPane.INFORMATION_MESSAGE);
+						return;
+					} else{
+						matchModel.addDonation(donationToAssign);
+						deleteFromModel.removeDonation(donationToAssign);
+						
+						matchModel.fireTableDataChanged();
+						
+						dispose();
+						JOptionPane.showMessageDialog(assignPerson, "Spende wurde erfolgreich zugewiesen", "Information", JOptionPane.INFORMATION_MESSAGE);
+					}
+				} catch(ServiceException ex){
+					ex.printStackTrace();
+					JOptionPane.showMessageDialog(assignPerson, "Fehler beim Zuweisen der Spende. Bitte probieren Sie es später erneut!", "Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 			}
 		}
 

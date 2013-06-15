@@ -68,6 +68,12 @@ public class ConflictValidationTableModel extends AbstractTableModel implements 
 		comboBoxes.add(cb);
 	}
 	
+	public void removeAll(){
+		donations = new Vector<Donation>();
+		comboBoxes = new Vector<JComboBox>();
+		fireTableDataChanged();
+	}
+	
 	public void addList (List<Donation> donationList){
 		for(int i=0; i<donationList.size(); i++){
 			addDonation(donationList.get(i));
@@ -76,12 +82,14 @@ public class ConflictValidationTableModel extends AbstractTableModel implements 
 	
 	@Override
 	public void removeDonation (Donation d){
+		comboBoxes.remove(donations.indexOf(d));
 		donations.remove(d);
 		fireTableDataChanged();
 	}
 	
 	public void removeDonation (int row){
 		donations.remove(row);
+		comboBoxes.remove(row);
 		fireTableDataChanged();
 	}
 	
@@ -99,7 +107,8 @@ public class ConflictValidationTableModel extends AbstractTableModel implements 
 	
 	public void setPersonIdToNull(){
 		for(Donation d : donations){
-			d.getDonator().setId(null);
+			if(d.getDonator() != null)
+				d.getDonator().setId(null);
 		}
 	}
 
@@ -137,17 +146,18 @@ public class ConflictValidationTableModel extends AbstractTableModel implements 
         Donation updateDonation = donations.get(rowIndex);
         Person updatePerson = updateDonation.getDonator();
 		Person oldDonator = new Person();
-		
-		oldDonator.setId(updatePerson.getId());
-		oldDonator.setAddresses(updatePerson.getAddresses());
-		oldDonator.setCompany(updatePerson.getCompany());
-		oldDonator.setSex(updatePerson.getSex());
-		oldDonator.setSurname(updatePerson.getSurname());
-        
-		Address updateAddress = updatePerson.getMainAddress();
-        
+		Address updateAddress;
+
         
         if(columnIndex != 13){
+			oldDonator.setId(updatePerson.getId());
+			oldDonator.setAddresses(updatePerson.getAddresses());
+			oldDonator.setCompany(updatePerson.getCompany());
+			oldDonator.setSex(updatePerson.getSex());
+			oldDonator.setSurname(updatePerson.getSurname());
+
+			updateAddress = updatePerson.getMainAddress();
+			
 	        switch(columnIndex){
 	        	case 0: updatePerson.setGivenName((String) value);
 	        			updatePerson.setId(null);
@@ -352,6 +362,40 @@ public class ConflictValidationTableModel extends AbstractTableModel implements 
 				p.setAddresses(personAddresses);
 			}
 		}
+	}
+
+	@Override
+	public void setComboBox(Donation d, ValidationType option) {
+		comboBoxes.get(donations.indexOf(d)).setSelectedIndex(ValidationType.indexOf(option));
+		fireTableDataChanged();
+	}
+	
+	public List<Donation> getAnonymList(){
+		List<Donation> anonymList = new ArrayList<Donation>();
+		String currentType;
+		
+		for(int i=0; i<donations.size(); i++){
+			currentType = (String) comboBoxes.get(i).getSelectedItem();
+			if(ValidationType.getByName(currentType) == ValidationType.ANONYM){
+				anonymList.add(donations.get(i));
+			}
+		}
+		
+		return anonymList;
+	}
+	
+	public List<Donation> getNoImportList(){
+		List<Donation> noImportList = new ArrayList<Donation>();
+		String currentType;
+		
+		for(int i=0; i<donations.size(); i++){
+			currentType = (String) comboBoxes.get(i).getSelectedItem();
+			if(ValidationType.getByName(currentType) == ValidationType.NOT_IMPORT){
+				noImportList.add(donations.get(i));
+			}
+		}
+		
+		return noImportList;
 	}
 }
 

@@ -157,12 +157,11 @@ public class DonationDAOImplemented implements IDonationDAO {
 	}
 
 	@Override
-	public List<Donation> getUnconfirmed() throws PersistenceException {
+	public List<Donation> getUnconfirmed(Import toImport) throws PersistenceException {
 
-		String select = "SELECT * FROM donations WHERE import IS NOT NULL ORDER BY id DESC";
+		String select = "SELECT * FROM donations WHERE import=? ORDER BY id DESC";
 
-		List<Donation> donations = jdbcTemplate.query(select,
-				new DonationMapper());
+		List<Donation> donations = jdbcTemplate.query(select, new Object[] { toImport.getId() }, new DonationMapper());
 
 		return donations;
 	}

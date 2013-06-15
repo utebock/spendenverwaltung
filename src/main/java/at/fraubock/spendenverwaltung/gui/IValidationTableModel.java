@@ -1,6 +1,8 @@
 package at.fraubock.spendenverwaltung.gui;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
+import at.fraubock.spendenverwaltung.util.ImportValidator;
+import at.fraubock.spendenverwaltung.util.ImportValidator.ValidationType;
 
 public interface IValidationTableModel {
 	/**
@@ -16,4 +18,11 @@ public interface IValidationTableModel {
 	 * 			Donation to remove
 	 */
 	public void removeDonation(Donation d);
+	
+	/**
+	 * Sets Standard Option for a ComboBox (Standard is edit)
+	 * @param index
+	 * 			Index of the combobox which should be updated
+	 */
+	public void setComboBox(Donation d, ValidationType option);
 }

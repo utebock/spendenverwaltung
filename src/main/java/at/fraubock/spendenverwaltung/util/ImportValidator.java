@@ -57,6 +57,22 @@ public class ImportValidator {
 			}
 		}
 		
+		public static int indexOf(ValidationType type){
+			switch(type){
+			case EDIT:
+				return 0;
+			case ANONYM:
+				return 1;
+			case NEW_DONATOR:
+				return 2;
+			case NOT_IMPORT:
+				return 3;
+			default:
+				throw new IllegalArgumentException(
+						"No validation type for name: " + type.toString());
+			}
+		}
+		
 		public static String[] toArray(){
 			return new String[]{ "bearbeiten", "anonym", "Spender zuweisen", "nicht importieren" };
 		}
@@ -71,6 +87,7 @@ public class ImportValidator {
 	}
 
 	public ValidatedData validate(List<Person> persons, List<Donation> donations) throws ServiceException{
+		validatedData = new ValidatedData();
 		Person matchedPerson;
 		Person currentPerson;
 		Donation currentDonation;

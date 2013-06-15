@@ -4,6 +4,7 @@ import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
+import at.fraubock.spendenverwaltung.interfaces.domain.Import;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
@@ -64,7 +65,7 @@ public interface IDonationService {
 	 * 
 	 * @return List of all unconfirmed donations
 	 */
-	public List<Donation> getUnconfirmed() throws ServiceException;
+	public List<Donation> getUnconfirmed(Import toImport) throws ServiceException;
 	
 	/**
 	 * Puts all Donation Types in a String Array

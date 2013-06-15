@@ -124,6 +124,12 @@ public class ImportDAOImplemented implements IImportDAO {
 	}
 
 	@Override
+	public List<Import> getAllUnconfirmed() throws PersistenceException {
+		log.debug("getAll");
+		return jdbcTemplate.query("SELECT * FROM imports WHERE (SELECT COUNT(*) FROM donations WHERE donations.import=imports.id) > 0", new ImportMapper());
+	}
+
+	@Override
 	public Import getByID(int id) throws PersistenceException {
 		log.debug("getById" + id);
 		try {

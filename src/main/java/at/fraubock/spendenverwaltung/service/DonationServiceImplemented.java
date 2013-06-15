@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IDonationDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
+import at.fraubock.spendenverwaltung.interfaces.domain.Import;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
@@ -87,9 +88,9 @@ public class DonationServiceImplemented implements IDonationService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<Donation> getUnconfirmed() throws ServiceException {
+	public List<Donation> getUnconfirmed(Import toImport) throws ServiceException {
 		try {
-			return donationDAO.getUnconfirmed();
+			return donationDAO.getUnconfirmed(toImport);
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}

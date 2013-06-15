@@ -40,11 +40,13 @@ import org.apache.log4j.Logger;
 
 import net.miginfocom.swing.MigLayout;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
+import at.fraubock.spendenverwaltung.interfaces.domain.Import;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
+import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.ImportValidator;
 import at.fraubock.spendenverwaltung.util.ValidatedData;
@@ -55,6 +57,7 @@ public class ImportValidation extends JPanel {
 	private IPersonService personService;
 	private IAddressService addressService;
 	private IDonationService donationService;
+	private IImportService importService;
 	private Overview overview;
 	private ConflictValidationTableModel conflictModel;
 	private NewValidationTableModel newModel;
@@ -74,14 +77,16 @@ public class ImportValidation extends JPanel {
 	private ButtonListener buttonListener;
 	private List<Donation> donationList;
 	private List<Person> personList;
+	List<Import> imports;
 	private ImportValidator importValidator;
 	private ValidatedData validatedData;
 	private JLabel newLabel;
 	private JLabel conflictLabel;
 	private JLabel matchLabel;
 	private JComboBox conflictComboBox;
+	private JComboBox importComboBox;
 
-	public ImportValidation(IPersonService personService, IAddressService addressService, IDonationService donationService, Overview overview){
+	public ImportValidation(IPersonService personService, IAddressService addressService, IDonationService donationService, IImportService importService, Overview overview){
 		super(new MigLayout());
 		
 		this.builder = new ComponentBuilder();
@@ -91,6 +96,7 @@ public class ImportValidation extends JPanel {
 		this.personService = personService;
 		this.addressService = addressService;
 		this.donationService = donationService;
+		this.importService = importService;
 		this.overview = overview;
 
 		conflictComboBox = new JComboBox(ImportValidator.ValidationType.toArray());
@@ -113,6 +119,8 @@ public class ImportValidation extends JPanel {
 		matchTable = new JTable(matchModel);
 		
 		conflictTable.getColumnModel().getColumn(13).setCellEditor(new DefaultCellEditor(conflictComboBox));
+		newTable.getColumnModel().getColumn(13).setCellEditor(new DefaultCellEditor(conflictComboBox));
+		matchTable.getColumnModel().getColumn(13).setCellEditor(new DefaultCellEditor(conflictComboBox));
 		
 		
 		conflictTable.setFillsViewportHeight(true);
@@ -130,6 +138,25 @@ public class ImportValidation extends JPanel {
 		conflictPane.setPreferredSize(new Dimension(1200, 200));
 		newPane.setPreferredSize(new Dimension(1200, 200));
 		matchPane.setPreferredSize(new Dimension(1200, 200));
+		
+		try {
+			imports = importService.getAllUnconfirmed();
+		} catch (ServiceException e) {
+			JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+		    e.printStackTrace();
+		    return;
+		}
+		
+		
+		importComboBox = new JComboBox();
+		int counter = 1;
+		for(Import i : imports){
+			importComboBox.addItem(counter + ": " + i.getSource() + ": " + i.getImportDate());
+			counter ++;
+		}
+
+		importComboBox.addActionListener(new ImportComboBoxListener(this));
+		add(importComboBox, "wrap");
 		
 		conflictLabel = builder.createLabel("Konflikte:");
 		conflictPanel.add(conflictLabel, "wrap");
@@ -154,20 +181,21 @@ public class ImportValidation extends JPanel {
 		this.add(newPanel, "wrap, growx");
 		this.add(matchPanel, "wrap, growx");
 		
-		getData();
+		if(imports.size() > 0){
+			try {
+				getData(donationService.getUnconfirmed(imports.get(0)));
+			} catch (ServiceException e) {
+				JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+			    e.printStackTrace();
+			    return;
+			}
+		}
 	}
 	
-	private void getData(){
-		donationList = new ArrayList<Donation>();
+	private void getData(List<Donation> donationList){
+		//donationList = new ArrayList<Donation>();
 		personList = new ArrayList<Person>();
 
-		try {
-			donationList = donationService.getUnconfirmed();
-		} catch(ServiceException e){
-			JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
-		    e.printStackTrace();
-		    return;
-		}
 		if(donationList == null){
 			JOptionPane.showMessageDialog(this, "Donationlist returns null.", "Error", JOptionPane.ERROR_MESSAGE);
 		    return;
@@ -183,6 +211,12 @@ public class ImportValidation extends JPanel {
 		    e.printStackTrace();
 		    return;
 		}
+
+		conflictModel.removeAll();
+
+		newModel.removeAll();
+
+		matchModel.removeAll();
 		
 		conflictModel.addList(validatedData.getDonationListConflict());
 		newModel.addList(validatedData.getDonationListNew());
@@ -202,14 +236,32 @@ public class ImportValidation extends JPanel {
 		
 		try {
 			
+			
+			//check if there are new donations from the same donator.
 			newModelDelete = checkPersonDoublesInNewEntries(newModelDonations);
+
+			deleteDonations(newModel.getNoImportList());
+			deleteDonations(matchModel.getNoImportList());
+			
+			//sets new donations anonym and deletes from database
+			setDonationsAnonym(newModel.getAnonymList());
+			donationService.setImportToNull(newModel.getAnonymList());
+			
+			
+			//set matched donations anonym and deletes from database
+			setDonationsAnonym(matchModel.getAnonymList());
+			donationService.setImportToNull(matchModel.getAnonymList());
+			
+			
 			
 			updateDonationList(newModelDonations);
 			updateDonationList(matchModelDonations);
 			
+			//set to null, so persons will be created again for conflicts
 			conflictModel.setPersonIdToNull();
 			updateDonationList(conflictModelDonations);
 
+			//update new and matched donations
 			donationService.setImportToNull(newModelDonations);
 			donationService.setImportToNull(matchModelDonations);
 			
@@ -217,6 +269,12 @@ public class ImportValidation extends JPanel {
 			deletePersonList(newModelDelete);
 			deletePersonList(validatedData.getPersonsToDelete());
 			deletePersonList(conflictModel.getPersonsToDelete());
+			
+			
+			setDonationsAnonym(conflictModel.getAnonymList());
+			donationService.setImportToNull(conflictModel.getAnonymList());
+			
+			deleteDonations(conflictModel.getNoImportList());
 		} catch (ServiceException e) {
 			JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
 		    e.printStackTrace();
@@ -227,7 +285,8 @@ public class ImportValidation extends JPanel {
 	private void updateDonationList(List<Donation> donations){
 		for(Donation d : donations){
 			try {
-				personService.update(d.getDonator());
+				if(d.getDonator() != null)
+					personService.update(d.getDonator());
 				donationService.update(d);
 			} catch (ServiceException e) {
 				JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
@@ -249,8 +308,55 @@ public class ImportValidation extends JPanel {
 		}
 	}
 	
+	private void setDonationsAnonym(List<Donation> donations){
+		Person oldPerson;
+		
+		for(Donation d : donations){
+			oldPerson = d.getDonator();
+			d.setDonator(null);
+			try {
+				donationService.update(d);
+				
+				if(oldPerson != null){
+					List<Donation> donationsFromPerson = donationService.getByPerson(oldPerson);
+				
+					if(donationsFromPerson.size() == 0){
+						personService.delete(oldPerson);
+					}
+				}
+			} catch (ServiceException e) {
+				JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+			    e.printStackTrace();
+			    return;
+			}
+		}
+	}
+	
+	private void deleteDonations(List<Donation> donations){
+		Person oldPerson;
+		
+		for(Donation d : donations){
+			oldPerson = d.getDonator();
+			d.setDonator(null);
+			try {
+				if(oldPerson != null){
+					List<Donation> donationsFromPerson = donationService.getByPerson(oldPerson);
+				
+					if(donationsFromPerson.size() == 0){
+						personService.delete(oldPerson);
+					}
+					donationService.delete(d);
+				}
+			} catch (ServiceException e) {
+				JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+			    e.printStackTrace();
+			    return;
+			}
+		}
+	}
+	
 	public void openPersonDialog(Donation donationToAssign, IValidationTableModel deleteFromModel){
-		JDialog assignPerson = new AssignPerson(personService, this, donationToAssign, matchModel, deleteFromModel);
+		JDialog assignPerson = new AssignPerson(personService, donationService, donationToAssign, matchModel, deleteFromModel);
 	}
 	
 	public void returnTo() {
@@ -288,15 +394,16 @@ public class ImportValidation extends JPanel {
 		Person doublePerson = null;
 		
 		for(Person donator : checkList){
-			
-			if(donator.getSurname().equals(p.getSurname())
-					&& donator.getGivenName().equals(p.getGivenName())
-					&& (donator.getEmail().equals(p.getEmail())
-						|| (!donator.getTelephone().equals("") && donator.getTelephone().equals(p.getTelephone()))
-						|| (donator.getMainAddress() != null && donator.getMainAddress().getCity().equals(p.getMainAddress().getCity())
-								&& donator.getMainAddress().getPostalCode().equals(p.getMainAddress().getPostalCode())
-								&& donator.getMainAddress().getStreet().equals(p.getMainAddress().getStreet())))){
-				return donator;
+			if(p != null){
+				if(donator.getSurname().equals(p.getSurname())
+						&& donator.getGivenName().equals(p.getGivenName())
+						&& (donator.getEmail().equals(p.getEmail())
+							|| (!donator.getTelephone().equals("") && donator.getTelephone().equals(p.getTelephone()))
+							|| (donator.getMainAddress() != null && donator.getMainAddress().getCity().equals(p.getMainAddress().getCity())
+									&& donator.getMainAddress().getPostalCode().equals(p.getMainAddress().getPostalCode())
+									&& donator.getMainAddress().getStreet().equals(p.getMainAddress().getStreet())))){
+					return donator;
+				}
 			}
 		}
 		
@@ -316,6 +423,29 @@ public class ImportValidation extends JPanel {
 	public void addToNew(Donation donation){
 		newModel.addDonation(donation);
 		newModel.fireTableDataChanged();
+	}
+	
+	private class ImportComboBoxListener implements ActionListener{
+
+		ImportValidation parent;
+		
+		public ImportComboBoxListener(ImportValidation parent){
+			this.parent = parent;
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			int index = importComboBox.getSelectedIndex();
+			Import currentImport = imports.get(index);
+			try {
+				getData(donationService.getUnconfirmed(currentImport));
+			} catch (ServiceException ex) {
+				JOptionPane.showMessageDialog(parent, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+			    ex.printStackTrace();
+			    return;
+			}
+		}
+		
 	}
 }
 

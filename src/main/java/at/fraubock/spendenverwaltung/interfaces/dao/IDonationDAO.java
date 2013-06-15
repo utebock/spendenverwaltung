@@ -74,7 +74,7 @@ public interface IDonationDAO {
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
-	public List<Donation> getUnconfirmed() throws PersistenceException;
+	public List<Donation> getUnconfirmed(Import toImport) throws PersistenceException;
 
 	/**
 	 * Retrieves all unconfirmed donations stored in the underlying persistence
