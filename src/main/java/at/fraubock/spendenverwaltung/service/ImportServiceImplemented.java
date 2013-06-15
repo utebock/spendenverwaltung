@@ -298,6 +298,76 @@ public class ImportServiceImplemented implements IImportService {
 		}
 	}
 
+	public void smsImport(File file) throws ServiceException, IOException {
+		
+		List<ImportRow> rowList;
+		rowList = CSVImport.readSmsCsv(file);
+	
+		Import i = new Import();
+		i.setImportDate(new Date());
+		i.setSource("SMS-Export");
+
+		List<Donation> donations = new ArrayList<Donation>(rowList.size());
+
+		// set up formats for date and amount parsing
+		NumberFormat f = NumberFormat.getInstance(Locale.GERMAN);
+		if (!(f instanceof DecimalFormat)) {
+			String msg = "Number format used for importing SMS CSV data is not applicable for decimal amounts";
+			log.error(msg);
+			throw new ServiceException(msg);
+		}
+		DecimalFormat df = (DecimalFormat) f;
+		df.setParseBigDecimal(true);
+
+		DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy",
+				Locale.GERMAN);
+
+		// convert the rows to donation entities
+		for (ImportRow row : rowList) {
+			Donation d = new Donation();
+
+			BigDecimal n = (BigDecimal) df.parse(row.getAmount(),
+					new ParsePosition(0));
+			n = n.multiply(new BigDecimal(100));
+			d.setAmount(n.toBigInteger().longValue());
+
+			try {
+				d.setDate(dateFormat.parse(row.getDate()));
+			} catch (ParseException e) {
+				String msg = "Date in the Hypo CSV file has wrong format";
+				log.warn(msg);
+				throw new ServiceException(msg, e);
+			}
+			d.setSource(i);
+
+			d.setType(Donation.DonationType.getByName(row.getType()));
+
+			donations.add(d);
+		}
+
+		createImport(i);
+
+		// now, save donations
+		for (Donation d : donations) {
+			try {
+				donationService.create(d);
+			} catch (Throwable t) {
+				log.debug("reverting import...");
+				int last = donations.indexOf(d);
+				for (int index = 0; index < last; ++index) {
+					try {
+						donationService.delete(donations.get(index));
+					} catch (Throwable t2) {
+						log.debug("deletion of previously-inserted donation failed: "
+								+ t2.getMessage());
+					}
+				}
+				throw t;
+			}
+		}
+		
+	}
+	
 	public IImportDAO getImportDAO() {
 		return importDAO;
 	}

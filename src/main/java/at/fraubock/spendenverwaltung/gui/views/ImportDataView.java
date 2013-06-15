@@ -61,7 +61,7 @@ public class ImportDataView extends InitializableView {
 	}
 	
 	private void setUpLayout(){
-		panel = componentFactory.createPanel(800, 800);
+		panel = componentFactory.createPanel(700, 800);
 		
 		headline = componentFactory.createLabel("CSV-Files importieren ");
 		headline.setFont(new Font("Headline", Font.PLAIN, 14));
@@ -70,13 +70,13 @@ public class ImportDataView extends InitializableView {
 		panel.add(empty, "wrap");
 		
 		
-		importTypes = new String[]{"native import", "Hypo import", "SMS import"};
+		importTypes = new String[]{"Nativer Import", "Hypo-Import", "SMS-Import"};
 		importType = new JComboBox<String>(importTypes);
 		panel.add(importType, "wrap, growx");
 		
 		pathField = componentFactory.createTextField("");
 		panel.add(pathField, "growx");
-		openFileBtn = new JButton("Datei auswählen");
+		openFileBtn = new JButton("Datei ausw\u00E4hlen");
 		panel.add(openFileBtn, "wrap, growx");
 		
 		JLabel empty2 = componentFactory.createLabel("		");
@@ -96,7 +96,7 @@ public class ImportDataView extends InitializableView {
 		private static final long serialVersionUID = 1L;
 
 		public ChooseFileAction(){
-			super("Datei auswählen");
+			super("Datei ausw\u00E4hlen");
 		}
 
 		@Override
@@ -123,11 +123,14 @@ public class ImportDataView extends InitializableView {
 				File selectedFile = new File(pathField.getText());
 				try {
 					switch (importType.getSelectedItem().toString()) {
-					case "native import":
+					case "Nativer Import":
 						importService.nativeImport(selectedFile);
 						break;
-					case "Hypo import":
+					case "Hypo-Import":
 						importService.hypoImport(selectedFile);
+						break;
+					case "SMS-Import":
+						importService.smsImport(selectedFile);
 						break;
 					default:
 						break;

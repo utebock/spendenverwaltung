@@ -206,4 +206,35 @@ public class CSVImport {
 			return false;
 		return true;
 	}
+	
+	/**
+	 * @param csvFile
+	 *            the CSV file in SMS structure
+	 * @return a list of rows where the donation dates, the donation type and
+	 *         the amounts are set.
+	 * @throws IOException
+	 *             if reading the file fails
+	 */
+	public static List<ImportRow> readSmsCsv(File csvFile) throws IOException{
+		CSVReader reader = new CSVReader(new FileReader(csvFile), ';');
+		List<String[]> lines = reader.readAll();
+		reader.close();
+		
+		ArrayList<String[]> dataLines = new ArrayList<String[]>(lines);
+		dataLines.remove(0); // remove header line
+		ArrayList<ImportRow> beans = new ArrayList<ImportRow>(dataLines.size());
+		for (String[] line : dataLines) {
+			if(line[3].equals("Spende erfolgreich")){
+				if (line[2].charAt(0) == '-'){
+					continue;
+				}
+				ImportRow row = new ImportRow();
+				row.setAmount(line[2]);
+				row.setType("sms");
+				row.setDate(line[1]); // "Buchungsdatum"
+				beans.add(row);
+			}
+		}
+		return beans;
+	}
 }

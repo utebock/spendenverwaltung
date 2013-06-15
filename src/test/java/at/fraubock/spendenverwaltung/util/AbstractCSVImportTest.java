@@ -14,6 +14,7 @@ import java.util.Properties;
 import org.junit.Test;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.csvimport.ImportRow;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
 
 public abstract class AbstractCSVImportTest {
 
@@ -72,6 +73,15 @@ public abstract class AbstractCSVImportTest {
 		assertEquals(importRows.get(3).getDedication(), "keine Antwort");
 		assertEquals(importRows.get(4).getDonationNote(), "FACEBOOK");
 		assertEquals(importRows.get(5).getPersonNote(), "NEIN");
+	}
+	
+	@Test
+	public void importSMSSpenden() throws IOException, ValidationException{
+		List<ImportRow> importRows = CSVImport.readSmsCsv(new File("src/test/resources/sms_spenden_export.csv"));
+		
+		assertTrue(importRows.size() == 1);
+		assertEquals(importRows.get(0).getAmount(),"10.00");
+		assertEquals(importRows.get(0).getDate(),"06.02.2013 15:39");
 	}
 
 }
