@@ -38,19 +38,11 @@ public abstract class AbstractMailingTemplateUtilTest {
 		MailingTemplateUtil.createMailingWithDocxTemplate(null, null, null);
 	}
 	
-	/* Just to test Mailing template without GUI 
-	 * Test runs, but opens a java window and need some time
-	 * will be removed later
-	 * 
-	@Test
-	public void trySimpleExample() throws ServiceException, IOException {
-		MailingTemplateUtil.createMailingWithDocxTemplate(new File("src/test/resources/examplemailing.docx"), persons, "Output");
-	}*/
-	
 	
 	@Test(expected=IOException.class)
 	public void invalidFileShouldThrowIOException() throws ServiceException, IOException{
-		MailingTemplateUtil.createMailingWithDocxTemplate(new File("INVALID FILE"), persons, "invalid.pdf");
+		MailingTemplateUtil.createMailingWithDocxTemplate(new File("INVALID FILE"), persons, new File("INVALID FILE"));
+		
 	}
 	
 	protected static void init() throws PersistenceException{
