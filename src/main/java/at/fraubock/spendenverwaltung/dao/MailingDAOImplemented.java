@@ -7,7 +7,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
@@ -300,6 +303,46 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 	}
 
+	public String getCreatorOfUnconfirmedMailing(Mailing m) throws PersistenceException {
+		try {
+			String creator = jdbcTemplate.queryForObject("SELECT u.creator FROM mailings m,unsent_mailings u WHERE m.unconfirmed = u.id AND m.id=?", new Object[] {m.getId()}, String.class);
+			return creator;
+		} catch (EmptyResultDataAccessException e) {
+			//only unconfirmed mailings should be passed in here
+			throw new PersistenceException(e);
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
+	}
+	
+	/**
+	 * adds all unconfirmed mailings to a hashmap, where each creator (key)
+	 * maps to a corresponding list of created mails.
+	 * 
+	 * @returns Map of creators and mailings
+	 */
+	@Override
+	public Map<String, List<Mailing>> getUnconfirmedMailingsWithCreator() throws PersistenceException {
+		
+		List<Mailing> unconfirmedMailings = getAllUnconfirmed();
+		Map<String, List<Mailing>> results = new HashMap<String, List<Mailing>>();
+		
+		for(Mailing m : unconfirmedMailings) {
+			String creator = getCreatorOfUnconfirmedMailing(m);
+			
+			if(results.containsKey(creator)) {
+				results.get(creator).add(m);
+			} else {
+				List<Mailing> newList = new ArrayList<Mailing>();
+				newList.add(m);
+				results.put(creator, newList);
+			}
+		}
+		
+		return results;
+	}
+	
 	/**
 	 * @return all mailings
 	 */

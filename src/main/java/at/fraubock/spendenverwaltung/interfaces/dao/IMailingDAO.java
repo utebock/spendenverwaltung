@@ -1,6 +1,7 @@
 package at.fraubock.spendenverwaltung.interfaces.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
@@ -98,6 +99,19 @@ public interface IMailingDAO {
 	 */
 	
 	void confirmMailing(Mailing mailing) throws PersistenceException;
+
+	/**
+	 * returns the creator of a mailing as a string
+	 * 
+	 * @param m
+	 * @return
+	 * @throws PersistenceException
+	 */
+	String getCreatorOfUnconfirmedMailing(Mailing m)
+			throws PersistenceException;
+
+	Map<String, List<Mailing>> getUnconfirmedMailingsWithCreator()
+			throws PersistenceException;
 
 
 }

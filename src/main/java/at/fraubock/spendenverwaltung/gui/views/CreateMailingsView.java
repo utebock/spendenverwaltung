@@ -235,7 +235,7 @@ public class CreateMailingsView extends InitializableView {
 			postalPersonFilterChooser.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					selectedPostalFilter = (Filter) eMailingPersonFilterChooser
+					selectedPostalFilter = (Filter) postalPersonFilterChooser
 							.getModel().getSelectedItem();
 				}
 			});
@@ -274,8 +274,7 @@ public class CreateMailingsView extends InitializableView {
 						"Es muss ein Personenfilter ausgewählt werden!");
 				return;
 			}
-			mailing.setFilter((Filter) eMailingPersonFilterChooser
-					.getSelectedItem());
+			mailing.setFilter(selectedEmailFilter);
 			mailing.setMedium(Medium.EMAIL);
 			mailing.setDate(emailDatePicker.getDate());
 			mailing.setType((Mailing.MailingType) eMailingTypeChooser

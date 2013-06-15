@@ -3,6 +3,7 @@ package at.fraubock.spendenverwaltung.service;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
@@ -78,6 +79,21 @@ public class MailingServiceImplemented implements IMailingService {
 	public List<Mailing> getAllUnconfirmed() throws ServiceException {
 		try {
 			return mailingDAO.getAllUnconfirmed();
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
+	
+	/**
+	 * adds all unconfirmed mailings to a hashmap, where each creator (key)
+	 * maps to a corresponding list of created mails.
+	 * 
+	 * @returns Map of creators and mailings
+	 */
+	@Override
+	public Map<String, List<Mailing>> getUnconfirmedMailingsWithCreator() throws ServiceException {
+		try {
+			return mailingDAO.getUnconfirmedMailingsWithCreator();
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
