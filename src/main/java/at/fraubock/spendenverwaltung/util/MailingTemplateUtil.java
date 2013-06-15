@@ -45,12 +45,12 @@ public class MailingTemplateUtil {
 	 * 			Docx template file with Velocity syntax in MergeFields 
 	 * @param personList
 	 * 			List of person to merge with the template file
-	 * @param pdfFile
-	 * 			Final pdf file
+	 * @param outputName
+	 * 			Name of final pdf file
 	 * @throws IOException
 	 * @throws ServiceException
 	 */
-	public static void createMailingWithDocxTemplate(File templateFile, List<Person> personList, File pdfFile) throws IOException, ServiceException{
+	public static void createMailingWithDocxTemplate(File templateFile, List<Person> personList, String outputName) throws IOException, ServiceException{
 		List<File> files = new ArrayList<File>();
 		IXDocReport report;
 		File tempFile;
@@ -58,7 +58,7 @@ public class MailingTemplateUtil {
 		OutputStream out;
 		
 		//Check Arguments
-		if(templateFile==null||personList==null||pdfFile==null){
+		if(templateFile==null||personList==null||outputName==null){
 			throw new IllegalArgumentException("Argument is null");
 		}
 		
@@ -96,7 +96,7 @@ public class MailingTemplateUtil {
 		}
 		
 		//Merge into one pdf and delete temp files
-		mergePdfs(files, pdfFile);
+		mergePdfs(files, new File(outputName));
 	}
 	
 	/**

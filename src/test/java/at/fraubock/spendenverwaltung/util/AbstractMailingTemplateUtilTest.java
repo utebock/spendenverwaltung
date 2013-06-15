@@ -41,7 +41,7 @@ public abstract class AbstractMailingTemplateUtilTest {
 	
 	@Test(expected=IOException.class)
 	public void invalidFileShouldThrowIOException() throws ServiceException, IOException{
-		MailingTemplateUtil.createMailingWithDocxTemplate(new File("INVALID FILE"), persons, new File("INVALID FILE"));
+		MailingTemplateUtil.createMailingWithDocxTemplate(new File("INVALID FILE"), persons, "INVALID FILENAME");
 		
 	}
 	
