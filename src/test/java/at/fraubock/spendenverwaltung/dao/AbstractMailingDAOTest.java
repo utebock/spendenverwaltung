@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +20,7 @@ import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.UnconfirmedMailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 
@@ -560,5 +562,129 @@ public class AbstractMailingDAOTest {
 		} catch (PersistenceException e) {
 			fail();
 		}
+	}
+	
+	@Test
+	@Transactional
+	public void getCreatorOfMailing() throws PersistenceException {
+		initData();
+		
+		Mailing mailingOne = new Mailing();
+		
+		mailingOne.setMedium(Mailing.Medium.EMAIL);
+		mailingOne.setType(Mailing.MailingType.DANKESBRIEF);
+		mailingOne.setDate(new Date(System.currentTimeMillis()));
+		mailingOne.setFilter(filterOnePerson);
+		
+		mailingDAO.insertOrUpdate(mailingOne);
+		
+		String result = mailingDAO.getCreatorOfUnconfirmedMailing(mailingOne);
+		assertEquals("ubadministrative@localhost", result);
+	}
+	
+	//test depends on current user, should be ubadministrative@localhost, will fail otherwise
+	@Test(expected = PersistenceException.class)
+	@Transactional
+	public void getCreatorOfConfirmedMailingShouldThrowException() throws PersistenceException {
+		initData();
+		
+		Mailing mailingOne = new Mailing();
+		
+		mailingOne.setMedium(Mailing.Medium.EMAIL);
+		mailingOne.setType(Mailing.MailingType.DANKESBRIEF);
+		mailingOne.setDate(new Date(System.currentTimeMillis()));
+		mailingOne.setFilter(filterOnePerson);
+		
+		mailingDAO.insertOrUpdate(mailingOne);
+		
+		mailingDAO.confirmMailing(mailingOne);
+		
+		String result = mailingDAO.getCreatorOfUnconfirmedMailing(mailingOne);
+		assertEquals("ubadministrative@localhost", result);
+	}
+	
+	//again, depends on user, would need a jdbcTemplate in order to get the user name dynamically
+	@Test
+	@Transactional
+	public void getCreatorAndMailingsMap() throws PersistenceException {
+		initData();
+		
+		String user = ("ubadministrative@localhost");
+		
+		Mailing mailingOne = new Mailing();
+		
+		mailingOne.setMedium(Mailing.Medium.EMAIL);
+		mailingOne.setType(Mailing.MailingType.DANKESBRIEF);
+		mailingOne.setDate(new Date(System.currentTimeMillis()));
+		mailingOne.setFilter(filterOnePerson);
+		
+		Mailing mailingTwo = new Mailing();
+		
+		mailingTwo.setMedium(Mailing.Medium.POSTAL);
+		mailingTwo.setType(Mailing.MailingType.DANKESBRIEF);
+		mailingTwo.setDate(new Date(System.currentTimeMillis()));
+		mailingTwo.setFilter(filterOnePerson);
+		
+		mailingDAO.insertOrUpdate(mailingOne);
+		mailingDAO.insertOrUpdate(mailingTwo);
+		
+		List<UnconfirmedMailing> expectedList = new ArrayList<UnconfirmedMailing>();
+		expectedList.add(new UnconfirmedMailing(mailingOne, user));
+		expectedList.add(new UnconfirmedMailing(mailingTwo, user));
+		
+		List<UnconfirmedMailing> unconfirmedMailings = mailingDAO.getUnconfirmedMailingsWithCreator();
+		
+		assertEquals(expectedList, unconfirmedMailings);
+	}
+	
+	@Test
+	@Transactional
+	public void getCreatorAndMailingsMapShouldBeEmpty() throws PersistenceException {
+		initData();
+			
+		Mailing mailingOne = new Mailing();
+		
+		mailingOne.setMedium(Mailing.Medium.EMAIL);
+		mailingOne.setType(Mailing.MailingType.DANKESBRIEF);
+		mailingOne.setDate(new Date(System.currentTimeMillis()));
+		mailingOne.setFilter(filterOnePerson);
+		
+		mailingDAO.insertOrUpdate(mailingOne);
+		mailingDAO.confirmMailing(mailingOne);
+		
+		List<UnconfirmedMailing> unconfirmedMailings = mailingDAO.getUnconfirmedMailingsWithCreator();
+		
+		assertTrue(unconfirmedMailings.isEmpty());
+	}
+	
+	@Test
+	@Transactional
+	public void getCreatorAndMailingsMapShouldBeEmpty2() throws PersistenceException {
+		initData();
+		
+		List<UnconfirmedMailing> unconfirmedMailings = mailingDAO.getUnconfirmedMailingsWithCreator();
+		
+		assertTrue(unconfirmedMailings.isEmpty());
+	}
+	
+	@Test
+	@Transactional
+	public void getCreatorAndMailingsMapShouldBeEmpty3() throws PersistenceException {
+		initData();
+		
+		Mailing mailingOne = new Mailing();
+		
+		mailingOne.setMedium(Mailing.Medium.EMAIL);
+		mailingOne.setType(Mailing.MailingType.DANKESBRIEF);
+		mailingOne.setDate(new Date(System.currentTimeMillis()));
+		mailingOne.setFilter(filterOnePerson);
+		
+		mailingDAO.insertOrUpdate(mailingOne);
+		
+		mailingDAO.delete(mailingOne);
+			
+		List<UnconfirmedMailing> unconfirmedMailings = mailingDAO.getUnconfirmedMailingsWithCreator();
+		
+		assertTrue(unconfirmedMailings.isEmpty());
 	}
 }

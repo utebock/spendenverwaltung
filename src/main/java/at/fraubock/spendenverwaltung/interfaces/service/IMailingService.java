@@ -1,10 +1,9 @@
 package at.fraubock.spendenverwaltung.interfaces.service;
 
 import java.util.List;
-import java.util.Map;
-
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.UnconfirmedMailing;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 
 public interface IMailingService {
@@ -109,10 +108,10 @@ public interface IMailingService {
 	public void confirmMailing(Mailing mailing) throws ServiceException;
 
 	/**
-	 * returns a map of unconfirmed mailings, keyed by creator
+	 * returns a list of unconfirmed mailings
 	 * @return
 	 * @throws ServiceException 
 	 */
-	Map<String, List<Mailing>> getUnconfirmedMailingsWithCreator() throws ServiceException;
+	List<UnconfirmedMailing> getUnconfirmedMailingsWithCreator() throws ServiceException;
 
 }

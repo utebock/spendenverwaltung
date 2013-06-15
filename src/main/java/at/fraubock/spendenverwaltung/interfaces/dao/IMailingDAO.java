@@ -1,10 +1,9 @@
 package at.fraubock.spendenverwaltung.interfaces.dao;
 
 import java.util.List;
-import java.util.Map;
-
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.UnconfirmedMailing;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 
 /**
@@ -110,7 +109,7 @@ public interface IMailingDAO {
 	String getCreatorOfUnconfirmedMailing(Mailing m)
 			throws PersistenceException;
 
-	Map<String, List<Mailing>> getUnconfirmedMailingsWithCreator()
+	List<UnconfirmedMailing> getUnconfirmedMailingsWithCreator()
 			throws PersistenceException;
 
 

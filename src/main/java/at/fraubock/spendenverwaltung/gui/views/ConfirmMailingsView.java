@@ -3,6 +3,7 @@ package at.fraubock.spendenverwaltung.gui.views;
 import javax.swing.JPanel;
 
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
+import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
 
 public class ConfirmMailingsView extends InitializableView {
@@ -32,5 +33,7 @@ public class ConfirmMailingsView extends InitializableView {
 		// TODO Auto-generated method stub
 
 	}
+	
+	
 
 }

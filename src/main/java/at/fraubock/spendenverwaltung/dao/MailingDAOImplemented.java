@@ -8,9 +8,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
@@ -24,6 +22,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.UnconfirmedMailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.ConnectedCriterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
@@ -323,21 +322,15 @@ public class MailingDAOImplemented implements IMailingDAO {
 	 * @returns Map of creators and mailings
 	 */
 	@Override
-	public Map<String, List<Mailing>> getUnconfirmedMailingsWithCreator() throws PersistenceException {
+	public List<UnconfirmedMailing> getUnconfirmedMailingsWithCreator() throws PersistenceException {
 		
 		List<Mailing> unconfirmedMailings = getAllUnconfirmed();
-		Map<String, List<Mailing>> results = new HashMap<String, List<Mailing>>();
+		List<UnconfirmedMailing> results = new ArrayList<UnconfirmedMailing>();
 		
 		for(Mailing m : unconfirmedMailings) {
 			String creator = getCreatorOfUnconfirmedMailing(m);
 			
-			if(results.containsKey(creator)) {
-				results.get(creator).add(m);
-			} else {
-				List<Mailing> newList = new ArrayList<Mailing>();
-				newList.add(m);
-				results.put(creator, newList);
-			}
+			results.add(new UnconfirmedMailing(m, creator));
 		}
 		
 		return results;

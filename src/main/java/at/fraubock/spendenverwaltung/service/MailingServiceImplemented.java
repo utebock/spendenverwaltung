@@ -3,13 +3,12 @@ package at.fraubock.spendenverwaltung.service;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Map;
-
 import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.MailingTemplate;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.UnconfirmedMailing;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
@@ -91,7 +90,7 @@ public class MailingServiceImplemented implements IMailingService {
 	 * @returns Map of creators and mailings
 	 */
 	@Override
-	public Map<String, List<Mailing>> getUnconfirmedMailingsWithCreator() throws ServiceException {
+	public List<UnconfirmedMailing> getUnconfirmedMailingsWithCreator() throws ServiceException {
 		try {
 			return mailingDAO.getUnconfirmedMailingsWithCreator();
 		} catch (PersistenceException e) {
