@@ -90,7 +90,7 @@ public class ViewActionFactory {
 	}
 	
 	public Action getImportValidationViewAction() {
-		return new DisplayViewAction(new ImportValidationView(personService, addressService, donationService, importService, this), "/images/importValidate.jpg");
+		return new DisplayViewAction(new ImportValidationView(personService, addressService, donationService, importService, new ComponentFactory(), this), "/images/importValidate.jpg");
 	}
 	
 	//TODO richtige view returnen!

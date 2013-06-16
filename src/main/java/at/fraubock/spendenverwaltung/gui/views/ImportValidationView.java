@@ -42,13 +42,12 @@ import org.apache.log4j.Logger;
 import net.miginfocom.swing.MigLayout;
 import at.fraubock.spendenverwaltung.gui.AbstractValidationTableModel;
 import at.fraubock.spendenverwaltung.gui.AssignPerson;
-import at.fraubock.spendenverwaltung.gui.ButtonListener;
 import at.fraubock.spendenverwaltung.gui.ComponentBuilder;
 import at.fraubock.spendenverwaltung.gui.ConflictValidationTableModel;
-import at.fraubock.spendenverwaltung.gui.IValidationTableModel;
 import at.fraubock.spendenverwaltung.gui.MatchValidationTableModel;
 import at.fraubock.spendenverwaltung.gui.NewValidationTableModel;
 import at.fraubock.spendenverwaltung.gui.Overview;
+import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Import;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
@@ -84,7 +83,6 @@ public class ImportValidationView extends InitializableView {
 	private ComponentBuilder builder;
 	private JButton backBtn;
 	private JButton saveBtn;
-	private ButtonListener buttonListener;
 	private List<Donation> donationList;
 	private List<Person> personList;
 	List<Import> imports;
@@ -95,13 +93,14 @@ public class ImportValidationView extends InitializableView {
 	private JLabel matchLabel;
 	private JComboBox conflictComboBox;
 	private JComboBox importComboBox;
+	private ComponentFactory componentFactory;
 	private ViewActionFactory actionFactory;
 
-	public ImportValidationView(IPersonService personService, IAddressService addressService, IDonationService donationService, IImportService importService, ViewActionFactory actionFactory){
+	public ImportValidationView(IPersonService personService, IAddressService addressService, IDonationService donationService, IImportService importService, ComponentFactory componentFactory, ViewActionFactory actionFactory){
 		setLayout(new MigLayout());
 		
 		this.builder = new ComponentBuilder();
-		this.buttonListener = new ButtonListener(this);
+		this.componentFactory = componentFactory;
 		this.importValidator = new ImportValidator(personService, donationService);
 		this.validatedData = new ValidatedData();
 		this.personService = personService;
@@ -181,10 +180,16 @@ public class ImportValidationView extends InitializableView {
 		newPanel.add(newPane, "wrap, growx");
 		matchPanel.add(matchPane, "wrap, growx, span 2");
 
-		saveBtn = builder.createButton("Speichern", buttonListener, "save_validation");
+		SaveButtonListener saveAction = new SaveButtonListener();
+		saveAction.putValue(Action.NAME, "Speichern");
+		saveBtn = new JButton();
+		saveBtn.setAction(saveAction);
 		matchPanel.add(saveBtn, "");
 
-		backBtn = builder.createButton("Abbrechen", buttonListener, "return_from_import_validation_to_overview");
+		CancelButtonListener cancelAction = new CancelButtonListener();
+		cancelAction.putValue(Action.NAME, "Abbrechen");
+		backBtn = new JButton();
+		backBtn.setAction(cancelAction);
 		matchPanel.add(backBtn, "");
 
 		this.add(conflictPanel, "wrap, growx");
@@ -248,7 +253,7 @@ public class ImportValidationView extends InitializableView {
 			
 			
 			//check if there are new donations from the same donator.
-			newModelDelete = checkPersonDoublesInNewEntries(newModelDonations);
+			newModelDelete = importValidator.checkPersonDoublesInNewEntries(newModelDonations);
 
 			deleteDonations(newModel.getNoImportList());
 			deleteDonations(matchModel.getNoImportList());
@@ -290,6 +295,10 @@ public class ImportValidationView extends InitializableView {
 		    e.printStackTrace();
 		    return;
 		}
+		
+		//TODO: Import is saved, go back to main menu. if there are another imports to validate, don't go back, but show the next import
+		
+		
 	}
 	
 	private void updateDonationList(List<Donation> donations){
@@ -376,45 +385,6 @@ public class ImportValidationView extends InitializableView {
 	
 
 	
-	public List<Person> checkPersonDoublesInNewEntries(List<Donation> toCheck){
-		List<Person> uniquePersons = new ArrayList<Person>();
-		List<Person> toDelete = new ArrayList<Person>();
-		Person doublePerson;
-		
-		for(Donation d : toCheck){
-			doublePerson = getDoublePersonIdFromList(d.getDonator(), uniquePersons);
-			
-			if(doublePerson == null){
-				uniquePersons.add(d.getDonator());
-			} else{
-				toDelete.add(d.getDonator());
-				d.setDonator(doublePerson);
-			}
-		}
-		
-		return toDelete;
-	}
-	
-	private Person getDoublePersonIdFromList(Person p, List<Person> checkList){
-		Person doublePerson = null;
-		
-		for(Person donator : checkList){
-			if(p != null){
-				if(donator.getSurname().equals(p.getSurname())
-						&& donator.getGivenName().equals(p.getGivenName())
-						&& (donator.getEmail().equals(p.getEmail())
-							|| (!donator.getTelephone().equals("") && donator.getTelephone().equals(p.getTelephone()))
-							|| (donator.getMainAddress() != null && donator.getMainAddress().getCity().equals(p.getMainAddress().getCity())
-									&& donator.getMainAddress().getPostalCode().equals(p.getMainAddress().getPostalCode())
-									&& donator.getMainAddress().getStreet().equals(p.getMainAddress().getStreet())))){
-					return donator;
-				}
-			}
-		}
-		
-		return doublePerson;
-	}
-	
 	public void addToConflict(Donation donation){
 		conflictModel.addDonation(donation);
 		conflictModel.fireTableDataChanged();
@@ -451,5 +421,21 @@ public class ImportValidationView extends InitializableView {
 			}
 		}
 		
+	}
+	
+	private class SaveButtonListener extends AbstractAction{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			saveValidation();
+		}
+	}
+	
+	private class CancelButtonListener extends AbstractAction{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Action switchToMenu = actionFactory.getMainMenuViewAction();
+			switchToMenu.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+		}
 	}
 }

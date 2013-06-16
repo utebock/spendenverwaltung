@@ -146,4 +146,43 @@ public class ImportValidator {
 	private boolean isDuplicate(Donation d) throws ServiceException{
 		return donationService.donationExists(d);
 	}
+	
+	public List<Person> checkPersonDoublesInNewEntries(List<Donation> toCheck){
+		List<Person> uniquePersons = new ArrayList<Person>();
+		List<Person> toDelete = new ArrayList<Person>();
+		Person doublePerson;
+		
+		for(Donation d : toCheck){
+			doublePerson = getDoublePersonIdFromList(d.getDonator(), uniquePersons);
+			
+			if(doublePerson == null){
+				uniquePersons.add(d.getDonator());
+			} else{
+				toDelete.add(d.getDonator());
+				d.setDonator(doublePerson);
+			}
+		}
+		
+		return toDelete;
+	}
+	
+	public Person getDoublePersonIdFromList(Person p, List<Person> checkList){
+		Person doublePerson = null;
+		
+		for(Person donator : checkList){
+			if(p != null){
+				if(donator.getSurname().equals(p.getSurname())
+						&& donator.getGivenName().equals(p.getGivenName())
+						&& (donator.getEmail().equals(p.getEmail())
+							|| (!donator.getTelephone().equals("") && donator.getTelephone().equals(p.getTelephone()))
+							|| (donator.getMainAddress() != null && donator.getMainAddress().getCity().equals(p.getMainAddress().getCity())
+									&& donator.getMainAddress().getPostalCode().equals(p.getMainAddress().getPostalCode())
+									&& donator.getMainAddress().getStreet().equals(p.getMainAddress().getStreet())))){
+					return donator;
+				}
+			}
+		}
+		
+		return doublePerson;
+	}
 }
