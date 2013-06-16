@@ -109,7 +109,22 @@ public interface IMailingDAO {
 	String getCreatorOfUnconfirmedMailing(Mailing m)
 			throws PersistenceException;
 
+	/**
+	 * returns a list of unconfirmed mailings
+	 * 
+	 * @return
+	 * @throws PersistenceException
+	 */
 	List<UnconfirmedMailing> getUnconfirmedMailingsWithCreator()
+			throws PersistenceException;
+
+	/**
+	 * removes a specific recipient (person) from an unsent mailing
+	 * @param p
+	 * @param m
+	 * @throws PersistenceException
+	 */
+	void removePersonFromUnsentMailing(Person p, Mailing m)
 			throws PersistenceException;
 
 

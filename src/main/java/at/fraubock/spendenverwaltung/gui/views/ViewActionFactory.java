@@ -114,7 +114,7 @@ public class ViewActionFactory {
 	
 	//TODO richtige view returnen!
 	public Action getConfirmMailingsViewAction() {
-		return new DisplayViewAction(new CreatePersonView(new ComponentFactory(), this, personService, addressService, donationService, new PersonTableModel()), "/images/confirmSendings.jpg");
+		return new DisplayViewAction(new ConfirmMailingsView(this, new ComponentFactory(), mailingService), "/images/confirmSendings.jpg");
 	}
 	
 	//TODO richtige view returnen!

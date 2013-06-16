@@ -1,14 +1,18 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
@@ -37,6 +41,8 @@ public class ConfirmMailingsView extends InitializableView {
 	private JTable unconfirmedTable;
 	private UnconfirmedMailingTableModel tableModel;
 	
+	private JLabel feedbackLabel;
+	
 	private JToolBar toolbar;
 	
 	public ConfirmMailingsView(ViewActionFactory viewActionFactory,
@@ -47,6 +53,7 @@ public class ConfirmMailingsView extends InitializableView {
 		
 		setUpLayout();
 	}
+	
 	public void setUpLayout() {
 		contentPanel = componentFactory.createPanel(800, 800);
 		
@@ -54,10 +61,19 @@ public class ConfirmMailingsView extends InitializableView {
 		
 		tableModel = new UnconfirmedMailingTableModel();
 		unconfirmedTable = new JTable(tableModel);
-		contentPanel.add(toolbar);
-		contentPanel.add(unconfirmedTable);
+		unconfirmedTable.setFillsViewportHeight(true);
+		JScrollPane scrollPane = new JScrollPane(unconfirmedTable);
+		scrollPane.setPreferredSize(new Dimension(700, 550));
+		
+		toolbar = new JToolBar();
+		contentPanel.add(toolbar, "wrap, growx");
+		contentPanel.add(scrollPane, "wrap, growx");
 		
 		unconfirmedTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+		feedbackLabel = componentFactory.createLabel("");
+		feedbackLabel.setFont(new Font("Headline", Font.PLAIN, 16));
+		contentPanel.add(feedbackLabel);
 	}
 	
 	@Override
@@ -70,6 +86,7 @@ public class ConfirmMailingsView extends InitializableView {
 		tableModel.clear();
 		try {
 			tableModel.addUnconfirmedMailings(mailingService.getUnconfirmedMailingsWithCreator());
+			unconfirmedTable.setAutoCreateRowSorter(true);
 		} catch (ServiceException e) {
 			log.warn(e.getLocalizedMessage());
 			JOptionPane.showMessageDialog(this, "Ein Fehler tritt während der Initialisierung der Tabelle auf");
@@ -78,6 +95,11 @@ public class ConfirmMailingsView extends InitializableView {
 	
 	private void addComponentsToToolbar(JToolBar toolbar) {
 
+		JButton backButton = new JButton();
+		Action getBack = viewActionFactory.getMainMenuViewAction();
+		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
+		backButton.setAction(getBack);
+		
 		JButton confirmButton = new JButton();
 		confirmButton.setFont(new Font("Bigger", Font.PLAIN, 13));
 		ConfirmAction confirmAction = new ConfirmAction();
@@ -93,16 +115,10 @@ public class ConfirmMailingsView extends InitializableView {
 		DeleteAction deleteAction = new DeleteAction();
 		deleteButton.setAction(deleteAction);
 
-		JButton backButton = new JButton();
-		backButton.setFont(new Font("Bigger", Font.PLAIN, 13));
-		Action getBack = viewActionFactory.getMainMenuViewAction();
-		getBack.putValue(Action.NAME, "<html>&nbsp;Zur\u00FCck</html>");
-		backButton.setAction(getBack);
-
+		toolbar.add(backButton, "growx");
 		toolbar.add(confirmButton, "split 4, growx");
 		toolbar.add(confirmAllButton, "growx");
 		toolbar.add(deleteButton, "growx");
-		toolbar.add(backButton, "growx");
 	}
 	
 	private final class DeleteAction extends AbstractAction {
@@ -120,9 +136,11 @@ public class ConfirmMailingsView extends InitializableView {
 				UnconfirmedMailing mailing = tableModel.getRow(selectedRow);
 				try {
 					mailingService.delete(mailing.getMailing());
+					tableModel.removeUnconfirmedMailing(mailing);
+					feedbackLabel.setText("Aussendung wurde gelöscht.");
 				} catch (ServiceException e1) {
 					log.warn(e1.getLocalizedMessage());
-					JOptionPane.showMessageDialog(null, "Ein Fehler trat während des Löschens auf");
+					feedbackLabel.setText("Ein Fehler trat während des Löschens auf");
 				}
 			}
 		}
@@ -144,9 +162,11 @@ public class ConfirmMailingsView extends InitializableView {
 				UnconfirmedMailing mailing = tableModel.getRow(selectedRow);
 				try {
 					mailingService.confirmMailing(mailing.getMailing());
+					tableModel.removeUnconfirmedMailing(mailing);
+					feedbackLabel.setText("Aussendung wurde bestätigt.");
 				} catch (ServiceException e1) {
 					log.warn(e1.getLocalizedMessage());
-					JOptionPane.showMessageDialog(null, "Ein Fehler trat während der Bestätigung auf");
+					feedbackLabel.setText("Ein Fehler trat während der Bestätigung auf");
 				}
 			}
 		}	
@@ -168,9 +188,11 @@ public class ConfirmMailingsView extends InitializableView {
 				for(UnconfirmedMailing umailing : unconfirmedMailings) {
 					mailingService.confirmMailing(umailing.getMailing());
 				}
+				tableModel.clear();
+				feedbackLabel.setText("Alle Aussendungen wurden bestätigt.");
 			} catch (ServiceException e1) {
 				log.warn(e1.getLocalizedMessage());
-				JOptionPane.showMessageDialog(null, "Ein Fehler trat während der Bestätigung auf");
+				feedbackLabel.setText("Ein Fehler trat während der Bestätigung auf");
 			}
 		}	
 	}

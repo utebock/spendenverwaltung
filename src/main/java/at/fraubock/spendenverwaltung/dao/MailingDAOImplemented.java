@@ -92,12 +92,6 @@ public class MailingDAOImplemented implements IMailingDAO {
 			throw new ValidationException("Type was null");
 		}
 
-		if (mailing.getTemplate() == null
-				&& mailing.getMedium() == Mailing.Medium.POSTAL) {
-			throw new ValidationException(
-					"Template can not be null when medium is POSTAL");
-		}
-
 		/**
 		 * fails if the mailing filter was not set, or if the type of the
 		 * mailing filter was not set, or if the type of the mailing filter was
@@ -273,7 +267,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 						mailing.getType().getName(),
 						mailing.getMedium().getName(), mailing.getId() };
 
-				if (mailing.getMedium() == Mailing.Medium.POSTAL) {
+				if (mailing.getMedium() == Mailing.Medium.POSTAL && mailing.getTemplate() != null) {
 					update = "UPDATE mailings SET mailing_date=?, mailing_type=?, "
 							+ "mailing_medium=?, template=? WHERE id=?";
 					values = new Object[] {
@@ -297,12 +291,6 @@ public class MailingDAOImplemented implements IMailingDAO {
 	public void delete(Mailing mailing) throws PersistenceException {
 		try {
 			log.debug("Entering delete with param " + mailing);
-
-			try {
-				validate(mailing);
-			} catch (ValidationException e) {
-				throw new PersistenceException(e);
-			}
 
 			if (mailing.getId() == null) {
 				throw new IllegalArgumentException(
@@ -416,6 +404,22 @@ public class MailingDAOImplemented implements IMailingDAO {
 			return confirmedMailings;
 		} catch (EmptyResultDataAccessException e) {
 			return null;
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
+	}
+	
+	@Override
+	public void removePersonFromUnsentMailing(Person p, Mailing m) throws PersistenceException {
+		if(p.getId() == null) {
+			log.warn("Person Id was null in removePersonFromUnsentMailing");
+		}
+		if(m.getId() == null) {
+			log.warn("Mailing Id was null in removePersonFromUnsentMailing");
+		}
+		try {
+			jdbcTemplate.update("DELETE FROM sent_mailings s WHERE mailing_id=? AND person_id=?", new Object[] {m.getId(),p.getId()});
 		} catch (DataAccessException e) {
 			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
@@ -565,8 +569,14 @@ public class MailingDAOImplemented implements IMailingDAO {
 			mailing.setMedium(Mailing.Medium.getByName(rs
 					.getString("mailing_medium")));
 
+			
 			if (mailing.getMedium() == Mailing.Medium.POSTAL) {
-				this.templateIds.put(rs.getInt("id"), rs.getInt("template"));
+				int tmp = rs.getInt("template");
+				//checks whether the template value was null,
+				//as rs.getInt returns 0 when null
+				if(!rs.wasNull()) {
+					this.templateIds.put(rs.getInt("id"), tmp);
+				}
 			}
 
 			return mailing;
