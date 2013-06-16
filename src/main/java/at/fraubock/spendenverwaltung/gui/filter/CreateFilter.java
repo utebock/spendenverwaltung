@@ -83,7 +83,7 @@ public class CreateFilter extends JPanel {
 		this.builder = new ComponentBuilder();
 		this.type = type;
 		this.factory = new ConfiguratorFactory(type, editFilter);
-		this.criterionSelectorPanel = builder.createPanel(800, 500);
+		this.criterionSelectorPanel = builder.createPanel(700, 500);
 
 		this.plusButton = new JButton();
 		AbstractAction plusAct = new AbstractAction() {
@@ -102,7 +102,7 @@ public class CreateFilter extends JPanel {
 		// set up GUI
 		setUpCreate();
 
-		this.add(criterionSelectorPanel, "wrap, h 800");
+		this.add(criterionSelectorPanel, "wrap, h 700");
 
 		// add plus button
 		criterionSelectorPanel.add(plusButton, "wrap, gapleft 7, gaptop 10");
@@ -154,12 +154,12 @@ public class CreateFilter extends JPanel {
 			nameField.setText(editFilter.getName());
 		}
 		this.add(builder.createLabel("Filtername: "), "split 2");
-		this.add(nameField, "growx, wrap, gapbottom 20");
+		this.add(nameField, "wrap, gapbottom 20");
 		// add(filterNamePanel, "wrap");
 
-		// RadioButtons für setting filter private or public
+		// RadioButtons for setting filter private or public
 		radioPrivate = new JRadioButton("Privat", true);
-		radioPublic = new JRadioButton("Für alle Benutzer freigeben", false);
+		radioPublic = new JRadioButton("F\u00FCr alle Benutzer freigeben", false);
 		buttonGroup.add (radioPrivate);
 		buttonGroup.add(radioPublic);
 		
@@ -252,7 +252,7 @@ public class CreateFilter extends JPanel {
 		minusButton.setAction(minusAct);
 		
 		minusButtons.add(minusButton);
-		criterionSelectorPanel.add(selectorComp, "w 800");
+		criterionSelectorPanel.add(selectorComp, "w 700");
 		criterionSelectorPanel.add(minusButton, "wrap");
 
 		if (plusButton != null) {

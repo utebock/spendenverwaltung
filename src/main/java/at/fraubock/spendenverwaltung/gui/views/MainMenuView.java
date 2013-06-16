@@ -20,7 +20,6 @@ public class MainMenuView extends InitializableView {
 	private JButton person;
 	private JLabel general;
 	private JPanel importPanel;
-	private JPanel confirmPanel;
 	private JButton filter;
 	private JLabel persons;
 	private JLabel filterLabel;
@@ -31,12 +30,10 @@ public class MainMenuView extends InitializableView {
 	private JLabel donationImport;
 	private JButton imports;
 	private JButton validation;
-	private JLabel confirm;
 	private JButton createConfirm;
 	private JButton obtainConfirm;
 	private JLabel createConfirmLabel;
 	private JLabel obtainConfirmLabel;
-	private JSeparator confirmSeparator;
 	private JPanel sendPanel;
 	private JButton mailings;
 	private JLabel sending;
@@ -98,7 +95,7 @@ public class MainMenuView extends InitializableView {
 		search = new JButton();;
 		personsPanel.add(search, "gap 35");
 		filter = new JButton();;
-		personsPanel.add(filter, "wrap 0px, gap 25");
+		personsPanel.add(filter, "wrap 0px, gap 38");
 		//button labels
 		persons = componentFactory.createLabel("Person anlegen");
 		personsPanel.add(persons);
@@ -109,68 +106,44 @@ public class MainMenuView extends InitializableView {
 		
 		//MainFilterView
 		filterLabel = componentFactory.createLabel("Filter");
-		personsPanel.add(filterLabel, "gap 48");
+		personsPanel.add(filterLabel, "gap 59");
 		
 		//separator for next section
 		personSeparator = componentFactory.createSeparator();
 		overviewPanel.add(personSeparator, "wrap 0px, growx");
 		
 		/**
-		 * "Spendenimport"-panel contains donationimport and validation
+		 * "Spenden"-panel contains import, validation, confirmations
 		 */
 		
 		//DonationImport
 		importPanel = componentFactory.createPanel(800,160);
 		overviewPanel.add(importPanel, "wrap 0px");
-		donationImport = componentFactory.createLabel("Spendenimport");
+		donationImport = componentFactory.createLabel("Spenden");
 		donationImport.setFont(new Font("Headline", Font.PLAIN, 14));
 		importPanel.add(donationImport, "wrap");
 		
-		imports = new JButton();;
-		importPanel.add(imports, "split 2");
-		//DonationValidation
-		validation = new JButton();;
-		importPanel.add(validation, "gap 55, wrap 0px");
+		imports = new JButton();
+		importPanel.add(imports, "split 3");
+		validation = new JButton();
+		importPanel.add(validation, "gap 55");
+		createConfirm = new JButton();
+		importPanel.add(createConfirm, "gap 55");
+		obtainConfirm = new JButton();
+		importPanel.add(obtainConfirm, "wrap 0px, gap 45");
 		
 		importLabel = componentFactory.createLabel("Importe");
-		importPanel.add(importLabel, "split 2, gap 18");
+		importPanel.add(importLabel, "gap 15, split3");
 		validationLabel = componentFactory.createLabel("Validierung");
-		importPanel.add(validationLabel, "gap 73");
+		importPanel.add(validationLabel, "gap 77");
+		createConfirmLabel = componentFactory.createLabel("<html><center>Best\u00E4tigung <br> erstellen</html>");
+		importPanel.add(createConfirmLabel, "gap 63");
+		obtainConfirmLabel = componentFactory.createLabel("<html><center>Best\u00E4tigung <br>abrufen</html>");
+		importPanel.add(obtainConfirmLabel, "gap 48");
 		
 		importSeparator = componentFactory.createSeparator();
 		overviewPanel.add(importSeparator, "wrap 0px, growx");
-		
-
-		/**
-		 * "Spendenbestaetigung"-panel contains create confirmation and obtain confirmation
-		 */
-		
-		//DonationConfirmation
-		confirmPanel = componentFactory.createPanel(800,160);
-		overviewPanel.add(confirmPanel, "wrap 0px");
-		confirm = componentFactory.createLabel("Spendenbest\u00E4tigung");
-		confirm.setFont(new Font("Headline", Font.PLAIN, 14));
-		confirmPanel.add(confirm, "wrap");
-		//importPanel.add(empty, "wrap");
-		createConfirm = new JButton();;
-		confirmPanel.add(createConfirm, "split 2");
-
-
-		//ObtainDonationConfirmation
-		obtainConfirm = new JButton();;
-		confirmPanel.add(obtainConfirm, "wrap 0px, gap 55");
-		
-		createConfirmLabel = componentFactory.createLabel("<html><center>Best\u00E4tigung <br> erstellen</html>");
-		//createConfirmLabel.setFont(new Font("kleiner", Font.PLAIN, 12));
-		confirmPanel.add(createConfirmLabel, "split 2");
-		obtainConfirmLabel = componentFactory.createLabel("<html><center>Best\u00E4tigung <br>abrufen</html>");
-		//obtainConfirmLabel.setFont(new Font("kleiner", Font.PLAIN, 12));
-		confirmPanel.add(obtainConfirmLabel, "gap 65");
-		
-		confirmSeparator = componentFactory.createSeparator();
-		overviewPanel.add(confirmSeparator, "wrap 0px, growx");
-		
-
+	
 		/**
 		 * "Aussendungen"-panel contains e-aussendung erstellen, briefaussendung erstellen, aussendungen anzeigen, 
 		 * aussendungen bestaetigen, aussendung loeschen
@@ -184,11 +157,11 @@ public class MainMenuView extends InitializableView {
 		//importPanel.add(empty, "wrap");
 		mailings = new JButton();;
 		sendPanel.add(mailings, "split 3");
-		showSendings = new JButton();;
+		showSendings = new JButton();
 		sendPanel.add(showSendings, "gap 55");
-		confirmSendings = new JButton();;
+		confirmSendings = new JButton();
 		sendPanel.add(confirmSendings, "gap 40");
-		deleteSendings = new JButton();;
+		deleteSendings = new JButton();
 		sendPanel.add(deleteSendings, "wrap 0px, gap 40");
 		
 		eSendingLabel = componentFactory.createLabel("<html><center>Aussendung<br>erstellen");

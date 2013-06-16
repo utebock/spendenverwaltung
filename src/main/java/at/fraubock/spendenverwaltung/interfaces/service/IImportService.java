@@ -57,4 +57,17 @@ public interface IImportService {
 	 * @throws ServiceException
 	 */
 	public void hypoImport(File file) throws ServiceException, IOException;
+	
+	
+	/**
+	 * Imports donations into the database.The
+	 * column mapping is based on the SMS CSV structure.
+	 * 
+	 * @param file
+	 *            the CSV file in SMS structure
+	 * @throws IOException
+	 *             if an error occurs while reading the given file
+	 * @throws ServiceException
+	 */
+	public void smsImport(File file) throws ServiceException, IOException;
 }

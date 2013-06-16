@@ -19,6 +19,7 @@ import com.lowagie.text.pdf.PdfReader;
 import fr.opensagres.xdocreport.converter.ConverterTypeTo;
 import fr.opensagres.xdocreport.converter.ConverterTypeVia;
 import fr.opensagres.xdocreport.converter.Options;
+import fr.opensagres.xdocreport.converter.OptionsHelper;
 import fr.opensagres.xdocreport.core.XDocReportException;
 import fr.opensagres.xdocreport.document.IXDocReport;
 import fr.opensagres.xdocreport.document.registry.XDocReportRegistry;
@@ -38,36 +39,36 @@ public class MailingTemplateUtil {
 	private static final Logger log = Logger.getLogger(MailingTemplateUtil.class);
 	
 	/**
-	 * Takes a docx template and a person list and creates a pdf file.
-	 * Before the final pdf file is created, there will be a pdf file for each 
-	 * person. After merging all pdf files together, the temp files will be removed.
-	 * @param file
-	 * 			Docx template file with Velocity syntax in MergeFields (MS Word)
+	 * Creates a pdf file from a template in docx and a person list.
+	 * The template gets filled for each person and added to one pdf file. 
+	 * @param templateFile
+	 * 			Docx template file with Velocity syntax in MergeFields 
 	 * @param personList
 	 * 			List of person to merge with the template file
 	 * @param outputName
-	 * 			Name of the final pdf file
+	 * 			Name of final pdf file
 	 * @throws IOException
 	 * @throws ServiceException
 	 */
-	public static void createMailingWithDocxTemplate(File file, List<Person> personList, String outputName) throws IOException, ServiceException{
-		int i = 0;
-		List<String> files = new ArrayList<String>();
-		String path;
+	public static void createMailingWithDocxTemplate(File templateFile, List<Person> personList, String outputName) throws IOException, ServiceException{
+		List<File> files = new ArrayList<File>();
+		IXDocReport report;
+		File tempFile;
+		IContext context;
+		OutputStream out;
 		
 		//Check Arguments
-		if(file==null||personList==null||outputName==null){
+		if(templateFile==null||personList==null||outputName==null){
 			throw new IllegalArgumentException("Argument is null");
 		}
 		
-
-		log.info("Create mailing with template "+file.getName());
+		log.info("Create mailing with template "+templateFile.getName());
 		
 		try {
 			//Load Template file
-			IXDocReport report = XDocReportRegistry.getRegistry().loadReport(new FileInputStream(file), TemplateEngineKind.Velocity);
-			IContext context;
-			OutputStream out;
+			report = XDocReportRegistry.getRegistry().loadReport(new FileInputStream(templateFile),
+					TemplateEngineKind.Velocity);
+			
 
 			//Create context to put person data into the template fields
 			context= report.createContext();
@@ -76,56 +77,56 @@ public class MailingTemplateUtil {
 			for(Person p : personList){
 
 				context.put("person", p);
-				//names are temp0.pdf, temp1.pdf, ... , tempN.pdf
-				path = "temp"+i+++".pdf";
-				files.add(path);
-				out = new FileOutputStream(new File(path));
+				tempFile = File.createTempFile("MailingTemp", ".docx");
+				
+				files.add(tempFile);
+				out = new FileOutputStream(tempFile);
 				Options options = Options.getTo(ConverterTypeTo.PDF).via(ConverterTypeVia.XWPF);
+				//set encoding for ä,ö,ü, etc.
+				OptionsHelper.setFontEncoding(options, "ISO-8859-1");
 				report.convert(context, options, out);
-				log.info("Created pdf: "+path);
+
+				log.info("Created pdf: "+tempFile);				
 			}
+		
+			
 		} catch (XDocReportException | NullPointerException e) {
 			log.error(e.getMessage());
 			throw new ServiceException(e);
 		}
-
+		
 		//Merge into one pdf and delete temp files
-		mergePdfs(files, outputName);
+		mergePdfs(files, new File(outputName));
 	}
 	
 	/**
 	 * Merges all pdf files into one pdf file and deletes all temp pdf files after that
 	 * @param pdfs
-	 * 		List of pdf file names
-	 * @param outputName
-	 * 		Name of the final pdf file
+	 * 		List of pdf files
+	 * @param mergedPDF
+	 * 		Final pdf file
 	 * @throws IOException
 	 * @throws ServiceException
 	 */
-	private static void mergePdfs(List<String> pdfs, String outputName) throws IOException, ServiceException{
+	private static void mergePdfs(List<File> pdfs,File mergedPDF) throws IOException, ServiceException{
 		Document pdfDocument = new Document();
 		PdfCopy copy;
 		PdfReader pdfReader;
-		File f;
 		int pages;
 		
-		if(pdfs==null){
+		if(pdfs == null || mergedPDF == null){
 			throw new IllegalArgumentException("Argument is null");
 		}
 		
 		try{
-			//Add .pdf if needed
-			if(!outputName.endsWith(".pdf")){
-				outputName += ".pdf";
-			}
 			//Combine pdf files to one
-			copy = new PdfCopy(pdfDocument, new FileOutputStream(outputName));
+			copy = new PdfCopy(pdfDocument, new FileOutputStream(mergedPDF));
 
 			pdfDocument.open();
 
 			//Read all pages and add them to the final pdf file
-			for (String pdf : pdfs) {
-				pdfReader = new PdfReader(pdf);
+			for (File pdf : pdfs) {
+				pdfReader = new PdfReader(new FileInputStream(pdf));
 				pages = pdfReader.getNumberOfPages();
 				for (int page = 0; page < pages; ) {
 					copy.addPage(copy.getImportedPage(pdfReader, ++page));
@@ -138,9 +139,8 @@ public class MailingTemplateUtil {
 		}
 
 		//Delete tmp files
-		for(String pdf : pdfs){
-			f = new File(pdf);
-			f.delete();
+		for(File tempPDF : pdfs){
+			tempPDF.delete();
 		}
 	}
 }

@@ -13,6 +13,7 @@ DROP TRIGGER IF EXISTS addresses_log_update;
 DROP TRIGGER IF EXISTS addresses_log_insert;
 DROP TRIGGER IF EXISTS addresses_log_delete;
 
+drop table if exists unsent_mailings;
 
 DROP VIEW IF EXISTS validated_addresses;
 DROP VIEW IF EXISTS validated_persons;
@@ -159,10 +160,8 @@ CREATE TABLE mailings (
 	id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
         mailing_date DATE NOT NULL,
 	mailing_type ENUM('allgemeiner Dankesbrief', 'Dankesbrief', 'Dauerspender Dankesbrief',
-		'Einzelspenden Dankesbrief', 'Infomaterial',
-		'Spendenaufruf', 'Spendenbrief'),
 	mailing_medium ENUM('email', 'postal'),
-	template INTEGER UNSIGNED REFERENCES mailing_templates(id) ON DELETE RESTRICT,
+    unconfirmed INTEGER UNSIGNED DEFAULT NULL REFERENCES unsent_mailings(id) ON DELETE SET NULL, -- if NULL, this mailing is considered confirmed/validated.	template INTEGER UNSIGNED REFERENCES mailing_templates(id) ON DELETE RESTRICT,
 	UNIQUE(mailing_date, mailing_type, mailing_medium, template)
 );
 
@@ -225,13 +224,17 @@ CREATE TABLE actions (
 	payload VARCHAR(10240) -- if type = 'insert', the data that has been inserted (w/o id), if type = 'updated', the new data, if type='delete', the old data. BLOBS not contained.
 );
 
+CREATE TABLE unsent_mailings (
+    id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    creator VARCHAR(30) NOT NULL -- user who created the import (database user name)
+);
+
 -- views for validated data:
 
 CREATE VIEW validated_donations AS SELECT * FROM donations WHERE import IS NULL; -- only validated donations (i.e. no pending imports)
 
 CREATE VIEW validated_persons AS SELECT * FROM persons p WHERE NOT EXISTS (SELECT id FROM donations d WHERE d.import IS NOT NULL AND d.personid = p.id); -- only validated persons (i.e. no pending imports)
 
-CREATE VIEW validated_addresses AS SELECT * FROM addresses a WHERE NOT EXISTS (SELECT * FROM livesat l JOIN persons p ON (l.pid = p.id) WHERE l.aid = a.id AND p.id NOT IN (SELECT id FROM validated_persons)); -- only validated addresses (i.e. no pending imports)
 
 
 -- triggers for action history:

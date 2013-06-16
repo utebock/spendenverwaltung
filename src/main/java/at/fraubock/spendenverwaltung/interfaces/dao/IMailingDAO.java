@@ -1,9 +1,9 @@
 package at.fraubock.spendenverwaltung.interfaces.dao;
 
 import java.util.List;
-
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.UnconfirmedMailing;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 
 /**
@@ -72,6 +72,45 @@ public interface IMailingDAO {
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
-	public List<Mailing> getMailingsByPerson(Person person)
+	public List<Mailing> getConfirmedMailingsByPerson(Person person)
 				throws PersistenceException;
+
+	/**
+	 * returns all unconfirmed mailings
+	 * 
+	 * @return
+	 * @throws PersistenceException
+	 */
+	List<Mailing> getAllUnconfirmed() throws PersistenceException;
+
+	/**
+	 * returns all confirmed mailings
+	 * 
+	 * @return
+	 * @throws PersistenceException
+	 */
+	List<Mailing> getAllConfirmed() throws PersistenceException;
+	
+	/**
+	 * confirms a mailing
+	 * 
+	 * @throws PersistenceException
+	 */
+	
+	void confirmMailing(Mailing mailing) throws PersistenceException;
+
+	/**
+	 * returns the creator of a mailing as a string
+	 * 
+	 * @param m
+	 * @return
+	 * @throws PersistenceException
+	 */
+	String getCreatorOfUnconfirmedMailing(Mailing m)
+			throws PersistenceException;
+
+	List<UnconfirmedMailing> getUnconfirmedMailingsWithCreator()
+			throws PersistenceException;
+
+
 }

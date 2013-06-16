@@ -3,12 +3,12 @@ package at.fraubock.spendenverwaltung.service;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
-
 import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.MailingTemplate;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.UnconfirmedMailing;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
@@ -54,6 +54,49 @@ public class MailingServiceImplemented implements IMailingService {
 			throw new ServiceException(e);
 		}
 	}
+	
+
+	@Override
+	public List<Mailing> getAllConfirmed() throws ServiceException {
+		try {
+			return mailingDAO.getAllConfirmed();
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
+	
+	@Override
+	public void confirmMailing(Mailing mailing) throws ServiceException {
+		try {
+			mailingDAO.confirmMailing(mailing);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
+
+	@Override
+	public List<Mailing> getAllUnconfirmed() throws ServiceException {
+		try {
+			return mailingDAO.getAllUnconfirmed();
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
+	
+	/**
+	 * adds all unconfirmed mailings to a hashmap, where each creator (key)
+	 * maps to a corresponding list of created mails.
+	 * 
+	 * @returns Map of creators and mailings
+	 */
+	@Override
+	public List<UnconfirmedMailing> getUnconfirmedMailingsWithCreator() throws ServiceException {
+		try {
+			return mailingDAO.getUnconfirmedMailingsWithCreator();
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
 
 	@Override
 	public Mailing getById(int id) throws ServiceException {
@@ -65,10 +108,10 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
-	public List<Mailing> getMailingsByPerson(Person person)
+	public List<Mailing> getConfirmedMailingsByPerson(Person person)
 			throws ServiceException {
 		try {
-			return mailingDAO.getMailingsByPerson(person);
+			return mailingDAO.getConfirmedMailingsByPerson(person);
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
