@@ -9,6 +9,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -71,25 +72,30 @@ public class MountedFilterCriterionDAOImplemented implements
 				throw new PersistenceException(e);
 		}
 	}
-	
-
 
 	@Override
 	public void replaceMountId(int mountId, int replaceWith)
 			throws PersistenceException {
-
-		jdbcTemplate.update("update mountedfilter_criterion set mount=? where mount = ?",
-				new Object[] { replaceWith , mountId }, new int[] { Types.INTEGER,Types.INTEGER });
-		
+		try {
+			jdbcTemplate
+					.update("update mountedfilter_criterion set mount=? where mount = ?",
+							new Object[] { replaceWith, mountId }, new int[] {
+									Types.INTEGER, Types.INTEGER });
+		} catch (DataAccessException e) {
+			throw new PersistenceException(e);
+		}
 	}
 
 	@Override
 	public void delete(MountedFilterCriterion f) throws PersistenceException {
 		validator.validate(f);
-
-		jdbcTemplate.update("delete from mountedfilter_criterion where id = ?",
-				new Object[] { f.getId() }, new int[] { Types.INTEGER });
-
+		try {
+			jdbcTemplate.update(
+					"delete from mountedfilter_criterion where id = ?",
+					new Object[] { f.getId() }, new int[] { Types.INTEGER });
+		} catch (DataAccessException e) {
+			throw new PersistenceException(e);
+		}
 		if (f.getMount().isAnonymous()) { // only delete mount when
 											// anonymous
 			filterDAO.delete(f.getMount());
@@ -97,11 +103,15 @@ public class MountedFilterCriterionDAOImplemented implements
 	}
 
 	@Override
-	public List<Integer> getAllMountedFilterIds() {
+	public List<Integer> getAllMountedFilterIds() throws PersistenceException {
 		MountedFilterMapper mapper = new MountedFilterMapper();
-		String select = "select * from mountedfilter_criterion mc " +
-				"join criterion c on mc.id=c.id";
-		jdbcTemplate.query(select, mapper);
+		String select = "select * from mountedfilter_criterion mc "
+				+ "join criterion c on mc.id=c.id";
+		try {
+			jdbcTemplate.query(select, mapper);
+		} catch (DataAccessException e) {
+			throw new PersistenceException(e);
+		}
 		return mapper.getMountIds();
 	}
 

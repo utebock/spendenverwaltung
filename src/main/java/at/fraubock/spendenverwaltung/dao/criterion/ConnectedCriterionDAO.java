@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -62,10 +63,14 @@ public class ConnectedCriterionDAO {
 
 	public void delete(ConnectedCriterion f) throws PersistenceException {
 		validator.validate(f);
-		jdbcTemplate.update("delete from connected_criterion where id = ?",
-				new Object[] { f.getId() }, new int[] { Types.INTEGER });
-		abstractCritDAO.delete(f.getOperand1());
-		abstractCritDAO.delete(f.getOperand2());
+		try {
+			jdbcTemplate.update("delete from connected_criterion where id = ?",
+					new Object[] { f.getId() }, new int[] { Types.INTEGER });
+			abstractCritDAO.delete(f.getOperand1());
+			abstractCritDAO.delete(f.getOperand2());
+	} catch (DataAccessException e) {
+		throw new PersistenceException(e);
+	}
 	}
 
 	/* mappers for inserting and reading this entity */

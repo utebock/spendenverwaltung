@@ -21,17 +21,18 @@ import at.fraubock.spendenverwaltung.util.RelationalOperator;
  * - the amount of entities in the filter's result set. therefore <code>count</code>
  * must be set. 
  * - the sum of a specific {@link FilterProperty} in the filter's result set.
- * therefore <code>sum</code> must be set. 
+ * therefore <code>property</code> and <code>sum</code> must be set. 
  * - the average of a specific {@link FilterProperty} in the filter's result set 
- * (sum divided by number of results). therefore <code>avg</code> must be set. 
+ * (sum divided by number of results). therefore <code>property</code> and 
+ * <code>avg</code> must be set. 
  * 
  * these values will be compared with the mounted filter's result set based on the given 
  * {@link RelationalOperator}.
  * 
  * now that we can define how to evaluate the result set, we must define the
- * input set for the filter. this COULD BE defined in this criterion, but since
- * there are only a few possibilities of mounting filters anyway, it is done in
- * the {@link FilterToSqlBuilder}.
+ * input set for the filter. there is no general way of doing so, each mounting
+ * has to be handled separately based on the relations of the two mounted tables.
+ * this is done exclusively in the {@link FilterToSqlBuilder}.
  * 
  * for example, if a donation filter is mounted to a person filter, the SQL
  * builder decides which donations the donation filter gets as input (which will

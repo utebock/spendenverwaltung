@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -30,14 +31,16 @@ public class PropertyCriterionDAO {
 
 	public void insert(PropertyCriterion f) throws PersistenceException {
 
-//		if (f.getId() == null) {
+		try {
 			PropertyCriterion prop = (PropertyCriterion) f;
 			validator.validate(prop);
 			KeyHolder propertyKeyHolder = new GeneratedKeyHolder();
 
 			jdbcTemplate.update(new CreatePropertyFilterStatementCreator(prop),
 					propertyKeyHolder);
-//		}
+		} catch (DataAccessException e) {
+			throw new PersistenceException(e);
+		}
 	}
 
 	public PropertyCriterion getById(int id) throws PersistenceException {
@@ -60,8 +63,16 @@ public class PropertyCriterionDAO {
 
 	public void delete(PropertyCriterion f) throws PersistenceException {
 		validator.validate(f);
-		jdbcTemplate.update("delete from property_criterion where id = ?",
-				new Object[] { f.getId() }, new int[] { Types.INTEGER });
+		try {
+			String stmt = "delete from property_criterion";
+			Object[] obj = new Object[0];
+//			obj[0] = f.getId();
+			int[] type = new int[0];
+//			type[0] = Types.INTEGER;
+			jdbcTemplate.update(stmt);
+		} catch (DataAccessException e) {
+			throw new PersistenceException(e);
+		}
 	}
 
 	/* mappers for inserting and reading this entity */
@@ -87,27 +98,27 @@ public class PropertyCriterionDAO {
 			ps.setInt(c++, prop.getId());
 			ps.setString(c++, prop.getRelationalOperator().toString());
 			ps.setString(c++, prop.getProperty().toString());
-			
+
 			if (prop.getNumValue() == null) {
 				ps.setNull(c++, java.sql.Types.DOUBLE);
 			} else {
 				ps.setDouble(c++, prop.getNumValue());
 			}
-			
+
 			ps.setString(c++, prop.getStrValue());
-			
+
 			if (prop.getDateValue() == null) {
 				ps.setNull(c++, java.sql.Types.DATE);
 			} else {
 				ps.setDate(c++, new Date(prop.getDateValue().getTime()));
 			}
-			
+
 			if (prop.getDaysBack() == null) {
 				ps.setNull(c++, java.sql.Types.INTEGER);
 			} else {
 				ps.setInt(c++, prop.getDaysBack());
 			}
-			
+
 			if (prop.getBoolValue() == null) {
 				ps.setNull(c++, java.sql.Types.BOOLEAN);
 			} else {
@@ -126,28 +137,29 @@ public class PropertyCriterionDAO {
 
 			criterion
 					.setType(FilterType.getTypeForString(rs.getString("type")));
-			
-			criterion.setProperty(FilterProperty.getPropertyForString(rs
-					.getString("property"),FilterType.getTypeForString(rs.getString("type"))));
+
+			criterion.setProperty(FilterProperty.getPropertyForString(
+					rs.getString("property"),
+					FilterType.getTypeForString(rs.getString("type"))));
 			criterion.setRelationalOperator(RelationalOperator.valueOf(rs
 					.getString("relational_operator")));
 			criterion.setId(rs.getInt("id"));
-			
+
 			Double dbl = rs.getDouble("numValue");
-			criterion.setNumValue(rs.wasNull()?null:dbl);
+			criterion.setNumValue(rs.wasNull() ? null : dbl);
 
 			String str = rs.getString("strValue");
-			criterion.setStrValue(rs.wasNull()?null:str);
-			
+			criterion.setStrValue(rs.wasNull() ? null : str);
+
 			Date date = rs.getDate("dateValue");
-			criterion.setDateValue(rs.wasNull()?null:date);
-			
+			criterion.setDateValue(rs.wasNull() ? null : date);
+
 			Boolean bool = rs.getBoolean("boolValue");
-			criterion.setBoolValue(rs.wasNull()?null:bool);
-			
+			criterion.setBoolValue(rs.wasNull() ? null : bool);
+
 			Integer daysBack = rs.getInt("daysBack");
-			criterion.setDaysBack(rs.wasNull()?null:daysBack);
-			
+			criterion.setDaysBack(rs.wasNull() ? null : daysBack);
+
 			return criterion;
 		}
 	}

@@ -366,7 +366,7 @@ END;//
 
 CREATE TRIGGER connected_criterion_log_delete AFTER DELETE ON connected_criterion FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'criterion', CAST(OLD.id AS CHAR(30)), CONCAT(IF(OLD.operand2 IS NULL, CONCAT(OLD.logical_operator, ' ', OLD.operand1), CONCAT(OLD.operand1, ' ', OLD.logical_operator, ' ', OLD.operand2)), '; on type ', (SELECT type FROM criterion WHERE id = OLD.id)));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'criterion', CAST(OLD.id AS CHAR(30)), CONCAT(IF(OLD.operand2 IS NULL, CONCAT(OLD.logical_operator, ' ', OLD.operand1), CONCAT(OLD.operand1, ' ', OLD.logical_operator, ' ', OLD.operand2))));
 END;//
 
 
@@ -382,7 +382,7 @@ END;//
 
 CREATE TRIGGER property_criterion_log_delete AFTER DELETE ON property_criterion FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'criterion', CAST(OLD.id AS CHAR(30)), CONCAT(OLD.property, ' ', OLD.relational_operator, ' ', IFNULL(OLD.numValue, ''), IFNULL(OLD.strValue, ''), IFNULL(OLD.dateValue, ''), IF(OLD.daysBack IS NULL, '', CONCAT(OLD.daysBack, ' days back')), IFNULL(OLD.boolValue, ''), '; on type ', (SELECT type FROM criterion WHERE id = OLD.id)));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'criterion', CAST(OLD.id AS CHAR(30)), CONCAT(OLD.property, ' ', OLD.relational_operator, ' ', IFNULL(OLD.numValue, ''), IFNULL(OLD.strValue, ''), IFNULL(OLD.dateValue, ''), IF(OLD.daysBack IS NULL, '', CONCAT(OLD.daysBack, ' days back')), IFNULL(OLD.boolValue, '')));
 END;//
 
 
@@ -398,7 +398,7 @@ END;//
 
 CREATE TRIGGER mountedfilter_criterion_log_delete AFTER DELETE ON mountedfilter_criterion FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'criterion', CAST(OLD.id AS CHAR(30)), CONCAT('mount filter #', OLD.mount, ' ON ', IF (OLD.count IS NULL, IF(OLD.sum IS NULL, CONCAT('average ', OLD.relational_operator, ' ', OLD.avg), CONCAT('sum ', OLD.relational_operator, ' ', OLD.sum)), CONCAT('count ', OLD.relational_operator, ' ', OLD.count)), '; on type ', (SELECT type FROM criterion WHERE id = OLD.id)));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'criterion', CAST(OLD.id AS CHAR(30)), CONCAT('mount filter #', OLD.mount, ' ON ', IF (OLD.count IS NULL, IF(OLD.sum IS NULL, CONCAT('average ', OLD.relational_operator, ' ', OLD.avg), CONCAT('sum ', OLD.relational_operator, ' ', OLD.sum)), CONCAT('count ', OLD.relational_operator, ' ', OLD.count))));
 END;//
 
 
