@@ -3,8 +3,6 @@ package at.fraubock.spendenverwaltung.gui.views;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -29,6 +27,8 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
 import at.fraubock.spendenverwaltung.util.FilterType;
+import at.fraubock.spendenverwaltung.util.MailChimp;
+import at.fraubock.spendenverwaltung.util.MailChimp.MailChimpListItem;
 
 /**
  * 
@@ -60,7 +60,7 @@ public class CreateMailingsView extends InitializableView {
 
 	JLabel emailTitle, postalTitle, reproduceTitle, emailFilterLabel,
 			postalFilterLabel, emailTypeLabel, postalTypeLabel, emailDateLabel,
-			postalDateLabel, feedbackLabel;
+			postalDateLabel, feedbackLabel, emailMailChimpLabel;
 	JButton createEMailingButton, createPostalMailingButton,
 			cancelEMailingButton, cancelPostalMailingButton;
 	JSeparator separator;
@@ -68,6 +68,8 @@ public class CreateMailingsView extends InitializableView {
 	JComboBox<Filter> eMailingPersonFilterChooser, postalPersonFilterChooser;
 	JComboBox<Mailing.MailingType> eMailingTypeChooser,
 			postalMailingTypeChooser;
+	JComboBox<MailChimpListItem> emailMailChimpListChooser;
+	
 
 	public CreateMailingsView(ViewActionFactory viewActionFactory,
 			ComponentFactory componentFactory, IMailingService mailingService,
@@ -120,6 +122,13 @@ public class CreateMailingsView extends InitializableView {
 		emailDatePicker = new JXDatePicker(new java.util.Date());
 		createEMailingPanel.add(emailDateLabel);
 		createEMailingPanel.add(emailDatePicker, "wrap");
+		
+		//MailChimp listChooser
+		emailMailChimpLabel = componentFactory.createLabel("MailChimp List");
+		emailMailChimpListChooser = new JComboBox<MailChimpListItem>();
+		createEMailingPanel.add(emailMailChimpLabel);
+		createEMailingPanel.add(emailMailChimpListChooser, "wrap");
+		
 
 		// buttons
 		createEMailingButton = new JButton("Anlegen");
@@ -254,6 +263,8 @@ public class CreateMailingsView extends InitializableView {
 							.getModel().getSelectedItem();
 				}
 			});
+			
+			
 
 			createEMailingButton.setAction(new CreateEMailingAction());
 			createPostalMailingButton
@@ -270,6 +281,15 @@ public class CreateMailingsView extends InitializableView {
 					.showMessageDialog(null,
 							"Ein Fehler trat beim Initialisieren der Personenfilter auf.");
 		}
+		
+		try{
+			//Load lists from MailChimp
+			emailMailChimpListChooser.setModel(new SimpleComboBoxModel<MailChimpListItem>(MailChimp.getLists()));
+		}
+		catch(ServiceException e){
+			JOptionPane.showMessageDialog(null, "Ein Fehler trat bei der Kommunikation mit MailChimp auf");
+		}
+		
 	}
 
 	private final class CreateEMailingAction extends AbstractAction {
@@ -283,10 +303,16 @@ public class CreateMailingsView extends InitializableView {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Mailing mailing = new Mailing();
+			int errors;
 			if ((selectedEmailFilter = (Filter) eMailingPersonFilterChooser
 					.getSelectedItem()) == null) {
 				JOptionPane.showMessageDialog(null,
 						"Es muss ein Personenfilter ausgewählt werden!");
+				return;
+			}
+			else if(emailMailChimpListChooser.getSelectedItem()==null){
+				JOptionPane.showMessageDialog(null,
+						"Es muss eine MailChimp Liste ausgewählt werden!");
 				return;
 			}
 			mailing.setFilter(selectedEmailFilter);
@@ -297,12 +323,21 @@ public class CreateMailingsView extends InitializableView {
 			try {
 				mailingService.insertOrUpdate(mailing);
 				feedbackLabel.setText("Aussendung wurde erstellt.");
+				errors = mailingService.exportEMailsToMailChimp(mailing, 
+						((MailChimpListItem)emailMailChimpListChooser.getSelectedItem()).getId());
+				if(errors==0){
+					JOptionPane.showMessageDialog(null,
+						"Es wurden alle ausgewählten Personen der MailChimp Liste hinzugefügt!");
+				}
+				else if(errors>0){
+					JOptionPane.showMessageDialog(null,
+							"Es gab "+errors+" fehlerhafte Datensätze beim Hinzufügen zu MailChimp!");
+				}
 			} catch (ServiceException e1) {
 				log.error(e1.getMessage() + " occured in CreateMailings");
 				feedbackLabel.setText("Ein Fehler ist während der Erstellung dieser Aussendung aufgetreten.");
 			}
-			// TODO create email mailing with service layer, add mailchimp
-			// logic, create
+			
 		}
 
 	}

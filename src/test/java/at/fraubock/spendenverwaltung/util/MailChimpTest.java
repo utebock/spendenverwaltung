@@ -3,10 +3,13 @@ package at.fraubock.spendenverwaltung.util;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Test;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
+import at.fraubock.spendenverwaltung.util.MailChimp.MailChimpListItem;
 
 public class MailChimpTest {
 
@@ -28,8 +31,10 @@ public class MailChimpTest {
 	
 	@Test
 	public void testExportToMailChimpWithEmptyList() throws ServiceException{
-		String id = (String) MailChimp.getLists().keySet().toArray()[0];
-		assertEquals(0,MailChimp.addPersonsToList(id, new ArrayList<Person>()));
+		List<MailChimpListItem> list = MailChimp.getLists();
+		if(!list.isEmpty()){
+			assertEquals(0,MailChimp.addPersonsToList(list.get(0).getId(), new ArrayList<Person>()));
+		}
 	}
 
 }

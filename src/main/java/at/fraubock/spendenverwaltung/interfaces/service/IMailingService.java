@@ -114,4 +114,14 @@ public interface IMailingService {
 	 */
 	List<UnconfirmedMailing> getUnconfirmedMailingsWithCreator() throws ServiceException;
 
+	/**
+	 * Exports the email addresses of all persons in the mailing to MailChimp
+	 * @param mailing
+	 * @param mailChimpListId
+	 * 			ID of the list at MailChimp
+	 * @return
+	 * 			returns the amount of errors during import at MailChimp
+	 * @throws ServiceException
+	 */
+	public int exportEMailsToMailChimp(Mailing mailing, String mailChimpListId) throws ServiceException;
 }
