@@ -219,16 +219,16 @@ CREATE TABLE sent_mailings (
 CREATE TABLE mailing_templates ( -- mailing template files in ODT/DOC format
 	id INTEGER UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 	name VARCHAR(120) NOT NULL, -- name of the template
-	data BLOB NOT NULL
+	data MEDIUMBLOB NOT NULL
 );
 
 CREATE TABLE donation_confirmation_templates ( -- donation confirmation templates in ODT/DOC format
 	id INTEGER UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 	name VARCHAR(120) NOT NULL UNIQUE, -- name of the template
-	data BLOB NOT NULL
+	data MEDIUMBLOB NOT NULL
 );
 
--- donation confirmations:
+-- donation confirmations:name
 
 CREATE TABLE donation_confirmations ( -- abstract confirmation, either for a single or multiple donations. must reference either single_donation_confirmations or multiple_donations_confirmations.
 	id INTEGER UNSIGNED AUTO_INCREMENT PRIMARY KEY,
