@@ -71,6 +71,8 @@ public class DonationProgressStatsView extends InitializableView {
 	private JFreeChart chart;
 	private ChartPanel chartPanel;
 	private List<Donation> donationList;
+
+	private JPanel plotPanel;
 	
 	public DonationProgressStatsView(ComponentFactory componentFactory, ViewActionFactory viewActionFactory, 
 			IDonationService donationService, IFilterService filterService) {
@@ -119,6 +121,7 @@ public class DonationProgressStatsView extends InitializableView {
 		
 		operationsPanel= componentFactory.createPanel(700, 800);
 		this.add(operationsPanel, "wrap");
+		plotPanel = componentFactory.createPanel(700, 400);
 		doSingleStat = componentFactory.createLabel("Statistische Berechnungen durchf\u00FChren ");
 		doSingleStat.setFont(new Font("Headline", Font.PLAIN, 14));
 		operationsPanel.add(doSingleStat, "wrap 30px");
@@ -200,8 +203,7 @@ public class DonationProgressStatsView extends InitializableView {
 		operationsPanel.add(submit, "split 2");
 		operationsPanel.add(cancel, "wrap 20px");
 		
-		
-		
+		operationsPanel.add(plotPanel);
 	}
 	
 	private List<Donation> getDonations(Filter filter) {
@@ -276,8 +278,10 @@ public class DonationProgressStatsView extends InitializableView {
 					chart = createBarChart(dataSet);
 					chartPanel = new ChartPanel(chart);
 					chartPanel.setPreferredSize(new Dimension(700, 270));
-					operationsPanel.add(chartPanel);
-					operationsPanel.validate();
+					plotPanel.removeAll();
+					plotPanel.repaint();
+					plotPanel.add(chartPanel);
+					plotPanel.validate();
 				}
 				if (secondFilter.getSelectedIndex() != 0
 						&& thirdFilter.getSelectedIndex() != 0) {
@@ -301,8 +305,10 @@ public class DonationProgressStatsView extends InitializableView {
 					chart = createBarChart(dataSet);
 					chartPanel = new ChartPanel(chart);
 					chartPanel.setPreferredSize(new Dimension(700, 270));
-					operationsPanel.add(chartPanel);
-					operationsPanel.validate();
+					plotPanel.removeAll();
+					plotPanel.repaint();
+					plotPanel.add(chartPanel);
+					plotPanel.validate();
 				}
 				if (firstFilter.getSelectedIndex() != 0
 						&& thirdFilter.getSelectedIndex() != 0) {
@@ -326,8 +332,10 @@ public class DonationProgressStatsView extends InitializableView {
 					chart = createBarChart(dataSet);
 					chartPanel = new ChartPanel(chart);
 					chartPanel.setPreferredSize(new Dimension(700, 270));
-					operationsPanel.add(chartPanel);
-					operationsPanel.validate();
+					plotPanel.removeAll();
+					plotPanel.repaint();
+					plotPanel.add(chartPanel);
+					plotPanel.validate();
 				}
 			}
 			else if(chooseThree.isSelected()==true){
@@ -357,8 +365,10 @@ public class DonationProgressStatsView extends InitializableView {
 				chart = createBarChart(dataSet);
 				chartPanel = new ChartPanel(chart);
 				chartPanel.setPreferredSize(new Dimension(700, 270));
-				operationsPanel.add(chartPanel);
-				operationsPanel.validate();
+				plotPanel.removeAll();
+				plotPanel.repaint();
+				plotPanel.add(chartPanel);
+				plotPanel.validate();
 			}
 			else{
 				JOptionPane.showMessageDialog(operationsPanel,
@@ -371,7 +381,7 @@ public class DonationProgressStatsView extends InitializableView {
 		//ChartFactory.createLineChart(title, categoryAxisLabel, valueAxisLabel, dataset, orientation, legend, tooltips, urls)
 		chart = ChartFactory.createLineChart(null, null, null, dataSet, PlotOrientation.VERTICAL, true, true, false);
 		CategoryPlot plot = chart.getCategoryPlot();
-        plot.setBackgroundPaint(Color.lightGray);
+        plot.setBackgroundPaint(Color.white);
         plot.setDomainGridlinePaint(Color.white);
         plot.setRangeGridlinePaint(Color.white);
         return chart;
