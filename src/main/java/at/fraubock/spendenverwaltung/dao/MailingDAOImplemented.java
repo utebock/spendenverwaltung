@@ -403,10 +403,16 @@ public class MailingDAOImplemented implements IMailingDAO {
 	public List<Mailing> getAllConfirmed() throws PersistenceException {
 		try {
 			log.debug("Entering getAll");
-			
+			MailingMapper mapper = new MailingMapper();
 			List<Mailing> confirmedMailings = jdbcTemplate.query("SELECT * FROM mailings m WHERE m.unconfirmed IS NULL"
-					, new MailingMapper());
-			
+					, mapper);
+
+			for (Mailing m : confirmedMailings) {
+				Integer tmplId = mapper.getTemplateIds().get(m.getId());
+				if (tmplId != null) {
+					m.setTemplate(mailingTemplateDao.getByID(tmplId));
+				}
+			}
 			return confirmedMailings;
 		} catch (EmptyResultDataAccessException e) {
 			return null;
@@ -421,8 +427,18 @@ public class MailingDAOImplemented implements IMailingDAO {
 		try {
 			log.debug("Entering getAll");
 			
+			MailingMapper mapper = new MailingMapper();
+			
 			List<Mailing> unconfirmedMailings = jdbcTemplate.query("SELECT * FROM mailings m WHERE m.unconfirmed IS NOT NULL"
-					, new MailingMapper());
+					, mapper);
+			
+
+			for (Mailing m : unconfirmedMailings) {
+				Integer tmplId = mapper.getTemplateIds().get(m.getId());
+				if (tmplId != null) {
+					m.setTemplate(mailingTemplateDao.getByID(tmplId));
+				}
+			}
 			
 			return unconfirmedMailings;
 		} catch (EmptyResultDataAccessException e) {

@@ -34,6 +34,8 @@ DROP TABLE IF EXISTS confirmed_mailings;
 DROP VIEW IF EXISTS unconfirmed_mailings;
 DROP TABLE IF EXISTS mailings;
 
+drop table if exists unsent_mailings;
+
 DROP TABLE IF EXISTS connected_criterion;
 DROP TABLE IF EXISTS mountedfilter_criterion;
 DROP TABLE IF EXISTS property_criterion;
@@ -160,8 +162,11 @@ CREATE TABLE mailings (
 	id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
         mailing_date DATE NOT NULL,
 	mailing_type ENUM('allgemeiner Dankesbrief', 'Dankesbrief', 'Dauerspender Dankesbrief',
+      'Einzelspenden Dankesbrief', 'Erlagscheinversand', 'Infomaterial',
+       'Spendenaufruf', 'Spendenbrief', 'T-Shirt Versand'),
 	mailing_medium ENUM('email', 'postal'),
-    unconfirmed INTEGER UNSIGNED DEFAULT NULL REFERENCES unsent_mailings(id) ON DELETE SET NULL, -- if NULL, this mailing is considered confirmed/validated.	template INTEGER UNSIGNED REFERENCES mailing_templates(id) ON DELETE RESTRICT,
+    unconfirmed INTEGER UNSIGNED DEFAULT NULL REFERENCES unsent_mailings(id) ON DELETE SET NULL, -- if NULL, this mailing is considered confirmed/validated.	
+    template INTEGER UNSIGNED REFERENCES mailing_templates(id) ON DELETE RESTRICT,
 	UNIQUE(mailing_date, mailing_type, mailing_medium, template)
 );
 
@@ -235,7 +240,7 @@ CREATE VIEW validated_donations AS SELECT * FROM donations WHERE import IS NULL;
 
 CREATE VIEW validated_persons AS SELECT * FROM persons p WHERE NOT EXISTS (SELECT id FROM donations d WHERE d.import IS NOT NULL AND d.personid = p.id); -- only validated persons (i.e. no pending imports)
 
-
+CREATE VIEW validated_addresses AS SELECT * FROM addresses a WHERE NOT EXISTS (SELECT * FROM livesat l JOIN persons p ON (l.pid = p.id) WHERE l.aid = a.id AND p.id NOT IN (SELECT id FROM validated_persons)); -- only validated addresses (i.e. no pending imports)
 
 -- triggers for action history:
 
@@ -353,7 +358,7 @@ BEGIN
 END;//
 
 --TODO hier weitermachen
-CREATE TRIGGER mountedfilter_criterion_log_insert AFTER INSERT ON mountedfilter_criterion FOR EACH ROW
+/*CREATE TRIGGER mountedfilter_criterion_log_insert AFTER INSERT ON mountedfilter_criterion FOR EACH ROW
 BEGIN
 	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'criterion', CAST(NEW.id AS CHAR(30)), CONCAT('mount filter #', NEW.mount, ' ON ', NEW.relational_operator, ' ', ));
 END;//
@@ -368,7 +373,9 @@ BEGIN
 	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'criterion', CONCAT(OLD.property, ' ', OLD.relational_operator, ' ', IFNULL(OLD.numValue, ''), IFNULL(OLD.strValue, ''), IFNULL(OLD.dateValue, ''), IF(OLD.daysBack IS NULL, '', CONCAT(OLD.daysBack, ' days back')), IFNULL(OLD.boolValue, '')));
 END;//
 
-
+*/
 
 DELIMITER ;
+
+
 

@@ -1,6 +1,10 @@
 package at.fraubock.spendenverwaltung.dao;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.text.ParseException;
@@ -8,7 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -359,6 +362,7 @@ public abstract class AbstractMailingDAOTest {
 		mailing.setDate(new Date(System.currentTimeMillis()));
 		mailing.setFilter(filterOnePerson);
 		mailing.setMedium(Mailing.Medium.POSTAL);
+		mailing.setTemplate(mt);
 		mailing.setType(Mailing.MailingType.DAUERSPENDER_DANKESBRIEF);
 		
 		Integer oldId = null;
@@ -399,6 +403,7 @@ public abstract class AbstractMailingDAOTest {
 		mailing.setDate(new Date(System.currentTimeMillis()));
 		mailing.setFilter(filterOnePerson);
 		mailing.setMedium(Mailing.Medium.POSTAL);
+		mailing.setTemplate(mt);
 		mailing.setType(Mailing.MailingType.DAUERSPENDER_DANKESBRIEF);
 		
 		Integer oldId = null;
@@ -517,6 +522,7 @@ public abstract class AbstractMailingDAOTest {
 			Mailing mailingTwo = new Mailing();
 			
 			mailingTwo.setMedium(Mailing.Medium.POSTAL);
+			mailingTwo.setTemplate(mt2);
 			mailingTwo.setType(Mailing.MailingType.DANKESBRIEF);
 			mailingTwo.setDate(new Date(System.currentTimeMillis()));
 			mailingTwo.setFilter(filterOnePerson);
@@ -574,6 +580,7 @@ public abstract class AbstractMailingDAOTest {
 			Mailing mailingTwo = new Mailing();
 			
 			mailingTwo.setMedium(Mailing.Medium.POSTAL);
+			mailingTwo.setTemplate(mt2);
 			mailingTwo.setType(Mailing.MailingType.DANKESBRIEF);
 			mailingTwo.setDate(new Date(System.currentTimeMillis()));
 			mailingTwo.setFilter(filterOnePerson);
@@ -653,6 +660,7 @@ public abstract class AbstractMailingDAOTest {
 		Mailing mailingTwo = new Mailing();
 		
 		mailingTwo.setMedium(Mailing.Medium.POSTAL);
+		mailingTwo.setTemplate(mt2);
 		mailingTwo.setType(Mailing.MailingType.DANKESBRIEF);
 		mailingTwo.setDate(new Date(System.currentTimeMillis()));
 		mailingTwo.setFilter(filterOnePerson);
