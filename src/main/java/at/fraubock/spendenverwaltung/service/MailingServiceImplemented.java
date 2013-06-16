@@ -84,8 +84,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 	
 	/**
-	 * adds all unconfirmed mailings to a hashmap, where each creator (key)
-	 * maps to a corresponding list of created mails.
+	 * adds all unconfirmed mailings to a list
 	 * 
 	 * @returns Map of creators and mailings
 	 */
@@ -142,19 +141,21 @@ public class MailingServiceImplemented implements IMailingService {
 		
 		MailingTemplate mt = mailing.getTemplate();
 		
-		List<Person> personList;
-		try {
-			personList = personDAO.getPersonsByMailing(mailing);
-			MailingTemplateUtil.createMailingWithDocxTemplate(mt.getFile(),
-					personList, mt.getFileName());
-		} catch (PersistenceException e) {
-			throw new ServiceException(e);
-		} catch (IOException e) {
-			throw new ServiceException(e);
-		} catch (ServiceException e) {
-			throw new ServiceException(e);
+		if(mt != null)
+		{		
+			List<Person> personList;
+		
+			try {
+				personList = personDAO.getPersonsByMailing(mailing);
+				MailingTemplateUtil.createMailingWithDocxTemplate(mt.getFile(),
+						personList, mt.getFileName());
+			} catch (PersistenceException e) {
+				throw new ServiceException(e);
+			} catch (IOException e) {
+				throw new ServiceException(e);
+			} catch (ServiceException e) {
+				throw new ServiceException(e);
+			}
 		}
-
 	}
-
 }

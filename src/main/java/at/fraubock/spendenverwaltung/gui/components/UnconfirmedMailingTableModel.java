@@ -5,7 +5,6 @@ import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
 
-import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.UnconfirmedMailing;
 
 /**
@@ -21,7 +20,7 @@ public class UnconfirmedMailingTableModel extends AbstractTableModel {
 	private Vector<UnconfirmedMailing> unconfirmedMailings = new Vector<UnconfirmedMailing>();
 	
 	private String[] columnNames = new String[] { "Datum",
-			"Aussendungstyp", "Medium", "Ersteller" };
+			"Aussendungstyp", "Medium", "Vorlage", "Ersteller" };
 	
 	public void addUnconfirmedMailing(UnconfirmedMailing m) {
 		unconfirmedMailings.add(m);
@@ -40,6 +39,7 @@ public class UnconfirmedMailingTableModel extends AbstractTableModel {
 	
 	public void clear() {
 		this.unconfirmedMailings = new Vector<UnconfirmedMailing>();
+		fireTableDataChanged();
 	}
 	
 	@Override
@@ -49,7 +49,7 @@ public class UnconfirmedMailingTableModel extends AbstractTableModel {
 
 	@Override
 	public int getColumnCount() {
-		return 4;
+		return columnNames.length;
 	}
 	
 	public Class<?> getColumnClass(int col) {
@@ -58,10 +58,12 @@ public class UnconfirmedMailingTableModel extends AbstractTableModel {
 		case 0:
 			return java.util.Date.class;
 		case 1:
-			return Mailing.MailingType.class;
+			return String.class;
 		case 2:
-			return Mailing.Medium.class;
+			return String.class;
 		case 3:
+			return String.class;
+		case 4:
 			return String.class;
 		}
 		return null;
@@ -91,11 +93,17 @@ public class UnconfirmedMailingTableModel extends AbstractTableModel {
 			case 0:
 				return unconfirmedMailings.get(rowIndex).getMailing().getDate();
 			case 1:
-				return unconfirmedMailings.get(rowIndex).getMailing().getType();
+				return unconfirmedMailings.get(rowIndex).getMailing().getType().getName();
 			case 2:
-				return unconfirmedMailings.get(rowIndex).getMailing().getMedium();
+				return unconfirmedMailings.get(rowIndex).getMailing().getMedium().getName();
 			case 3:
+				if(unconfirmedMailings.get(rowIndex).getMailing().getTemplate() != null) {
+					return unconfirmedMailings.get(rowIndex).getMailing().getTemplate().getFileName();
+				}
+				return "Keine Vorlage";
+			case 4:
 				return unconfirmedMailings.get(rowIndex).getCreator();
+				
 			default:
 			return null;
 		}

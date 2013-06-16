@@ -14,7 +14,7 @@ public class MailingTableModel extends AbstractTableModel {
 	private Vector<Mailing> mailings = new Vector<Mailing>();
 	
 	private String[] columnNames = new String[] { "Datum",
-			"Aussendungstyp", "Medium" };
+			"Aussendungstyp", "Medium", "Vorlage" };
 	
 	public void addMailing(Mailing m) {
 		mailings.add(m);
@@ -33,6 +33,7 @@ public class MailingTableModel extends AbstractTableModel {
 	
 	public void clear() {
 		this.mailings = new Vector<Mailing>();
+		fireTableDataChanged();
 	}
 	
 	@Override
@@ -42,7 +43,7 @@ public class MailingTableModel extends AbstractTableModel {
 
 	@Override
 	public int getColumnCount() {
-		return 3;
+		return columnNames.length;
 	}
 	
 	public Class<?> getColumnClass(int col) {
@@ -51,9 +52,11 @@ public class MailingTableModel extends AbstractTableModel {
 		case 0:
 			return java.util.Date.class;
 		case 1:
-			return Mailing.MailingType.class;
+			return String.class;		
 		case 2:
-			return Mailing.Medium.class;
+			return String.class;		
+		case 3:
+			return String.class;
 		}
 		return null;
 	}
@@ -74,9 +77,15 @@ public class MailingTableModel extends AbstractTableModel {
 			case 0:
 				return mailings.get(rowIndex).getDate();
 			case 1:
-				return mailings.get(rowIndex).getType();
+				return mailings.get(rowIndex).getType().getName();
 			case 2:
-				return mailings.get(rowIndex).getMedium();
+				return mailings.get(rowIndex).getMedium().getName();
+			case 3:
+				if(mailings.get(rowIndex).getTemplate() != null) {
+					return mailings.get(rowIndex).getTemplate().getFileName();
+				} else {
+					return "Keine Vorlage vorhanden";
+				}
 			default:
 				//TODO correct return/exception
 			return null;
