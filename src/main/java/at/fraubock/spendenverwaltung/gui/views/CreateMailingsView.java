@@ -3,32 +3,39 @@ package at.fraubock.spendenverwaltung.gui.views;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXDatePicker;
 
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
+import at.fraubock.spendenverwaltung.gui.components.ComponentConstants;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
-import at.fraubock.spendenverwaltung.gui.components.NumericTextField;
+import at.fraubock.spendenverwaltung.gui.components.StringTextField;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing.Medium;
+import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
+import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.FilterType;
+import at.fraubock.spendenverwaltung.util.MailingTemplateUtil;
 
 /**
  * 
@@ -47,6 +54,7 @@ public class CreateMailingsView extends InitializableView {
 	private ComponentFactory componentFactory;
 	private IMailingService mailingService;
 	private IFilterService filterService;
+	private IPersonService personService;
 	private JXDatePicker emailDatePicker;
 	private JXDatePicker postalDatePicker;
 
@@ -54,28 +62,32 @@ public class CreateMailingsView extends InitializableView {
 	private Filter selectedEmailFilter;
 	private Filter selectedPostalFilter;
 	
+	private File templateFile;
 
 	JPanel contentPanel, createEMailingPanel, createPostalMailingPanel,
 			createReproducePanel;
 
 	JLabel emailTitle, postalTitle, reproduceTitle, emailFilterLabel,
 			postalFilterLabel, emailTypeLabel, postalTypeLabel, emailDateLabel,
-			postalDateLabel, feedbackLabel;
-	JButton createEMailingButton, createPostalMailingButton,
+			postalDateLabel, feedbackLabel, outputNameLabel;
+	JButton createEMailingButton, createPostalMailingButton, fileChooserButton,
 			cancelEMailingButton, cancelPostalMailingButton;
 	JSeparator separator;
+	
+	StringTextField outputNameField;
 
 	JComboBox<Filter> eMailingPersonFilterChooser, postalPersonFilterChooser;
 	JComboBox<Mailing.MailingType> eMailingTypeChooser,
 			postalMailingTypeChooser;
-
+	
 	public CreateMailingsView(ViewActionFactory viewActionFactory,
 			ComponentFactory componentFactory, IMailingService mailingService,
-			IFilterService filterService) {
+			IFilterService filterService, IPersonService personService) {
 		this.viewActionFactory = viewActionFactory;
 		this.componentFactory = componentFactory;
 		this.mailingService = mailingService;
 		this.filterService = filterService;
+		this.personService = personService;
 		setUpLayout();
 	}
 
@@ -83,7 +95,6 @@ public class CreateMailingsView extends InitializableView {
 		contentPanel = componentFactory.createPanel(800, 800);
 		createEMailingPanel = componentFactory.createPanel(800, 350);
 		createPostalMailingPanel = componentFactory.createPanel(800, 350);
-//		createReproducePanel = componentFactory.createPanel(800, 350);
 
 		this.add(contentPanel);
 
@@ -93,7 +104,6 @@ public class CreateMailingsView extends InitializableView {
 		contentPanel.add(createPostalMailingPanel, "wrap");
 		// end of mailing panel, add separator
 		contentPanel.add(componentFactory.createSeparator(), "wrap, growx");
-//		contentPanel.add(createReproducePanel);
 
 		// set title label
 		emailTitle = componentFactory
@@ -152,7 +162,15 @@ public class CreateMailingsView extends InitializableView {
 		postalDatePicker = new JXDatePicker(new java.util.Date());
 		createPostalMailingPanel.add(postalDateLabel);
 		createPostalMailingPanel.add(postalDatePicker, "wrap");
-
+		
+		outputNameLabel = componentFactory.createLabel("PDF Name");
+		outputNameField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
+		createPostalMailingPanel.add(outputNameLabel);
+		createPostalMailingPanel.add(outputNameField, "wrap");
+		
+		fileChooserButton = new JButton("Auswählen");
+		createPostalMailingPanel.add(fileChooserButton, "wrap");
+		
 		// buttons
 		createPostalMailingButton = new JButton("Anlegen");
 		cancelPostalMailingButton = new JButton("Abbrechen");
@@ -162,6 +180,8 @@ public class CreateMailingsView extends InitializableView {
 		feedbackLabel = componentFactory.createLabel("");
 		feedbackLabel.setFont(new Font("Headline", Font.PLAIN, 16));
 		contentPanel.add(feedbackLabel);
+		
+
 
 
 //		// reproduce mailed documents
@@ -263,8 +283,8 @@ public class CreateMailingsView extends InitializableView {
 			cancelAction.putValue(Action.NAME, "Abbrechen");
 			cancelEMailingButton.setAction(cancelAction);
 			cancelPostalMailingButton.setAction(cancelAction);
-			NumericTextField test = new NumericTextField();
-			test.validateContents();
+			fileChooserButton.setAction(new ChoosePostalTemplateAction());
+			
 		} catch (ServiceException e) {
 			JOptionPane
 					.showMessageDialog(null,
@@ -329,18 +349,65 @@ public class CreateMailingsView extends InitializableView {
 			mailing.setDate(postalDatePicker.getDate());
 			mailing.setType((Mailing.MailingType) postalMailingTypeChooser
 					.getSelectedItem());
+			
 
 			try {
 				mailingService.insertOrUpdate(mailing);
 				feedbackLabel.setText("Aussendung wurde erstellt.");
+				
+				if(templateFile != null) {
+					String name;
+					if(outputNameField.getText().isEmpty()) {
+						name = "./vorlage"+(new Date())+".pdf";
+					} else {
+						name = "./"+outputNameField.getText()+".pdf";
+					}
+					
+					List<Person> recipients = personService.getPersonsByMailing(mailing);
+					
+					if(recipients.isEmpty()) {
+						feedbackLabel.setText("Der Personenfilter enthielt keine erreichbaren Personen.");
+						mailingService.delete(mailing);
+					} else {					
+						MailingTemplateUtil.createMailingWithDocxTemplate(templateFile, personService.getPersonsByMailing(mailing), name);
+					}
+				}
 			} catch (ServiceException e1) {
 				log.error(e1 + " occured in CreateMailingsView");
-				feedbackLabel.setText("Ein Fehler ist während der Erstellung dieser Aussendung aufgetreten");
+				feedbackLabel.setText("Ein Fehler ist während der Erstellung dieser Aussendung aufgetreten.");
+			} catch (IOException e1) {
+				log.error(e1 + " occured in CreateMailingsView");
+				feedbackLabel.setText("Ein Fehler ist während der Erstellung des PDFs aufgetreten.");
 			}
 		}
 
 	}
 
+	private final class ChoosePostalTemplateAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+		
+		public ChoosePostalTemplateAction() {
+			super("Vorlage auswählen");
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JFileChooser fileChooser = new JFileChooser();
+			
+			FileNameExtensionFilter filter = new FileNameExtensionFilter(
+				        "docx", "docx");
+			
+			fileChooser.setFileFilter(filter);
+			
+			int returnval = fileChooser.showOpenDialog(contentPanel);
+			
+			if(returnval == JFileChooser.APPROVE_OPTION) {
+				templateFile = fileChooser.getSelectedFile();
+				log.debug("Set template file");
+			}	
+		}
+	}
 //	private class PostalMailingPicker {
 //
 //		private Mailing mailing;

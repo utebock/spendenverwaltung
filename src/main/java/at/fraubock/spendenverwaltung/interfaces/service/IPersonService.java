@@ -3,6 +3,7 @@ package at.fraubock.spendenverwaltung.interfaces.service;
 import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
+import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
@@ -76,5 +77,14 @@ public interface IPersonService {
 	 * @return CSV representation of the persons
 	 */
 	public String convertToCSV(List<Person> persons);
+
+	/**
+	 * returns all persons associated with a specific mailing
+	 * 
+	 * @param mailing
+	 * @return
+	 * @throws ServiceException
+	 */
+	public List<Person> getPersonsByMailing(Mailing mailing) throws ServiceException;
 	
 }

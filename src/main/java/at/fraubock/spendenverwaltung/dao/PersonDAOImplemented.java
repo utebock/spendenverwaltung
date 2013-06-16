@@ -186,13 +186,6 @@ public class PersonDAOImplemented implements IPersonDAO {
 						person.isPostalNotification(), person.getNote(),
 						person.getId() };
 
-				// TODO check if types is necessary for null values, if not then
-				// we can safely delete this.
-				// int[] types = new int[] { Types.VARCHAR, Types.VARCHAR,
-				// Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-				// Types.VARCHAR, Types.BOOLEAN, Types.BOOLEAN, Types.VARCHAR,
-				// Types.INTEGER };
-
 				jdbcTemplate.update(updatePersons, params);
 
 				// to update address relationhips, simply delete them and then
@@ -590,6 +583,10 @@ public class PersonDAOImplemented implements IPersonDAO {
 					new Object[] { mailing.getId() },
 					new int[] { Types.INTEGER }, new PersonMapper());
 
+			for(Person person : persons) {
+				fetchAddresses(person);
+			}
+			
 			log.debug("Returning from getPersonsByMailing");
 
 			return persons;

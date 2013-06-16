@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
+import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
@@ -135,7 +136,7 @@ public class PersonServiceImplemented implements IPersonService {
 			throw new IllegalArgumentException("Argument must not be null.");
 		}
 		
-		String csv = "Vorname;Nachname;E-Mail;Geschlecht;Titel;Unternehmen;Telephon;Empfängt E-Mail;Empfängt Post;Notiz;Land;Stadt;PLZ;Strasse\n";
+		String csv = "Vorname;Nachname;E-Mail;Geschlecht;Titel;Unternehmen;Telephon;Empfï¿½ngt E-Mail;Empfï¿½ngt Post;Notiz;Land;Stadt;PLZ;Strasse\n";
 		
 		for(Person p: persons) {
 			csv+=p.getGivenName()+";";
@@ -167,6 +168,15 @@ public class PersonServiceImplemented implements IPersonService {
 			throw new ServiceException(e);
 		}
 		return list;
+	}
+
+	@Override
+	public List<Person> getPersonsByMailing(Mailing mailing) throws ServiceException{
+		try {
+			return personDAO.getPersonsByMailing(mailing);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
 	}
 
 }
