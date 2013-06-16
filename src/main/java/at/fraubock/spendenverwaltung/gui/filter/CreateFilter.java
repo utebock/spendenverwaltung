@@ -102,7 +102,7 @@ public class CreateFilter extends JPanel {
 		// set up GUI
 		setUpCreate();
 
-		this.add(criterionSelectorPanel, "wrap, h 700");
+		this.add(criterionSelectorPanel, "wrap, h 400");
 
 		// add plus button
 		criterionSelectorPanel.add(plusButton, "wrap, gapleft 7, gaptop 10");
@@ -144,11 +144,6 @@ public class CreateFilter extends JPanel {
 		headline.setFont(new Font("Headline", Font.PLAIN, 14));
 		this.add(headline, "wrap, gapbottom 20");
 
-		// create filter name panel
-		// this.filterNamePanel = new JPanel(); - by putting nameField in a
-		// separate panel,
-		// nameField is not usable, since height is ~1px - ch
-		// filterNamePanel.setPreferredSize(new Dimension(800,250));
 		nameField = new CustomTextField(100);
 		if (editFilter != null) {
 			nameField.setText(editFilter.getName());

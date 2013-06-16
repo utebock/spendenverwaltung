@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -68,8 +69,8 @@ public class MainFilterView extends InitializableView {
 		showTable.setFillsViewportHeight(true);
 		showTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		scrollPane = new JScrollPane(showTable);
-		scrollPane.setPreferredSize(new Dimension(700, 550));
-		add(scrollPane);
+		scrollPane.setPreferredSize(new Dimension(748, 550));
+		this.add(scrollPane);
 
 	}
 
@@ -82,7 +83,7 @@ public class MainFilterView extends InitializableView {
 		toolbar.setFloatable(false);
 		toolbar.setRollover(true);
 		addComponentsToToolbar(toolbar);
-		panel.add(toolbar, "growx, wrap");
+		panel.add(toolbar, "wrap");
 		empty = builder.createLabel("		 ");
 		panel.add(empty, "wrap");
 		initTable();
@@ -90,6 +91,12 @@ public class MainFilterView extends InitializableView {
 	}
 
 	private void addComponentsToToolbar(JToolBar toolbar) {
+		
+		backButton = new JButton();
+		Action getBack = viewActionFactory.getMainMenuViewAction();
+		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
+		backButton.setAction(getBack);
+		
 		personFilter = new JButton();
 		personFilter.setAction(new AbstractAction("Personenfilter erstellen") {
 			private static final long serialVersionUID = 7948990257221071839L;
@@ -155,19 +162,14 @@ public class MainFilterView extends InitializableView {
 			
 		});
 		delete.setFont(new Font("Bigger", Font.PLAIN, 13));
-
-		backButton = new JButton();
-		backButton.setFont(new Font("Bigger", Font.PLAIN, 13));
-		Action act = viewActionFactory.getMainMenuViewAction();
-		act.putValue(Action.NAME, "<html>&nbsp;Zur\u00FCck</html>");
-		backButton.setAction(act);
 		
+		toolbar.add(backButton);
 		toolbar.add(personFilter);
 		toolbar.add(donationFilter);
 		toolbar.add(sendingsFilter);
 		toolbar.add(edit);
 		toolbar.add(delete);
-		toolbar.add(backButton, "wrap");
+		
 
 	}
 

@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -148,6 +149,7 @@ public class FindPersonsView extends InitializableView {
 		this.setLayout(new MigLayout());
 		overviewPanel = componentFactory.createPanel(800, 800);
 		this.add(overviewPanel);
+		
 		toolbar = new JToolBar();
 		toolbar.setFloatable(false);
 		toolbar.setRollover(true);
@@ -212,7 +214,12 @@ public class FindPersonsView extends InitializableView {
 	}
 
 	private void addComponentsToToolbar(JToolBar toolbar) {
-
+		
+		backButton = new JButton();
+		Action getBack = viewActionFactory.getMainMenuViewAction();
+		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
+		backButton.setAction(getBack);
+		
 		addAttribute = new JButton();
 		addAttribute.setFont(new Font("Bigger", Font.PLAIN, 13));
 		AddAction addAction = new AddAction();
@@ -233,17 +240,12 @@ public class FindPersonsView extends InitializableView {
 		deleteAction.putValue(Action.NAME,
 				"<html>&nbsp;Person l\u00F6schen</html>");
 		deleteButton.setAction(deleteAction);
-
-		backButton = new JButton();
-		backButton.setFont(new Font("Bigger", Font.PLAIN, 13));
-		Action getBack = viewActionFactory.getMainMenuViewAction();
-		getBack.putValue(Action.NAME, "<html>&nbsp;Zur\u00FCck</html>");
-		backButton.setAction(getBack);
-
+		
+		toolbar.add(backButton, "growx");
 		toolbar.add(addAttribute, "split 4, growx");
 		toolbar.add(editButton, "growx");
 		toolbar.add(deleteButton, "growx");
-		toolbar.add(backButton, "growx");
+		
 	}
 
 	public PersonTableModel getPersonModel() {

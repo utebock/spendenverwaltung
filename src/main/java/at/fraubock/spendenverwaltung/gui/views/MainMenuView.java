@@ -41,18 +41,14 @@ public class MainMenuView extends InitializableView {
 	private JSeparator sendSeparator;
 	private JButton showSendings;
 	private JButton confirmSendings;
-	private JButton deleteSendings;
 	private JLabel showSendingsLabel;
 	private JLabel confirmSendingsLabel;
-	private JLabel deleteSendingsLabel;
 	private JPanel statsPanel;
 	private JLabel stats;
 	private JButton progress;
 	private JButton statsSendings;
-	private JButton statsPersons;
 	private JLabel progressLabel;
 	private JLabel statsSendingsLabel;
-	private JLabel statsPersonsLabel;
 	private JButton search;
 	private JLabel searchLabel;
 	private JPanel overviewPanel;
@@ -90,11 +86,11 @@ public class MainMenuView extends InitializableView {
 
 		//CreatePersonView
 		personsPanel.add(general, "wrap");
-		person = new JButton();;
+		person = new JButton();
 		personsPanel.add(person);
-		search = new JButton();;
+		search = new JButton();
 		personsPanel.add(search, "gap 35");
-		filter = new JButton();;
+		filter = new JButton();
 		personsPanel.add(filter, "wrap 0px, gap 38");
 		//button labels
 		persons = componentFactory.createLabel("Person anlegen");
@@ -175,7 +171,7 @@ public class MainMenuView extends InitializableView {
 		overviewPanel.add(sendSeparator, "wrap 0px, growx");
 		
 		/**
-		 * "Statistiken"-panel contains spendenentwicklung, aussendungen, personen
+		 * "Statistiken"-panel contains spendenentwicklung, aussendungen
 		 */
 				
 		statsPanel = componentFactory.createPanel(800,160);
@@ -186,16 +182,13 @@ public class MainMenuView extends InitializableView {
 		progress = new JButton();
 		statsPanel.add(progress, "split 2");
 		statsSendings = new JButton();;
-		statsPanel.add(statsSendings, "gap 55");
-		statsPersons = new JButton();;
-		statsPanel.add(statsPersons, "wrap 0px, gap 45");
+		statsPanel.add(statsSendings, "gap 55, wrap 0px");
 		
 		progressLabel = componentFactory.createLabel("<html><center>Spenden-<br>entwicklung</html>");
 		statsPanel.add(progressLabel, "split 2");
 		statsSendingsLabel = componentFactory.createLabel("Aussendungen");
 		statsPanel.add(statsSendingsLabel, "gap 55");
-		statsPersonsLabel = componentFactory.createLabel("Personen");
-		statsPanel.add(statsPersonsLabel, "gap 55");
+
 			}
 	
 	//call when viewActionFactory is fully populated
@@ -211,10 +204,8 @@ public class MainMenuView extends InitializableView {
 		mailings.setAction(viewActionFactory.getCreateMailingsViewAction());
 		showSendings.setAction(viewActionFactory.getFindMailingsViewAction());
 		confirmSendings.setAction(viewActionFactory.getConfirmMailingsViewAction());
-	//	deleteSendings.setAction(viewActionFactory.getDeleteMailingsViewAction());
 		progress.setAction(viewActionFactory.getDonationProgressStatsViewAction());
 		statsSendings.setAction(viewActionFactory.getShowMailingStatsViewAction());
-		statsPersons.setAction( viewActionFactory.getShowPersonStatsViewAction());
 	}
 	
 //	public static void main(String[] args) {
