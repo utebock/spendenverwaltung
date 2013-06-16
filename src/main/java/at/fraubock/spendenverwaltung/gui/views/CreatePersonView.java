@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -307,7 +308,9 @@ public class CreatePersonView extends InitializableView {
 		
 		Action cancelAction = viewActionFactory.getMainMenuViewAction();
 		cancelAction.putValue(Action.NAME, "Abbrechen");
+		cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
 		cancel.setAction(cancelAction);
+		cancel.setFont(new Font("bigger", Font.PLAIN, 13));
 	}
 	
 	private final class SubmitAction extends AbstractAction {
