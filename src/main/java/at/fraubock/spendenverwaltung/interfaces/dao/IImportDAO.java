@@ -48,6 +48,14 @@ public interface IImportDAO {
 	public List<Import> getAll() throws PersistenceException;
 
 	/**
+	 * Retrieves all imports stored in the underlying persistence layer which are not confirmed yes
+	 * @return List of all unconfirmed imports, sorted by id descending.
+	 * @throws PersistenceException
+	 * 				if communication to the underlying persistence system failed
+	 */
+	public List<Import> getAllUnconfirmed() throws PersistenceException;
+	
+	/**
 	 * Retrieves import by ID
 	 * 
 	 * @param id

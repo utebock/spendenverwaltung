@@ -367,6 +367,16 @@ public class ImportServiceImplemented implements IImportService {
 		}
 		
 	}
+
+
+	@Override
+	public List<Import> getAllUnconfirmed() throws ServiceException {
+		try {
+			return importDAO.getAllUnconfirmed();
+		} catch (PersistenceException e) {
+			return new ArrayList<Import>();
+		}
+	}
 	
 	public IImportDAO getImportDAO() {
 		return importDAO;

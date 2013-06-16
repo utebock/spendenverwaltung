@@ -26,6 +26,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Import;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
+import at.fraubock.spendenverwaltung.service.DonationValidator;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
 import at.fraubock.spendenverwaltung.util.FilterToSqlBuilder;
 
@@ -73,7 +74,7 @@ public class DonationDAOImplemented implements IDonationDAO {
 		if (d.getType() == null)
 			throw new ValidationException("Type must not be null");
 	}
-
+	
 	private class CreateDonationStatementCreator implements
 			PreparedStatementCreator {
 
@@ -186,13 +187,11 @@ public class DonationDAOImplemented implements IDonationDAO {
 	}
 
 	@Override
-	public List<Donation> getUnconfirmed() throws PersistenceException {
-		try {
-
-			String select = "SELECT * FROM donations WHERE import IS NOT NULL ORDER BY id DESC";
-
-			List<Donation> donations = jdbcTemplate.query(select,
-					new DonationMapper());
+	public List<Donation> getUnconfirmed(Import toImport) throws PersistenceException {
+		try{
+			String select = "SELECT * FROM donations WHERE import=? ORDER BY id DESC";
+	
+			List<Donation> donations = jdbcTemplate.query(select, new Object[] { toImport.getId() }, new DonationMapper());
 
 			return donations;
 		} catch (DataAccessException e) {
@@ -344,9 +343,9 @@ public class DonationDAOImplemented implements IDonationDAO {
 		try {
 			String select = "SELECT * FROM validated_donations WHERE personid=? AND amount=? AND donationdate=? AND dedication=? AND type=? AND note=?";
 
-			Object[] params = new Object[] { d.getDonator().getId(),
-					d.getAmount(), d.getDate(), d.getDedication(),
-					d.getType().getName(), d.getNote() };
+		Object[] params = new Object[] { d.getDonator().getId(),
+				d.getAmount(), d.getDate(), d.getDedication(),
+				d.getType().getName(), d.getNote() };
 
 			List<Donation> donations = jdbcTemplate.query(select, params,
 					new DonationMapper());

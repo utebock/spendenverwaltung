@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
 import at.fraubock.spendenverwaltung.gui.views.FindPersonsView;
 import at.fraubock.spendenverwaltung.gui.views.ImportDataView;
+import at.fraubock.spendenverwaltung.gui.views.ImportValidationView;
 
 @Deprecated
 public class ButtonListener implements ActionListener{
@@ -17,7 +18,7 @@ public class ButtonListener implements ActionListener{
 	private MainFilterView filterOverview;
 	private CreateFilter createFilter;
 	private EditPerson editPerson;
-	private ImportValidation importValidation;
+	private ImportValidationView importValidation;
 	private ImportDataView importData;
 	
 	public ButtonListener(Overview overview){
@@ -46,7 +47,7 @@ public class ButtonListener implements ActionListener{
 	public ButtonListener(EditPerson editPerson) {
 		this.editPerson = editPerson;
 	}
-	public ButtonListener(ImportValidation importValidation){
+	public ButtonListener(ImportValidationView importValidation){
 		this.importValidation = importValidation;
 	}
 

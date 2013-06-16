@@ -105,15 +105,55 @@ public class ValidatedData {
 			
 			if(donator.getSurname().equals(p.getSurname())
 					&& donator.getGivenName().equals(p.getGivenName())
-					&& (donator.getEmail().equals(p.getEmail()))
+					&& (donator.getEmail().equals(p.getEmail())
 						|| (!donator.getTelephone().equals("") && donator.getTelephone().equals(p.getTelephone()))
 						|| (donator.getMainAddress() != null && donator.getMainAddress().getCity().equals(p.getMainAddress().getCity())
 								&& donator.getMainAddress().getPostalCode().equals(p.getMainAddress().getPostalCode())
-								&& donator.getMainAddress().getStreet().equals(p.getMainAddress().getStreet()))){
+								&& donator.getMainAddress().getStreet().equals(p.getMainAddress().getStreet())))){
 				return donator;
 			}
 		}
 		
 		return doublePerson;
+	}
+	
+	public void removeEntryFromList(Person person, Donation donation){
+		for(Person p : personListNew){
+			if(person == p){
+				personsToDelete.add(person);
+				personListNew.remove(person);
+			}
+		}
+		for(Person p : personListMatch){
+			if(person == p){
+				personsToDelete.add(person);
+				personListMatch.remove(person);
+			}
+		}
+		for(Person p : personListConflict){
+			if(person == p){
+				personsToDelete.add(person);
+				personListConflict.remove(person);
+			}
+		}
+
+		for(Donation d : donationListNew){
+			if(donation == d){
+				donationsToDelete.add(donation);
+				donationListNew.remove(donation);
+			}
+		}
+		for(Donation d : donationListMatch){
+			if(donation == d){
+				donationsToDelete.add(donation);
+				donationListMatch.remove(donation);
+			}
+		}
+		for(Donation d : donationListConflict){
+			if(donation == d){
+				donationsToDelete.add(donation);
+				donationListConflict.remove(donation);
+			}
+		}
 	}
 }

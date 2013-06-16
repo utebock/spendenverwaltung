@@ -155,4 +155,3 @@ public class ValidationTableModel extends AbstractTableModel{
 		}
 	}
 }
-
