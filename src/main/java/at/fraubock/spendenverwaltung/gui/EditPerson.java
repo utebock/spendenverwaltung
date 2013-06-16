@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -101,6 +102,7 @@ public class EditPerson extends JPanel{
 	private JLabel setAsMainAddress;
 	private JCheckBox mainAddress;
 	private JButton cancelAddr;
+	private JButton backButton;
 
 	public EditPerson(ComponentFactory componentFactory, ViewActionFactory viewActionFactory, 
 			Person person, IPersonService personService, IAddressService addressService, FindPersonsView filterPersons, PersonTableModel personModel) {
@@ -275,7 +277,9 @@ public class EditPerson extends JPanel{
 		cancel = new JButton();
 		Action getBack = viewActionFactory.getFindPersonsView();
 		getBack.putValue(Action.NAME, "Abbrechen");
+		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
 		cancel.setAction(getBack);
+		cancel.setFont(new Font("bigger", Font.PLAIN, 13));
 		panel.add(cancel, "wrap");
 		
 		separator = componentFactory.createSeparator();
@@ -311,6 +315,7 @@ public class EditPerson extends JPanel{
 		
 		cancelAddr = new JButton();
 		cancelAddr.setAction(getBack);
+		cancelAddr.setFont(new Font("bigger", Font.PLAIN, 13));
 		tablePanel.add(cancelAddr, "wrap");
 		
 		getAddresses();	

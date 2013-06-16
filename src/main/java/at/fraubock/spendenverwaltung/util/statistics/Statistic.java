@@ -15,13 +15,35 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.util.Pair;
 
+/**
+ * A statistic for {@link Donation}s creates {@link StatisticClass}es based on a
+ * classification and produces {@link DefaultCategoryDataset}s to be used e.g.
+ * for feeding charts.
+ * 
+ * @author manuel-bichler
+ * 
+ */
 public class Statistic {
 
 	private static final Logger log = Logger.getLogger(Statistic.class);
 
-	private Map<GregorianCalendar, StatisticClass> classes; // key: start date
-															// of class
+	/**
+	 * key: start date of class
+	 */
+	private Map<GregorianCalendar, StatisticClass> classes;
 
+	/**
+	 * Creates a new statistic.
+	 * 
+	 * @param dataSets
+	 *            a list of rows the statistic shall be calculated from. Each
+	 *            row consists of a list of donations and a name.
+	 * @param classfication
+	 *            the granularity of the "buckets" the donations will be thrown
+	 *            into. When creating a dataset using
+	 *            {@link #createDataset(Operation)}, each of its columns will
+	 *            represent one bucket.
+	 */
 	public Statistic(List<Pair<List<Donation>, String>> dataSets,
 			Classification classfication) {
 
@@ -171,6 +193,14 @@ public class Statistic {
 
 	}
 
+	/**
+	 * creates a dataset, e.g. for use with charts
+	 * 
+	 * @param operation
+	 *            the statistic operation that shall be used to calculate the
+	 *            statistic value for each bucket in each row.
+	 * @return the generated dataset
+	 */
 	public DefaultCategoryDataset createDataset(Operation operation) {
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 		for (StatisticClass c : classes.values()) {

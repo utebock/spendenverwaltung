@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -224,6 +225,8 @@ public class AddAttributes extends JPanel{
 		backBtn = new JButton();
 		Action getBack = viewActionFactory.getFindPersonsView();
 		getBack.putValue(Action.NAME, "Abbrechen");
+		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
+		backBtn.setFont(new Font("bigger", Font.PLAIN, 13));
 		backBtn.setAction(getBack);
 		addressPanel.add(backBtn, "wrap");
 		JSeparator separator = componentFactory.createSeparator();
@@ -424,6 +427,8 @@ public class AddAttributes extends JPanel{
 		backBtn = new JButton();
 		Action getBack = viewActionFactory.getFindPersonsView();
 		getBack.putValue(Action.NAME, "Abbrechen");
+		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
+		backBtn.setFont(new Font("bigger", Font.PLAIN, 13));
 		backBtn.setAction(getBack);
 		donationPanel.add(backBtn, "");
 		
