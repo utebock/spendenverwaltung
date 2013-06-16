@@ -2,18 +2,57 @@ SET SESSION innodb_strict_mode=on;
 
 USE ubspenderverwaltung;
 
--- TODO: DROP TRIGGERS
-DROP TRIGGER IF EXISTS livesat_log_update;
-DROP TRIGGER IF EXISTS livesat_log_insert;
-DROP TRIGGER IF EXISTS livesat_log_delete;
-DROP TRIGGER IF EXISTS persons_log_update;
-DROP TRIGGER IF EXISTS persons_log_insert;
-DROP TRIGGER IF EXISTS persons_log_delete;
-DROP TRIGGER IF EXISTS addresses_log_update;
 DROP TRIGGER IF EXISTS addresses_log_insert;
+DROP TRIGGER IF EXISTS addresses_log_update;
 DROP TRIGGER IF EXISTS addresses_log_delete;
-
-drop table if exists unsent_mailings;
+DROP TRIGGER IF EXISTS persons_log_insert;
+DROP TRIGGER IF EXISTS persons_log_update;
+DROP TRIGGER IF EXISTS persons_log_delete;
+DROP TRIGGER IF EXISTS livesat_log_insert;
+DROP TRIGGER IF EXISTS livesat_log_update;
+DROP TRIGGER IF EXISTS livesat_log_delete;
+DROP TRIGGER IF EXISTS imports_log_insert;
+DROP TRIGGER IF EXISTS imports_log_update;
+DROP TRIGGER IF EXISTS imports_log_delete;
+DROP TRIGGER IF EXISTS donations_log_insert;
+DROP TRIGGER IF EXISTS donations_log_update;
+DROP TRIGGER IF EXISTS donations_log_delete;
+DROP TRIGGER IF EXISTS connected_criterion_log_insert;
+DROP TRIGGER IF EXISTS connected_criterion_log_update;
+DROP TRIGGER IF EXISTS connected_criterion_log_delete;
+DROP TRIGGER IF EXISTS property_criterion_log_insert;
+DROP TRIGGER IF EXISTS property_criterion_log_update;
+DROP TRIGGER IF EXISTS property_criterion_log_delete;
+DROP TRIGGER IF EXISTS mountedfilter_criterion_log_insert;
+DROP TRIGGER IF EXISTS mountedfilter_criterion_log_update;
+DROP TRIGGER IF EXISTS mountedfilter_criterion_log_delete;
+DROP TRIGGER IF EXISTS filter_log_insert;
+DROP TRIGGER IF EXISTS filter_log_update;
+DROP TRIGGER IF EXISTS filter_log_delete;
+DROP TRIGGER IF EXISTS mailings_log_insert;
+DROP TRIGGER IF EXISTS mailings_log_update;
+DROP TRIGGER IF EXISTS mailings_log_delete;
+DROP TRIGGER IF EXISTS unconfirmed_mailings_log_insert;
+DROP TRIGGER IF EXISTS unconfirmed_mailings_log_update;
+DROP TRIGGER IF EXISTS unconfirmed_mailings_log_delete;
+DROP TRIGGER IF EXISTS sent_mailings_log_insert;
+DROP TRIGGER IF EXISTS sent_mailings_log_update;
+DROP TRIGGER IF EXISTS sent_mailings_log_delete;
+DROP TRIGGER IF EXISTS mailing_templates_log_insert;
+DROP TRIGGER IF EXISTS mailing_templates_log_update;
+DROP TRIGGER IF EXISTS mailing_templates_log_delete;
+DROP TRIGGER IF EXISTS donation_confirmation_templates_log_insert;
+DROP TRIGGER IF EXISTS donation_confirmation_templates_log_update;
+DROP TRIGGER IF EXISTS donation_confirmation_templates_log_delete;
+DROP TRIGGER IF EXISTS donation_confirmations_log_insert;
+DROP TRIGGER IF EXISTS donation_confirmations_log_update;
+DROP TRIGGER IF EXISTS donation_confirmations_log_delete;
+DROP TRIGGER IF EXISTS single_donation_confirmation_log_insert;
+DROP TRIGGER IF EXISTS single_donation_confirmation_log_update;
+DROP TRIGGER IF EXISTS single_donation_confirmation_log_delete;
+DROP TRIGGER IF EXISTS multiple_donations_confirmation_log_insert;
+DROP TRIGGER IF EXISTS multiple_donations_confirmation_log_update;
+DROP TRIGGER IF EXISTS multiple_donations_confirmation_log_delete;
 
 DROP VIEW IF EXISTS validated_addresses;
 DROP VIEW IF EXISTS validated_persons;
@@ -27,14 +66,11 @@ DROP TABLE IF EXISTS donation_confirmations;
 
 DROP TABLE IF EXISTS donation_confirmation_templates;
 DROP TABLE IF EXISTS mailing_templates;
-DROP TABLE IF EXISTS document_templates;
 
 DROP TABLE IF EXISTS sent_mailings;
-DROP TABLE IF EXISTS confirmed_mailings;
-DROP VIEW IF EXISTS unconfirmed_mailings;
+DROP VIEW IF EXISTS confirmed_mailings;
+DROP TABLE IF EXISTS unconfirmed_mailings;
 DROP TABLE IF EXISTS mailings;
-
-drop table if exists unsent_mailings;
 
 DROP TABLE IF EXISTS connected_criterion;
 DROP TABLE IF EXISTS mountedfilter_criterion;
@@ -47,8 +83,6 @@ DROP TABLE IF EXISTS donations;
 DROP TABLE IF EXISTS imports;
 DROP TABLE IF EXISTS persons;
 DROP TABLE IF EXISTS addresses;
-
-DROP TABLE IF EXISTS mailing_templates;
 
 
 CREATE TABLE addresses ( -- for querying, you may want to use validated_addresses
@@ -161,20 +195,18 @@ CREATE TABLE mountedfilter_criterion ( -- a criterion which applies another filt
 CREATE TABLE mailings (
 	id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
         mailing_date DATE NOT NULL,
-	mailing_type ENUM('allgemeiner Dankesbrief', 'Dankesbrief', 'Dauerspender Dankesbrief',
-      'Einzelspenden Dankesbrief', 'Erlagscheinversand', 'Infomaterial',
-       'Spendenaufruf', 'Spendenbrief', 'T-Shirt Versand'),
+	mailing_type ENUM('allgemeiner Dankesbrief', 'Dankesbrief', 'Dauerspender Dankesbrief', 'Einzelspenden Dankesbrief', 'Infomaterial', 'Spendenaufruf', 'Spendenbrief'),
 	mailing_medium ENUM('email', 'postal'),
-    unconfirmed INTEGER UNSIGNED DEFAULT NULL REFERENCES unsent_mailings(id) ON DELETE SET NULL, -- if NULL, this mailing is considered confirmed/validated.	
-    template INTEGER UNSIGNED REFERENCES mailing_templates(id) ON DELETE RESTRICT,
+	template INTEGER UNSIGNED REFERENCES mailing_templates(id) ON DELETE RESTRICT,
 	UNIQUE(mailing_date, mailing_type, mailing_medium, template)
 );
 
-CREATE TABLE confirmed_mailings ( -- ids of those mailings that are already confirmed by the user
-	id INTEGER UNSIGNED PRIMARY KEY REFERENCES mailings(id)
+CREATE TABLE unconfirmed_mailings ( -- mailings that are not yet confirmed by the user
+	id INTEGER UNSIGNED PRIMARY KEY REFERENCES mailings(id) ON DELETE CASCADE,
+	creator VARCHAR(30) NOT NULL -- user who created the import (database user name)
 );
 
-CREATE VIEW unconfirmed_mailings AS SELECT * FROM mailings WHERE id NOT IN (SELECT id FROM confirmed_mailings); -- only unconfirmed mailings
+CREATE VIEW confirmed_mailings AS SELECT * FROM mailings WHERE id NOT IN (SELECT id FROM unconfirmed_mailings); -- only confirmed mailings
 
 CREATE TABLE sent_mailings (
 	mailing_id INTEGER UNSIGNED NOT NULL REFERENCES mailings(id) ON DELETE CASCADE,
@@ -229,10 +261,6 @@ CREATE TABLE actions (
 	payload VARCHAR(10240) -- if type = 'insert', the data that has been inserted (w/o id), if type = 'updated', the new data, if type='delete', the old data. BLOBS not contained.
 );
 
-CREATE TABLE unsent_mailings (
-    id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    creator VARCHAR(30) NOT NULL -- user who created the import (database user name)
-);
 
 -- views for validated data:
 
@@ -328,52 +356,194 @@ END;//
 
 CREATE TRIGGER connected_criterion_log_insert AFTER INSERT ON connected_criterion FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'criterion', CAST(NEW.id AS CHAR(30)), IF(NEW.operand2 IS NULL, CONCAT(NEW.logical_operator, ' ', NEW.operand1), CONCAT(NEW.operand1, ' ', NEW.logical_operator, ' ', NEW.operand2)));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'criterion', CAST(NEW.id AS CHAR(30)), CONCAT(IF(NEW.operand2 IS NULL, CONCAT(NEW.logical_operator, ' ', NEW.operand1), CONCAT(NEW.operand1, ' ', NEW.logical_operator, ' ', NEW.operand2)), '; on type ', (SELECT type FROM criterion WHERE id = NEW.id)));
 END;//
 
 CREATE TRIGGER connected_criterion_log_update AFTER UPDATE ON connected_criterion FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'criterion', CAST(NEW.id AS CHAR(30)), IF(NEW.operand2 IS NULL, CONCAT(NEW.logical_operator, ' ', NEW.operand1), CONCAT(NEW.operand1, ' ', NEW.logical_operator, ' ', NEW.operand2)));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'criterion', CAST(NEW.id AS CHAR(30)), CONCAT(IF(NEW.operand2 IS NULL, CONCAT(NEW.logical_operator, ' ', NEW.operand1), CONCAT(NEW.operand1, ' ', NEW.logical_operator, ' ', NEW.operand2)), '; on type ', (SELECT type FROM criterion WHERE id = NEW.id)));
 END;//
 
 CREATE TRIGGER connected_criterion_log_delete AFTER DELETE ON connected_criterion FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'criterion', CAST(OLD.id AS CHAR(30)), IF(OLD.operand2 IS NULL, CONCAT(OLD.logical_operator, ' ', OLD.operand1), CONCAT(OLD.operand1, ' ', OLD.logical_operator, ' ', OLD.operand2)));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'criterion', CAST(OLD.id AS CHAR(30)), CONCAT(IF(OLD.operand2 IS NULL, CONCAT(OLD.logical_operator, ' ', OLD.operand1), CONCAT(OLD.operand1, ' ', OLD.logical_operator, ' ', OLD.operand2)), '; on type ', (SELECT type FROM criterion WHERE id = OLD.id)));
 END;//
 
 
 CREATE TRIGGER property_criterion_log_insert AFTER INSERT ON property_criterion FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'criterion', CAST(NEW.id AS CHAR(30)), CONCAT(NEW.property, ' ', NEW.relational_operator, ' ', IFNULL(NEW.numValue, ''), IFNULL(NEW.strValue, ''), IFNULL(NEW.dateValue, ''), IF(NEW.daysBack IS NULL, '', CONCAT(NEW.daysBack, ' days back')), IFNULL(NEW.boolValue, '')));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'criterion', CAST(NEW.id AS CHAR(30)), CONCAT(NEW.property, ' ', NEW.relational_operator, ' ', IFNULL(NEW.numValue, ''), IFNULL(NEW.strValue, ''), IFNULL(NEW.dateValue, ''), IF(NEW.daysBack IS NULL, '', CONCAT(NEW.daysBack, ' days back')), IFNULL(NEW.boolValue, ''), '; on type ', (SELECT type FROM criterion WHERE id = NEW.id)));
 END;//
 
 CREATE TRIGGER property_criterion_log_update AFTER UPDATE ON property_criterion FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'criterion', CAST(NEW.id AS CHAR(30)), CONCAT(NEW.property, ' ', NEW.relational_operator, ' ', IFNULL(NEW.numValue, ''), IFNULL(NEW.strValue, ''), IFNULL(NEW.dateValue, ''), IF(NEW.daysBack IS NULL, '', CONCAT(NEW.daysBack, ' days back')), IFNULL(NEW.boolValue, '')));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'criterion', CAST(NEW.id AS CHAR(30)), CONCAT(NEW.property, ' ', NEW.relational_operator, ' ', IFNULL(NEW.numValue, ''), IFNULL(NEW.strValue, ''), IFNULL(NEW.dateValue, ''), IF(NEW.daysBack IS NULL, '', CONCAT(NEW.daysBack, ' days back')), IFNULL(NEW.boolValue, ''), '; on type ', (SELECT type FROM criterion WHERE id = NEW.id)));
 END;//
 
 CREATE TRIGGER property_criterion_log_delete AFTER DELETE ON property_criterion FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'criterion', CONCAT(OLD.property, ' ', OLD.relational_operator, ' ', IFNULL(OLD.numValue, ''), IFNULL(OLD.strValue, ''), IFNULL(OLD.dateValue, ''), IF(OLD.daysBack IS NULL, '', CONCAT(OLD.daysBack, ' days back')), IFNULL(OLD.boolValue, '')));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'criterion', CAST(OLD.id AS CHAR(30)), CONCAT(OLD.property, ' ', OLD.relational_operator, ' ', IFNULL(OLD.numValue, ''), IFNULL(OLD.strValue, ''), IFNULL(OLD.dateValue, ''), IF(OLD.daysBack IS NULL, '', CONCAT(OLD.daysBack, ' days back')), IFNULL(OLD.boolValue, ''), '; on type ', (SELECT type FROM criterion WHERE id = OLD.id)));
 END;//
 
---TODO hier weitermachen
-/*CREATE TRIGGER mountedfilter_criterion_log_insert AFTER INSERT ON mountedfilter_criterion FOR EACH ROW
+
+CREATE TRIGGER mountedfilter_criterion_log_insert AFTER INSERT ON mountedfilter_criterion FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'criterion', CAST(NEW.id AS CHAR(30)), CONCAT('mount filter #', NEW.mount, ' ON ', NEW.relational_operator, ' ', ));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'criterion', CAST(NEW.id AS CHAR(30)), CONCAT('mount filter #', NEW.mount, ' ON ', IF (NEW.count IS NULL, IF(NEW.sum IS NULL, CONCAT('average ', NEW.relational_operator, ' ', NEW.avg), CONCAT('sum ', NEW.relational_operator, ' ', NEW.sum)), CONCAT('count ', NEW.relational_operator, ' ', NEW.count)), '; on type ', (SELECT type FROM criterion WHERE id = NEW.id)));
 END;//
 
 CREATE TRIGGER mountedfilter_criterion_log_update AFTER UPDATE ON mountedfilter_criterion FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'criterion', CAST(NEW.id AS CHAR(30)), CONCAT(NEW.property, ' ', NEW.relational_operator, ' ', IFNULL(NEW.numValue, ''), IFNULL(NEW.strValue, ''), IFNULL(NEW.dateValue, ''), IF(NEW.daysBack IS NULL, '', CONCAT(NEW.daysBack, ' days back')), IFNULL(NEW.boolValue, '')));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'criterion', CAST(NEW.id AS CHAR(30)), CONCAT('mount filter #', NEW.mount, ' ON ', IF (NEW.count IS NULL, IF(NEW.sum IS NULL, CONCAT('average ', NEW.relational_operator, ' ', NEW.avg), CONCAT('sum ', NEW.relational_operator, ' ', NEW.sum)), CONCAT('count ', NEW.relational_operator, ' ', NEW.count)), '; on type ', (SELECT type FROM criterion WHERE id = NEW.id)));
 END;//
 
 CREATE TRIGGER mountedfilter_criterion_log_delete AFTER DELETE ON mountedfilter_criterion FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'criterion', CONCAT(OLD.property, ' ', OLD.relational_operator, ' ', IFNULL(OLD.numValue, ''), IFNULL(OLD.strValue, ''), IFNULL(OLD.dateValue, ''), IF(OLD.daysBack IS NULL, '', CONCAT(OLD.daysBack, ' days back')), IFNULL(OLD.boolValue, '')));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'criterion', CAST(OLD.id AS CHAR(30)), CONCAT('mount filter #', OLD.mount, ' ON ', IF (OLD.count IS NULL, IF(OLD.sum IS NULL, CONCAT('average ', OLD.relational_operator, ' ', OLD.avg), CONCAT('sum ', OLD.relational_operator, ' ', OLD.sum)), CONCAT('count ', OLD.relational_operator, ' ', OLD.count)), '; on type ', (SELECT type FROM criterion WHERE id = OLD.id)));
 END;//
 
-*/
+
+CREATE TRIGGER filter_log_insert AFTER INSERT ON filter FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'filter', CAST(NEW.id AS CHAR(30)), CONCAT('criterion #', NEW.criterion, ', type ', NEW.type, IF(NEW.name IS NULL, '', CONCAT('name: "', NEW.name, '", ')), IF(NEW.anonymous, 'anonymous, ', ''), IF(NEW.private, 'private, ', 'public, '), 'owner: ', NEW.owner));
+END;//
+
+CREATE TRIGGER filter_log_update AFTER UPDATE ON filter FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'filter', CAST(NEW.id AS CHAR(30)), CONCAT('criterion #', NEW.criterion, ', type ', NEW.type, IF(NEW.name IS NULL, '', CONCAT('name: "', NEW.name, '", ')), IF(NEW.anonymous, 'anonymous, ', ''), IF(NEW.private, 'private, ', 'public, '), 'owner: ', NEW.owner));
+END;//
+
+CREATE TRIGGER filter_log_delete AFTER DELETE ON filter FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'filter', CAST(OLD.id AS CHAR(30)), CONCAT('criterion #', OLD.criterion, ', type ', OLD.type, IF(OLD.name IS NULL, '', CONCAT('name: "', OLD.name, '", ')), IF(OLD.anonymous, 'anonymous, ', ''), IF(OLD.private, 'private, ', 'public, '), 'owner: ', OLD.owner));
+END;//
+
+
+CREATE TRIGGER mailings_log_insert AFTER INSERT ON mailings FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'mailings', CAST(NEW.id AS CHAR(30)), CONCAT(NEW.mailing_type, ', ', NEW.mailing_medium, ', ', NEW.mailing_date, IF(NEW.template IS NULL, '',CONCAT('template #', NEW.template))));
+END;//
+
+CREATE TRIGGER mailings_log_update AFTER UPDATE ON mailings FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'mailings', CAST(NEW.id AS CHAR(30)), CONCAT(NEW.mailing_type, ', ', NEW.mailing_medium, ', ', NEW.mailing_date, IF(NEW.template IS NULL, '',CONCAT('template #', NEW.template))));
+END;//
+
+CREATE TRIGGER mailings_log_delete AFTER DELETE ON mailings FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'mailings', CAST(OLD.id AS CHAR(30)), CONCAT(OLD.mailing_type, ', ', OLD.mailing_medium, ', ', OLD.mailing_date, IF(OLD.template IS NULL, '',CONCAT('template #', OLD.template))));
+END;//
+
+CREATE TRIGGER unconfirmed_mailings_log_insert AFTER INSERT ON unconfirmed_mailings FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'mailings', CAST(NEW.id AS CHAR(30)), CONCAT('now considered unconfirmed. Creator: ', NEW.creator));
+END;//
+
+CREATE TRIGGER unconfirmed_mailings_log_update AFTER UPDATE ON unconfirmed_mailings FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'mailings', CAST(NEW.id AS CHAR(30)), CONCAT('now considered unconfirmed. Creator: ', NEW.creator));
+END;//
+
+CREATE TRIGGER unconfirmed_mailings_log_delete AFTER DELETE ON unconfirmed_mailings FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'mailings', CAST(OLD.id AS CHAR(30)), 'now considered confirmed.');
+END;//
+
+
+CREATE TRIGGER sent_mailings_log_insert AFTER INSERT ON sent_mailings FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'sent_mailings', CONCAT(CAST(NEW.mailing_id AS CHAR(14)), '/', CAST(NEW.person_id AS CHAR(14))), NULL);
+END;//
+
+CREATE TRIGGER sent_mailings_log_update AFTER UPDATE ON sent_mailings FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'sent_mailings', CONCAT(CAST(NEW.mailing_id AS CHAR(14)), '/', CAST(NEW.person_id AS CHAR(14))), NULL);
+END;//
+
+CREATE TRIGGER sent_mailings_log_delete AFTER DELETE ON sent_mailings FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'sent_mailings', CONCAT(CAST(OLD.mailing_id AS CHAR(14)), '/', CAST(OLD.person_id AS CHAR(14))), NULL);
+END;//
+
+
+CREATE TRIGGER mailing_templates_log_insert AFTER INSERT ON mailing_templates FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'mailing_templates', CAST(NEW.id AS CHAR(30)), CONCAT('name: "', NEW.name, '"'));
+END;//
+
+CREATE TRIGGER mailing_templates_log_update AFTER UPDATE ON mailing_templates FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'mailing_templates', CAST(NEW.id AS CHAR(30)), CONCAT('name: "', NEW.name, '"'));
+END;//
+
+CREATE TRIGGER mailing_templates_log_delete AFTER DELETE ON mailing_templates FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'mailing_templates', CAST(OLD.id AS CHAR(30)), CONCAT('name: "', OLD.name, '"'));
+END;//
+
+
+CREATE TRIGGER donation_confirmation_templates_log_insert AFTER INSERT ON donation_confirmation_templates FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'donation_confirmation_templates', CAST(NEW.id AS CHAR(30)), CONCAT('name: "', NEW.name, '"'));
+END;//
+
+CREATE TRIGGER donation_confirmation_templates_log_update AFTER UPDATE ON donation_confirmation_templates FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmation_templates', CAST(NEW.id AS CHAR(30)), CONCAT('name: "', NEW.name, '"'));
+END;//
+
+CREATE TRIGGER donation_confirmation_templates_log_delete AFTER DELETE ON donation_confirmation_templates FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'donation_confirmation_templates', CAST(OLD.id AS CHAR(30)), CONCAT('name: "', OLD.name, '"'));
+END;//
+
+
+CREATE TRIGGER donation_confirmations_log_insert AFTER INSERT ON donation_confirmations FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'donation_confirmations', CAST(NEW.id AS CHAR(30)), CONCAT('person #', NEW.personid, ', ', 'template #', NEW.template, ', date: ', NEW.confirmation_date));
+END;//
+
+CREATE TRIGGER donation_confirmations_log_update AFTER UPDATE ON donation_confirmations FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(NEW.id AS CHAR(30)), CONCAT('person #', NEW.personid, ', ', 'template #', NEW.template, ', date: ', NEW.confirmation_date));
+END;//
+
+CREATE TRIGGER donation_confirmations_log_delete AFTER DELETE ON donation_confirmations FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'donation_confirmations', CAST(OLD.id AS CHAR(30)), CONCAT('person #', OLD.personid, ', ', 'template #', OLD.template, ', date: ', OLD.confirmation_date));
+END;//
+
+CREATE TRIGGER single_donation_confirmation_log_insert AFTER INSERT ON single_donation_confirmation FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(NEW.id AS CHAR(30)), CONCAT('for single donation #', NEW.donationid));
+END;//
+
+CREATE TRIGGER single_donation_confirmation_log_update AFTER UPDATE ON single_donation_confirmation FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(NEW.id AS CHAR(30)), CONCAT('for single donation #', NEW.donationid));
+END;//
+
+CREATE TRIGGER single_donation_confirmation_log_delete AFTER DELETE ON single_donation_confirmation FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(OLD.id AS CHAR(30)), CONCAT('for single donation #', OLD.donationid));
+END;//
+
+CREATE TRIGGER multiple_donations_confirmation_log_insert AFTER INSERT ON multiple_donations_confirmation FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(NEW.id AS CHAR(30)), CONCAT('for all donations between ', NEW.from_date, ' to ', NEW.to_date));
+END;//
+
+CREATE TRIGGER multiple_donations_confirmation_log_update AFTER UPDATE ON multiple_donations_confirmation FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(NEW.id AS CHAR(30)), CONCAT('for all donations between ', NEW.from_date, ' to ', NEW.to_date));
+END;//
+
+CREATE TRIGGER multiple_donations_confirmation_log_delete AFTER DELETE ON multiple_donations_confirmation FOR EACH ROW
+BEGIN
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(OLD.id AS CHAR(30)), CONCAT('for all donations between ', OLD.from_date, ' to ', OLD.to_date));
+END;//
+
+
+
 
 DELIMITER ;
 
