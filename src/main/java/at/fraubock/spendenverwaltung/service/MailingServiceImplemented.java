@@ -3,10 +3,8 @@ package at.fraubock.spendenverwaltung.service;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
-
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
 import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
@@ -16,6 +14,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.UnconfirmedMailing;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
+import at.fraubock.spendenverwaltung.util.MailChimp;
 import at.fraubock.spendenverwaltung.util.MailingTemplateUtil;
 
 public class MailingServiceImplemented implements IMailingService {
@@ -172,4 +171,19 @@ public class MailingServiceImplemented implements IMailingService {
 			}
 		}
 	}
+
+	@Override
+	public int exportEMailsToMailChimp(Mailing mailing, String mailChimpListId)
+			throws ServiceException {
+		int errors = 0;
+		
+		try {
+			errors = MailChimp.addPersonsToList(mailChimpListId, personDAO.getPersonsByMailing(mailing));
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+		return errors;
+	}
+	
+	
 }
