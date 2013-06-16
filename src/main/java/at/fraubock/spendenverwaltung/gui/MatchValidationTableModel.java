@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.event.ListDataListener;
 import javax.swing.table.AbstractTableModel;
 
+import at.fraubock.spendenverwaltung.gui.views.ImportValidationView;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
@@ -43,10 +44,10 @@ public class MatchValidationTableModel extends AbstractTableModel implements IVa
 	private IPersonService personService;
 	private IAddressService addressService;
 	private IDonationService donationService;
-	private ImportValidation parent;
+	private ImportValidationView parent;
 	private boolean editable;
 	
-	public MatchValidationTableModel(IPersonService personService, IAddressService addressService, IDonationService donationService, ImportValidation parent){
+	public MatchValidationTableModel(IPersonService personService, IAddressService addressService, IDonationService donationService, ImportValidationView parent){
 		this.personService = personService;
 		this.addressService = addressService;
 		this.donationService = donationService;

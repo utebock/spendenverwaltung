@@ -89,9 +89,8 @@ public class ViewActionFactory {
 		return new DisplayViewAction(new ImportDataView(new ComponentFactory(), this, importService), "/images/importOverview.jpg" );
 	}
 	
-	//TODO richtige view returnen!
 	public Action getImportValidationViewAction() {
-		return new DisplayViewAction(new CreatePersonView(new ComponentFactory(), this, personService, addressService, donationService, new PersonTableModel()), "/images/importValidate.jpg");
+		return new DisplayViewAction(new ImportValidationView(personService, addressService, donationService, importService, this), "/images/importValidate.jpg");
 	}
 	
 	//TODO richtige view returnen!

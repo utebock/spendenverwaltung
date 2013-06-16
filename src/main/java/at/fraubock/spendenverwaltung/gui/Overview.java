@@ -19,6 +19,7 @@ import net.miginfocom.swing.MigLayout;
 import org.apache.log4j.Logger;
 
 import at.fraubock.spendenverwaltung.gui.views.FindPersonsView;
+import at.fraubock.spendenverwaltung.gui.views.ImportValidationView;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
@@ -311,7 +312,7 @@ public class Overview extends JPanel{
 	}
 	
 	public void goToValidation(){
-		ImportValidation validation = new ImportValidation(personService, addressService, donationService, importService, this);
+//		ImportValidationView validation = new ImportValidationView(personService, addressService, donationService, importService, this);
 		removeAll();
 		revalidate();
 		repaint();

@@ -155,7 +155,7 @@ public class MainMenuView extends InitializableView {
 		sending.setFont(new Font("Headline", Font.PLAIN, 14));
 		sendPanel.add(sending, "wrap 0px");
 		//importPanel.add(empty, "wrap");
-		mailings = new JButton();;
+		mailings = new JButton();
 		sendPanel.add(mailings, "split 3");
 		showSendings = new JButton();
 		sendPanel.add(showSendings, "gap 55");
@@ -188,7 +188,7 @@ public class MainMenuView extends InitializableView {
 		stats = componentFactory.createLabel("Statistiken");
 		stats.setFont(new Font("Headline", Font.PLAIN, 14));
 		statsPanel.add(stats, "wrap");
-		progress = new JButton();;
+		progress = new JButton();
 		statsPanel.add(progress, "split 2");
 		statsSendings = new JButton();;
 		statsPanel.add(statsSendings, "gap 55");

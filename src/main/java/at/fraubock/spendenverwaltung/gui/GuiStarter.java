@@ -55,7 +55,7 @@ public class GuiStarter {
 				
 		//populate viewActionFactory
 		
-		
+	
 		//finish view initialization after viewActionFactory is populated (for button wiring)
 //		createPerson.init();
 //		createMailingsView.initButtons();

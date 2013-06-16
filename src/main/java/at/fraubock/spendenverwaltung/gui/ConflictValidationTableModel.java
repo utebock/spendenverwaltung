@@ -18,6 +18,7 @@ import javax.swing.event.ListDataListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 
+import at.fraubock.spendenverwaltung.gui.views.ImportValidationView;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
@@ -44,13 +45,13 @@ public class ConflictValidationTableModel extends AbstractTableModel implements 
 	private IDonationService donationService;
 	private IPersonService personService;
 	private IAddressService addressService;
-	private ImportValidation parent;
+	private ImportValidationView parent;
 	private Vector<JComboBox> comboBoxes = new Vector<JComboBox>();
 	private boolean editable;
 	private ImportValidator importValidator;
 	private ValidatedData validatedData;
 	 
-	public ConflictValidationTableModel(ImportValidation parent, IDonationService donationService, IPersonService personService, IAddressService addressService){
+	public ConflictValidationTableModel(ImportValidationView parent, IDonationService donationService, IPersonService personService, IAddressService addressService){
 		this.parent = parent;
 		this.personService = personService;
 		this.donationService = donationService;

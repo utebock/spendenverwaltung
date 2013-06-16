@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 
 import at.fraubock.spendenverwaltung.gui.filter.ConfiguratorFactory;
 import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
+import at.fraubock.spendenverwaltung.gui.views.ImportValidationView;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
@@ -52,7 +53,7 @@ public class AssignPerson extends JDialog {
 	private static final Logger log = Logger.getLogger(AssignPerson.class);
 	private IPersonService personService;
 	private IDonationService donationService;
-	private ImportValidation overview;
+	private ImportValidationView overview;
 	private ComponentBuilder builder;
 	private PersonTableModel personModel;
 	private JTable showTable;
