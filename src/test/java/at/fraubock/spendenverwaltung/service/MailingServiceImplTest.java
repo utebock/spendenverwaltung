@@ -13,6 +13,7 @@ public class MailingServiceImplTest extends AbstractMailingServiceTest {
 	public void initService() {
 		MailingServiceImplemented mailingService = new MailingServiceImplemented();
 		mailingService.setMailingDAO(mailingDAO);
+		mailingService.setPersonDAO(personDAO);
 		super.mailingService = mailingService;
 	}
 }

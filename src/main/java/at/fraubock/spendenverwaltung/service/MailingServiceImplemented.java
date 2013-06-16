@@ -136,7 +136,12 @@ public class MailingServiceImplemented implements IMailingService {
 
 	@Override
 	public void reproduceDocument(Mailing mailing) throws ServiceException {
+		if (mailing == null) {
+			throw new IllegalArgumentException("Argument must not be null.");
+		}
+		
 		MailingTemplate mt = mailing.getTemplate();
+		
 		List<Person> personList;
 		try {
 			personList = personDAO.getPersonsByMailing(mailing);

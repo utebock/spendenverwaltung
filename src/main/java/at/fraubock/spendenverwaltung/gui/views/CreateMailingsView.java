@@ -54,13 +54,14 @@ public class CreateMailingsView extends InitializableView {
 	private Filter selectedEmailFilter;
 	private Filter selectedPostalFilter;
 
-	JPanel contentPanel, createEMailingPanel, createPostalMailingPanel, createReproducePanel;
+	JPanel contentPanel, createEMailingPanel, createPostalMailingPanel,
+			createReproducePanel;
 
-	JLabel emailTitle, postalTitle, reproduceTitle, emailFilterLabel, postalFilterLabel,
-			emailTypeLabel, postalTypeLabel, emailDateLabel, postalDateLabel;
+	JLabel emailTitle, postalTitle, reproduceTitle, emailFilterLabel,
+			postalFilterLabel, emailTypeLabel, postalTypeLabel, emailDateLabel,
+			postalDateLabel;
 	JButton createEMailingButton, createPostalMailingButton,
-			cancelEMailingButton, cancelPostalMailingButton
-			;
+			cancelEMailingButton, cancelPostalMailingButton;
 	JSeparator separator;
 
 	JComboBox<Filter> eMailingPersonFilterChooser, postalPersonFilterChooser;
@@ -82,7 +83,7 @@ public class CreateMailingsView extends InitializableView {
 		createEMailingPanel = componentFactory.createPanel(800, 350);
 		createPostalMailingPanel = componentFactory.createPanel(800, 350);
 		createReproducePanel = componentFactory.createPanel(800, 350);
-		
+
 		this.add(contentPanel);
 
 		contentPanel.add(createEMailingPanel, "wrap");
@@ -155,14 +156,14 @@ public class CreateMailingsView extends InitializableView {
 		createPostalMailingButton = new JButton("Anlegen");
 		cancelPostalMailingButton = new JButton("Abbrechen");
 		createPostalMailingPanel.add(cancelPostalMailingButton, "split 2");
-		createPostalMailingPanel.add(createPostalMailingButton,"wrap");
+		createPostalMailingPanel.add(createPostalMailingButton, "wrap");
 
 		// reproduce mailed documents
 		reproduceTitle = componentFactory
 				.createLabel("Postalische Aussendungen wiederherstellen");
 		reproduceTitle.setFont(new Font("Headline", Font.PLAIN, 16));
 		createReproducePanel.add(reproduceTitle, "gapbottom 30,wrap");
-		
+
 		List<Mailing> mailings = null;
 		try {
 			mailings = mailingService.getAll();
@@ -193,7 +194,15 @@ public class CreateMailingsView extends InitializableView {
 			public void actionPerformed(ActionEvent arg0) {
 				PostalMailingPicker mailingChoice = (PostalMailingPicker) sentMailingsDD
 						.getSelectedItem();
+
+				if (mailingChoice == null) {
+					JOptionPane.showMessageDialog(CreateMailingsView.this,
+							"Bitte wählen Sie eine Aussendung aus.", "Info",
+							JOptionPane.INFORMATION_MESSAGE);
+				}
+				
 				Mailing mailing = mailingChoice.getMailing();
+
 
 				try {
 					mailingService.reproduceDocument(mailing);
@@ -210,7 +219,7 @@ public class CreateMailingsView extends InitializableView {
 			}
 
 		});
-		createReproducePanel.add(reproduceDocument,"wrap, gaptop 10");
+		createReproducePanel.add(reproduceDocument, "wrap, gaptop 10");
 
 	}
 
@@ -342,7 +351,7 @@ public class CreateMailingsView extends InitializableView {
 			res += new SimpleDateFormat("dd.MM.yyyy").format(mailing.getDate())
 					+ " - ";
 			res += mailing.getType() + " - ";
-			// res += mailing.getTemplate();TODO
+			res += mailing.getTemplate().getFileName();
 
 			return res;
 		}

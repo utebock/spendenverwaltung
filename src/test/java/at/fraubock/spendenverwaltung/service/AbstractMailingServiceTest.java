@@ -1,17 +1,26 @@
 package at.fraubock.spendenverwaltung.service;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
+import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
+import at.fraubock.spendenverwaltung.interfaces.domain.MailingTemplate;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
@@ -30,6 +39,7 @@ public abstract class AbstractMailingServiceTest {
 
 	protected IMailingService mailingService;
 	protected final IMailingDAO mailingDAO = mock(IMailingDAO.class);
+	protected final IPersonDAO personDAO = mock(IPersonDAO.class);
 
 	private Mailing validMailing;
 	private Mailing validMailingTwo;
@@ -218,9 +228,17 @@ public abstract class AbstractMailingServiceTest {
 	@Test
 	public void createCSVWithValidArgument_ReturnsCSVString() {
 		List<Mailing> list = new ArrayList<Mailing>();
-		validMailing.setDate(new Date());
-		validMailingTwo.setDate(new Date());
-		validMailingThree.setDate(new Date());
+
+		try {
+			validMailing.setDate(new SimpleDateFormat("dd.MM.yyyy")
+					.parse("12.06.2013"));
+			validMailingTwo.setDate(new SimpleDateFormat("dd.MM.yyyy")
+					.parse("13.06.2013"));
+			validMailingThree.setDate(new SimpleDateFormat("dd.MM.yyyy")
+					.parse("14.06.2013"));
+		} catch (ParseException e) {
+			fail();
+		}
 		list.add(validMailing);
 		list.add(validMailingTwo);
 		list.add(validMailingThree);
@@ -235,7 +253,35 @@ public abstract class AbstractMailingServiceTest {
 		assertTrue(csv.equals("Datum;Art;Medium;\n"));
 	}
 
-	private String csvExpected = "Datum;Art;Medium;\n10.06.2013;DANKESBRIEF;EMAIL;\n10.06.2013;INFOMATERIAL;POSTAL;\n"
-			+ "10.06.2013;ERLAGSCHEINVERSAND;EMAIL;\n";
+	@Test(expected = IllegalArgumentException.class)
+	public void reproduceDocumentWithNullArgument_ThrowsException()
+			throws ServiceException {
+		mailingService.reproduceDocument(null);
+	}
+
+	@Test
+	public void reproduceDocumentWithValidArgument_ProducesDocument()
+			throws ServiceException {
+		try {
+			String fs = File.separator;
+			MailingTemplate mt = new MailingTemplate();
+			File f = new File("src" + fs + "test" + fs + "resources" + fs
+					+ "examplemailing2.docx");
+			mt.setFile(f);
+			mt.setFileName(f.getName());
+			validMailing.setTemplate(mt);
+
+			mailingService.reproduceDocument(validMailing);
+
+			verify(personDAO).getPersonsByMailing(validMailing);
+			// TODO how to mock a static method?
+			// (MailingTemplateUtil#createMailingWithDocxTemplate())
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+
+	private String csvExpected = "Datum;Art;Medium;\n12.06.2013;DANKESBRIEF;EMAIL;\n13.06.2013;INFOMATERIAL;POSTAL;\n"
+			+ "14.06.2013;ERLAGSCHEINVERSAND;EMAIL;\n";
 
 }

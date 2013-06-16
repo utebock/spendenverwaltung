@@ -73,6 +73,7 @@ public abstract class AbstractFilterDAOTest {
 			assert (savedFilter.equals(testFilter));
 
 		} catch (PersistenceException e) {
+			e.printStackTrace();
 			fail();
 		}
 	}
@@ -102,6 +103,7 @@ public abstract class AbstractFilterDAOTest {
 			assert (!allFilters.contains(testFilter));
 
 		} catch (PersistenceException e) {
+			e.printStackTrace();
 			fail();
 		}
 	}
@@ -167,6 +169,7 @@ public abstract class AbstractFilterDAOTest {
 		testFilter.setCriterion(testPropCrit);
 		testFilter.setName("Testname");
 		testFilter.setType(FilterType.PERSON);
+		testFilter.setOwner("test");
 
 		testPropCrit2 = new PropertyCriterion();
 		testPropCrit2.setType(FilterType.PERSON);
@@ -178,6 +181,7 @@ public abstract class AbstractFilterDAOTest {
 		testFilter2.setCriterion(testPropCrit2);
 		testFilter2.setName("Testname");
 		testFilter2.setType(FilterType.PERSON);
+		testFilter2.setOwner("test2");
 	}
 
 }

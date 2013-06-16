@@ -8,7 +8,9 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
@@ -20,6 +22,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
+import at.fraubock.spendenverwaltung.interfaces.dao.IMailingTemplateDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.UnconfirmedMailing;
@@ -48,6 +51,15 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 	private JdbcTemplate jdbcTemplate;
 	private FilterToSqlBuilder filterToSqlBuilder;
+	private IMailingTemplateDAO mailingTemplateDao;
+
+	public IMailingTemplateDAO getMailingTemplateDao() {
+		return mailingTemplateDao;
+	}
+
+	public void setMailingTemplateDao(IMailingTemplateDAO mailingTemplateDao) {
+		this.mailingTemplateDao = mailingTemplateDao;
+	}
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -80,6 +92,12 @@ public class MailingDAOImplemented implements IMailingDAO {
 			throw new ValidationException("Type was null");
 		}
 
+		if (mailing.getTemplate() == null
+				&& mailing.getMedium() == Mailing.Medium.POSTAL) {
+			throw new ValidationException(
+					"Template can not be null when medium is POSTAL");
+		}
+
 		/**
 		 * fails if the mailing filter was not set, or if the type of the
 		 * mailing filter was not set, or if the type of the mailing filter was
@@ -110,7 +128,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 			this.unconfirmedId = unconfirmedId;
 		}
 
-		private String createMailings = "insert into mailings (mailing_date, mailing_type, mailing_medium, unconfirmed) values (?,?,?,?)";
+		private String createMailings = "insert into mailings (mailing_date, mailing_type, mailing_medium, template, unconfirmed) values (?,?,?,?,?)";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
@@ -121,7 +139,12 @@ public class MailingDAOImplemented implements IMailingDAO {
 			ps.setDate(1, new java.sql.Date(mailing.getDate().getTime()));
 			ps.setString(2, mailing.getType().getName());
 			ps.setString(3, mailing.getMedium().getName());
-			ps.setInt(4, unconfirmedId);
+			if (mailing.getTemplate() == null) {
+				ps.setNull(4, java.sql.Types.INTEGER);
+			} else {
+				ps.setInt(4, mailing.getTemplate().getId());
+			}
+			ps.setInt(5, unconfirmedId);
 
 			return ps;
 		}
@@ -164,6 +187,10 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 			if (mailing.getId() == null) {
 				// create
+
+				if (mailing.getTemplate() != null) {
+					mailingTemplateDao.insert(mailing.getTemplate());
+				}
 
 				KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -239,14 +266,23 @@ public class MailingDAOImplemented implements IMailingDAO {
 				}
 
 			} else {
-				jdbcTemplate
-						.update("UPDATE mailings SET mailing_date=?, mailing_type=?, mailing_medium=? WHERE id=?",
-								new Object[] {
-										new Timestamp(mailing.getDate()
-												.getTime()),
-										mailing.getType().getName(),
-										mailing.getMedium().getName(),
-										mailing.getId() });
+				String update = "UPDATE mailings SET mailing_date=?, mailing_type=?, "
+						+ "mailing_medium=? WHERE id=?";
+				Object[] values = new Object[] {
+						new Timestamp(mailing.getDate().getTime()),
+						mailing.getType().getName(),
+						mailing.getMedium().getName(), mailing.getId() };
+
+				if (mailing.getMedium() == Mailing.Medium.POSTAL) {
+					update = "UPDATE mailings SET mailing_date=?, mailing_type=?, "
+							+ "mailing_medium=?, template=? WHERE id=?";
+					values = new Object[] {
+							new Timestamp(mailing.getDate().getTime()),
+							mailing.getType().getName(),
+							mailing.getMedium().getName(),
+							mailing.getTemplate().getId(), mailing.getId() };
+				}
+				jdbcTemplate.update(update, values);
 			}
 
 			log.debug("Returning from insertOrUpdate");
@@ -343,9 +379,16 @@ public class MailingDAOImplemented implements IMailingDAO {
 	public List<Mailing> getAll() throws PersistenceException {
 		try {
 			log.debug("Entering getAll");
-
+			MailingMapper mapper = new MailingMapper();
 			List<Mailing> mailings = jdbcTemplate.query(
-					"SELECT * FROM mailings", new MailingMapper());
+					"SELECT * FROM mailings", mapper);
+
+			for (Mailing m : mailings) {
+				Integer tmplId = mapper.getTemplateIds().get(m.getId());
+				if (tmplId != null) {
+					m.setTemplate(mailingTemplateDao.getByID(tmplId));
+				}
+			}
 
 			log.debug("Returning from getAll");
 			return mailings;
@@ -360,10 +403,16 @@ public class MailingDAOImplemented implements IMailingDAO {
 	public List<Mailing> getAllConfirmed() throws PersistenceException {
 		try {
 			log.debug("Entering getAll");
-			
+			MailingMapper mapper = new MailingMapper();
 			List<Mailing> confirmedMailings = jdbcTemplate.query("SELECT * FROM mailings m WHERE m.unconfirmed IS NULL"
-					, new MailingMapper());
-			
+					, mapper);
+
+			for (Mailing m : confirmedMailings) {
+				Integer tmplId = mapper.getTemplateIds().get(m.getId());
+				if (tmplId != null) {
+					m.setTemplate(mailingTemplateDao.getByID(tmplId));
+				}
+			}
 			return confirmedMailings;
 		} catch (EmptyResultDataAccessException e) {
 			return null;
@@ -378,8 +427,18 @@ public class MailingDAOImplemented implements IMailingDAO {
 		try {
 			log.debug("Entering getAll");
 			
+			MailingMapper mapper = new MailingMapper();
+			
 			List<Mailing> unconfirmedMailings = jdbcTemplate.query("SELECT * FROM mailings m WHERE m.unconfirmed IS NOT NULL"
-					, new MailingMapper());
+					, mapper);
+			
+
+			for (Mailing m : unconfirmedMailings) {
+				Integer tmplId = mapper.getTemplateIds().get(m.getId());
+				if (tmplId != null) {
+					m.setTemplate(mailingTemplateDao.getByID(tmplId));
+				}
+			}
 			
 			return unconfirmedMailings;
 		} catch (EmptyResultDataAccessException e) {
@@ -396,9 +455,15 @@ public class MailingDAOImplemented implements IMailingDAO {
 			log.debug("Entering getById with param " + id);
 
 			try {
+				MailingMapper mapper = new MailingMapper();
 				Mailing mailing = jdbcTemplate.queryForObject(
 						"SELECT * FROM mailings WHERE id=?",
-						new Object[] { id }, new MailingMapper());
+						new Object[] { id }, mapper);
+
+				Integer tmplId = mapper.getTemplateIds().get(mailing.getId());
+				if (tmplId != null) {
+					mailing.setTemplate(mailingTemplateDao.getByID(tmplId));
+				}
 
 				log.debug("Returning from getById with result " + mailing);
 				return mailing;
@@ -452,11 +517,19 @@ public class MailingDAOImplemented implements IMailingDAO {
 			
 			try {
 
+			MailingMapper mapper = new MailingMapper();
 			List<Mailing> mailings = jdbcTemplate.query(
 					"SELECT ma.* FROM mailings ma, sent_mailings se "
 							+ "WHERE ma.unconfirmed IS NULL AND ma.id=se.mailing_id AND se.person_id=?",
 					new Object[] { person.getId() },
-					new int[] { Types.INTEGER }, new MailingMapper());
+					new int[] { Types.INTEGER }, mapper);
+
+			for (Mailing m : mailings) {
+				Integer tmplId = mapper.getTemplateIds().get(m.getId());
+				if (tmplId != null) {
+					m.setTemplate(mailingTemplateDao.getByID(tmplId));
+				}
+			}
 
 			log.debug("Returning from getMailingsByPerson");
 
@@ -478,6 +551,8 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 	private class MailingMapper implements RowMapper<Mailing> {
 
+		private Map<Integer, Integer> templateIds = new HashMap<Integer, Integer>();
+
 		@Override
 		public Mailing mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Mailing mailing = new Mailing();
@@ -490,7 +565,15 @@ public class MailingDAOImplemented implements IMailingDAO {
 			mailing.setMedium(Mailing.Medium.getByName(rs
 					.getString("mailing_medium")));
 
+			if (mailing.getMedium() == Mailing.Medium.POSTAL) {
+				this.templateIds.put(rs.getInt("id"), rs.getInt("template"));
+			}
+
 			return mailing;
+		}
+
+		public Map<Integer, Integer> getTemplateIds() {
+			return templateIds;
 		}
 
 	}

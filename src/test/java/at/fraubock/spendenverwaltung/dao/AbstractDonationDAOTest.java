@@ -7,6 +7,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IDonationDAO;
+import at.fraubock.spendenverwaltung.interfaces.dao.IImportDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
@@ -45,6 +48,11 @@ public abstract class AbstractDonationDAOTest {
 	protected static IPersonDAO personDAO;
 	protected static IDonationDAO donationDAO;
 	protected static IAddressDAO addressDAO;
+	protected static IImportDAO importDAO;
+
+	public static void setImportDao(IImportDAO importDAO) {
+		AbstractDonationDAOTest.importDAO = importDAO;
+	}
 
 	public static void setDonationDao(IDonationDAO donationDAO) {
 		AbstractDonationDAOTest.donationDAO = donationDAO;
@@ -247,7 +255,7 @@ public abstract class AbstractDonationDAOTest {
 			donationDAO.insertOrUpdate(donation);
 			Donation createdDonation = donationDAO.getByID(donation.getId());
 			assertThat(createdDonation != null
-					&& createdDonation.getId() == donation.getId(), is(true));
+					&& createdDonation.getId().equals(donation.getId()), is(true));
 
 			donationDAO.delete(donation);
 			assertNull(donationDAO.getByID(donation.getId()));
@@ -412,7 +420,11 @@ public abstract class AbstractDonationDAOTest {
 
 		donation.setDonator(person);
 		donation.setAmount(9999L);
-		donation.setDate(new Date());
+		try {
+			donation.setDate(new SimpleDateFormat("yyyy-MM-dd").parse("2013-06-10"));
+		} catch (ParseException e1) {
+			fail();
+		}
 		donation.setDedication("test");
 		donation.setNote("bla");
 		donation.setType(Donation.DonationType.BANK_TRANSFER);
@@ -422,7 +434,7 @@ public abstract class AbstractDonationDAOTest {
 			Donation createdDonation = donationDAO.getByID(donation.getId());
 
 			assertThat(createdDonation != null
-					&& createdDonation.getId() == donation.getId(), is(true));
+					&& createdDonation.equals(donation), is(true));
 
 		} catch (PersistenceException e) {
 			fail();
@@ -477,30 +489,35 @@ public abstract class AbstractDonationDAOTest {
 			fail();
 		}
 
-		Calendar cal1 = Calendar.getInstance();
-		cal1.set(2012, Calendar.JUNE, 20);
-		Calendar cal2 = Calendar.getInstance();
-		cal2.set(2013, Calendar.JANUARY, 3);
-		Calendar cal3 = Calendar.getInstance();
-		cal3.set(2013, Calendar.MAY, 20);
-
 		donation1.setDonator(person1);
 		donation1.setAmount(9999L);
-		donation1.setDate(cal1.getTime());
+		try {
+			donation1.setDate(new SimpleDateFormat("yyyy-MM-dd").parse("2012-06-20"));
+		} catch (ParseException e1) {
+			fail();
+		}
 		donation1.setDedication("test");
 		donation1.setNote("bla");
 		donation1.setType(Donation.DonationType.BANK_TRANSFER);
 
 		donation2.setDonator(person1);
 		donation2.setAmount(1L);
-		donation2.setDate(cal2.getTime());
+		try {
+			donation2.setDate(new SimpleDateFormat("yyyy-MM-dd").parse("2013-01-03"));
+		} catch (ParseException e1) {
+			fail();
+		}
 		donation2.setDedication("Spendenaufruf Neujahr 2013");
 		donation2.setNote("bla2");
 		donation2.setType(Donation.DonationType.SMS);
 
 		donation3.setDonator(person2);
 		donation3.setAmount(50L);
-		donation3.setDate(cal3.getTime());
+		try {
+			donation3.setDate(new SimpleDateFormat("yyyy-MM-dd").parse("2013-05-20"));
+		} catch (ParseException e1) {
+			fail();
+		}
 		donation3.setDedication("test3");
 		donation3.setNote("bla3");
 		donation3.setType(Donation.DonationType.BANK_TRANSFER);
@@ -576,21 +593,33 @@ public abstract class AbstractDonationDAOTest {
 
 		donation1.setDonator(person1);
 		donation1.setAmount(150L);
-		donation1.setDate(new Date());
+		try {
+			donation1.setDate(new SimpleDateFormat("yyyy-MM-dd").parse("2013-06-10"));
+		} catch (ParseException e1) {
+			fail();
+		}
 		donation1.setDedication("test");
 		donation1.setNote("bla");
 		donation1.setType(Donation.DonationType.BANK_TRANSFER);
 
 		donation2.setDonator(person1);
 		donation2.setAmount(10L);
-		donation2.setDate(new Date());
+		try {
+			donation2.setDate(new SimpleDateFormat("yyyy-MM-dd").parse("2013-06-10"));
+		} catch (ParseException e1) {
+			fail();
+		}
 		donation2.setDedication("Spendenaufruf Neujahr 2013");
 		donation2.setNote("bla2");
 		donation2.setType(Donation.DonationType.SMS);
 
 		donation3.setDonator(person1);
 		donation3.setAmount(80L);
-		donation3.setDate(new Date());
+		try {
+			donation3.setDate(new SimpleDateFormat("yyyy-MM-dd").parse("2013-06-10"));
+		} catch (ParseException e1) {
+			fail();
+		}
 		donation3.setDedication("test3");
 		donation3.setNote("bla3");
 		donation3.setType(Donation.DonationType.BANK_TRANSFER);
@@ -661,29 +690,41 @@ public abstract class AbstractDonationDAOTest {
 
 		donation1.setDonator(person1);
 		donation1.setAmount(150L);
-		donation1.setDate(new Date());
-		donation1.setDedication("Spendenaufruf 2013");
+		try {
+			donation1.setDate(new SimpleDateFormat("yyyy-MM-dd").parse("2013-06-10"));
+		} catch (ParseException e1) {
+			fail();
+		}
+		donation1.setDedication("Spendenaufruf 2013 J\u00E4nner");
 		donation1.setNote("bla5");
 		donation1.setType(Donation.DonationType.BANK_TRANSFER);
 
 		donation2.setDonator(person1);
 		donation2.setAmount(10L);
-		donation2.setDate(new Date());
-		donation2.setDedication("Spendenaufruf 2013 J�nner");
+		try {
+			donation2.setDate(new SimpleDateFormat("yyyy-MM-dd").parse("2013-06-10"));
+		} catch (ParseException e1) {
+			fail();
+		}
+		donation2.setDedication("Spendenaufruf 2013 J\u00E4nner");
 		donation2.setNote("bla22");
 		donation2.setType(Donation.DonationType.SMS);
 
 		donation3.setDonator(person1);
 		donation3.setAmount(80L);
-		donation3.setDate(new Date());
-		donation3.setDedication("Regelm��ige Spende");
+		try {
+			donation3.setDate(new SimpleDateFormat("yyyy-MM-dd").parse("2013-06-10"));
+		} catch (ParseException e1) {
+			fail();
+		}
+		donation3.setDedication("Regelm\u00E4ssige Spende");
 		donation3.setNote("bla31");
 		donation3.setType(Donation.DonationType.BANK_TRANSFER);
 
 		// create filter and criterions
 		PropertyCriterion dedication = new PropertyCriterion();
 		dedication.compare(FilterProperty.DONATION_DEDICATION,
-				RelationalOperator.EQUALS, "Spendenaufruf 2013");
+				RelationalOperator.EQUALS, "Spendenaufruf 2013 J\u00E4nner");
 
 		Filter donationFilter = new Filter(FilterType.DONATION, dedication);
 
@@ -752,14 +793,18 @@ public abstract class AbstractDonationDAOTest {
 
 		donation3.setDonator(person1);
 		donation3.setAmount(80L);
-		donation3.setDate(new Date());
+		try {
+			donation3.setDate(new SimpleDateFormat("yyyy-MM-dd").parse("2013-06-10"));
+		} catch (ParseException e1) {
+			fail();
+		}
 		donation3.setDedication("T-Shirt");
 		donation3.setNote("Bestellid 123123123123");
 		donation3.setType(Donation.DonationType.MERCHANDISE);
 
 		// create filter and criterions
 		PropertyCriterion note = new PropertyCriterion();
-		note.compare(FilterProperty.DONATION_NOTE, RelationalOperator.EQUALS,
+		note.compare(FilterProperty.DONATION_NOTE, RelationalOperator.LIKE,
 				"Bestellid");
 
 		Filter donationFilter = new Filter(FilterType.DONATION, note);
@@ -813,7 +858,7 @@ public abstract class AbstractDonationDAOTest {
 		} catch (PersistenceException e) {
 			fail();
 		}
-
+		
 		donation1.setDonator(person1);
 		donation1.setAmount(150L);
 		donation1.setDate(new Date());
@@ -849,7 +894,7 @@ public abstract class AbstractDonationDAOTest {
 
 			List<Donation> donations = donationDAO.getByFilter(donationFilter);
 
-			assertThat(donations != null && donations.size() == 3, is(true));
+			assertThat(donations != null && donations.size() == 2, is(true));
 
 		} catch (PersistenceException e) {
 			fail();
@@ -892,32 +937,37 @@ public abstract class AbstractDonationDAOTest {
 			fail();
 		}
 
-		Calendar cal1 = Calendar.getInstance();
-		cal1.set(2012, Calendar.JUNE, 20);
-		Calendar cal2 = Calendar.getInstance();
-		cal2.set(2013, Calendar.JANUARY, 3);
-		Calendar cal3 = Calendar.getInstance();
-		cal3.set(2013, Calendar.MAY, 20);
-
 		donation1.setDonator(person1);
 		donation1.setAmount(9999L);
-		donation1.setDate(cal1.getTime());
+		try {
+			donation1.setDate(new SimpleDateFormat("yyyy-MM-dd").parse("2012-06-20"));
+		} catch (ParseException e1) {
+			fail();
+		}
 		donation1.setDedication("test");
 		donation1.setNote("bla");
 		donation1.setType(Donation.DonationType.BANK_TRANSFER);
 
 		donation2.setDonator(person1);
 		donation2.setAmount(1L);
-		donation2.setDate(cal2.getTime());
+		try {
+			donation2.setDate(new SimpleDateFormat("yyyy-MM-dd").parse("2013-01-03"));
+		} catch (ParseException e1) {
+			fail();
+		}
 		donation2.setDedication("Spendenaufruf Neujahr 2013");
 		donation2.setNote("bla2");
 		donation2.setType(Donation.DonationType.SMS);
 
 		donation3.setDonator(person1);
 		donation3.setAmount(50L);
-		donation3.setDate(cal3.getTime());
-		donation3.setDedication("Spendenaufruf");
-		donation3.setNote("bla3");
+		try {
+			donation3.setDate(new SimpleDateFormat("yyyy-MM-dd").parse("2013-05-20"));
+		} catch (ParseException e1) {
+			fail();
+		}
+		donation3.setDedication("Spendenaufruf 2013");
+		donation3.setNote("Bestellid");
 		donation3.setType(Donation.DonationType.BANK_TRANSFER);
 
 		Calendar minCal = Calendar.getInstance();
@@ -958,7 +1008,7 @@ public abstract class AbstractDonationDAOTest {
 		typeAndNote.connect(type, LogicalOperator.AND, note);
 
 		ConnectedCriterion dedicationAndtAn = new ConnectedCriterion();
-		typeAndNote.connect(dedication, LogicalOperator.AND, typeAndNote);
+		dedicationAndtAn.connect(dedication, LogicalOperator.AND, typeAndNote);
 
 		ConnectedCriterion amountCrit = new ConnectedCriterion();
 		amountCrit.connect(minAmount, LogicalOperator.AND, maxAmount);
@@ -967,10 +1017,10 @@ public abstract class AbstractDonationDAOTest {
 		dateCrit.connect(minDate, LogicalOperator.AND, maxDate);
 
 		ConnectedCriterion dateAndAmount = new ConnectedCriterion();
-		dateCrit.connect(dateCrit, LogicalOperator.AND, amountCrit);
+		dateAndAmount.connect(dateCrit, LogicalOperator.AND, amountCrit);
 
 		ConnectedCriterion mainCrit = new ConnectedCriterion();
-		typeAndNote.connect(dateAndAmount, LogicalOperator.AND,
+		mainCrit.connect(dateAndAmount, LogicalOperator.AND,
 				dedicationAndtAn);
 
 		Filter donationFilter = new Filter(FilterType.DONATION, mainCrit);

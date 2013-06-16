@@ -26,17 +26,14 @@ public class ConnectedCriterionDAO {
 	private AbstractCriterionDAO abstractCritDAO;
 	private JdbcTemplate jdbcTemplate;
 
-	public void insert(ConnectedCriterion f)
-			throws PersistenceException {
+	public void insert(ConnectedCriterion f) throws PersistenceException {
 
-//		if (f.getId() == null) {
-			ConnectedCriterion log = (ConnectedCriterion) f;
-			validator.validate(log);
-			KeyHolder logicalKeyHolder = new GeneratedKeyHolder();
+		ConnectedCriterion log = (ConnectedCriterion) f;
+		validator.validate(log);
+		KeyHolder logicalKeyHolder = new GeneratedKeyHolder();
 
-			jdbcTemplate.update(new CreateConnectedCriterionStatementCreator(
-					log), logicalKeyHolder);
-//		}
+		jdbcTemplate.update(new CreateConnectedCriterionStatementCreator(log),
+				logicalKeyHolder);
 	}
 
 	public ConnectedCriterion getById(int id) throws PersistenceException {
@@ -47,11 +44,12 @@ public class ConnectedCriterionDAO {
 		String select = "select * from connected_criterion cc join criterion c on cc.id=c.id where cc.id = ?";
 		ConnectedCriterionMapper mapper = new ConnectedCriterionMapper();
 		try {
-			ConnectedCriterion result = jdbcTemplate.queryForObject(select, new Object[] { id },
-					mapper);
+			ConnectedCriterion result = jdbcTemplate.queryForObject(select,
+					new Object[] { id }, mapper);
 			result.setOperand1(abstractCritDAO.getById(mapper.getOperand1Id()));
-			if(mapper.getOperand2Id()!=null) {
-				result.setOperand2(abstractCritDAO.getById(mapper.getOperand2Id()));
+			if (mapper.getOperand2Id() != null) {
+				result.setOperand2(abstractCritDAO.getById(mapper
+						.getOperand2Id()));
 			}
 			return result;
 		} catch (IncorrectResultSizeDataAccessException e) {
@@ -112,7 +110,7 @@ public class ConnectedCriterionDAO {
 
 		private Integer operand1Id;
 		private Integer operand2Id;
-		
+
 		public ConnectedCriterion mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
 			ConnectedCriterion criterion = new ConnectedCriterion();
@@ -122,13 +120,13 @@ public class ConnectedCriterionDAO {
 			criterion.setLogicalOperator(LogicalOperator.valueOf(rs
 					.getString("logical_operator")));
 			criterion.setId(rs.getInt("id"));
-			
+
 			this.operand1Id = rs.getInt("operand1");
 			Integer operand2Id = rs.getInt("operand2");
-			if(!rs.wasNull()) {
+			if (!rs.wasNull()) {
 				this.operand2Id = operand2Id;
 			}
-			
+
 			return criterion;
 		}
 
@@ -139,8 +137,7 @@ public class ConnectedCriterionDAO {
 		public Integer getOperand2Id() {
 			return operand2Id;
 		}
-		
-		
+
 	}
 
 	public FilterValidator getValidator() {

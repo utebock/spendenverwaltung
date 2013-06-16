@@ -8,6 +8,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -297,9 +299,13 @@ public abstract class AbstractDonationServiceTest {
 	@Test
 	public void createCSVWithValidArgument_ReturnsCSVString() {
 		List<Donation> list = new ArrayList<Donation>();
-		donation.setDate(new Date());
-		donation2.setDate(new Date());
-		donation3.setDate(new Date());
+		try {
+			donation.setDate(new SimpleDateFormat("dd.MM.yyyy").parse("12.06.2013"));
+			donation2.setDate(new SimpleDateFormat("dd.MM.yyyy").parse("13.06.2013"));
+			donation3.setDate(new SimpleDateFormat("dd.MM.yyyy").parse("14.06.2013"));
+		} catch (ParseException e) {
+			fail();
+		}
 		list.add(donation);
 		list.add(donation2);
 		list.add(donation3);
@@ -317,8 +323,8 @@ public abstract class AbstractDonationServiceTest {
 	}
 
 	private String csvExpected = "Betrag;Datum;Widmung;Art;Notiz;Vorname;Nachname;E-Mail;Unternehmen;Land;Stadt;PLZ;Strasse\n"
-			+ "100;10.06.2013;test;BANK_TRANSFER;test;Test;Test;test@test.at;IBM;n.v.;n.v.;n.v.;n.v.;\n"
-			+ "200;10.06.2013;test2;SMS;test2;Test;Test;test@test.at;IBM;n.v.;n.v.;n.v.;n.v.;\n"
-			+ "300;10.06.2013;test3;MERCHANDISE;test3;dfdasd;ffff;test2@ff.at;asfd;n.v.;n.v.;n.v.;n.v.;\n";
+			+ "100;12.06.2013;test;bank transfer;test;Test;Test;test@test.at;IBM;n.v.;n.v.;n.v.;n.v.;\n"
+			+ "200;13.06.2013;test2;sms;test2;Test;Test;test@test.at;IBM;n.v.;n.v.;n.v.;n.v.;\n"
+			+ "300;14.06.2013;test3;merchandise;test3;dfdasd;ffff;test2@ff.at;asfd;n.v.;n.v.;n.v.;n.v.;\n";
 
 }

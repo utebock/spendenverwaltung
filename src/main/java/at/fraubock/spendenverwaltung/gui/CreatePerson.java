@@ -252,7 +252,7 @@ public class CreatePerson extends JPanel{
 		
 	}
 	
-	public void createPersonInDb(){
+	public void createPersonInDb() {
 		
 		p.setSex(Person.Sex.values()[salutation.getSelectedIndex()]);
 		

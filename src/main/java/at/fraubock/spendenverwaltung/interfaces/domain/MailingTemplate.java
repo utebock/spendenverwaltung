@@ -12,7 +12,7 @@ import java.io.File;
 public class MailingTemplate {
 
 	private Integer id;
-	private String fileName;
+	private String name;
 	private File file;
 
 	public Integer getId() {
@@ -24,11 +24,11 @@ public class MailingTemplate {
 	}
 
 	public String getFileName() {
-		return fileName;
+		return name;
 	}
 
 	public void setFileName(String fileName) {
-		this.fileName = fileName;
+		this.name = fileName;
 	}
 
 	public File getFile() {
@@ -40,40 +40,40 @@ public class MailingTemplate {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((file == null) ? 0 : file.hashCode());
-		result = prime * result
-				+ ((fileName == null) ? 0 : fileName.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
-
-	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (obj == this)
 			return true;
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+		if (obj.getClass() != this.getClass())
 			return false;
+
 		MailingTemplate other = (MailingTemplate) obj;
-		if (file == null) {
-			if (other.file != null)
-				return false;
-		} else if (!file.equals(other.file))
-			return false;
-		if (fileName == null) {
-			if (other.fileName != null)
-				return false;
-		} else if (!fileName.equals(other.fileName))
-			return false;
+
 		if (id == null) {
 			if (other.id != null)
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
+
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+
+		// don't compare the absolute file path because the files could be on
+		// different places but still match (e.g. tmp files)
+		if (file == null) {
+			if (other.file != null)
+				return false;
+		} else {
+			if (other.file == null)
+				return false;
+			if (file.length() != other.file.length())
+				return false;
+		}
+
 		return true;
 	}
 
