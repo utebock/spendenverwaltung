@@ -128,8 +128,8 @@ public class MailingServiceImplemented implements IMailingService {
 		for (Mailing m : mailings) {
 			csv += m.getDate() == null ? "n.v." : (new SimpleDateFormat(
 					"dd.MM.yyyy").format(m.getDate())) + ";";
-			csv += m.getType() + ";";
-			csv += m.getMedium() + ";\n";
+			csv += m.getType().getName() + ";";
+			csv += (m.getMedium()==Mailing.Medium.POSTAL?"Postalisch":"E-Mail") + ";\n";
 		}
 		return csv;
 	}

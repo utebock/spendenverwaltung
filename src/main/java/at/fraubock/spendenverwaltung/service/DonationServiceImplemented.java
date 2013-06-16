@@ -1,7 +1,6 @@
 package at.fraubock.spendenverwaltung.service;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Isolation;

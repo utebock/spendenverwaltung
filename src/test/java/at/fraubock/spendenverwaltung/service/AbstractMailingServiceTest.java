@@ -71,7 +71,7 @@ public abstract class AbstractMailingServiceTest {
 
 		validMailingThree = new Mailing();
 		validMailingThree.setMedium(Mailing.Medium.EMAIL);
-		validMailingThree.setType(Mailing.MailingType.ERLAGSCHEINVERSAND);
+		validMailingThree.setType(Mailing.MailingType.EINZELSPENDEN_DANKESBRIEF);
 		validMailingThree.setFilter(validFilter);
 
 		invalidMailing = new Mailing();
@@ -281,7 +281,7 @@ public abstract class AbstractMailingServiceTest {
 		}
 	}
 
-	private String csvExpected = "Datum;Art;Medium;\n12.06.2013;DANKESBRIEF;EMAIL;\n13.06.2013;INFOMATERIAL;POSTAL;\n"
-			+ "14.06.2013;ERLAGSCHEINVERSAND;EMAIL;\n";
+	private String csvExpected = "Datum;Art;Medium;\n12.06.2013;Dankesbrief;E-Mail;\n13.06.2013;Infomaterial;Postalisch;\n"
+			+ "14.06.2013;Einzelspenden Dankesbrief;E-Mail;\n";
 
 }

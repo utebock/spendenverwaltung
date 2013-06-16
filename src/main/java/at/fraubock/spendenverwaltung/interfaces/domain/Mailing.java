@@ -23,10 +23,8 @@ public class Mailing {
 		ALLGEMEINER_DANKESBRIEF("allgemeiner Dankesbrief"), DANKESBRIEF(
 				"Dankesbrief"), DAUERSPENDER_DANKESBRIEF(
 				"Dauerspender Dankesbrief"), EINZELSPENDEN_DANKESBRIEF(
-				"Einzelspenden Dankesbrief"), ERLAGSCHEINVERSAND(
-				"Erlagscheinversand"), INFOMATERIAL("Infomaterial"), SPENDENAUFRUF(
-				"Spendenaufruf"), SPENDENBRIEF("Spendenbrief"), T_SHIRT_VERSAND(
-				"T-Shirt Versand");
+				"Einzelspenden Dankesbrief"), INFOMATERIAL("Infomaterial"), SPENDENAUFRUF(
+				"Spendenaufruf"), SPENDENBRIEF("Spendenbrief");
 
 		private final String name;
 
@@ -48,16 +46,12 @@ public class Mailing {
 				return DAUERSPENDER_DANKESBRIEF;
 			case "Einzelspenden Dankesbrief":
 				return EINZELSPENDEN_DANKESBRIEF;
-			case "Erlagscheinversand":
-				return ERLAGSCHEINVERSAND;
 			case "Infomaterial":
 				return INFOMATERIAL;
 			case "Spendenaufruf":
 				return SPENDENAUFRUF;
 			case "Spendenbrief":
 				return SPENDENBRIEF;
-			case "T-Shirt Versand":
-				return T_SHIRT_VERSAND;
 			default:
 				throw new IllegalArgumentException("No such MailingType");
 			}
