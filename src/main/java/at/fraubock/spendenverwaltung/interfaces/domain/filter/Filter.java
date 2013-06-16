@@ -1,6 +1,7 @@
 package at.fraubock.spendenverwaltung.interfaces.domain.filter;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
+import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.util.FilterType;
 
@@ -38,12 +39,51 @@ public class Filter {
 	/* determines whether this filter can exist on it's own */
 	private boolean anonymous = false;
 	
-	/* determines whether this filter is private or public */
-	private boolean privateFilter = true;
-	
 	/* name of the user who created the filter */
 	private String owner;
 
+	/* determines whether this filter is private or public */
+	private FilterPrivacyStatus privacyStatus = FilterPrivacyStatus.PRIVATE;
+
+	public static enum FilterPrivacyStatus {
+		PRIVATE("privat"), READ("anzeigen"), READ_UPDATE("anzeigen, bearbeiten"), READ_UPDATE_DELETE("anzeigen, bearbeiten, löschen");
+
+		private final String name;
+
+		private FilterPrivacyStatus(String name) {
+			this.name = name;
+		}
+
+		public String getName() {
+			return name;
+		}
+		
+		@Override
+		public String toString() {
+			return name;
+		}
+		
+		public static FilterPrivacyStatus getByName(String name) {
+			switch (name) {
+			case "privat":
+				return PRIVATE;
+			case "anzeigen":
+				return READ;
+			case "anzeigen, bearbeiten":
+				return READ_UPDATE;
+			case "anzeigen, bearbeiten, löschen":
+				return READ_UPDATE_DELETE;
+			default:
+				throw new IllegalArgumentException(
+						"No donation type for name: " + name);
+			}
+		}
+		
+		public static String[] toStringArray(){
+			return new String[]{ "privat", "anzeigen", "anzeigen, bearbeiten", "anzeigen, bearbeiten, löschen" };
+		}
+	};
+	
 	public Filter() {
 
 	}
@@ -108,12 +148,12 @@ public class Filter {
 		this.anonymous = anonymous;
 	}
 	
-	public boolean isPrivate() {
-		return privateFilter;
+	public FilterPrivacyStatus getPrivacyStatus() {
+		return privacyStatus;
 	}
 	
-	public void setPrivate(boolean privateFilter) {
-		this.privateFilter = privateFilter;
+	public void setPrivacyStatus(FilterPrivacyStatus privacyStatus) {
+		this.privacyStatus = privacyStatus;
 	}
 	
 	public String getOwner(){

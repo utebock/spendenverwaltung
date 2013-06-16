@@ -146,7 +146,7 @@ CREATE TABLE filter ( -- defines a filter for a specific entity
 	type ENUM('validated_persons','validated_donations','confirmed_mailings','validated_addresses') NOT NULL, -- the entity this filter is applicable to
 	name VARCHAR(120), -- a name for this filter. can be null when anonymous
 	anonymous BOOLEAN NOT NULL DEFAULT FALSE, -- anonymous filters are created inside other filters and only exist there
-	private BOOLEAN NOT NULL DEFAULT TRUE, -- have all users access to this filter?!
+	privacy_status ENUM('privat', 'anzeigen', 'anzeigen, bearbeiten', 'anzeigen, bearbeiten, löschen') NOT NULL DEFAULT 'privat', -- have all users access to this filter?!
 	owner VARCHAR(30) NOT NULL -- name of the user who created this filter
 );
 
@@ -404,17 +404,17 @@ END;//
 
 CREATE TRIGGER filter_log_insert AFTER INSERT ON filter FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'filter', CAST(NEW.id AS CHAR(30)), CONCAT('criterion #', NEW.criterion, ', type ', NEW.type, IF(NEW.name IS NULL, '', CONCAT('name: "', NEW.name, '", ')), IF(NEW.anonymous, 'anonymous, ', ''), IF(NEW.private, 'private, ', 'public, '), 'owner: ', NEW.owner));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'filter', CAST(NEW.id AS CHAR(30)), CONCAT('criterion #', NEW.criterion, ', type ', NEW.type, IF(NEW.name IS NULL, '', CONCAT('name: "', NEW.name, '", ')), IF(NEW.anonymous, 'anonymous, ', ''), 'privacy: ', NEW.privacy_status, ', owner: ', NEW.owner));
 END;//
 
 CREATE TRIGGER filter_log_update AFTER UPDATE ON filter FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'filter', CAST(NEW.id AS CHAR(30)), CONCAT('criterion #', NEW.criterion, ', type ', NEW.type, IF(NEW.name IS NULL, '', CONCAT('name: "', NEW.name, '", ')), IF(NEW.anonymous, 'anonymous, ', ''), IF(NEW.private, 'private, ', 'public, '), 'owner: ', NEW.owner));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'filter', CAST(NEW.id AS CHAR(30)), CONCAT('criterion #', NEW.criterion, ', type ', NEW.type, IF(NEW.name IS NULL, '', CONCAT('name: "', NEW.name, '", ')), IF(NEW.anonymous, 'anonymous, ', ''), 'privacy: ', NEW.privacy_status, ', owner: ', NEW.owner));
 END;//
 
 CREATE TRIGGER filter_log_delete AFTER DELETE ON filter FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'filter', CAST(OLD.id AS CHAR(30)), CONCAT('criterion #', OLD.criterion, ', type ', OLD.type, IF(OLD.name IS NULL, '', CONCAT('name: "', OLD.name, '", ')), IF(OLD.anonymous, 'anonymous, ', ''), IF(OLD.private, 'private, ', 'public, '), 'owner: ', OLD.owner));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'filter', CAST(OLD.id AS CHAR(30)), CONCAT('criterion #', OLD.criterion, ', type ', OLD.type, IF(OLD.name IS NULL, '', CONCAT('name: "', OLD.name, '", ')), IF(OLD.anonymous, 'anonymous, ', ''), 'privacy: ', OLD.privacy_status, ', owner: ', OLD.owner));
 END;//
 
 

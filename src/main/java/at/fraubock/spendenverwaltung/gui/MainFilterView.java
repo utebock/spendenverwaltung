@@ -27,9 +27,11 @@ import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
 import at.fraubock.spendenverwaltung.gui.views.InitializableView;
 import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter.FilterPrivacyStatus;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.FilterInUseException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
+import at.fraubock.spendenverwaltung.util.CurrentUser;
 import at.fraubock.spendenverwaltung.util.FilterType;
 
 public class MainFilterView extends InitializableView {
@@ -145,7 +147,16 @@ public class MainFilterView extends InitializableView {
 					return;
 				}
 				Filter filter = filterModel.getFilterRow(showTable.getSelectedRow());
-				createFilter(filter.getType(),filter);
+				
+				if(filter.getOwner().equals(CurrentUser.userName) 
+						|| filter.getPrivacyStatus() == FilterPrivacyStatus.READ_UPDATE
+						|| filter.getPrivacyStatus() == FilterPrivacyStatus.READ_UPDATE_DELETE){
+					createFilter(filter.getType(),filter);
+				} else{
+					JOptionPane.showMessageDialog(MainFilterView.this,
+							"Sie sind nicht berechtigt diesen Filter zu bearbeiten");
+					return;
+				}
 			}
 			
 		});
@@ -218,6 +229,14 @@ public class MainFilterView extends InitializableView {
 		}
 
 		Filter filter = filterModel.getFilterRow(showTable.getSelectedRow());
+
+		if(!filter.getOwner().equals(CurrentUser.userName) 
+				&& filter.getPrivacyStatus() != FilterPrivacyStatus.READ_UPDATE_DELETE){
+			JOptionPane.showMessageDialog(MainFilterView.this,
+					"Sie sind nicht berechtigt diesen Filter zu löschen");
+			return;
+		}
+		
 		int answer = JOptionPane.showConfirmDialog(this,
 				"Wollen Sie den Filter " + filter.getName()
 						+ " wirklich l\u00F6schen?");

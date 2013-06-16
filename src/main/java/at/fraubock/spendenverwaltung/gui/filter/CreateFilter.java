@@ -25,6 +25,7 @@ import at.fraubock.spendenverwaltung.gui.MainFilterView;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter.FilterPrivacyStatus;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.ConnectedCriterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.to.FilterTO;
@@ -61,9 +62,7 @@ public class CreateFilter extends JPanel {
 	private List<CriterionSelector> selectors = new ArrayList<CriterionSelector>();
 	private List<JButton> minusButtons = new ArrayList<JButton>();
 	
-	ButtonGroup buttonGroup = new ButtonGroup();
-	JRadioButton radioPrivate;
-	JRadioButton radioPublic;
+	JComboBox privacyComboBox;
 	
 	public CreateFilter(FilterType type, IFilterService filterService,
 			MainFilterView overview, ViewActionFactory viewActionFactory) {
@@ -152,25 +151,13 @@ public class CreateFilter extends JPanel {
 		this.add(nameField, "wrap, gapbottom 20");
 		// add(filterNamePanel, "wrap");
 
-		// RadioButtons for setting filter private or public
-		radioPrivate = new JRadioButton("Privat", true);
-		radioPublic = new JRadioButton("F\u00FCr alle Benutzer freigeben", false);
-		buttonGroup.add (radioPrivate);
-		buttonGroup.add(radioPublic);
-		
-		if(editFilter != null){
-			if (editFilter.isPrivate()){
-				radioPrivate.setSelected(true);
-				radioPublic.setSelected(false);
-			} else{
-				radioPrivate.setSelected(false);
-				radioPublic.setSelected(true);
-			}
-		}
-		
+		// Combobox for filter privacy setting
 		if((editFilter != null && CurrentUser.userName.equals(editFilter.getOwner())) || editFilter == null){
-			this.add(radioPrivate, "wrap");
-			this.add(radioPublic, "wrap, gapbottom 10");
+			privacyComboBox = new JComboBox(FilterPrivacyStatus.toStringArray());
+			this.add(privacyComboBox, "wrap");
+			
+			if(editFilter != null)
+				privacyComboBox.setSelectedItem(editFilter.getPrivacyStatus().toString());
 		}
 		
 		
@@ -294,7 +281,7 @@ public class CreateFilter extends JPanel {
 		filter.setOperator(andOperator ? LogicalOperator.AND
 				: LogicalOperator.OR);
 		filter.setName(nameField.getText());
-		filter.setPrivate(radioPrivate.isSelected() ? true : false);
+		filter.setPrivacyStatus(FilterPrivacyStatus.getByName(privacyComboBox.getSelectedItem().toString()));
 
 		try {
 			List<Criterion> crits = new ArrayList<Criterion>();
