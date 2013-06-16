@@ -40,6 +40,7 @@ import javax.swing.table.TableColumnModel;
 import org.apache.log4j.Logger;
 
 import net.miginfocom.swing.MigLayout;
+import at.fraubock.spendenverwaltung.gui.AbstractValidationTableModel;
 import at.fraubock.spendenverwaltung.gui.AssignPerson;
 import at.fraubock.spendenverwaltung.gui.ButtonListener;
 import at.fraubock.spendenverwaltung.gui.ComponentBuilder;
@@ -111,7 +112,7 @@ public class ImportValidationView extends InitializableView {
 
 		conflictComboBox = new JComboBox(ImportValidator.ValidationType.toArray());
 		
-		this.conflictModel = new ConflictValidationTableModel(this, this.donationService, this.personService, this.addressService);
+		this.conflictModel = new ConflictValidationTableModel(personService, addressService, donationService, this);
 		this.newModel = new NewValidationTableModel(personService, addressService, donationService, this);
 		this.matchModel = new MatchValidationTableModel(personService, addressService, donationService, this);
 		
@@ -229,7 +230,7 @@ public class ImportValidationView extends InitializableView {
 		
 		conflictModel.addList(validatedData.getDonationListConflict());
 		newModel.addList(validatedData.getDonationListNew());
-		matchModel.addList(validatedData.getDonationListMatch(), validatedData.getPersonListMatch());
+		matchModel.addList(validatedData.getDonationListMatch());
 		
 		conflictTable.revalidate();
 		newTable.revalidate();
@@ -364,7 +365,7 @@ public class ImportValidationView extends InitializableView {
 		}
 	}
 	
-	public void openPersonDialog(Donation donationToAssign, IValidationTableModel deleteFromModel){
+	public void openPersonDialog(Donation donationToAssign, AbstractValidationTableModel deleteFromModel){
 		JDialog assignPerson = new AssignPerson(personService, donationService, donationToAssign, matchModel, deleteFromModel);
 	}
 	

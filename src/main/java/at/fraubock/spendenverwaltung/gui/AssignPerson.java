@@ -66,9 +66,9 @@ public class AssignPerson extends JDialog {
 	private JTextField tbGivenname;
 	private Donation donationToAssign;
 	private MatchValidationTableModel matchModel;
-	private IValidationTableModel deleteFromModel;
+	private AbstractValidationTableModel deleteFromModel;
 
-	public AssignPerson(IPersonService personService, IDonationService donationService, Donation donationToAssign, MatchValidationTableModel matchModel, IValidationTableModel deleteFromModel) {
+	public AssignPerson(IPersonService personService, IDonationService donationService, Donation donationToAssign, MatchValidationTableModel matchModel, AbstractValidationTableModel deleteFromModel) {
 
 		this.personService = personService;
 		this.donationService = donationService;

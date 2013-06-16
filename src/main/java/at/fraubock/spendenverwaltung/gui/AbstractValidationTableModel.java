@@ -33,54 +33,102 @@ import at.fraubock.spendenverwaltung.util.ImportValidator.ValidationType;
  * @author thomas
  *
  */
-public class MatchValidationTableModel extends AbstractValidationTableModel {
+public class AbstractValidationTableModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 1L;
 	
-	public MatchValidationTableModel(IPersonService personService, IAddressService addressService, IDonationService donationService, ImportValidationView parent){
-		super(personService, addressService, donationService, parent);
-	}
+	protected String[] columnNames = new String[]{ "Vorname", "Nachname", "Telefonnummer", "E-Mail Adresse", "Straße", "PLZ", "Ort", "Land", "Betrag", "Datum", "Widmung", "Typ", "Notiz", "Option" };
+	protected Vector<Donation> donations = new Vector<Donation>();
+	protected Vector<JComboBox> comboBoxes = new Vector<JComboBox>();
+	protected IPersonService personService;
+	protected IDonationService donationService;
+	protected ImportValidationView parent;
+	protected boolean editable;
 	
-	@Override
+	public AbstractValidationTableModel(IPersonService personService, IAddressService addressService, IDonationService donationService, ImportValidationView parent){
+		this.personService = personService;
+		this.donationService = donationService;
+		this.parent = parent;
+		
+		this.editable = true;
+	}
+
+	/**
+	 * Adds a donation to the model
+	 * @param donation
+	 */
 	public void addDonation (Donation donation){
 		JComboBox cb = new JComboBox(ImportValidator.ValidationType.toArray());
 		donations.add(donation);
 		comboBoxes.add(cb);
 	}
-	
-	@Override
+
+	/**
+	 * Removes a donation from the model
+	 * @param d
+	 */
 	public void removeDonation (Donation d){
 		comboBoxes.remove(donations.indexOf(d));
 		donations.remove(d);
 		fireTableDataChanged();
 	}
 	
+	/**
+	 * Adds all donations from the given donationList to the model
+	 * @param donationList
+	 */
+	public void addList (List<Donation> donationList){
+		for(int i=0; i<donationList.size(); i++){
+			addDonation(donationList.get(i));
+		}
+	}
+	
+	/**
+	 * Removes the donation in a specified row from the model
+	 * @param row
+	 */
 	public void removeDonation (int row){
 		donations.remove(row);
 		comboBoxes.remove(row);
 		fireTableDataChanged();
 	}
 	
+	/**
+	 * Returns donation in a specified row
+	 * @param rowIndex
+	 * @return
+	 */
 	public Donation getDonationRow(int rowIndex){
 		return donations.get(rowIndex);
 	}
 
+	/**
+	 * Returns list of all donations in this model
+	 * @return
+	 */
 	public List<Donation> getDonationList(){
 		return donations;
 	}
 	
-	@Override
+	/**
+	 * Returns the number of the donations in this model
+	 */
 	public int getRowCount() {
 		return donations.size();
 	}
 	
+	/**
+	 * Removes all donations from this model
+	 */
 	public void removeAll(){
 		donations = new Vector<Donation>();
 		comboBoxes = new Vector<JComboBox>();
 		fireTableDataChanged();
 	}
 	
-	@Override
+	/**
+	 * Returns the value at an existing row/column
+	 */
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		Donation donation = (Donation)donations.get(rowIndex);
 		Person person = donation.getDonator();
@@ -104,101 +152,10 @@ public class MatchValidationTableModel extends AbstractValidationTableModel {
 			default: return null;
 		}
 	}
-    public void setValueAt(Object value, int rowIndex, int columnIndex) {
-        Donation updateDonation = donations.get(rowIndex);
-        Person updatePerson = updateDonation.getDonator();
-		Person oldDonator = new Person();
-        Address updateAddress = updatePerson.getMainAddress();
-        
-        if(columnIndex != 13){
-			oldDonator.setId(updatePerson.getId());
-			oldDonator.setAddresses(updatePerson.getAddresses());
-			oldDonator.setCompany(updatePerson.getCompany());
-			oldDonator.setSex(updatePerson.getSex());
-			oldDonator.setSurname(updatePerson.getSurname());
-
-			updateAddress = updatePerson.getMainAddress();
-			
-			switch(columnIndex){
-	        	case 0: updatePerson.setGivenName((String) value);
-	        			break;
-	        	case 1: updatePerson.setSurname((String) value);
-						break;
-	        	case 2: updatePerson.setTelephone((String) value);
-						break;
-	        	case 3: updatePerson.setEmail((String) value);
-						break;
-	        	case 4: updateAddress.setStreet((String) value);
-						break;
-	        	case 5: updateAddress.setPostalCode((String) value);
-						break;
-	        	case 6: updateAddress.setCity((String) value);
-						break;
-	        	case 7: updateAddress.setCountry((String) value);
-						break;
-	        	case 8: updateDonation.setAmount((Long) value);
-						break;
-	        	case 9: updateDonation.setDate((Date) value);
-						break;
-	        	case 10: updateDonation.setDedication((String) value);
-						break;
-	        	case 11: updateDonation.setType((Donation.DonationType) value);
-						break;
-	        	case 12: updateDonation.setNote((String) value);
-						break;
-	        }
-	        
-	        boolean changedModel = false;
-	        
-			try {
-				List<Person> matchedPersons = personService.getByAttributes(updatePerson);
-				if(matchedPersons.size() != 0)
-					updateDonation.setDonator(matchedPersons.get(0));
-				if(donationService.donationExists(updateDonation)){
-					//add to conflictModel
-					removeDonation(rowIndex);
-					parent.addToConflict(updateDonation);
-					changedModel = true;
-				} else if (matchedPersons.size() == 0){
-					//add to newModel and create new person if there is no match to another confirmed person
-					updatePerson.setId(null);
-					updateDonation.setDonator(updatePerson);
-					removeDonation(rowIndex);
-					parent.addToNew(updateDonation);
-					changedModel = true;
-				}
-			} catch (ServiceException e) {
-				JOptionPane.showMessageDialog(parent, "Updating Row failed", "Error", JOptionPane.ERROR_MESSAGE);
-		        e.printStackTrace();
-		        return;
-			}
-		    
-			//if donation didn't change model, update row in this model
-			if(!changedModel){
-				donations.set(rowIndex, updateDonation);
-				
-		        fireTableCellUpdated(rowIndex, columnIndex);
-			}
-        }
-        else{
-        	JComboBox selectedBox = comboBoxes.get(rowIndex);
-        	
-        	selectedBox.setSelectedItem((String) value);
-        	
-        	ValidationType selectedType = ValidationType.getByName((String) selectedBox.getSelectedItem());
-        	
-        	if(selectedType == ValidationType.NEW_DONATOR){
-        			parent.openPersonDialog(donations.get(rowIndex), this);
-        	} else if(selectedType == ValidationType.EDIT){
-        		editable = true;
-        	} else{
-        		editable = false;
-        	}
-        	
-        	fireTableDataChanged();
-        }
-    }
 	
+	/**
+	 * Returns the type of a column in this model
+	 */
 	public Class<?> getColumnClass(int col) {
 		
 		switch (col) {
@@ -220,17 +177,23 @@ public class MatchValidationTableModel extends AbstractValidationTableModel {
 		}
 	}
 
-	@Override
+	/**
+	 * Returns the number of existing columns in this model
+	 */
 	public int getColumnCount() {
 		return columnNames.length;
 	}
 	
-	@Override
+	/**
+	 * Returns the name of a specific column
+	 */
 	public String getColumnName(int col) {
 		return columnNames[col];
 	}
 
-	@Override
+	/**
+	 * Returns true, if a specific cell should be editable
+	 */
 	public boolean isCellEditable(int row, int col) {
 		if(editable){
 			return true;
@@ -239,12 +202,20 @@ public class MatchValidationTableModel extends AbstractValidationTableModel {
 		}
 	}
 
-	@Override
+	/**
+	 * Allows to set the value of a comboBox
+	 * @param d
+	 * @param option
+	 */
 	public void setComboBox(Donation d, ValidationType option) {
 		comboBoxes.get(donations.indexOf(d)).setSelectedIndex(ValidationType.indexOf(option));
 		fireTableDataChanged();
 	}
 	
+	/**
+	 * Returns a list of donations where comboBox option "anonym" is chosen
+	 * @return
+	 */
 	public List<Donation> getAnonymList(){
 		List<Donation> anonymList = new ArrayList<Donation>();
 		String currentType;
@@ -259,6 +230,10 @@ public class MatchValidationTableModel extends AbstractValidationTableModel {
 		return anonymList;
 	}
 	
+	/**
+	 * Returns a list of donations where comboBox option "nicht importieren" is chosen
+	 * @return
+	 */
 	public List<Donation> getNoImportList(){
 		List<Donation> noImportList = new ArrayList<Donation>();
 		String currentType;
