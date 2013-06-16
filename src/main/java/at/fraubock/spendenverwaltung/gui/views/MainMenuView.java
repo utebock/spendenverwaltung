@@ -160,22 +160,17 @@ public class MainMenuView extends InitializableView {
 		showSendings = new JButton();
 		sendPanel.add(showSendings, "gap 55");
 		confirmSendings = new JButton();
-		sendPanel.add(confirmSendings, "gap 40");
-		deleteSendings = new JButton();
-		sendPanel.add(deleteSendings, "wrap 0px, gap 40");
+		sendPanel.add(confirmSendings, "gap 55, wrap 0px");
 		
 		eSendingLabel = componentFactory.createLabel("<html><center>Aussendung<br>erstellen");
 		sendPanel.add(eSendingLabel, "split 3");
 		
 		showSendingsLabel = componentFactory.createLabel("<html><center>Aussendungen<br>anzeigen");
-		sendPanel.add(showSendingsLabel, "gap 37");
+		sendPanel.add(showSendingsLabel, "gap 53");
 		
 		confirmSendingsLabel = componentFactory.createLabel("<html><center>Aussendungen<br>best\u00E4tigen</html>");
-		sendPanel.add(confirmSendingsLabel, "gap 33");
+		sendPanel.add(confirmSendingsLabel, "gap 43");
 		
-		deleteSendingsLabel = componentFactory.createLabel("<html><center>Aussendungen<br>l\u00F6schen</html>");
-		sendPanel.add(deleteSendingsLabel, "gap 35");
-
 		sendSeparator = componentFactory.createSeparator();
 		overviewPanel.add(sendSeparator, "wrap 0px, growx");
 		
@@ -216,7 +211,7 @@ public class MainMenuView extends InitializableView {
 		mailings.setAction(viewActionFactory.getCreateMailingsViewAction());
 		showSendings.setAction(viewActionFactory.getFindMailingsViewAction());
 		confirmSendings.setAction(viewActionFactory.getConfirmMailingsViewAction());
-		deleteSendings.setAction(viewActionFactory.getDeleteMailingsViewAction());
+	//	deleteSendings.setAction(viewActionFactory.getDeleteMailingsViewAction());
 		progress.setAction(viewActionFactory.getDonationProgressStatsViewAction());
 		statsSendings.setAction(viewActionFactory.getShowMailingStatsViewAction());
 		statsPersons.setAction( viewActionFactory.getShowPersonStatsViewAction());
