@@ -8,9 +8,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
@@ -41,6 +39,7 @@ import at.fraubock.spendenverwaltung.util.RelationalOperator;
 /**
  * 
  * @author Chris Steele
+ * @author manuel-bichler
  * 
  */
 
@@ -115,14 +114,12 @@ public class MailingDAOImplemented implements IMailingDAO {
 			PreparedStatementCreator {
 
 		private Mailing mailing;
-		private int unconfirmedId;
-		
-		CreateMailingStatementCreator(Mailing mailing, int unconfirmedId) {
+
+		CreateMailingStatementCreator(Mailing mailing) {
 			this.mailing = mailing;
-			this.unconfirmedId = unconfirmedId;
 		}
 
-		private String createMailings = "insert into mailings (mailing_date, mailing_type, mailing_medium, template, unconfirmed) values (?,?,?,?,?)";
+		private String createMailings = "insert into mailings (mailing_date, mailing_type, mailing_medium, template) values (?,?,?,?)";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
@@ -138,32 +135,31 @@ public class MailingDAOImplemented implements IMailingDAO {
 			} else {
 				ps.setInt(4, mailing.getTemplate().getId());
 			}
-			ps.setInt(5, unconfirmedId);
 
 			return ps;
 		}
 	}
-	
-	private class CreateUnsentMailingStatementCreator implements
-		PreparedStatementCreator {
-		
-		private String user;
-		
-		public CreateUnsentMailingStatementCreator(String user) {
-			this.user = user;
+
+	private class CreateUnconfirmedMailingStatementCreator implements
+			PreparedStatementCreator {
+
+		private int id;
+
+		public CreateUnconfirmedMailingStatementCreator(int id) {
+			this.id = id;
 		}
-		
-		private String insertUnsentMailings = "INSERT INTO unsent_mailings (creator) VALUES (?)";
-		
+
+		private String insertUnconfirmedMailings = "INSERT INTO unconfirmed_mailings (id, creator) VALUES (?, SUBSTRING_INDEX(USER(),'@',1))";
+
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
 				throws SQLException {
-			PreparedStatement ps = connection.prepareStatement(insertUnsentMailings,
-					Statement.RETURN_GENERATED_KEYS);
-			ps.setString(1, user);
+			PreparedStatement ps = connection
+					.prepareStatement(insertUnconfirmedMailings);
+			ps.setInt(1, id);
 			return ps;
-}
-}
+		}
+	}
 
 	/**
 	 * 
@@ -188,16 +184,16 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 				KeyHolder keyHolder = new GeneratedKeyHolder();
 
-				String user = jdbcTemplate.queryForObject("SELECT current_user()", String.class);
-				
-				log.debug("inserting user "+user+ "as creator");
-				jdbcTemplate.update(new CreateUnsentMailingStatementCreator(user), keyHolder);
-				int unconfirmedId = keyHolder.getKey().intValue();
-
-				log.debug("unconfirmed id returned as "+unconfirmedId);
-				
-				jdbcTemplate.update(new CreateMailingStatementCreator(mailing, unconfirmedId),
+				jdbcTemplate.update(new CreateMailingStatementCreator(mailing),
 						keyHolder);
+				mailing.setId(keyHolder.getKey().intValue());
+
+				jdbcTemplate
+						.update(new CreateUnconfirmedMailingStatementCreator(
+								mailing.getId()));
+
+				log.debug("inserted mailing #" + mailing.getId()
+						+ " into mailings and unconfirmed_mailings tables");
 
 				/**
 				 * apply correct properties to filter to exclude people who
@@ -260,6 +256,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 				}
 
 			} else {
+				// update
 				String update = "UPDATE mailings SET mailing_date=?, mailing_type=?, "
 						+ "mailing_medium=? WHERE id=?";
 				Object[] values = new Object[] {
@@ -267,7 +264,8 @@ public class MailingDAOImplemented implements IMailingDAO {
 						mailing.getType().getName(),
 						mailing.getMedium().getName(), mailing.getId() };
 
-				if (mailing.getMedium() == Mailing.Medium.POSTAL && mailing.getTemplate() != null) {
+				if (mailing.getMedium() == Mailing.Medium.POSTAL
+						&& mailing.getTemplate() != null) {
 					update = "UPDATE mailings SET mailing_date=?, mailing_type=?, "
 							+ "mailing_medium=?, template=? WHERE id=?";
 					values = new Object[] {
@@ -296,28 +294,10 @@ public class MailingDAOImplemented implements IMailingDAO {
 				throw new IllegalArgumentException(
 						"Mailing's id was null in delete");
 			}
-			
-			Integer unconfirmedId;
-			
-			try {
-				unconfirmedId = jdbcTemplate.queryForObject(
-						"SELECT m.unconfirmed FROM mailings m WHERE m.id=? AND m.unconfirmed IS NOT NULL",
-						new Object[] {mailing.getId()}, Integer.class);
 
-				log.debug("Returning from getById with result " + mailing);
-		
-			} catch (EmptyResultDataAccessException e) {
-				log.debug("unconfirmedMailing query had 0 results");
-				unconfirmedId = null;
-			}
-			
 			jdbcTemplate.update("DELETE FROM mailings where id=?",
 					new Object[] { mailing.getId() });
 
-			if(unconfirmedId != null) {
-				jdbcTemplate.update("DELETE FROM unsent_mailings WHERE id=?", new Object[] {unconfirmedId});
-			}
-			
 			log.debug("Returning from delete");
 		} catch (DataAccessException e) {
 			log.warn(e.getLocalizedMessage());
@@ -326,40 +306,38 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 	}
 
-	public String getCreatorOfUnconfirmedMailing(Mailing m) throws PersistenceException {
+	public String getCreatorOfUnconfirmedMailing(Mailing m)
+			throws PersistenceException {
 		try {
-			String creator = jdbcTemplate.queryForObject("SELECT u.creator FROM mailings m,unsent_mailings u WHERE m.unconfirmed = u.id AND m.id=?", new Object[] {m.getId()}, String.class);
+			String creator = jdbcTemplate.queryForObject(
+					"SELECT creator FROM unconfirmed_mailings WHERE id = ?",
+					new Object[] { m.getId() }, String.class);
 			return creator;
 		} catch (EmptyResultDataAccessException e) {
-			//only unconfirmed mailings should be passed in here
+			// only unconfirmed mailings should be passed in here
 			throw new PersistenceException(e);
 		} catch (DataAccessException e) {
 			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
 		}
 	}
-	
-	/**
-	 * adds all unconfirmed mailings to a hashmap, where each creator (key)
-	 * maps to a corresponding list of created mails.
-	 * 
-	 * @returns Map of creators and mailings
-	 */
+
 	@Override
-	public List<UnconfirmedMailing> getUnconfirmedMailingsWithCreator() throws PersistenceException {
-		
+	public List<UnconfirmedMailing> getUnconfirmedMailingsWithCreator()
+			throws PersistenceException {
+
 		List<Mailing> unconfirmedMailings = getAllUnconfirmed();
 		List<UnconfirmedMailing> results = new ArrayList<UnconfirmedMailing>();
-		
-		for(Mailing m : unconfirmedMailings) {
+
+		for (Mailing m : unconfirmedMailings) {
 			String creator = getCreatorOfUnconfirmedMailing(m);
-			
+
 			results.add(new UnconfirmedMailing(m, creator));
 		}
-		
+
 		return results;
 	}
-	
+
 	/**
 	 * @return all mailings
 	 */
@@ -371,13 +349,6 @@ public class MailingDAOImplemented implements IMailingDAO {
 			List<Mailing> mailings = jdbcTemplate.query(
 					"SELECT * FROM mailings", mapper);
 
-			for (Mailing m : mailings) {
-				Integer tmplId = mapper.getTemplateIds().get(m.getId());
-				if (tmplId != null) {
-					m.setTemplate(mailingTemplateDao.getByID(tmplId));
-				}
-			}
-
 			log.debug("Returning from getAll");
 			return mailings;
 		} catch (DataAccessException e) {
@@ -386,21 +357,15 @@ public class MailingDAOImplemented implements IMailingDAO {
 		}
 
 	}
-	
+
 	@Override
 	public List<Mailing> getAllConfirmed() throws PersistenceException {
 		try {
-			log.debug("Entering getAll");
+			log.debug("Entering getAllConfirmed");
 			MailingMapper mapper = new MailingMapper();
-			List<Mailing> confirmedMailings = jdbcTemplate.query("SELECT * FROM mailings m WHERE m.unconfirmed IS NULL"
-					, mapper);
+			List<Mailing> confirmedMailings = jdbcTemplate.query(
+					"SELECT * FROM confirmed_mailings", mapper);
 
-			for (Mailing m : confirmedMailings) {
-				Integer tmplId = mapper.getTemplateIds().get(m.getId());
-				if (tmplId != null) {
-					m.setTemplate(mailingTemplateDao.getByID(tmplId));
-				}
-			}
 			return confirmedMailings;
 		} catch (EmptyResultDataAccessException e) {
 			return null;
@@ -409,17 +374,20 @@ public class MailingDAOImplemented implements IMailingDAO {
 			throw new PersistenceException(e);
 		}
 	}
-	
+
 	@Override
-	public void removePersonFromUnsentMailing(Person p, Mailing m) throws PersistenceException {
-		if(p.getId() == null) {
+	public void removePersonFromUnsentMailing(Person p, Mailing m)
+			throws PersistenceException {
+		if (p.getId() == null) {
 			log.warn("Person Id was null in removePersonFromUnsentMailing");
 		}
-		if(m.getId() == null) {
+		if (m.getId() == null) {
 			log.warn("Mailing Id was null in removePersonFromUnsentMailing");
 		}
 		try {
-			jdbcTemplate.update("DELETE FROM sent_mailings s WHERE mailing_id=? AND person_id=?", new Object[] {m.getId(),p.getId()});
+			jdbcTemplate
+					.update("DELETE FROM sent_mailings s WHERE mailing_id=? AND person_id=?",
+							new Object[] { m.getId(), p.getId() });
 		} catch (DataAccessException e) {
 			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
@@ -429,21 +397,14 @@ public class MailingDAOImplemented implements IMailingDAO {
 	@Override
 	public List<Mailing> getAllUnconfirmed() throws PersistenceException {
 		try {
-			log.debug("Entering getAll");
-			
-			MailingMapper mapper = new MailingMapper();
-			
-			List<Mailing> unconfirmedMailings = jdbcTemplate.query("SELECT * FROM mailings m WHERE m.unconfirmed IS NOT NULL"
-					, mapper);
-			
+			log.debug("Entering getAllUnconfirmed");
 
-			for (Mailing m : unconfirmedMailings) {
-				Integer tmplId = mapper.getTemplateIds().get(m.getId());
-				if (tmplId != null) {
-					m.setTemplate(mailingTemplateDao.getByID(tmplId));
-				}
-			}
-			
+			MailingMapper mapper = new MailingMapper();
+
+			List<Mailing> unconfirmedMailings = jdbcTemplate
+					.query("SELECT * FROM mailings WHERE id IN (SELECT id FROM unconfirmed_mailings)",
+							mapper);
+
 			return unconfirmedMailings;
 		} catch (EmptyResultDataAccessException e) {
 			return null;
@@ -464,11 +425,6 @@ public class MailingDAOImplemented implements IMailingDAO {
 						"SELECT * FROM mailings WHERE id=?",
 						new Object[] { id }, mapper);
 
-				Integer tmplId = mapper.getTemplateIds().get(mailing.getId());
-				if (tmplId != null) {
-					mailing.setTemplate(mailingTemplateDao.getByID(tmplId));
-				}
-
 				log.debug("Returning from getById with result " + mailing);
 				return mailing;
 			} catch (EmptyResultDataAccessException e) {
@@ -481,26 +437,26 @@ public class MailingDAOImplemented implements IMailingDAO {
 		}
 
 	}
-	
+
 	@Override
-	public void confirmMailing(Mailing mailing) throws PersistenceException  {
-		log.debug("Entering confirmMailing with param "+mailing);
-		
+	public void confirmMailing(Mailing mailing) throws PersistenceException {
+		log.debug("Entering confirmMailing with param " + mailing);
+
 		try {
 			validate(mailing);
 		} catch (ValidationException e) {
-			log.warn("Validation of mailing object failed in confirmMailing");
+			throw new IllegalArgumentException(e);
 		}
-		
+
 		try {
-			if(mailing.getId() == null) {
+			if (mailing.getId() == null) {
 				log.warn("Mailing with unset ID passed to confirmMailing");
-			} else {
-				int unconfirmed_id = jdbcTemplate.queryForObject("SELECT m.unconfirmed FROM mailings m WHERE m.id=?", new Object[] {mailing.getId()}, Integer.class);
-				log.debug("unconfirmed id is "+ unconfirmed_id);
-				jdbcTemplate.update("DELETE FROM unsent_mailings WHERE id=?", new Object[] {unconfirmed_id});
-				jdbcTemplate.update("UPDATE mailings ma SET ma.unconfirmed=NULL WHERE ma.id=?", new Object[] {mailing.getId()});
+				throw new IllegalArgumentException(
+						"Mailing with unset ID passed to confirmMailing");
 			}
+			jdbcTemplate.update("DELETE FROM unconfirmed_mailings WHERE id=?",
+					new Object[] { mailing.getId() });
+
 		} catch (DataAccessException e) {
 			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
@@ -511,41 +467,27 @@ public class MailingDAOImplemented implements IMailingDAO {
 	public List<Mailing> getConfirmedMailingsByPerson(Person person)
 			throws PersistenceException {
 		try {
-			log.debug("Entering getConfirmedMailingsByPerson with param " + person);
+			log.debug("Entering getConfirmedMailingsByPerson with param "
+					+ person);
 
 			try {
 				PersonDAOImplemented.validate(person);
 			} catch (ValidationException e) {
-				throw new PersistenceException(e);
+				throw new IllegalArgumentException(e);
 			}
-			
-			try {
 
 			MailingMapper mapper = new MailingMapper();
-			List<Mailing> mailings = jdbcTemplate.query(
-					"SELECT ma.* FROM mailings ma, sent_mailings se "
-							+ "WHERE ma.unconfirmed IS NULL AND ma.id=se.mailing_id AND se.person_id=?",
-					new Object[] { person.getId() },
-					new int[] { Types.INTEGER }, mapper);
+			List<Mailing> mailings = jdbcTemplate
+					.query("SELECT ma.* FROM confirmed_mailings ma JOIN sent_mailings se ON (ma.id = se.mailing_id) WHERE se.person_id=?",
+							new Object[] { person.getId() },
+							new int[] { Types.INTEGER }, mapper);
 
-			for (Mailing m : mailings) {
-				Integer tmplId = mapper.getTemplateIds().get(m.getId());
-				if (tmplId != null) {
-					m.setTemplate(mailingTemplateDao.getByID(tmplId));
-				}
-			}
+			if (mailings.isEmpty())
+				log.debug("Returning empty list from getConfirmedMailingsByPerson");
 
 			log.debug("Returning from getMailingsByPerson");
-
-			if(mailings.isEmpty())
-				log.debug("Returning empty list from getConfirmedMailingsByPerson");
-			
 			return mailings;
-			
-			} catch (EmptyResultDataAccessException e) {
-				log.debug("Returning null from getConfirmedMailingsByPerson");
-				return null;
-			}
+
 		} catch (DataAccessException e) {
 			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
@@ -555,42 +497,40 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 	private class MailingMapper implements RowMapper<Mailing> {
 
-		private Map<Integer, Integer> templateIds = new HashMap<Integer, Integer>();
-
 		@Override
 		public Mailing mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Mailing mailing = new Mailing();
 
 			mailing.setId(rs.getInt("id"));
-			mailing.setDate(new java.util.Date(rs.getDate("mailing_date")
-					.getTime()));
+			mailing.setDate((rs.getDate("mailing_date")));
 			mailing.setType(Mailing.MailingType.getByName(rs
 					.getString("mailing_type")));
 			mailing.setMedium(Mailing.Medium.getByName(rs
 					.getString("mailing_medium")));
 
-			
 			if (mailing.getMedium() == Mailing.Medium.POSTAL) {
 				int tmp = rs.getInt("template");
-				//checks whether the template value was null,
-				//as rs.getInt returns 0 when null
-				if(!rs.wasNull()) {
-					this.templateIds.put(rs.getInt("id"), tmp);
+				// checks whether the template value was null,
+				// as rs.getInt returns 0 when null
+				if (!rs.wasNull()) {
+					try {
+						mailing.setTemplate(mailingTemplateDao.getByID(tmp));
+					} catch (PersistenceException e) {
+						throw new SQLException(e);
+					}
 				}
 			}
 
 			return mailing;
 		}
 
-		public Map<Integer, Integer> getTemplateIds() {
-			return templateIds;
-		}
-
 	}
 
 	/**
-	 * @author Chris Steele maps a row of type person into a person object, used
-	 *         to insert entries into sent_mailings
+	 * maps a row of type person into a person object, used to insert entries
+	 * into sent_mailings
+	 * 
+	 * @author Chris Steele
 	 */
 	private class PersonIdMapper implements RowMapper<Person> {
 
