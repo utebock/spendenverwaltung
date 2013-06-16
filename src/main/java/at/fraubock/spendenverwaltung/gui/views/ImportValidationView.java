@@ -296,8 +296,41 @@ public class ImportValidationView extends InitializableView {
 		    return;
 		}
 		
-		//TODO: Import is saved, go back to main menu. if there are another imports to validate, don't go back, but show the next import
 		
+		//Import is saved, go back to main menu. if there are another imports to validate, don't go back, but show the next import
+		int conflicts = conflictModel.getDonationList().size();
+		
+		if(newModel.getDonationList().size() >= 1 || matchModel.getDonationList().size() >= 1){
+			if(conflicts == 0)
+				JOptionPane.showMessageDialog(this, "Import erfolgreich validiert", "Information", JOptionPane.INFORMATION_MESSAGE);
+			else
+				JOptionPane.showMessageDialog(this, "Import erfolgreich validiert. Es bestehen noch weiterhin " + conflicts + " Konflikte", "Information", JOptionPane.INFORMATION_MESSAGE);
+		} else{
+			if(conflicts == 0)
+				JOptionPane.showMessageDialog(this, "Nichts zu importieren.", "Information", JOptionPane.INFORMATION_MESSAGE);
+			else
+				JOptionPane.showMessageDialog(this, "Es bestehen noch weiterhin " + conflicts + " Konflikte", "Information", JOptionPane.INFORMATION_MESSAGE);
+		}
+		
+		if(conflicts == 0){
+			if(imports.size() == 1){
+				returnToMain();
+			} else if(imports.size() > 1) {
+				this.removeAll();
+				this.revalidate();
+				init();
+				return;
+			}
+					
+		} else{
+			try {
+				getData(donationService.getUnconfirmed(imports.get(importComboBox.getSelectedIndex())));
+			} catch (ServiceException e) {
+				JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+			    e.printStackTrace();
+			    return;
+			}
+		}
 		
 	}
 	
@@ -400,6 +433,11 @@ public class ImportValidationView extends InitializableView {
 		newModel.fireTableDataChanged();
 	}
 	
+	public void returnToMain(){
+		Action switchToMenu = actionFactory.getMainMenuViewAction();
+		switchToMenu.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+	}
+	
 	private class ImportComboBoxListener implements ActionListener{
 
 		ImportValidationView parent;
@@ -434,8 +472,7 @@ public class ImportValidationView extends InitializableView {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			Action switchToMenu = actionFactory.getMainMenuViewAction();
-			switchToMenu.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+			returnToMain();
 		}
 	}
 }
