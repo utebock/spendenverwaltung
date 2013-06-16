@@ -22,6 +22,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import at.fraubock.spendenverwaltung.dao.criterion.AbstractCriterionDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IFilterDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter.FilterPrivacyStatus;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.service.FilterValidator;
 import at.fraubock.spendenverwaltung.util.CurrentUser;
@@ -84,7 +85,7 @@ public class FilterDAOImplemented implements IFilterDAO {
 		try {
 			// FIXME order alphabetically by name?
 			FilterMapper mapper = new FilterMapper();
-			String select = "SELECT * FROM filter WHERE owner = ? OR private = false ORDER BY id DESC";
+			String select = "SELECT * FROM filter WHERE owner = ? OR privacy_status NOT LIKE 'privat' ORDER BY id DESC";
 			List<Filter> filterList = jdbcTemplate.query(select,
 					new Object[] { CurrentUser.userName }, mapper);
 			for (Filter result : filterList) {
@@ -144,7 +145,7 @@ public class FilterDAOImplemented implements IFilterDAO {
 			this.filter = filter;
 		}
 
-		private String createFilter = "insert into filter (type,name,anonymous,criterion,private,owner) values (?, ?, ?, ?, ?, ?)";
+		private String createFilter = "insert into filter (type,name,anonymous,criterion,privacy_status,owner) values (?, ?, ?, ?, ?, ?)";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
@@ -159,7 +160,7 @@ public class FilterDAOImplemented implements IFilterDAO {
 			} else {
 				ps.setInt(4, filter.getCriterion().getId());
 			}
-			ps.setBoolean(5, filter.isPrivate());
+			ps.setString(5, filter.getPrivacyStatus().getName());
 			ps.setString(6, CurrentUser.userName);
 			return ps;
 		}
@@ -176,7 +177,7 @@ public class FilterDAOImplemented implements IFilterDAO {
 			filter.setAnonymous(rs.getBoolean("anonymous"));
 
 			filter.setType(FilterType.getTypeForString(rs.getString("type")));
-			filter.setPrivate(rs.getBoolean("private"));
+			filter.setPrivacyStatus(FilterPrivacyStatus.getByName(rs.getString("privacy_status")));
 			filter.setOwner(rs.getString("owner"));
 			Integer crit_id = rs.getInt("criterion");
 			if (!rs.wasNull()) {

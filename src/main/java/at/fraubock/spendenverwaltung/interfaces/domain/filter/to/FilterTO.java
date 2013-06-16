@@ -3,6 +3,7 @@ package at.fraubock.spendenverwaltung.interfaces.domain.filter.to;
 import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter.FilterPrivacyStatus;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
@@ -22,7 +23,7 @@ public class FilterTO {
 
 	private String name;
 	private boolean anonymous;
-	private boolean isPrivate;
+	private FilterPrivacyStatus privacyStatus;
 	private FilterType type;
 	private List<Criterion> criterions;
 	private LogicalOperator operator;
@@ -67,11 +68,11 @@ public class FilterTO {
 		this.operator = operator;
 	}
 	
-	public boolean getPrivate(){
-		return isPrivate;
+	public FilterPrivacyStatus getPrivacyStatus() {
+		return privacyStatus;
 	}
-
-	public void setPrivate(boolean isPrivate){
-		this.isPrivate = isPrivate;
+	
+	public void setPrivacyStatus(FilterPrivacyStatus privacyStatus) {
+		this.privacyStatus = privacyStatus;
 	}
 }
