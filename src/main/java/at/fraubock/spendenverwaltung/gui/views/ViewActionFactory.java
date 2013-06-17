@@ -118,7 +118,7 @@ public class ViewActionFactory {
 	}
 
 	public Action getFindMailingsViewAction() {
-		return new DisplayViewAction(new FindMailingsView(this, new ComponentFactory(), personService, mailingService), "/images/showNotifications.jpg");
+		return new DisplayViewAction(new FindMailingsView(this, new ComponentFactory(), personService, mailingService, filterService), "/images/showNotifications.jpg");
 	}
 	
 	public Action getConfirmMailingsViewAction() {

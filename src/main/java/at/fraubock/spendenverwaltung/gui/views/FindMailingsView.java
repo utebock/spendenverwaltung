@@ -5,11 +5,13 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -21,12 +23,16 @@ import javax.swing.ListSelectionModel;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXDatePicker;
 
+import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.MailingTableModel;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
+import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
+import at.fraubock.spendenverwaltung.util.FilterType;
 
 public class FindMailingsView extends InitializableView {
 	
@@ -40,24 +46,31 @@ public class FindMailingsView extends InitializableView {
 	
 	private IPersonService personService;
 	private IMailingService mailingService;
+	private IFilterService filterService;
+	
+	private JComboBox<Filter> filterCombo;
+	private Filter selectedFilter;
 	
 	private MailingTableModel tableModel;
 	
 	private JPanel contentPanel;
-	private JLabel feedbackLabel, beforeDateLabel, afterDateLabel;
+	private JLabel feedbackLabel, beforeDateLabel, afterDateLabel, filterLabel;
 	
 	private JXDatePicker beforeDate, afterDate;
 	
 	JToolBar toolbar;
 	JTable mailingsTable;
 	
+	
+	
 	public FindMailingsView(ViewActionFactory viewActionFactory, ComponentFactory componentFactory,
-			IPersonService personService, IMailingService mailingService) {
+			IPersonService personService, IMailingService mailingService, IFilterService filterService) {
 		
 		this.viewActionFactory = viewActionFactory;
 		this.componentFactory = componentFactory;
 		this.mailingService = mailingService;
 		this.personService = personService;
+		this.filterService = filterService;
 		
 		setUpLayout();
 	}
@@ -88,6 +101,11 @@ public class FindMailingsView extends InitializableView {
 		beforeDate = new JXDatePicker();
 		beforeDate.addActionListener(new BeforeDatePickedListener());
 		contentPanel.add(beforeDate, "wrap");		
+		
+		filterLabel = componentFactory.createLabel("Aussendungs Filter");
+		contentPanel.add(filterLabel, "split 2");
+		filterCombo = new JComboBox<Filter>();
+		contentPanel.add(filterCombo, "wrap");
 				
 		mailingsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
@@ -100,6 +118,20 @@ public class FindMailingsView extends InitializableView {
 	public void init() {
 		addComponentsToToolbar(toolbar);		
 		initTable();
+		
+		List<Filter> mailingFilters;
+		try {
+			mailingFilters = filterService.getAllByFilter(FilterType.MAILING);
+			log.debug("getAllByFilter returned "+ mailingFilters.size()+ " filters");
+			filterCombo.setModel(new SimpleComboBoxModel<Filter>(
+					mailingFilters));
+			filterCombo.setSelectedIndex(-1);
+			filterCombo.addActionListener(new FilterSelectedAction());
+		} catch (ServiceException e) {
+			log.warn(e.getLocalizedMessage());
+			JOptionPane.showMessageDialog(this, "Ein Fehler trat während der Initialisierung der Tabelle auf");
+		}
+		
 	}
 	
 	private void initTable() {
@@ -109,7 +141,7 @@ public class FindMailingsView extends InitializableView {
 			mailingsTable.setAutoCreateRowSorter(true);
 		} catch (ServiceException e) {
 			log.warn(e.getLocalizedMessage());
-			JOptionPane.showMessageDialog(this, "Ein Fehler tritt während der Initialisierung der Tabelle auf");
+			JOptionPane.showMessageDialog(this, "Ein Fehler trat während der Initialisierung der Tabelle auf");
 		}
 	}
 	
@@ -141,6 +173,8 @@ public class FindMailingsView extends InitializableView {
 		toolbar.add(deleteButton, "growx");
 	}
 	
+
+
 	private final class AfterDatePickedListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -270,6 +304,24 @@ public class FindMailingsView extends InitializableView {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
+		}
+	}
+	
+	private final class FilterSelectedAction implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			selectedFilter = (Filter) filterCombo.getModel().getSelectedItem();
+
+			if(selectedFilter != null) {
+				
+				tableModel.clear();
+				try {
+					tableModel.addMailings(mailingService.getByFilter(selectedFilter));
+				} catch (ServiceException e1) {
+					log.warn(e1.getLocalizedMessage());
+					feedbackLabel.setText("Es passierte ein Fehler während der Auswertung des Filters.");
+				}
+			}
 		}
 	}
 }

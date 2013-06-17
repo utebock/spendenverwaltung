@@ -250,12 +250,13 @@ public class MailingServiceImplemented implements IMailingService {
 		beforeCriterion.compare(FilterProperty.MAILING_DATE, RelationalOperator.LESS_EQ, end);
 		
 		PropertyCriterion afterCriterion = new PropertyCriterion();
-		beforeCriterion.setType(FilterType.MAILING);
-		beforeCriterion.compare(FilterProperty.MAILING_DATE, RelationalOperator.GREATER_EQ, start);
+		afterCriterion.setType(FilterType.MAILING);
+		afterCriterion.compare(FilterProperty.MAILING_DATE, RelationalOperator.GREATER_EQ, start);
 		
 		ConnectedCriterion betweenCriterion = new ConnectedCriterion();
+		betweenCriterion.setType(FilterType.MAILING);
 		betweenCriterion.connect(beforeCriterion, LogicalOperator.AND, afterCriterion);
-	
+		
 		betweenFilter.setCriterion(betweenCriterion);
 		
 		try {
