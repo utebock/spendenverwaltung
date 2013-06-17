@@ -4,7 +4,7 @@ public enum FilterType {
 	
 	PERSON("validated_persons","Personen"), 
 	DONATION("validated_donations","Spenden"), 
-	MAILING("mailings","Aussendungen"), 
+	MAILING("confirmed_mailings","Aussendungen"), 
 	ADDRESS("validated_addresses","Adressen");
 	
 	private String type;
@@ -29,7 +29,7 @@ public enum FilterType {
 			return PERSON;
 		} else if("validated_donations".equals(value)) {
 			return DONATION;
-		} else if("validated_mailings".equals(value)) {
+		} else if("confirmed_mailings".equals(value)) {
 			return MAILING;
 		} else if("validated_addresses".equals(value)) {
 			return ADDRESS;

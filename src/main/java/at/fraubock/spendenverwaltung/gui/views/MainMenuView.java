@@ -21,6 +21,7 @@ public class MainMenuView extends InitializableView {
 	private JLabel general;
 	private JPanel importPanel;
 	private JButton filter;
+	private JButton history;
 	private JLabel persons;
 	private JLabel filterLabel;
 	private JLabel importLabel;
@@ -91,7 +92,9 @@ public class MainMenuView extends InitializableView {
 		search = new JButton();
 		personsPanel.add(search, "gap 35");
 		filter = new JButton();
-		personsPanel.add(filter, "wrap 0px, gap 38");
+		personsPanel.add(filter, "gap 35");
+		history = new JButton();
+		personsPanel.add(history, "wrap 0px, gap 38");
 		//button labels
 		persons = componentFactory.createLabel("Person anlegen");
 		personsPanel.add(persons);
@@ -197,6 +200,7 @@ public class MainMenuView extends InitializableView {
 		person.setAction(viewActionFactory.getCreatePersonsViewAction());
 		search.setAction(viewActionFactory.getFindPersonsViewAction());
 		filter.setAction(viewActionFactory.getMainFilterViewAction());
+		history.setAction(viewActionFactory.getHistoryViewAction());
 		imports.setAction(viewActionFactory.getDonationImportViewAction());
 		validation.setAction(viewActionFactory.getImportValidationViewAction());
 		createConfirm.setAction(viewActionFactory.getCreateDonationConfirmationViewAction());

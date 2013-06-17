@@ -31,9 +31,9 @@ import org.apache.log4j.Logger;
 
 import at.fraubock.spendenverwaltung.gui.AddAttributes;
 import at.fraubock.spendenverwaltung.gui.EditPerson;
-import at.fraubock.spendenverwaltung.gui.PersonTableModel;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
+import at.fraubock.spendenverwaltung.gui.components.PersonTableModel;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;

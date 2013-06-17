@@ -19,11 +19,11 @@ import javax.swing.JSeparator;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXDatePicker;
 
-import at.fraubock.spendenverwaltung.gui.PersonTableModel;
 import at.fraubock.spendenverwaltung.gui.components.ComponentConstants;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.EmailTextField;
 import at.fraubock.spendenverwaltung.gui.components.NumericTextField;
+import at.fraubock.spendenverwaltung.gui.components.PersonTableModel;
 import at.fraubock.spendenverwaltung.gui.components.StringTextField;
 import at.fraubock.spendenverwaltung.gui.components.interfaces.ValidateableComponent;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;

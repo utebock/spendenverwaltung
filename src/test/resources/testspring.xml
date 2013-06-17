@@ -34,6 +34,9 @@
 	<bean id="addressDao" class="at.fraubock.spendenverwaltung.dao.AddressDAOImplemented">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 	</bean>
+	<bean id="actionDao" class="at.fraubock.spendenverwaltung.dao.ActionDAOImplemented">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+	</bean>
 	<bean id="personDao" class="at.fraubock.spendenverwaltung.dao.PersonDAOImplemented">
 		<property name="addressDao" ref="addressDao" />
 		<property name="jdbcTemplate" ref="jdbcTemplate" />

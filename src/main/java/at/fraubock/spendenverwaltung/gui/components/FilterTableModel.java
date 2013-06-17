@@ -1,4 +1,4 @@
-package at.fraubock.spendenverwaltung.gui;
+package at.fraubock.spendenverwaltung.gui.components;
 
 import java.util.Vector;
 import javax.swing.table.AbstractTableModel;

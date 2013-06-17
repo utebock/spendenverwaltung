@@ -25,6 +25,7 @@ import net.miginfocom.swing.MigLayout;
 import at.fraubock.spendenverwaltung.gui.components.ComponentConstants;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.NumericTextField;
+import at.fraubock.spendenverwaltung.gui.components.PersonTableModel;
 import at.fraubock.spendenverwaltung.gui.components.StringTextField;
 import at.fraubock.spendenverwaltung.gui.views.FindPersonsView;
 import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
