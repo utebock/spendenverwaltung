@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.interfaces.service;
 
+import java.util.Date;
 import java.util.List;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
@@ -128,7 +129,14 @@ public interface IMailingService {
 	
 	/**
 	 * returns all mailings that match a specific mailing filter
+	 * @throws ServiceException 
 	 * 
 	 */
-	public List<Mailing> getByFilter(Filter filter);
+	public List<Mailing> getByFilter(Filter filter) throws ServiceException;
+	
+	public List<Mailing> getBeforeDate(Date date) throws ServiceException;
+	
+	public List<Mailing> getAfterDate(Date date) throws ServiceException;
+	
+	public List<Mailing> getBetweenDates(Date before, Date after) throws ServiceException;
 }

@@ -15,7 +15,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 
@@ -148,14 +147,26 @@ public class FindMailingsView extends InitializableView {
 			Date bDate = beforeDate.getDate();
 			Date aDate = afterDate.getDate();
 			
-			if(aDate != null) {
-				if(bDate.after(aDate)) {
+			if(aDate != null && bDate != null) {
+				if(aDate.after(bDate)) {
 					feedbackLabel.setText("Ungültiger Datumsbereich");
 				} else {
-					//mailingService call betweenSearch
+					try {
+						tableModel.clear();
+						tableModel.addMailings(mailingService.getBetweenDates(aDate, bDate));
+				} catch (ServiceException e1) {
+					log.warn(e1.getLocalizedMessage());
+					feedbackLabel.setText("Es passierte ein Fehler beim Auswerten der Abfrage");
 				}
-			} else if (bDate != null) {
-				//mailingService call beforeSearch
+				}
+			} else if (aDate != null) {
+				try {
+					tableModel.clear();
+					tableModel.addMailings(mailingService.getAfterDate(aDate));
+				} catch (ServiceException e1) {
+					log.warn(e1.getLocalizedMessage());
+					feedbackLabel.setText("Es passierte ein Fehler beim Auswerten der Abfrage");
+				}
 			}
 		}
 	}
@@ -166,14 +177,26 @@ public class FindMailingsView extends InitializableView {
 			Date aDate = afterDate.getDate();
 			Date bDate = beforeDate.getDate();
 			
-			if(bDate != null) {
-				if(bDate.after(aDate)) {
+			if(aDate != null && bDate != null) {
+				if(aDate.after(bDate)) {
 					feedbackLabel.setText("Ungültiger Datumsbereich");
 				} else {
-					//mailingService call betweenSearch
+					try {
+						tableModel.clear();
+						tableModel.addMailings(mailingService.getBetweenDates(aDate, bDate));
+					} catch (ServiceException e1) {
+						log.warn(e1.getLocalizedMessage());
+						feedbackLabel.setText("Es passierte ein Fehler beim Auswerten der Abfrage");
+					}
 				}
-			} else if (aDate != null) {
-				//mailingService call afterSearch
+			} else if (bDate != null) {
+				try {
+					tableModel.clear();
+					tableModel.addMailings(mailingService.getBeforeDate(bDate));
+				} catch (ServiceException e1) {
+					log.warn(e1.getLocalizedMessage());
+					feedbackLabel.setText("Es passierte ein Fehler beim Auswerten der Abfrage");
+				}
 			}
 		}
 	}

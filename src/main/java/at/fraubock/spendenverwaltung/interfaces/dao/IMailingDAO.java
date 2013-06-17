@@ -132,8 +132,8 @@ public interface IMailingDAO {
 	 * returns all mailings matched by this filter
 	 * @param filter
 	 * @return
+	 * @throws PersistenceException 
 	 */
-	List<Mailing> getMailingsByFilter(Filter filter);
-
+	List<Mailing> getMailingsByFilter(Filter filter) throws PersistenceException;
 
 }

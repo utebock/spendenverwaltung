@@ -2,6 +2,7 @@ package at.fraubock.spendenverwaltung.service;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,11 +13,18 @@ import at.fraubock.spendenverwaltung.interfaces.domain.MailingTemplate;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.UnconfirmedMailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.ConnectedCriterion;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
+import at.fraubock.spendenverwaltung.util.FilterProperty;
+import at.fraubock.spendenverwaltung.util.FilterType;
+import at.fraubock.spendenverwaltung.util.LogicalOperator;
 import at.fraubock.spendenverwaltung.util.MailChimp;
 import at.fraubock.spendenverwaltung.util.MailingTemplateUtil;
+import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
 public class MailingServiceImplemented implements IMailingService {
 
@@ -187,10 +195,73 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
-	public List<Mailing> getByFilter(Filter filter) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Mailing> getByFilter(Filter filter) throws ServiceException {
+		try {
+			return mailingDAO.getMailingsByFilter(filter);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
 	}
+
+	@Override
+	public List<Mailing> getBeforeDate(Date date) throws ServiceException {
+		Filter beforeFilter = new Filter();
+		beforeFilter.setType(FilterType.MAILING);
+		
+		PropertyCriterion beforeCriterion = new PropertyCriterion();
+		beforeCriterion.setType(FilterType.MAILING);
+		beforeCriterion.compare(FilterProperty.MAILING_DATE, RelationalOperator.LESS_EQ, date);
+		
+		beforeFilter.setCriterion(beforeCriterion);
+		
+		try {
+			return mailingDAO.getMailingsByFilter(beforeFilter);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
+
+	@Override
+	public List<Mailing> getAfterDate(Date date) throws ServiceException {
+		Filter afterFilter = new Filter();
+		afterFilter.setType(FilterType.MAILING);
+		
+		PropertyCriterion afterCriterion = new PropertyCriterion();
+		afterCriterion.setType(FilterType.MAILING);
+		afterCriterion.compare(FilterProperty.MAILING_DATE, RelationalOperator.GREATER_EQ, date);
+		
+		afterFilter.setCriterion(afterCriterion);
+		
+		try {
+			return mailingDAO.getMailingsByFilter(afterFilter);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
+
+	@Override
+	public List<Mailing> getBetweenDates(Date start, Date end)
+			throws ServiceException {
+		Filter betweenFilter = new Filter();
+		betweenFilter.setType(FilterType.MAILING);
+		
+		PropertyCriterion beforeCriterion = new PropertyCriterion();
+		beforeCriterion.setType(FilterType.MAILING);
+		beforeCriterion.compare(FilterProperty.MAILING_DATE, RelationalOperator.LESS_EQ, end);
+		
+		PropertyCriterion afterCriterion = new PropertyCriterion();
+		beforeCriterion.setType(FilterType.MAILING);
+		beforeCriterion.compare(FilterProperty.MAILING_DATE, RelationalOperator.GREATER_EQ, start);
+		
+		ConnectedCriterion betweenCriterion = new ConnectedCriterion();
+		betweenCriterion.connect(beforeCriterion, LogicalOperator.AND, afterCriterion);
 	
-	
+		betweenFilter.setCriterion(betweenCriterion);
+		
+		try {
+			return mailingDAO.getMailingsByFilter(betweenFilter);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
 }

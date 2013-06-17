@@ -482,20 +482,24 @@ public class MailingDAOImplemented implements IMailingDAO {
 	}
 	
 	@Override
-	public List<Mailing> getMailingsByFilter(Filter filter) {
+	public List<Mailing> getMailingsByFilter(Filter filter) throws PersistenceException {
 		List<Mailing> results;
 		
 		if(!filter.getType().equals(FilterType.MAILING)) {
 			return null;
 		} else {
-			//gotta change the filters to only search confirmed mailings...
-			String sql = filterToSqlBuilder.createSqlStatement(filter);
-			MailingMapper mapper = new MailingMapper();
-			results = jdbcTemplate.query(sql, mapper);
+			try {
+				//gotta change the filters to only search confirmed mailings...
+				String sql = filterToSqlBuilder.createSqlStatement(filter);
+				MailingMapper mapper = new MailingMapper();
+				results = jdbcTemplate.query(sql, mapper);
+			} catch (DataAccessException e) {
+				log.warn(e.getLocalizedMessage());
+				throw new PersistenceException(e);
+			}
 		}
 		
 		return results;
-		
 	}
 
 	@Override
@@ -579,4 +583,6 @@ public class MailingDAOImplemented implements IMailingDAO {
 			return person;
 		}
 	}
+
+
 }
