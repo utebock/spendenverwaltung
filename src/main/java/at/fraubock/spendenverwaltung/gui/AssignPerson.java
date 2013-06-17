@@ -1,24 +1,19 @@
 package at.fraubock.spendenverwaltung.gui;
 
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.WindowConstants;
 
@@ -26,27 +21,20 @@ import net.miginfocom.swing.MigLayout;
 
 import org.apache.log4j.Logger;
 
-import at.fraubock.spendenverwaltung.gui.components.PersonTableModel;
-import at.fraubock.spendenverwaltung.gui.filter.ConfiguratorFactory;
-import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
 import at.fraubock.spendenverwaltung.gui.views.ImportValidationView;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.ConnectedCriterion;
-import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
-import at.fraubock.spendenverwaltung.interfaces.domain.filter.to.FilterTO;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
-import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
-import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
 import at.fraubock.spendenverwaltung.util.FilterType;
+import at.fraubock.spendenverwaltung.util.ImportValidator.ValidationType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
-import at.fraubock.spendenverwaltung.util.ImportValidator.ValidationType;
 
 public class AssignPerson extends JDialog {
 

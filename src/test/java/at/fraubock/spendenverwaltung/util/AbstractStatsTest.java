@@ -1,6 +1,5 @@
 package at.fraubock.spendenverwaltung.util;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -25,12 +24,10 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
-import at.fraubock.spendenverwaltung.util.statistics.DonationStats;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/testspring.xml")
 @TransactionConfiguration(defaultRollback = true)
-
 public abstract class AbstractStatsTest {
 	private static final Logger log = Logger.getLogger(AbstractStatsTest.class);
 
@@ -38,7 +35,6 @@ public abstract class AbstractStatsTest {
 	protected static IDonationDAO donationDAO;
 	protected static IAddressDAO addressDAO;
 	protected static IFilterDAO filterDAO;
-	protected  DonationStats donationStats = new DonationStats();
 
 	public static void setDonationDao(IDonationDAO donationDAO) {
 		AbstractStatsTest.donationDAO = donationDAO;
@@ -51,25 +47,23 @@ public abstract class AbstractStatsTest {
 	public static void setAddressDao(IAddressDAO addressDAO) {
 		AbstractStatsTest.addressDAO = addressDAO;
 	}
-	
+
 	public static void setFilterDao(IFilterDAO filterDAO) {
 		AbstractStatsTest.filterDAO = filterDAO;
 	}
-	
+
 	@Test
 	@Transactional
-	public void getCountOfFilterListShoutGetCorrectCount(){
+	public void getCountOfFilterListShoutGetCorrectCount() {
 		Person person = new Person();
 		Donation donation = new Donation();
 		Donation donation2 = new Donation();
 		Address address = new Address();
 		Filter filter = new Filter();
 		PropertyCriterion crit = new PropertyCriterion();
-		List<Donation> list = new ArrayList<Donation>();
 		Filter filter2 = new Filter();
 		PropertyCriterion crit2 = new PropertyCriterion();
-		List<Donation> list2 = new ArrayList<Donation>();
-		
+
 		address.setStreet("Teststreet 1/1");
 		address.setPostalCode("00000");
 		address.setCity("Testcity");
@@ -113,7 +107,7 @@ public abstract class AbstractStatsTest {
 		} catch (PersistenceException e) {
 			fail();
 		}
-		
+
 		donation2.setDonator(person);
 		donation2.setAmount(200L);
 		donation2.setDate(new Date());
@@ -127,57 +121,45 @@ public abstract class AbstractStatsTest {
 		} catch (PersistenceException e) {
 			fail();
 		}
-		
+
 		crit.setType(FilterType.DONATION);
 		crit.setProperty(FilterProperty.DONATION_AMOUNT);
 		crit.setRelationalOperator(RelationalOperator.GREATER_EQ);
 		crit.setStrValue("100");
-		
+
 		filter.setCriterion(crit);
 		filter.setName("Test");
 		filter.setType(FilterType.DONATION);
-		
-		try{
+
+		try {
 			filterDAO.insert(filter);
-		}catch(PersistenceException e){
+		} catch (PersistenceException e) {
 			fail();
 		}
-		
+
 		crit2.setType(FilterType.DONATION);
 		crit2.setProperty(FilterProperty.DONATION_AMOUNT);
 		crit2.setRelationalOperator(RelationalOperator.LESS);
 		crit2.setStrValue("150");
-		
+
 		filter2.setCriterion(crit2);
 		filter2.setName("Test2");
 		filter2.setType(FilterType.DONATION);
-		
-		try{
+
+		try {
 			filterDAO.insert(filter2);
-		}catch(PersistenceException e){
+		} catch (PersistenceException e) {
 			fail();
 		}
-		
+
 		try {
-			list2 = donationDAO.getByFilter(filter2);
-			
+			donationDAO.getByFilter(filter2);
+
 		} catch (PersistenceException e) {
 			fail();
 			log.error("GetByFilter in AbsractStatsTest does not work");
 		}
-		
-		assert(donationStats.getCount(list)==2);
-		assert(donationStats.getSum(list)==300.0);
-		assert(donationStats.getMean(list)==150.0);
-		assert(donationStats.getMax(list)==200.0);
-		assert(donationStats.getMin(list)==100.0);
-		assert(donationStats.getMedian(list)==150.0);
-		
-		assert(donationStats.getCount(list2)==1);
-		assert(donationStats.getSum(list2)==100.0);
-		
-		
-		
+
 	}
-	
+
 }

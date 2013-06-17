@@ -2,9 +2,7 @@ package at.fraubock.spendenverwaltung.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -110,8 +108,8 @@ public class MailChimp {
 	 * @return
 	 * @throws ServiceException
 	 */
-	public static Map<String, String> getLists() throws ServiceException{
-		Map<String, String> map = new HashMap<String, String>();
+	public static List<MailChimpListItem> getLists() throws ServiceException{
+		List<MailChimpListItem> list = new ArrayList<MailChimpListItem>();
 		ListsResult result;
 		
 		log.debug("Get MailChimp Lists");
@@ -130,10 +128,10 @@ public class MailChimp {
 		
 		//Only return id and name
 		for(ListInformation info : result.data){
-			map.put(info.id, info.name);
+			list.add(new MailChimpListItem(info.id, info.name));
 		}
 		
-		return map;
+		return list;
 	}
 	
 	
@@ -150,6 +148,37 @@ public class MailChimp {
 	        this.FNAME = fname;
 	        this.LNAME = lname;
 	    }
+	}
+	
+	public static class MailChimpListItem{
+		private String id, name;
+		
+		public MailChimpListItem(String id, String name){
+			this.id = id;
+			this.name = name;
+		}
+
+		public String getId() {
+			return id;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setId(String id) {
+			this.id = id;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+		
+		@Override
+		public String toString(){
+			return name;
+		}
+		
 	}
 
 }

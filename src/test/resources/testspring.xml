@@ -61,6 +61,10 @@
 		class="at.fraubock.spendenverwaltung.dao.MailingTemplateDAOImplemented">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 	</bean>
+	<bean id="confirmationTemplateDao"
+		class="at.fraubock.spendenverwaltung.dao.ConfirmationTemplateDAOImplemented">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+	</bean>
 
 	<bean id="abstractCritDao"
 		class="at.fraubock.spendenverwaltung.dao.criterion.AbstractCriterionDAO">

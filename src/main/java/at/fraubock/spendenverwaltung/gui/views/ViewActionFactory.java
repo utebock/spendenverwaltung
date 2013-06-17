@@ -114,7 +114,7 @@ public class ViewActionFactory {
 	}
 	
 	public Action getCreateMailingsViewAction() {
-		return new DisplayViewAction(new CreateMailingsView(this, new ComponentFactory(), mailingService, filterService), "/images/eNotification.jpg");
+		return new DisplayViewAction(new CreateMailingsView(this, new ComponentFactory(), mailingService, filterService, personService), "/images/eNotification.jpg");
 	}
 
 	//TODO richtige view returnen!

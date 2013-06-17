@@ -1,21 +1,14 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.EventObject;
 import java.util.List;
 
 import javax.swing.AbstractAction;
-import javax.swing.AbstractCellEditor;
 import javax.swing.Action;
 import javax.swing.DefaultCellEditor;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -25,21 +18,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.event.CellEditorListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
+
+import net.miginfocom.swing.MigLayout;
 
 import org.apache.log4j.Logger;
 
-import net.miginfocom.swing.MigLayout;
 import at.fraubock.spendenverwaltung.gui.AbstractValidationTableModel;
 import at.fraubock.spendenverwaltung.gui.AssignPerson;
 import at.fraubock.spendenverwaltung.gui.ComponentBuilder;
@@ -51,7 +34,6 @@ import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Import;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
-import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;

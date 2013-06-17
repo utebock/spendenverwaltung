@@ -3,6 +3,8 @@ package at.fraubock.spendenverwaltung.service;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
@@ -12,6 +14,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.UnconfirmedMailing;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
+import at.fraubock.spendenverwaltung.util.MailChimp;
 import at.fraubock.spendenverwaltung.util.MailingTemplateUtil;
 
 public class MailingServiceImplemented implements IMailingService {
@@ -28,6 +31,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public Mailing insertOrUpdate(Mailing m) throws ServiceException {
 		try {
 			mailingDAO.insertOrUpdate(m);
@@ -38,6 +42,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public void delete(Mailing m) throws ServiceException {
 		try {
 			mailingDAO.delete(m);
@@ -47,6 +52,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<Mailing> getAll() throws ServiceException {
 		try {
 			return mailingDAO.getAll();
@@ -57,6 +63,7 @@ public class MailingServiceImplemented implements IMailingService {
 	
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<Mailing> getAllConfirmed() throws ServiceException {
 		try {
 			return mailingDAO.getAllConfirmed();
@@ -66,6 +73,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 	
 	@Override
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public void confirmMailing(Mailing mailing) throws ServiceException {
 		try {
 			mailingDAO.confirmMailing(mailing);
@@ -75,6 +83,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<Mailing> getAllUnconfirmed() throws ServiceException {
 		try {
 			return mailingDAO.getAllUnconfirmed();
@@ -89,6 +98,7 @@ public class MailingServiceImplemented implements IMailingService {
 	 * @returns Map of creators and mailings
 	 */
 	@Override
+	@Transactional(readOnly = true)
 	public List<UnconfirmedMailing> getUnconfirmedMailingsWithCreator() throws ServiceException {
 		try {
 			return mailingDAO.getUnconfirmedMailingsWithCreator();
@@ -98,6 +108,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Mailing getById(int id) throws ServiceException {
 		try {
 			return mailingDAO.getById(id);
@@ -107,6 +118,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<Mailing> getConfirmedMailingsByPerson(Person person)
 			throws ServiceException {
 		try {
@@ -133,7 +145,8 @@ public class MailingServiceImplemented implements IMailingService {
 		return csv;
 	}
 
-	@Override
+	@Override	
+	@Transactional(readOnly = true)
 	public void reproduceDocument(Mailing mailing) throws ServiceException {
 		if (mailing == null) {
 			throw new IllegalArgumentException("Argument must not be null.");
@@ -158,4 +171,19 @@ public class MailingServiceImplemented implements IMailingService {
 			}
 		}
 	}
+
+	@Override
+	public int exportEMailsToMailChimp(Mailing mailing, String mailChimpListId)
+			throws ServiceException {
+		int errors = 0;
+		
+		try {
+			errors = MailChimp.addPersonsToList(mailChimpListId, personDAO.getPersonsByMailing(mailing));
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+		return errors;
+	}
+	
+	
 }

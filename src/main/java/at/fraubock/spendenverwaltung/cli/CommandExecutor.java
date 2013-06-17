@@ -95,11 +95,12 @@ public class CommandExecutor {
 		mutexActions.addOption(importOption);
 
 		options.addOptionGroup(mutexActions);
-		options.addOption(OptionBuilder
-				.withLongOpt("style")
-				.withDescription(
-						"use with -i: use STYLE as import style (\"hypo\", \"native\" or \"sms\", default native)")
-				.hasArg().withArgName("STYLE").create());
+		OptionBuilder.withLongOpt("style");
+		OptionBuilder
+				.withDescription("use with -i: use STYLE as import style (\"hypo\", \"native\" or \"sms\", default native)");
+		OptionBuilder.hasArg();
+		OptionBuilder.withArgName("STYLE");
+		options.addOption(OptionBuilder.create());
 
 		// parse:
 		CommandLineParser parser = new GnuParser();

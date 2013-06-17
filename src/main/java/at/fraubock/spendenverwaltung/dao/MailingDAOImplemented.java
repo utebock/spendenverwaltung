@@ -442,11 +442,10 @@ public class MailingDAOImplemented implements IMailingDAO {
 	public void confirmMailing(Mailing mailing) throws PersistenceException {
 		log.debug("Entering confirmMailing with param " + mailing);
 
-		try {
-			validate(mailing);
-		} catch (ValidationException e) {
-			throw new IllegalArgumentException(e);
+		if(mailing == null || mailing.getId() == null) {
+			throw new IllegalArgumentException("mailing or mailing id was null");
 		}
+		
 
 		try {
 			if (mailing.getId() == null) {

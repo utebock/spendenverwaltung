@@ -6,10 +6,8 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
-import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 

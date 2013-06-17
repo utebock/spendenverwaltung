@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -65,10 +64,10 @@ public class PropertyCriterionDAO {
 		validator.validate(f);
 		try {
 			String stmt = "delete from property_criterion";
-			Object[] obj = new Object[0];
-//			obj[0] = f.getId();
-			int[] type = new int[0];
-//			type[0] = Types.INTEGER;
+			// Object[] obj = new Object[0];
+			// obj[0] = f.getId();
+			// int[] type = new int[0];
+			// type[0] = Types.INTEGER;
 			jdbcTemplate.update(stmt);
 		} catch (DataAccessException e) {
 			throw new PersistenceException(e);

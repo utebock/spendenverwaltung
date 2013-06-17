@@ -1,12 +1,14 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -18,14 +20,21 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JSeparator;
+
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.chart.labels.StandardXYToolTipGenerator;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.time.Day;
+import org.jfree.data.time.Month;
+import org.jfree.data.time.Quarter;
+import org.jfree.data.time.RegularTimePeriod;
+import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.data.time.Week;
+import org.jfree.data.time.Year;
+import org.jfree.data.xy.XYDataset;
 
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
@@ -36,20 +45,19 @@ import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.Pair;
-import at.fraubock.spendenverwaltung.util.statistics.Classification;
+import at.fraubock.spendenverwaltung.util.statistics.DonationTimeStatisticDatasetGenerator;
 import at.fraubock.spendenverwaltung.util.statistics.Operation;
-import at.fraubock.spendenverwaltung.util.statistics.Statistic;
 
 public class DonationProgressStatsView extends InitializableView {
-	
-	private static final Logger log = Logger.getLogger(DonationProgressStatsView.class);
+
+	private static final Logger log = Logger
+			.getLogger(DonationProgressStatsView.class);
 
 	private static final long serialVersionUID = 1L;
 	private IDonationService donationService;
 	private IFilterService filterService;
 	private ViewActionFactory viewActionFactory;
 	private ComponentFactory componentFactory;
-	private Statistic statistic;
 	private JButton submit;
 	private JButton cancel;
 	private JPanel operationsPanel;
@@ -58,8 +66,7 @@ public class DonationProgressStatsView extends InitializableView {
 	private JComboBox<Filter> firstFilter;
 	private JLabel chooseFilter;
 	private JLabel chooseOperation;
-	private JComboBox<String> operationBox;
-	private JComboBox<String> filterCountCombo;
+	private JComboBox<Operation> operationBox;
 	private JLabel chooseFilterCount;
 	private JComboBox<Filter> secondFilter;
 	private JComboBox<Filter> thirdFilter;
@@ -74,8 +81,9 @@ public class DonationProgressStatsView extends InitializableView {
 	private List<Donation> donationList;
 
 	private JPanel plotPanel;
-	
-	public DonationProgressStatsView(ComponentFactory componentFactory, ViewActionFactory viewActionFactory, 
+
+	public DonationProgressStatsView(ComponentFactory componentFactory,
+			ViewActionFactory viewActionFactory,
 			IDonationService donationService, IFilterService filterService) {
 		this.componentFactory = componentFactory;
 		this.viewActionFactory = viewActionFactory;
@@ -88,6 +96,7 @@ public class DonationProgressStatsView extends InitializableView {
 	public void setDonationService(IDonationService donationService) {
 		this.donationService = donationService;
 	}
+
 	public void setFilterService(IFilterService filterService) {
 		this.filterService = filterService;
 	}
@@ -95,61 +104,61 @@ public class DonationProgressStatsView extends InitializableView {
 	public void setComponentFactory(ComponentFactory componentFactory) {
 		this.componentFactory = componentFactory;
 	}
-	
+
 	public void setViewActionFactory(ViewActionFactory viewActionFactory) {
 		this.viewActionFactory = viewActionFactory;
 	}
-	
+
 	private void fillFilters() {
 		showAllFilter = new Filter(FilterType.DONATION);
 		donationFilters = new ArrayList<Filter>();
 		donationFilters.add(showAllFilter);
-		
-		try{
-			donationFilters.addAll(filterService.getAllByFilter(FilterType.DONATION));
-		}	catch (ServiceException e) {
-			JOptionPane
-			.showMessageDialog(
-					this,
-					"Ein unerwarteter Fehler ist aufgetreten.",
-					"Error", JOptionPane.ERROR_MESSAGE);
+
+		try {
+			donationFilters.addAll(filterService
+					.getAllByFilter(FilterType.DONATION));
+		} catch (ServiceException e) {
+			JOptionPane.showMessageDialog(this,
+					"Ein unerwarteter Fehler ist aufgetreten.", "Error",
+					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 			return;
 		}
 	}
-	
+
 	private void setUpCreate() {
-		
-		operationsPanel= componentFactory.createPanel(700, 800);
+
+		operationsPanel = componentFactory.createPanel(700, 800);
 		this.add(operationsPanel, "wrap");
 		plotPanel = componentFactory.createPanel(700, 400);
-		doSingleStat = componentFactory.createLabel("Statistische Berechnungen durchf\u00FChren ");
+		doSingleStat = componentFactory
+				.createLabel("Statistische Berechnungen durchf\u00FChren ");
 		doSingleStat.setFont(new Font("Headline", Font.PLAIN, 14));
 		operationsPanel.add(doSingleStat, "wrap 30px");
-		
-// choose number of filters for comparison
+
+		// choose number of filters for comparison
 		chooseFilterCount = componentFactory
 				.createLabel("Filteranzahl ausw\u00E4hlen: ");
 		operationsPanel.add(chooseFilterCount, "split4");
 
 		chooseTwo = new JRadioButton("2");
-		chooseTwo.addActionListener(new ActionListener(){
+		chooseTwo.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				}
+			}
 		});
 		chooseThree = new JRadioButton("3");
-		chooseThree.addActionListener(new ActionListener(){
+		chooseThree.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				}
+			}
 		});
 		group = new ButtonGroup();
 		group.add(chooseTwo);
 		group.add(chooseThree);
 		operationsPanel.add(chooseTwo);
 		operationsPanel.add(chooseThree, "wrap 10px");
-		
+
 		firstFilter = new JComboBox<Filter>(new SimpleComboBoxModel<Filter>(
 				donationFilters));
 		firstFilter.addActionListener(new ActionListener() {
@@ -158,7 +167,7 @@ public class DonationProgressStatsView extends InitializableView {
 				getDonations((Filter) firstFilter.getModel().getSelectedItem());
 			}
 		});
-		
+
 		secondFilter = new JComboBox<Filter>(new SimpleComboBoxModel<Filter>(
 				donationFilters));
 		secondFilter.addActionListener(new ActionListener() {
@@ -167,7 +176,7 @@ public class DonationProgressStatsView extends InitializableView {
 				getDonations((Filter) secondFilter.getModel().getSelectedItem());
 			}
 		});
-		
+
 		thirdFilter = new JComboBox<Filter>(new SimpleComboBoxModel<Filter>(
 				donationFilters));
 		thirdFilter.addActionListener(new ActionListener() {
@@ -176,40 +185,38 @@ public class DonationProgressStatsView extends InitializableView {
 				getDonations((Filter) thirdFilter.getModel().getSelectedItem());
 			}
 		});
-		
+
 		chooseFilter = componentFactory.createLabel("Filter ausw\u00E4hlen: ");
 		operationsPanel.add(chooseFilter, "split4");
 		operationsPanel.add(firstFilter, "gap 40");
 		operationsPanel.add(secondFilter);
 		operationsPanel.add(thirdFilter, "wrap 10px");
-		
-// then choose class 
+
+		// then choose class
 		chooseClass = componentFactory.createLabel("Darstellung nach: ");
 		operationsPanel.add(chooseClass, "split 2");
 		String[] classification = new String[] { "Tag", "Woche", "Monat",
 				"Quartal", "Jahr" };
 		classBox = new JComboBox<String>(classification);
 		operationsPanel.add(classBox, "gap 35, wrap 10px, growx");
-				
-//	choose operation then
-		chooseOperation = componentFactory.createLabel("Operation ausw\u00E4hlen: ");
+
+		// choose operation then
+		chooseOperation = componentFactory
+				.createLabel("Operation ausw\u00E4hlen: ");
 		operationsPanel.add(chooseOperation, "split 2");
-		String[] operations = new String[]{"Betragsmaximum", "Betragsmedian", "Betragsminimum", 
-				"Betragsmittelwert", "Gesamtanzahl der Spenden", "Gesamtsumme der Spenden"};
-		operationBox = new JComboBox<String>(operations);
+		operationBox = new JComboBox<Operation>(Operation.values());
 		operationsPanel.add(operationBox, "gap 10, growx, wrap 30px");
-	
+
 		submit = new JButton();
 		cancel = new JButton();
 		operationsPanel.add(submit, "split 2");
 		operationsPanel.add(cancel, "wrap 20px");
-		
+
 		operationsPanel.add(plotPanel);
 	}
-	
+
 	private List<Donation> getDonations(Filter filter) {
-		
-		donationList = new ArrayList<Donation>();
+
 		try {
 			donationList = donationService.getByFilter(filter);
 			log.info("List " + donationList.size() + " persons");
@@ -220,44 +227,56 @@ public class DonationProgressStatsView extends InitializableView {
 							"Ein unerwarter Fehler ist aufgetreten! Bitte kontaktieren Sie Ihren Administrator.",
 							"Fehler", JOptionPane.ERROR_MESSAGE);
 			log.error(e);
-			e.printStackTrace();
-		}
-		if (donationList == null) {
-			JOptionPane.showMessageDialog(this, "GetAll() returns null.",
-					"Error", JOptionPane.ERROR_MESSAGE);
 		}
 		return donationList;
 	}
-	
+
 	public void init() {
 		PlotAction calculateAction = new PlotAction();
 		calculateAction.putValue(Action.NAME, "Berechnen");
 		submit.setAction(calculateAction);
-		
+
 		Action cancelAction = viewActionFactory.getMainMenuViewAction();
 		cancelAction.putValue(Action.NAME, "Abbrechen");
-		cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
+		cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass()
+				.getResource("/images/backButton.jpg")));
 		cancel.setAction(cancelAction);
 		cancel.setFont(new Font("bigger", Font.PLAIN, 13));
-		
+
 	}
-	
+
 	private final class PlotAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 2003305342391375273L;
 		private List<Donation> donationList;
-		private List<Pair<List<Donation>, String>> pairList;
-		private Classification classification;
-		private Operation operation;
-		private DefaultCategoryDataset dataSet;
 		private String name;
 		Pair<List<Donation>, String> pair;
-		
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			donationList = new ArrayList<Donation>();
-			pairList = new ArrayList<Pair<List<Donation>, String>>();
-			operation = (Operation.values()[operationBox.getSelectedIndex()]);
-			
+			List<Pair<List<Donation>, String>> pairList = new ArrayList<Pair<List<Donation>, String>>();
+			Operation operation = (Operation) operationBox.getSelectedItem();
+			Class<? extends RegularTimePeriod> periodClass;
+			switch ((String) classBox.getSelectedItem()) {
+			case "Jahr":
+				periodClass = Year.class;
+				break;
+			case "Tag":
+				periodClass = Day.class;
+				break;
+			case "Woche":
+				periodClass = Week.class;
+				break;
+			case "Monat":
+				periodClass = Month.class;
+				break;
+			case "Quartal":
+				periodClass = Quarter.class;
+				break;
+			default:
+				periodClass = Year.class;
+				break;
+			}
+
 			if (chooseTwo.isSelected() == true) {
 				if (firstFilter.getSelectedIndex() != 0
 						&& secondFilter.getSelectedIndex() != 0) {
@@ -273,12 +292,10 @@ public class DonationProgressStatsView extends InitializableView {
 					pair = new Pair<List<Donation>, String>(donationList, name);
 					pairList.add(pair);
 
-					classification = (Classification.values()[classBox
-							.getSelectedIndex()]);
-					statistic = new Statistic(pairList, classification);
-					dataSet = statistic.createDataset(operation);
+					TimeSeriesCollection dataSets = DonationTimeStatisticDatasetGenerator
+							.createDataset(pairList, operation, periodClass);
 
-					chart = createBarChart(dataSet);
+					chart = createTimeSeriesChart(dataSets);
 					chartPanel = new ChartPanel(chart);
 					chartPanel.setPreferredSize(new Dimension(700, 270));
 					plotPanel.removeAll();
@@ -300,12 +317,10 @@ public class DonationProgressStatsView extends InitializableView {
 					pair = new Pair<List<Donation>, String>(donationList, name);
 					pairList.add(pair);
 
-					classification = (Classification.values()[classBox
-							.getSelectedIndex()]);
-					statistic = new Statistic(pairList, classification);
-					dataSet = statistic.createDataset(operation);
+					TimeSeriesCollection dataSets = DonationTimeStatisticDatasetGenerator
+							.createDataset(pairList, operation, periodClass);
 
-					chart = createBarChart(dataSet);
+					chart = createTimeSeriesChart(dataSets);
 					chartPanel = new ChartPanel(chart);
 					chartPanel.setPreferredSize(new Dimension(700, 270));
 					plotPanel.removeAll();
@@ -327,12 +342,10 @@ public class DonationProgressStatsView extends InitializableView {
 					pair = new Pair<List<Donation>, String>(donationList, name);
 					pairList.add(pair);
 
-					classification = (Classification.values()[classBox
-							.getSelectedIndex()]);
-					statistic = new Statistic(pairList, classification);
-					dataSet = statistic.createDataset(operation);
+					TimeSeriesCollection dataSets = DonationTimeStatisticDatasetGenerator
+							.createDataset(pairList, operation, periodClass);
 
-					chart = createBarChart(dataSet);
+					chart = createTimeSeriesChart(dataSets);
 					chartPanel = new ChartPanel(chart);
 					chartPanel.setPreferredSize(new Dimension(700, 270));
 					plotPanel.removeAll();
@@ -340,8 +353,7 @@ public class DonationProgressStatsView extends InitializableView {
 					plotPanel.add(chartPanel);
 					plotPanel.validate();
 				}
-			}
-			else if(chooseThree.isSelected()==true){
+			} else if (chooseThree.isSelected() == true) {
 				donationList = getDonations((Filter) firstFilter
 						.getSelectedItem());
 				name = ((Filter) firstFilter.getSelectedItem()).getName();
@@ -360,42 +372,34 @@ public class DonationProgressStatsView extends InitializableView {
 				pair = new Pair<List<Donation>, String>(donationList, name);
 				pairList.add(pair);
 
-				classification = (Classification.values()[classBox
-						.getSelectedIndex()]);
-				statistic = new Statistic(pairList, classification);
-				dataSet = statistic.createDataset(operation);
+				TimeSeriesCollection dataSets = DonationTimeStatisticDatasetGenerator
+						.createDataset(pairList, operation, periodClass);
 
-				chart = createBarChart(dataSet);
+				chart = createTimeSeriesChart(dataSets);
 				chartPanel = new ChartPanel(chart);
 				chartPanel.setPreferredSize(new Dimension(700, 270));
 				plotPanel.removeAll();
 				plotPanel.repaint();
 				plotPanel.add(chartPanel);
 				plotPanel.validate();
-			}
-			else{
+			} else {
 				JOptionPane.showMessageDialog(operationsPanel,
-						"Bitte Auswahl an Einstellungen treffen."); return;
+						"Bitte Auswahl an Einstellungen treffen.");
+				return;
 			}
-			}
+		}
 	}
-	
-	private JFreeChart createLineChart(DefaultCategoryDataset dataSet) {
-		//ChartFactory.createLineChart(title, categoryAxisLabel, valueAxisLabel, dataset, orientation, legend, tooltips, urls)
-		chart = ChartFactory.createLineChart(null, null, null, dataSet, PlotOrientation.VERTICAL, true, true, false);
-		CategoryPlot plot = chart.getCategoryPlot();
-        plot.setBackgroundPaint(Color.white);
-        plot.setDomainGridlinePaint(Color.white);
-        plot.setRangeGridlinePaint(Color.white);
-        return chart;
-	}
-	
-	private JFreeChart createBarChart(DefaultCategoryDataset dataSet) {
-		chart = ChartFactory.createBarChart(null, null, null, dataSet, PlotOrientation.VERTICAL, true, true, false);
-		CategoryPlot plot = chart.getCategoryPlot();
-        plot.setBackgroundPaint(Color.lightGray);
-        plot.setDomainGridlinePaint(Color.white);
-        plot.setRangeGridlinePaint(Color.white);
-        return chart;
+
+	private JFreeChart createTimeSeriesChart(XYDataset dataset) {
+		final JFreeChart chart = ChartFactory.createTimeSeriesChart(null,
+				"Datum", "Betrag", dataset, true, true, false);
+		final XYItemRenderer renderer = chart.getXYPlot().getRenderer();
+		final StandardXYToolTipGenerator g = new StandardXYToolTipGenerator(
+				StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
+				DateFormat.getDateInstance(DateFormat.LONG),
+				DecimalFormat.getCurrencyInstance(Locale.GERMANY));
+		renderer.setBaseToolTipGenerator(g);
+		return chart;
+
 	}
 }
