@@ -13,17 +13,23 @@ public class Action {
 	private String payload;
 
 	public enum Type {
-		INSERT("insert"), UPDATE("update"), DELETE("delete");
+		INSERT("insert","Erstellt"), UPDATE("update","Bearbeitet"), DELETE("delete","Gel\u00F6scht");
 
 		private String name;
+		private String displayableName;
 
-		private Type(String name) {
+		private Type(String name, String displayableName) {
 			this.name = name;
+			this.displayableName = displayableName;
 		}
 
 		@Override
 		public String toString() {
 			return name;
+		}
+		
+		public String getDisplayableName() {
+			return displayableName;
 		}
 		
 		public static Type getByName(String name) {

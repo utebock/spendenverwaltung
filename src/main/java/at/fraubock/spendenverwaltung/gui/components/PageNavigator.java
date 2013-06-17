@@ -29,7 +29,7 @@ public class PageNavigator extends JPanel {
 		
 		this.model = modelParam;
 		
-		prev = new JLabel("prev");
+		prev = new JLabel("<");
 		prev.addMouseListener(new MouseListener() {
 
 			@Override
@@ -65,7 +65,7 @@ public class PageNavigator extends JPanel {
 		});
 		add(prev);
 		
-		next = new JLabel("next");
+		next = new JLabel(">");
 		next.addMouseListener(new MouseListener() {
 
 			@Override

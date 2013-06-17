@@ -10,6 +10,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Action;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IActionService;
+import at.fraubock.spendenverwaltung.util.ActionAttribute;
 import at.fraubock.spendenverwaltung.util.Pager;
 
 /**
@@ -53,48 +54,20 @@ public class ActionServiceImplemented implements IActionService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<Action> getAll() throws ServiceException {
-		try {
-			return actionDAO.getAll();
-		} catch (PersistenceException e) {
-			throw new ServiceException(e);
-		}
-	}
-	
-	@Override
-	@Transactional(readOnly = true)
-	public Pager<Action> getAllAsPager(final int pageSizeParam) throws ServiceException {
+	public Pager<Action> getAllAsPager(final int pageSizeParam)
+			throws ServiceException {
 		Pager<Action> pager = new Pager<Action>() {
 
 			private IActionDAO actionDAO = ActionServiceImplemented.this.actionDAO;
 			private int pageSize = pageSizeParam;
 			private int position = 0;
-			
+
 			@Override
 			public List<Action> getPage(int index) throws ServiceException {
 				this.position = index;
 				try {
-					return actionDAO.getAllLimitResult(position*pageSize, pageSize);
-				} catch (PersistenceException e) {
-					throw new ServiceException(e);
-				}
-			}
-
-			@Override
-			public List<Action> getPreviousPage() throws ServiceException {
-				this.position--;
-				try {
-					return actionDAO.getAllLimitResult(position*pageSize, pageSize);
-				} catch (PersistenceException e) {
-					throw new ServiceException(e);
-				}
-			}
-
-			@Override
-			public List<Action> getNextPage() throws ServiceException {
-				this.position++;
-				try {
-					return actionDAO.getAllLimitResult(position*pageSize, pageSize);
+					return actionDAO.getAllWithLimitedResult(position
+							* pageSize, pageSize);
 				} catch (PersistenceException e) {
 					throw new ServiceException(e);
 				}
@@ -110,22 +83,66 @@ public class ActionServiceImplemented implements IActionService {
 				long count;
 				try {
 					count = actionDAO.countResultsOfAll();
-					
-					long mod = count%pageSize;
-					
-					return mod==0?(long)count/pageSize:(((long)count/pageSize)+1);
+
+					long mod = count % pageSize;
+
+					return mod == 0 ? (long) count / pageSize
+							: (((long) count / pageSize) + 1);
+				} catch (PersistenceException e) {
+					throw new ServiceException(e);
+				}
+			}
+
+		};
+
+		return pager;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Pager<Action> getAttributeLikeAsPager(final ActionAttribute attributeParam,
+			final String valueParam, final int pageSizeParam) throws ServiceException {
+		Pager<Action> pager = new Pager<Action>() {
+
+			private IActionDAO actionDAO = ActionServiceImplemented.this.actionDAO;
+			private int pageSize = pageSizeParam;
+			private int position = 0;
+			private ActionAttribute attribute = attributeParam;
+			private String value = valueParam;
+
+			@Override
+			public List<Action> getPage(int index) throws ServiceException {
+				this.position = index;
+				try {
+					return actionDAO.getLimitedResultByAttributeLike(attribute, value, position
+							* pageSize, pageSize);
 				} catch (PersistenceException e) {
 					throw new ServiceException(e);
 				}
 			}
 
 			@Override
-			public int getPageSize() {
-				return pageSize;
+			public int getCurrentPosition() {
+				return position;
 			}
-			
+
+			@Override
+			public long getNumberOfPages() throws ServiceException {
+				long count;
+				try {
+					count = actionDAO.countResultsOfAttributeLike(attribute, value);
+
+					long mod = count % pageSize;
+
+					return mod == 0 ? (long) count / pageSize
+							: (((long) count / pageSize) + 1);
+				} catch (PersistenceException e) {
+					throw new ServiceException(e);
+				}
+			}
+
 		};
-		
+
 		return pager;
 	}
 }

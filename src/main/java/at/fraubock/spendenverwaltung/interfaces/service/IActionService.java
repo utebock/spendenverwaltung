@@ -1,9 +1,8 @@
 package at.fraubock.spendenverwaltung.interfaces.service;
 
-import java.util.List;
-
 import at.fraubock.spendenverwaltung.interfaces.domain.Action;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
+import at.fraubock.spendenverwaltung.util.ActionAttribute;
 import at.fraubock.spendenverwaltung.util.Pager;
 
 /**
@@ -31,12 +30,10 @@ public interface IActionService {
 	 */
 	public void delete(Action a) throws ServiceException;
 
-	/**
-	 * Retrieves entire Action table
-	 * 
-	 * @return List of all actions
-	 */
-	public List<Action> getAll() throws ServiceException;
+	public Pager<Action> getAllAsPager(final int pageSizeParam)
+			throws ServiceException;
 
-	public Pager<Action> getAllAsPager(final int pageSizeParam) throws ServiceException;
+	public Pager<Action> getAttributeLikeAsPager(final ActionAttribute attributeParam,
+			final String valueParam, final int pageSizeParam)
+			throws ServiceException;
 }

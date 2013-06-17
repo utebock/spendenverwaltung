@@ -4,6 +4,7 @@ import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Action;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
+import at.fraubock.spendenverwaltung.util.ActionAttribute;
 
 /**
  * interface to the data source for {@link Action} entities.
@@ -42,17 +43,27 @@ public interface IActionDAO {
 	 *             if communication to the underlying persistence system failed
 	 */
 	public List<Action> getAll() throws PersistenceException;
-	
+
 	/**
 	 * Retrieves the number of actions given in <code>count</code> starting from
 	 * the given <code>offset</code>.
 	 * 
-	 * @param offset - starting from this result
-	 * @param count - retrieving this amount of results
-	 * @return List of actions from offset plus count, sorted by date descending.
+	 * @param offset
+	 *            - starting from this result
+	 * @param count
+	 *            - retrieving this amount of results
+	 * @return List of actions from offset plus count, sorted by date
+	 *         descending.
 	 * @throws PersistenceException
 	 */
-	public List<Action> getAllLimitResult(int offset, int count) throws PersistenceException;
-	
+	public List<Action> getAllWithLimitedResult(int offset, int count)
+			throws PersistenceException;
+
 	public long countResultsOfAll() throws PersistenceException;
+
+	public List<Action> getLimitedResultByAttributeLike(ActionAttribute attribute,
+			String value, int offset, int count) throws PersistenceException;
+
+	public long countResultsOfAttributeLike(ActionAttribute attribute, String value)
+			throws PersistenceException;
 }

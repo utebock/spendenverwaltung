@@ -5,11 +5,8 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -134,22 +131,5 @@ public abstract class AbstractActionServiceTest {
 	 * testing find
 	 */
 
-	@Test
-	public void getAll_ReturnsAllEntities() {
-		try {
-			List<Action> allActions = new ArrayList<Action>();
-			allActions.add(newAction);
-			allActions.add(newAction2);
-			when(actionDAO.getAll()).thenReturn(allActions);
-
-			List<Action> actionList = actionService.getAll();
-			assert (actionList != null && actionList.size() == 2);
-			assert (actionList.get(0).equals(newAction) && actionList.get(1)
-					.equals(newAction2));
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
-	}
+	//TODO pager
 }

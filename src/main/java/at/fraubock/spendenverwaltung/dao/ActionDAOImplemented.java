@@ -21,6 +21,7 @@ import at.fraubock.spendenverwaltung.interfaces.dao.IActionDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Action;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
+import at.fraubock.spendenverwaltung.util.ActionAttribute;
 
 /**
  * implementation of {@link IActionDAO}
@@ -168,7 +169,7 @@ public class ActionDAOImplemented implements IActionDAO {
 	@Override
 	public long countResultsOfAll() throws PersistenceException {
 		try {
-			log.info("Reading Actions.");
+			log.info("Counting all Actions.");
 			return jdbcTemplate.queryForObject("select count(*) from actions",
 					Integer.class);
 		} catch (DataAccessException e) {
@@ -178,7 +179,7 @@ public class ActionDAOImplemented implements IActionDAO {
 	}
 
 	@Override
-	public List<Action> getAllLimitResult(int offset, int count)
+	public List<Action> getAllWithLimitedResult(int offset, int count)
 			throws PersistenceException {
 		try {
 			log.info("Reading Actions.");
@@ -190,6 +191,48 @@ public class ActionDAOImplemented implements IActionDAO {
 			throw new PersistenceException(e);
 		}
 	}
+
+	@Override
+	public List<Action> getLimitedResultByAttributeLike(ActionAttribute attribute,
+			String value, int offset, int count) throws PersistenceException {
+
+		if (attribute == null || value == null) {
+			log.error("Error executing getLimitedResultByAttributeLike: " +
+					"attribute and/or value were null");
+			throw new IllegalArgumentException(
+					"attribute and value must both be set");
+		}
+
+		log.info("Reading Actions for attribute='" + attribute.getName() + "', value='"
+				+ value + "'");
+
+		try {
+			return jdbcTemplate.query("select * from actions where "
+					+ attribute.getName() + " LIKE ? ORDER BY time DESC LIMIT " + offset
+							+ ", " + count,
+					new Object[] { "%"+value+"%" }, new ActionMapper());
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
+	}
+
+	@Override
+	public long countResultsOfAttributeLike(ActionAttribute attribute, String value)
+			throws PersistenceException {
+		log.info("Counting Actions for attribute='" + attribute.getName() + "', value='"
+				+ value + "'");
+		
+		try {
+			return jdbcTemplate.queryForObject("select count(*) from actions where "
+					+ attribute.getName() + " LIKE ? ORDER BY time DESC",
+					new Object[] { "%"+value+"%" },Integer.class);
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
+	}
+	
 
 	private class ActionMapper implements RowMapper<Action> {
 
@@ -205,5 +248,4 @@ public class ActionDAOImplemented implements IActionDAO {
 			return action;
 		}
 	}
-
 }

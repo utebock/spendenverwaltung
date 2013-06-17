@@ -23,19 +23,6 @@ public class HistoryTableModel extends AbstractTableModel implements
 		this.pager = pager;
 	}
 
-	// public void addAction(Action action) {
-	// actions.add(action);
-	// }
-	//
-	// public void removeAction(int row) {
-	// actions.remove(row);
-	// fireTableDataChanged();
-	// }
-
-	// public Action getActionRow(int rowIndex) {
-	// return actions.get(rowIndex);
-	// }
-
 	@Override
 	public int getRowCount() {
 		return actions.size();
@@ -49,7 +36,7 @@ public class HistoryTableModel extends AbstractTableModel implements
 		case 0:
 			return action.getActor();
 		case 1:
-			return action.getType();
+			return action.getType().getDisplayableName();
 		case 2:
 			return action.getEntity();
 		case 3:
@@ -114,5 +101,9 @@ public class HistoryTableModel extends AbstractTableModel implements
 
 	public void refreshPage() throws ServiceException {
 		showPage(getPosition());
+	}
+	
+	public void setPager(Pager<Action> pager) {
+		this.pager = pager;
 	}
 }
