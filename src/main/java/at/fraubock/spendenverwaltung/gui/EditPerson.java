@@ -3,7 +3,6 @@ package at.fraubock.spendenverwaltung.gui;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +20,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+
+import net.miginfocom.swing.MigLayout;
 import at.fraubock.spendenverwaltung.gui.components.ComponentConstants;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.NumericTextField;
@@ -32,8 +33,6 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
-
-import net.miginfocom.swing.MigLayout;
 
 public class EditPerson extends JPanel{
 	

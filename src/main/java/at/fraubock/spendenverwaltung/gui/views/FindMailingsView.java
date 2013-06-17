@@ -1,7 +1,5 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
-import javax.swing.JPanel;
-
 import at.fraubock.spendenverwaltung.gui.components.MailingTableModel;
 
 public class FindMailingsView extends InitializableView {

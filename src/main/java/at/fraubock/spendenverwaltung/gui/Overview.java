@@ -18,8 +18,6 @@ import net.miginfocom.swing.MigLayout;
 
 import org.apache.log4j.Logger;
 
-import at.fraubock.spendenverwaltung.gui.views.FindPersonsView;
-import at.fraubock.spendenverwaltung.gui.views.ImportValidationView;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;

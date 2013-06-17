@@ -1,29 +1,21 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import at.fraubock.spendenverwaltung.gui.GuiStarter;
+import net.miginfocom.swing.MigLayout;
 import at.fraubock.spendenverwaltung.gui.MainFrame;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
-import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IUserService;
 import at.fraubock.spendenverwaltung.util.CurrentUser;
-
-import net.miginfocom.swing.MigLayout;
 
 public class LoginView extends InitializableView {
 

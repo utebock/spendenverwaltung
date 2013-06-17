@@ -1,7 +1,5 @@
 package at.fraubock.spendenverwaltung.interfaces.domain.filter;
 
-import at.fraubock.spendenverwaltung.interfaces.domain.Address;
-import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.util.FilterType;
 
