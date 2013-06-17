@@ -101,17 +101,17 @@ public class PersonDAOImplemented implements IPersonDAO {
 			PreparedStatement ps = connection.prepareStatement(createPersons,
 					Statement.RETURN_GENERATED_KEYS);
 			if (person.getGivenName() == null)
-				ps.setNull(1, Types.NULL);
+				ps.setNull(1, Types.VARCHAR);
 			else
 				ps.setString(1, person.getGivenName());
 
 			if (person.getSurname() == null)
-				ps.setNull(2, Types.NULL);
+				ps.setNull(2, Types.VARCHAR);
 			else
 				ps.setString(2, person.getSurname());
 
 			if (person.getEmail() == null) {
-				ps.setNull(3, Types.NULL);
+				ps.setNull(3, Types.VARCHAR);
 				ps.setBoolean(8, false);
 			} else {
 				ps.setString(3, person.getEmail());
@@ -121,17 +121,17 @@ public class PersonDAOImplemented implements IPersonDAO {
 			ps.setString(4, person.getSex().getName());
 
 			if (person.getTitle() == null)
-				ps.setNull(5, Types.NULL);
+				ps.setNull(5, Types.VARCHAR);
 			else
 				ps.setString(5, person.getTitle());
 
 			if (person.getCompany() == null)
-				ps.setNull(6, Types.NULL);
+				ps.setNull(6, Types.VARCHAR);
 			else
 				ps.setString(6, person.getCompany());
 
 			if (person.getTelephone() == null)
-				ps.setNull(7, Types.NULL);
+				ps.setNull(7, Types.VARCHAR);
 			else
 				ps.setString(7, person.getTelephone());
 
@@ -143,7 +143,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 				ps.setBoolean(9, person.isPostalNotification());
 
 			if (person.getNote() == null)
-				ps.setNull(10, Types.NULL);
+				ps.setNull(10, Types.VARCHAR);
 			else
 				ps.setString(10, person.getNote());
 
@@ -587,7 +587,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 				fetchAddresses(person);
 			}
 			
-			log.debug("Returning from getPersonsByMailing");
+			log.debug("Returning from getPersonsByMailing with "+persons.size()+" persons");
 
 			return persons;
 		} catch (DataAccessException e) {

@@ -202,20 +202,30 @@ public class MailingDAOImplemented implements IMailingDAO {
 				 */
 
 				if (mailing.getMedium() == Mailing.Medium.EMAIL) {
+					
+					log.debug("Modifying mailing of type Email to exclude unwanted recipients.");
 					Filter andEmail = new Filter();
 					andEmail.setType(FilterType.PERSON);
 
 					PropertyCriterion hasEmail = new PropertyCriterion();
-					hasEmail.compareNotNull(FilterProperty.PERSON_EMAIL);
+					hasEmail.compare(FilterProperty.PERSON_EMAIL, RelationalOperator.UNEQUAL, "");
 
-					ConnectedCriterion andCriterion = new ConnectedCriterion();
-					andCriterion.connect(hasEmail, LogicalOperator.AND, mailing
+					ConnectedCriterion andHasEmailCriterion = new ConnectedCriterion();
+					andHasEmailCriterion.connect(hasEmail, LogicalOperator.AND, mailing
 							.getFilter().getCriterion());
-
-					andEmail.setCriterion(andCriterion);
+					
+					PropertyCriterion wantsEmail = new PropertyCriterion();
+					wantsEmail.compare(FilterProperty.PERSON_WANTS_EMAIL, true);
+					
+					ConnectedCriterion andWantsEmailsCriterion = new ConnectedCriterion();
+					andWantsEmailsCriterion.connect(andHasEmailCriterion, LogicalOperator.AND, wantsEmail);
+					
+					andEmail.setCriterion(andWantsEmailsCriterion);
 					mailing.setFilter(andEmail);
 
 				} else if (mailing.getMedium() == Mailing.Medium.POSTAL) {
+					log.debug("Modifying mailing of type Postal to exclude unwanted recipients.");
+
 					Filter andMainAddressFilter = new Filter();
 					andMainAddressFilter.setType(FilterType.PERSON);
 
@@ -233,8 +243,14 @@ public class MailingDAOImplemented implements IMailingDAO {
 					ConnectedCriterion andCriterion = new ConnectedCriterion();
 					andCriterion.connect(mailing.getFilter().getCriterion(),
 							LogicalOperator.AND, mountedCompositeFilter);
-
-					andMainAddressFilter.setCriterion(andCriterion);
+					
+					PropertyCriterion wantsMail = new PropertyCriterion();
+					wantsMail.compare(FilterProperty.PERSON_WANTS_MAIL, true);
+					
+					ConnectedCriterion andWantsMailingsCriterion = new ConnectedCriterion();
+					andWantsMailingsCriterion.connect(andCriterion, LogicalOperator.AND, wantsMail);
+					
+					andMainAddressFilter.setCriterion(andWantsMailingsCriterion);
 					mailing.setFilter(andMainAddressFilter);
 				}
 
@@ -247,6 +263,8 @@ public class MailingDAOImplemented implements IMailingDAO {
 						.createSqlStatement(mailing.getFilter());
 				List<Person> persons = jdbcTemplate.query(filterStmt,
 						new PersonIdMapper());
+				
+				log.debug("Filter returned "+persons.size()+" persons");
 
 				for (Person person : persons) {
 					jdbcTemplate

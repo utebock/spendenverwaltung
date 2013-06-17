@@ -342,12 +342,15 @@ public class CreateMailingsView extends InitializableView {
 					.getSelectedItem());
 			try {
 				mailingService.insertOrUpdate(mailing);
+				
+				List<Person> recipients = personService.getPersonsByMailing(mailing);
+				
 				errors = mailingService.exportEMailsToMailChimp(mailing, 
 						((MailChimpListItem)emailMailChimpListChooser.getSelectedItem()).getId());
 				feedbackLabel.setText("Aussendung wurde erstellt.");
 				if(errors==0){
 					JOptionPane.showMessageDialog(null,
-						"Es wurden alle ausgewählten Personen der MailChimp Liste hinzugefügt!");
+						"Es wurden "+recipients.size()+" Personen der MailChimp Liste hinzugefügt!");
 				}
 				else if(errors>0){
 					JOptionPane.showMessageDialog(null,
