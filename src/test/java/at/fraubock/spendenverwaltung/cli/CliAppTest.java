@@ -126,6 +126,23 @@ public class CliAppTest {
 	}
 
 	@Test
+	public void importSms() throws Exception {
+		CommandExecutor exec = new CommandExecutor(importService, new String[] {
+				"-i", "sms.csv", "--style=sms" }, new PrintStream(out),
+				new PrintStream(err));
+		int errCode = exec.execute();
+		out.close();
+		err.close();
+
+		assertEquals(0, errCode);
+		assertEquals("", out.toString());
+		assertEquals("", err.toString());
+
+		verify(importService, times(1)).smsImport(eq(new File("sms.csv")));
+		verify(importService, times(1)).smsImport(any(File.class));
+	}
+
+	@Test
 	public void importWithoutFile_fails() throws Exception {
 		CommandExecutor exec = new CommandExecutor(importService, new String[] {
 				"-i", "--style=native" }, new PrintStream(out),

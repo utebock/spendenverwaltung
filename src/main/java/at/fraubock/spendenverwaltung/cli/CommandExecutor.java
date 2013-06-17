@@ -127,7 +127,8 @@ public class CommandExecutor {
 					importService.hypoImport(importFile);
 					break;
 				case "sms":
-					throw new ParseException("sms import not yet implemented");
+					importService.smsImport(importFile);
+					break;
 				default:
 					throw new ParseException("\"" + importStyle
 							+ "\" is no supported import file style");
