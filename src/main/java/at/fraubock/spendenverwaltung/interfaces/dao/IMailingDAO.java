@@ -4,6 +4,7 @@ import java.util.List;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.UnconfirmedMailing;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 
 /**
@@ -127,5 +128,12 @@ public interface IMailingDAO {
 	void removePersonFromUnsentMailing(Person p, Mailing m)
 			throws PersistenceException;
 
+	/**
+	 * returns all mailings matched by this filter
+	 * @param filter
+	 * @return
+	 * @throws PersistenceException 
+	 */
+	List<Mailing> getMailingsByFilter(Filter filter) throws PersistenceException;
 
 }

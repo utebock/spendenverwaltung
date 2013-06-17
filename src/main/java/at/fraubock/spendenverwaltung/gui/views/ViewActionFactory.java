@@ -117,12 +117,10 @@ public class ViewActionFactory {
 		return new DisplayViewAction(new CreateMailingsView(this, new ComponentFactory(), mailingService, filterService, personService), "/images/eNotification.jpg");
 	}
 
-	//TODO richtige view returnen!
 	public Action getFindMailingsViewAction() {
-		return new DisplayViewAction(new CreatePersonView(new ComponentFactory(), this, personService, addressService, donationService, new PersonTableModel()), "/images/showNotifications.jpg");
+		return new DisplayViewAction(new FindMailingsView(this, new ComponentFactory(), personService, mailingService, filterService), "/images/showNotifications.jpg");
 	}
 	
-	//TODO richtige view returnen!
 	public Action getConfirmMailingsViewAction() {
 		return new DisplayViewAction(new ConfirmMailingsView(this, new ComponentFactory(), mailingService), "/images/confirmSendings.jpg");
 	}
