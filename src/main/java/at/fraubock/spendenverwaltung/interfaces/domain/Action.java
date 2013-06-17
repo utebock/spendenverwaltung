@@ -13,7 +13,8 @@ public class Action {
 	private String payload;
 
 	public enum Type {
-		INSERT("insert","Erstellt"), UPDATE("update","Bearbeitet"), DELETE("delete","Gel\u00F6scht");
+		INSERT("insert", "Erstellt"), UPDATE("update", "Bearbeitet"), DELETE(
+				"delete", "Gel\u00F6scht");
 
 		private String name;
 		private String displayableName;
@@ -27,11 +28,11 @@ public class Action {
 		public String toString() {
 			return name;
 		}
-		
+
 		public String getDisplayableName() {
 			return displayableName;
 		}
-		
+
 		public static Type getByName(String name) {
 			for (Type type : Type.values()) {
 				if (type.toString().equals(name)) {
@@ -43,12 +44,15 @@ public class Action {
 	}
 
 	public enum Entity {
-		PERSON("persons","Person"), ADDRESSES("addresses","Adresse"), LIVES_AT("livesat","livesat"), IMPORT(
-				"imports","Import"), DONATION("donations","Spende"), CRITERION("criterion","criterion"), FILTER(
-				"filter","Filter"), MAILING("mailings","Aussendung"), SENT_MAILING("sent_mailings","sent_mailings"), MAILING_TEMPLATE(
-				"mailing_templates","Aussendungsvorlage"), DONATION_CONFIRMATION_TEMPLATE(
-				"donation_confirmation_templates","Spendenbestätigungsvorlage"), DONATION_CONFIRMATION(
-				"donation_confirmations","Spendenbestätigung");
+		PERSON("persons", "Person"), ADDRESSES("addresses", "Adresse"), LIVES_AT(
+				"livesat", "livesat"), IMPORT("imports", "Import"), DONATION(
+				"donations", "Spende"), CRITERION("criterion", "criterion"), FILTER(
+				"filter", "Filter"), MAILING("mailings", "Aussendung"), SENT_MAILING(
+				"sent_mailings", "sent_mailings"), MAILING_TEMPLATE(
+				"mailing_templates", "Aussendungsvorlage"), DONATION_CONFIRMATION_TEMPLATE(
+				"donation_confirmation_templates",
+				"Spendenbest\u00e4tigungsvorlage"), DONATION_CONFIRMATION(
+				"donation_confirmations", "Spendenbest\u00e4tigung");
 
 		private String name;
 		private String displayableName;
@@ -62,11 +66,11 @@ public class Action {
 		public String toString() {
 			return name;
 		}
-		
+
 		public String getDisplayableName() {
 			return displayableName;
 		}
-		
+
 		public static Entity getByName(String name) {
 			for (Entity entity : Entity.values()) {
 				if (entity.toString().equals(name)) {
