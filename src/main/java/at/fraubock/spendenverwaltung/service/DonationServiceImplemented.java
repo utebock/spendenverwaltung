@@ -1,8 +1,12 @@
 package at.fraubock.spendenverwaltung.service;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +29,9 @@ import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
  * 
  */
 public class DonationServiceImplemented implements IDonationService {
+
+	private static final Logger log = Logger
+			.getLogger(DonationServiceImplemented.class);
 
 	private IDonationDAO donationDAO;
 
@@ -90,7 +97,8 @@ public class DonationServiceImplemented implements IDonationService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<Donation> getUnconfirmed(Import toImport) throws ServiceException {
+	public List<Donation> getUnconfirmed(Import toImport)
+			throws ServiceException {
 		try {
 			return donationDAO.getUnconfirmed(toImport);
 		} catch (PersistenceException e) {
@@ -134,31 +142,32 @@ public class DonationServiceImplemented implements IDonationService {
 		String csv = "Betrag;Datum;Widmung;Art;Notiz;Vorname;Nachname;E-Mail;Unternehmen;Land;Stadt;PLZ;Strasse\n";
 
 		for (Donation d : donations) {
-			csv+=d.getAmount()+";";
-			csv+=new SimpleDateFormat("dd.MM.yyyy").format(d.getDate()) + ";";
-			csv+=d.getDedication()+";";
+			csv += d.getAmount() + ";";
+			csv += new SimpleDateFormat("dd.MM.yyyy").format(d.getDate()) + ";";
+			csv += d.getDedication() + ";";
 			csv += d.getType() + ";";
 			csv += d.getNote() + ";";
 
 			String nA = "n.v.";
 			Person p = d.getDonator();
 			Address a = p.getMainAddress();
-			
-			csv+=(p==null?nA:p.getGivenName())+";";
-			csv+=(p==null?nA:p.getSurname())+";";
-			csv+=(p==null?nA:p.getEmail())+";";
-			csv+=(p==null?nA:p.getCompany())+";";
-			
-			csv+=(a==null?nA:a.getCountry())+";";
-			csv+=(a==null?nA:a.getCity())+";";
-			csv+=(a==null?nA:a.getPostalCode())+";";
-			csv+=(a==null?nA:a.getStreet())+";\n";
+
+			csv += (p == null ? nA : p.getGivenName()) + ";";
+			csv += (p == null ? nA : p.getSurname()) + ";";
+			csv += (p == null ? nA : p.getEmail()) + ";";
+			csv += (p == null ? nA : p.getCompany()) + ";";
+
+			csv += (a == null ? nA : a.getCountry()) + ";";
+			csv += (a == null ? nA : a.getCity()) + ";";
+			csv += (a == null ? nA : a.getPostalCode()) + ";";
+			csv += (a == null ? nA : a.getStreet()) + ";\n";
 		}
 		return csv;
 	}
 
 	@Override
-	public void setImportToNull(List<Donation> donationList) throws ServiceException {
+	public void setImportToNull(List<Donation> donationList)
+			throws ServiceException {
 		try {
 			donationDAO.setImportToNull(donationList);
 		} catch (PersistenceException e) {
@@ -172,6 +181,25 @@ public class DonationServiceImplemented implements IDonationService {
 			return donationDAO.donationExists(donation);
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
+		}
+	}
+
+	@Override
+	public void saveAsCSV(List<Donation> donations, File csvFile)
+			throws IOException {
+		FileWriter writer = null;
+		try {
+			writer = new FileWriter(csvFile);
+			writer.write(convertToCSV(donations));
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			log.warn(
+					"CSV data could not be written to "
+							+ csvFile.getAbsolutePath(), e);
+		} finally {
+			if (writer != null)
+				writer.close();
 		}
 	}
 }

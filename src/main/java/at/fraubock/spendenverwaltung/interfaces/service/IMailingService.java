@@ -1,7 +1,10 @@
 package at.fraubock.spendenverwaltung.interfaces.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.UnconfirmedMailing;
@@ -76,6 +79,21 @@ public interface IMailingService {
 	public String convertToCSV(List<Mailing> mailings);
 
 	/**
+	 * Converts a list of mailings to a CSV and saves it as the given file.
+	 * 
+	 * @author manuel-bichler
+	 * 
+	 * @param mailings
+	 *            a list of mailings
+	 * @param csvFile
+	 *            the file the CSV should be saved to
+	 * @throws IOException
+	 *             if writing the file failed
+	 */
+	public void saveAsCSV(List<Mailing> mailings, File csvFile)
+			throws IOException;
+
+	/**
 	 * reproduces the document that was created by the given mailing. the
 	 * resulting file will be identical to the one that was produced when the
 	 * given mailing was initially created.
@@ -111,29 +129,33 @@ public interface IMailingService {
 
 	/**
 	 * returns a list of unconfirmed mailings
+	 * 
 	 * @return
-	 * @throws ServiceException 
+	 * @throws ServiceException
 	 */
-	List<UnconfirmedMailing> getUnconfirmedMailingsWithCreator() throws ServiceException;
+	List<UnconfirmedMailing> getUnconfirmedMailingsWithCreator()
+			throws ServiceException;
 
 	/**
 	 * Exports the email addresses of all persons in the mailing to MailChimp
+	 * 
 	 * @param mailing
 	 * @param mailChimpListId
-	 * 			ID of the list at MailChimp
-	 * @return
-	 * 			returns the amount of errors during import at MailChimp
+	 *            ID of the list at MailChimp
+	 * @return returns the amount of errors during import at MailChimp
 	 * @throws ServiceException
 	 */
-	public int exportEMailsToMailChimp(Mailing mailing, String mailChimpListId) throws ServiceException;
-	
+	public int exportEMailsToMailChimp(Mailing mailing, String mailChimpListId)
+			throws ServiceException;
+
 	/**
 	 * returns all mailings that match a specific mailing filter
-	 * @throws ServiceException 
+	 * 
+	 * @throws ServiceException
 	 * 
 	 */
 	public List<Mailing> getByFilter(Filter filter) throws ServiceException;
-	
+
 	/**
 	 * returns mailings that happened before or on the same day as date
 	 * 
@@ -142,7 +164,7 @@ public interface IMailingService {
 	 * @throws ServiceException
 	 */
 	public List<Mailing> getBeforeDate(Date date) throws ServiceException;
-	
+
 	/**
 	 * returns mailings that happened after or on the same day as date
 	 * 
@@ -151,16 +173,18 @@ public interface IMailingService {
 	 * @throws ServiceException
 	 */
 	public List<Mailing> getAfterDate(Date date) throws ServiceException;
-	
+
 	/**
-	 * returns mailings created between (including the specific days) before and after
+	 * returns mailings created between (including the specific days) before and
+	 * after
 	 * 
 	 * @param before
 	 * @param after
 	 * @return
 	 * @throws ServiceException
 	 */
-	public List<Mailing> getBetweenDates(Date before, Date after) throws ServiceException;
+	public List<Mailing> getBetweenDates(Date before, Date after)
+			throws ServiceException;
 
 	/**
 	 * deletes one person from a mailing

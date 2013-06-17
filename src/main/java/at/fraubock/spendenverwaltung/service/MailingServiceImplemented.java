@@ -1,9 +1,13 @@
 package at.fraubock.spendenverwaltung.service;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
+import org.apache.log4j.Logger;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
@@ -26,6 +30,8 @@ import at.fraubock.spendenverwaltung.util.MailingTemplateUtil;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
 public class MailingServiceImplemented implements IMailingService {
+	private static final Logger log = Logger
+			.getLogger(MailingServiceImplemented.class);
 
 	private IMailingDAO mailingDAO;
 	private IPersonDAO personDAO;
@@ -68,7 +74,6 @@ public class MailingServiceImplemented implements IMailingService {
 			throw new ServiceException(e);
 		}
 	}
-	
 
 	@Override
 	@Transactional(readOnly = true)
@@ -79,7 +84,7 @@ public class MailingServiceImplemented implements IMailingService {
 			throw new ServiceException(e);
 		}
 	}
-	
+
 	@Override
 	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public void confirmMailing(Mailing mailing) throws ServiceException {
@@ -99,7 +104,7 @@ public class MailingServiceImplemented implements IMailingService {
 			throw new ServiceException(e);
 		}
 	}
-	
+
 	/**
 	 * adds all unconfirmed mailings to a list
 	 * 
@@ -107,7 +112,8 @@ public class MailingServiceImplemented implements IMailingService {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public List<UnconfirmedMailing> getUnconfirmedMailingsWithCreator() throws ServiceException {
+	public List<UnconfirmedMailing> getUnconfirmedMailingsWithCreator()
+			throws ServiceException {
 		try {
 			return mailingDAO.getUnconfirmedMailingsWithCreator();
 		} catch (PersistenceException e) {
@@ -135,10 +141,11 @@ public class MailingServiceImplemented implements IMailingService {
 			throw new ServiceException(e);
 		}
 	}
-	
+
 	@Override
 	@Transactional
-	public void deletePersonFromMailing(Person person, Mailing mailing) throws ServiceException {
+	public void deletePersonFromMailing(Person person, Mailing mailing)
+			throws ServiceException {
 		try {
 			mailingDAO.deletePersonFromMailing(person, mailing);
 		} catch (PersistenceException e) {
@@ -158,24 +165,24 @@ public class MailingServiceImplemented implements IMailingService {
 			csv += m.getDate() == null ? "n.v." : (new SimpleDateFormat(
 					"dd.MM.yyyy").format(m.getDate())) + ";";
 			csv += m.getType().getName() + ";";
-			csv += (m.getMedium()==Mailing.Medium.POSTAL?"Postalisch":"E-Mail") + ";\n";
+			csv += (m.getMedium() == Mailing.Medium.POSTAL ? "Postalisch"
+					: "E-Mail") + ";\n";
 		}
 		return csv;
 	}
 
-	@Override	
+	@Override
 	@Transactional(readOnly = true)
 	public void reproduceDocument(Mailing mailing) throws ServiceException {
 		if (mailing == null) {
 			throw new IllegalArgumentException("Argument must not be null.");
 		}
-		
+
 		MailingTemplate mt = mailing.getTemplate();
-		
-		if(mt != null)
-		{		
+
+		if (mt != null) {
 			List<Person> personList;
-		
+
 			try {
 				personList = personDAO.getPersonsByMailing(mailing);
 				MailingTemplateUtil.createMailingWithDocxTemplate(mt.getFile(),
@@ -194,9 +201,10 @@ public class MailingServiceImplemented implements IMailingService {
 	public int exportEMailsToMailChimp(Mailing mailing, String mailChimpListId)
 			throws ServiceException {
 		int errors = 0;
-		
+
 		try {
-			errors = MailChimp.addPersonsToList(mailChimpListId, personDAO.getPersonsByMailing(mailing));
+			errors = MailChimp.addPersonsToList(mailChimpListId,
+					personDAO.getPersonsByMailing(mailing));
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
@@ -216,13 +224,14 @@ public class MailingServiceImplemented implements IMailingService {
 	public List<Mailing> getBeforeDate(Date date) throws ServiceException {
 		Filter beforeFilter = new Filter();
 		beforeFilter.setType(FilterType.MAILING);
-		
+
 		PropertyCriterion beforeCriterion = new PropertyCriterion();
 		beforeCriterion.setType(FilterType.MAILING);
-		beforeCriterion.compare(FilterProperty.MAILING_DATE, RelationalOperator.LESS_EQ, date);
-		
+		beforeCriterion.compare(FilterProperty.MAILING_DATE,
+				RelationalOperator.LESS_EQ, date);
+
 		beforeFilter.setCriterion(beforeCriterion);
-		
+
 		try {
 			return mailingDAO.getMailingsByFilter(beforeFilter);
 		} catch (PersistenceException e) {
@@ -234,13 +243,14 @@ public class MailingServiceImplemented implements IMailingService {
 	public List<Mailing> getAfterDate(Date date) throws ServiceException {
 		Filter afterFilter = new Filter();
 		afterFilter.setType(FilterType.MAILING);
-		
+
 		PropertyCriterion afterCriterion = new PropertyCriterion();
 		afterCriterion.setType(FilterType.MAILING);
-		afterCriterion.compare(FilterProperty.MAILING_DATE, RelationalOperator.GREATER_EQ, date);
-		
+		afterCriterion.compare(FilterProperty.MAILING_DATE,
+				RelationalOperator.GREATER_EQ, date);
+
 		afterFilter.setCriterion(afterCriterion);
-		
+
 		try {
 			return mailingDAO.getMailingsByFilter(afterFilter);
 		} catch (PersistenceException e) {
@@ -253,25 +263,48 @@ public class MailingServiceImplemented implements IMailingService {
 			throws ServiceException {
 		Filter betweenFilter = new Filter();
 		betweenFilter.setType(FilterType.MAILING);
-		
+
 		PropertyCriterion beforeCriterion = new PropertyCriterion();
 		beforeCriterion.setType(FilterType.MAILING);
-		beforeCriterion.compare(FilterProperty.MAILING_DATE, RelationalOperator.LESS_EQ, end);
-		
+		beforeCriterion.compare(FilterProperty.MAILING_DATE,
+				RelationalOperator.LESS_EQ, end);
+
 		PropertyCriterion afterCriterion = new PropertyCriterion();
 		afterCriterion.setType(FilterType.MAILING);
-		afterCriterion.compare(FilterProperty.MAILING_DATE, RelationalOperator.GREATER_EQ, start);
-		
+		afterCriterion.compare(FilterProperty.MAILING_DATE,
+				RelationalOperator.GREATER_EQ, start);
+
 		ConnectedCriterion betweenCriterion = new ConnectedCriterion();
 		betweenCriterion.setType(FilterType.MAILING);
-		betweenCriterion.connect(beforeCriterion, LogicalOperator.AND, afterCriterion);
-		
+		betweenCriterion.connect(beforeCriterion, LogicalOperator.AND,
+				afterCriterion);
+
 		betweenFilter.setCriterion(betweenCriterion);
-		
+
 		try {
 			return mailingDAO.getMailingsByFilter(betweenFilter);
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
+	}
+
+	@Override
+	public void saveAsCSV(List<Mailing> mailings, File csvFile)
+			throws IOException {
+		FileWriter writer = null;
+		try {
+			writer = new FileWriter(csvFile);
+			writer.write(convertToCSV(mailings));
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			log.warn(
+					"CSV data could not be written to "
+							+ csvFile.getAbsolutePath(), e);
+		} finally {
+			if (writer != null)
+				writer.close();
+		}
+
 	}
 }

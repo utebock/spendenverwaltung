@@ -1,8 +1,12 @@
 package at.fraubock.spendenverwaltung.service;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,8 +20,9 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
-
 public class PersonServiceImplemented implements IPersonService {
+	private static final Logger log = Logger
+			.getLogger(PersonServiceImplemented.class);
 
 	private IPersonDAO personDAO;
 	private IAddressDAO addressDAO;
@@ -75,7 +80,8 @@ public class PersonServiceImplemented implements IPersonService {
 
 	@Override
 	@Transactional(isolation = Isolation.SERIALIZABLE)
-	public void deleteAddressAndUpdatePerson(Address a, Person p) throws ServiceException {
+	public void deleteAddressAndUpdatePerson(Address a, Person p)
+			throws ServiceException {
 		update(p);
 		try {
 			addressDAO.delete(a);
@@ -119,6 +125,7 @@ public class PersonServiceImplemented implements IPersonService {
 		}
 		return persons;
 	}
+
 	@Override
 	public List<Person> getByFilter(Filter filter) throws ServiceException {
 		List<Person> list = null;
@@ -129,32 +136,32 @@ public class PersonServiceImplemented implements IPersonService {
 		}
 		return list;
 	}
-	
+
 	@Override
 	public String convertToCSV(List<Person> persons) {
-		if(persons==null) {
+		if (persons == null) {
 			throw new IllegalArgumentException("Argument must not be null.");
 		}
-		
+
 		String csv = "Vorname;Nachname;E-Mail;Geschlecht;Titel;Unternehmen;Telephon;Empf�ngt E-Mail;Empf�ngt Post;Notiz;Land;Stadt;PLZ;Strasse\n";
-		
-		for(Person p: persons) {
-			csv+=p.getGivenName()+";";
-			csv+=p.getSurname()+";";
-			csv+=p.getEmail()+";";
-			csv+=Person.Sex.getDisplayableName(p.getSex())+";";
-			csv+=p.getTitle()+";";
-			csv+=p.getCompany()+";";
-			csv+=p.getTelephone()+";";
-			csv+=(p.isEmailNotification()?"ja":"nein")+";";
-			csv+=(p.isPostalNotification()?"ja":"nein")+";";
-			csv+=p.getNote()+";";
+
+		for (Person p : persons) {
+			csv += p.getGivenName() + ";";
+			csv += p.getSurname() + ";";
+			csv += p.getEmail() + ";";
+			csv += Person.Sex.getDisplayableName(p.getSex()) + ";";
+			csv += p.getTitle() + ";";
+			csv += p.getCompany() + ";";
+			csv += p.getTelephone() + ";";
+			csv += (p.isEmailNotification() ? "ja" : "nein") + ";";
+			csv += (p.isPostalNotification() ? "ja" : "nein") + ";";
+			csv += p.getNote() + ";";
 			Address a = p.getMainAddress();
 			String nA = "n.v.;";
-			csv+=a==null?nA:(a.getCountry()+";");
-			csv+=a==null?nA:(a.getCity()+";");
-			csv+=a==null?nA:(a.getPostalCode()+";");
-			csv+=(a==null?nA:(a.getStreet()+";"))+"\n";
+			csv += a == null ? nA : (a.getCountry() + ";");
+			csv += a == null ? nA : (a.getCity() + ";");
+			csv += a == null ? nA : (a.getPostalCode() + ";");
+			csv += (a == null ? nA : (a.getStreet() + ";")) + "\n";
 		}
 		return csv;
 	}
@@ -171,11 +178,31 @@ public class PersonServiceImplemented implements IPersonService {
 	}
 
 	@Override
-	public List<Person> getPersonsByMailing(Mailing mailing) throws ServiceException{
+	public List<Person> getPersonsByMailing(Mailing mailing)
+			throws ServiceException {
 		try {
 			return personDAO.getPersonsByMailing(mailing);
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
+		}
+	}
+
+	@Override
+	public void saveAsCSV(List<Person> persons, File csvFile)
+			throws IOException {
+		FileWriter writer = null;
+		try {
+			writer = new FileWriter(csvFile);
+			writer.write(convertToCSV(persons));
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			log.warn(
+					"CSV data could not be written to "
+							+ csvFile.getAbsolutePath(), e);
+		} finally {
+			if (writer != null)
+				writer.close();
 		}
 	}
 

@@ -1,5 +1,7 @@
 package at.fraubock.spendenverwaltung.interfaces.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
@@ -65,8 +67,9 @@ public interface IDonationService {
 	 * 
 	 * @return List of all unconfirmed donations
 	 */
-	public List<Donation> getUnconfirmed(Import toImport) throws ServiceException;
-	
+	public List<Donation> getUnconfirmed(Import toImport)
+			throws ServiceException;
+
 	/**
 	 * Puts all Donation Types in a String Array
 	 * 
@@ -102,21 +105,40 @@ public interface IDonationService {
 	 * @return CSV representation of the donations
 	 */
 	public String convertToCSV(List<Donation> donations);
-	
+
 	/**
-	 * For the donations in the donation list the import attribute will be updated to null
-	 * @param donationList
-	 * 			List of donations which should be affected
-	 * @throws PersistenceException
-	 *          If communication to the underlying persistence system failed
+	 * Converts a list of donations to a CSV and saves it as the given file.
+	 * 
+	 * @author manuel-bichler
+	 * 
+	 * @param donations
+	 *            a list of donations
+	 * @param csvFile
+	 *            the file the CSV should be saved to
+	 * @throws IOException
+	 *             if writing the file failed
 	 */
-	public void setImportToNull(List<Donation> donationList) throws ServiceException;
-	
+	public void saveAsCSV(List<Donation> donations, File csvFile)
+			throws IOException;
+
+	/**
+	 * For the donations in the donation list the import attribute will be
+	 * updated to null
+	 * 
+	 * @param donationList
+	 *            List of donations which should be affected
+	 * @throws PersistenceException
+	 *             If communication to the underlying persistence system failed
+	 */
+	public void setImportToNull(List<Donation> donationList)
+			throws ServiceException;
+
 	/**
 	 * check if donation d exists already
+	 * 
 	 * @param d
-	 * 			Donation which should be proofed
-	 * @return	true, is donation already exists
+	 *            Donation which should be proofed
+	 * @return true, is donation already exists
 	 * @throws PersistenceException
 	 */
 	public boolean donationExists(Donation d) throws ServiceException;
