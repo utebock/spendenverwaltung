@@ -40,21 +40,31 @@ public class ConfirmationTemplateDAOImplemented implements
 	}
 	
 	@Override
-	public void insert(ConfirmationTemplate template)
+	public void insertOrUpdate(ConfirmationTemplate template)
 			throws PersistenceException {
 		
 		try {
-			log.info("Inserting ConfirmationTemplate");
 			validate(template);
+			if(template.getId()==null){
+				//Create
+				log.info("Inserting ConfirmationTemplate");
+				
+				KeyHolder keyHolder = new GeneratedKeyHolder();
+				jdbcTemplate.update(new ConfirmationTemplateStatementCreator(template),
+						keyHolder);
 
-			KeyHolder keyHolder = new GeneratedKeyHolder();
-			jdbcTemplate.update(new ConfirmationTemplateStatementCreator(template),
-					keyHolder);
+				template.setId(keyHolder.getKey().intValue());
 
-			template.setId(keyHolder.getKey().intValue());
-
-			log.info("ConfirmationTemplate entry successfully created: "
-					+ template.getFile().getAbsolutePath());
+				log.info("ConfirmationTemplate entry successfully created: "
+						+ template.getFile().getAbsolutePath());
+			}
+			else{
+				//Update
+				
+				String update = "update donation_confirmation_templates set name = ?, data = ? where id = ?";
+				
+				jdbcTemplate.update(update, new Object[]{template.getName(), template.getFile(), template.getId()});
+			}
 		} catch (DataAccessException e) {
 			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
@@ -225,18 +235,18 @@ public class ConfirmationTemplateDAOImplemented implements
 		}
 	}
 
-	private static void validate(ConfirmationTemplate mt) throws ValidationException {
-		if (mt == null) {
+	private static void validate(ConfirmationTemplate template) throws ValidationException {
+		if (template == null) {
 			log.error("Argument was null");
 			throw new ValidationException("ConfirmationTemplate must not be null");
 		}
 
-		if (mt.getName() == null) {
+		if (template.getName() == null) {
 			log.error("File name was null");
 			throw new ValidationException("File name must not be null");
 		}
 
-		if (mt.getFile() == null) {
+		if (template.getFile() == null) {
 			log.error("File was null");
 			throw new ValidationException("File must not be null");
 		}

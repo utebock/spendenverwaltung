@@ -68,6 +68,13 @@
 		<property name="propertyCritDAO" ref="propertyCritDao" />
 		<property name="mountedCritDAO" ref="mountedCritDao" />
 	</bean>
+	<bean id="confirmationDao"
+		class="at.fraubock.spendenverwaltung.dao.ConfirmationDAOImplemented">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<property name="confirmationTemplateDao" ref="confirmationTemplateDao" />
+		<property name="personDao" ref="personDao" />
+		<property name="donationDao" ref="donationDao" />
+	</bean>
 	<bean id="confirmationTemplateDao"
 		class="at.fraubock.spendenverwaltung.dao.ConfirmationTemplateDAOImplemented">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
