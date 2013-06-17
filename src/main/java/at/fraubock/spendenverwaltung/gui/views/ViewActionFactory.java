@@ -8,8 +8,11 @@ import javax.swing.ImageIcon;
 
 import at.fraubock.spendenverwaltung.gui.MainFilterView;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
+import at.fraubock.spendenverwaltung.gui.components.MailingTableModel;
 import at.fraubock.spendenverwaltung.gui.components.PersonTableModel;
+import at.fraubock.spendenverwaltung.gui.components.UnconfirmedMailingTableModel;
 import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
+import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.service.IActionService;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
@@ -87,6 +90,14 @@ public class ViewActionFactory {
 		return new DisplayViewAction(new MainFilterView(new ComponentFactory(), this, filterService), "/images/filter.jpg");
 	}
 	
+	public Action getRemovePersonFromMailingViewAction(Mailing mailing, MailingTableModel tableModel) {
+		return new DisplayViewAction(new RemovePersonsFromMailingView(this, new ComponentFactory(), personService, mailingService, mailing, tableModel));
+	}
+	
+	public Action getRemovePersonFromMailingViewAction(Mailing mailing, UnconfirmedMailingTableModel tableModel) {
+		return new DisplayViewAction(new RemovePersonsFromMailingView(this, new ComponentFactory(), personService, mailingService, mailing, tableModel));
+	}
+	
 	public Action getHistoryViewAction() {
 		DisplayViewAction action = new DisplayViewAction(new HistoryView(this, actionService), "");
 		action.putValue(Action.NAME, "Historie");
@@ -117,17 +128,12 @@ public class ViewActionFactory {
 		return new DisplayViewAction(new CreateMailingsView(this, new ComponentFactory(), mailingService, filterService, personService), "/images/eNotification.jpg");
 	}
 
-	public Action getFindMailingsViewAction() {
-		return new DisplayViewAction(new FindMailingsView(this, new ComponentFactory(), personService, mailingService), "/images/showNotifications.jpg");
+	public Action getFindMailingsViewAction(MailingTableModel tableModel) {
+		return new DisplayViewAction(new FindMailingsView(this, new ComponentFactory(), mailingService, filterService, tableModel), "/images/showNotifications.jpg");
 	}
 	
-	public Action getConfirmMailingsViewAction() {
-		return new DisplayViewAction(new ConfirmMailingsView(this, new ComponentFactory(), mailingService), "/images/confirmSendings.jpg");
-	}
-	
-	//TODO richtige view returnen!
-	public Action getDeleteMailingsViewAction() {
-		return new DisplayViewAction(new CreatePersonView(new ComponentFactory(), this, personService, addressService, donationService, new PersonTableModel()), "/images/deleteNotifications.jpg");
+	public Action getConfirmMailingsViewAction(UnconfirmedMailingTableModel parentMailingTableModel) {
+		return new DisplayViewAction(new ConfirmMailingsView(this, new ComponentFactory(), mailingService, parentMailingTableModel), "/images/confirmSendings.jpg");
 	}
 	
 	public Action getDonationProgressStatsViewAction() {

@@ -205,10 +205,14 @@ public class ActionDAOImplemented implements IActionDAO {
 
 		log.info("Reading Actions for attribute='" + attribute.getName() + "', value='"
 				+ value + "'");
-
+		
+		String name = attribute.getName();
+		if(attribute==ActionAttribute.TIME) {
+			name = "DATE_FORMAT("+name+", '%d.%m.%Y')";
+		}
 		try {
 			return jdbcTemplate.query("select * from actions where "
-					+ attribute.getName() + " LIKE ? ORDER BY time DESC LIMIT " + offset
+					+ name + " LIKE ? ORDER BY time DESC LIMIT " + offset
 							+ ", " + count,
 					new Object[] { "%"+value+"%" }, new ActionMapper());
 		} catch (DataAccessException e) {
@@ -223,9 +227,13 @@ public class ActionDAOImplemented implements IActionDAO {
 		log.info("Counting Actions for attribute='" + attribute.getName() + "', value='"
 				+ value + "'");
 		
+		String name = attribute.getName();
+		if(attribute==ActionAttribute.TIME) {
+			name = "DATE_FORMAT("+name+", '%d.%m.%Y')";
+		}
 		try {
 			return jdbcTemplate.queryForObject("select count(*) from actions where "
-					+ attribute.getName() + " LIKE ? ORDER BY time DESC",
+					+ name + " LIKE ? ORDER BY time DESC",
 					new Object[] { "%"+value+"%" },Integer.class);
 		} catch (DataAccessException e) {
 			log.warn(e.getLocalizedMessage());

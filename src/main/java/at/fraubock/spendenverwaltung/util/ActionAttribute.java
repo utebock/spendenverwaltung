@@ -1,8 +1,7 @@
 package at.fraubock.spendenverwaltung.util;
 
 public enum ActionAttribute {
-	ACTOR("actor", "Benutzer"), TYPE("type", "Aktion"), ENTITY("entity",
-			"Objekt"), TIME("time", "Datum"), PAYLOAD("payload", "Daten");
+	ACTOR("actor", "Benutzer"), TIME("time", "Datum"), PAYLOAD("payload", "Daten");
 
 	private String name, displayableName;
 

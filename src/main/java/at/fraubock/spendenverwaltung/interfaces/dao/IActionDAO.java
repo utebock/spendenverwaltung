@@ -59,11 +59,46 @@ public interface IActionDAO {
 	public List<Action> getAllWithLimitedResult(int offset, int count)
 			throws PersistenceException;
 
+	/**
+	 * returns the amount of all persisted actions
+	 * 
+	 * @return
+	 * @throws PersistenceException
+	 */
 	public long countResultsOfAll() throws PersistenceException;
 
-	public List<Action> getLimitedResultByAttributeLike(ActionAttribute attribute,
-			String value, int offset, int count) throws PersistenceException;
-
-	public long countResultsOfAttributeLike(ActionAttribute attribute, String value)
+	/**
+	 * Retrieves the number of actions given in <code>count</code> starting from
+	 * <code>offset</code>, where the attribute given in the
+	 * {@link ActionAttribute} contains <code>value</code>
+	 * 
+	 * @param attribute
+	 *            - the attribute to be compared
+	 * @param value
+	 *            - the value the attribute will be compared with (LIKE)
+	 * @param offset
+	 *            - starting from this result
+	 * @param count
+	 *            - retrieving this amount of results
+	 * @return List of actions from offset plus count, sorted by date descending
+	 *         where attribute LIKE value
+	 * @throws PersistenceException
+	 */
+	public List<Action> getLimitedResultByAttributeLike(
+			ActionAttribute attribute, String value, int offset, int count)
 			throws PersistenceException;
+
+	/**
+	 * returns the amount of all persisted actions where the attribute given in
+	 * the {@link ActionAttribute} contains the given <code>value</code>
+	 * 
+	 * @param attribute
+	 *            - the attribute to be compared
+	 * @param value
+	 *            - the value the attribute will be compared with (LIKE)
+	 * @return - amount of persisted actions
+	 * @throws PersistenceException
+	 */
+	public long countResultsOfAttributeLike(ActionAttribute attribute,
+			String value) throws PersistenceException;
 }

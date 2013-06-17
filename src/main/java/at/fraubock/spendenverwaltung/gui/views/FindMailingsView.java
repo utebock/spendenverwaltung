@@ -5,29 +5,33 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXDatePicker;
 
+import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.MailingTableModel;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
+import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
-import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
+import at.fraubock.spendenverwaltung.util.FilterType;
 
 public class FindMailingsView extends InitializableView {
 	
@@ -39,26 +43,32 @@ public class FindMailingsView extends InitializableView {
 	private ComponentFactory componentFactory;
 	private ViewActionFactory viewActionFactory;
 	
-	private IPersonService personService;
 	private IMailingService mailingService;
+	private IFilterService filterService;
+	
+	private JComboBox<Filter> filterCombo;
+	private Filter selectedFilter;
 	
 	private MailingTableModel tableModel;
 	
 	private JPanel contentPanel;
-	private JLabel feedbackLabel, beforeDateLabel, afterDateLabel;
+	private JLabel feedbackLabel, beforeDateLabel, afterDateLabel, filterLabel;
 	
 	private JXDatePicker beforeDate, afterDate;
 	
 	JToolBar toolbar;
 	JTable mailingsTable;
 	
+	
+	
 	public FindMailingsView(ViewActionFactory viewActionFactory, ComponentFactory componentFactory,
-			IPersonService personService, IMailingService mailingService) {
+			 IMailingService mailingService, IFilterService filterService, MailingTableModel tableModel) {
 		
 		this.viewActionFactory = viewActionFactory;
 		this.componentFactory = componentFactory;
 		this.mailingService = mailingService;
-		this.personService = personService;
+		this.filterService = filterService;
+		this.tableModel = tableModel;
 		
 		setUpLayout();
 	}
@@ -68,7 +78,9 @@ public class FindMailingsView extends InitializableView {
 		
 		this.add(contentPanel);
 		
-		tableModel = new MailingTableModel();
+		if(tableModel == null) {
+			tableModel = new MailingTableModel();
+		}
 		mailingsTable = new JTable(tableModel);
 		mailingsTable.setFillsViewportHeight(true);
 		JScrollPane scrollPane = new JScrollPane(mailingsTable);
@@ -89,6 +101,11 @@ public class FindMailingsView extends InitializableView {
 		beforeDate = new JXDatePicker();
 		beforeDate.addActionListener(new BeforeDatePickedListener());
 		contentPanel.add(beforeDate, "wrap");		
+		
+		filterLabel = componentFactory.createLabel("Aussendungs Filter");
+		contentPanel.add(filterLabel, "split 2");
+		filterCombo = new JComboBox<Filter>();
+		contentPanel.add(filterCombo, "wrap");
 				
 		mailingsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
@@ -101,16 +118,32 @@ public class FindMailingsView extends InitializableView {
 	public void init() {
 		addComponentsToToolbar(toolbar);		
 		initTable();
+		
+		List<Filter> mailingFilters;
+		try {
+			mailingFilters = filterService.getAllByFilter(FilterType.MAILING);
+			log.debug("getAllByFilter returned "+ mailingFilters.size()+ " filters");
+			filterCombo.setModel(new SimpleComboBoxModel<Filter>(
+					mailingFilters));
+			filterCombo.setSelectedIndex(-1);
+			filterCombo.addActionListener(new FilterSelectedAction());
+		} catch (ServiceException e) {
+			log.warn(e.getLocalizedMessage());
+			JOptionPane.showMessageDialog(this, "Ein Fehler trat während der Initialisierung der Tabelle auf");
+		}
+		
 	}
 	
 	private void initTable() {
-		tableModel.clear();
-		try {
-			tableModel.addMailings(mailingService.getAllConfirmed());
-			mailingsTable.setAutoCreateRowSorter(true);
-		} catch (ServiceException e) {
-			log.warn(e.getLocalizedMessage());
-			JOptionPane.showMessageDialog(this, "Ein Fehler tritt während der Initialisierung der Tabelle auf");
+		if(tableModel.getRowCount() == 0) { 
+			tableModel.clear();
+			try {
+				tableModel.addMailings(mailingService.getAllConfirmed());
+				mailingsTable.setAutoCreateRowSorter(true);
+			} catch (ServiceException e) {
+				log.warn(e.getLocalizedMessage());
+				JOptionPane.showMessageDialog(this, "Ein Fehler trat während der Initialisierung der Tabelle auf");
+			}
 		}
 	}
 	
@@ -142,20 +175,34 @@ public class FindMailingsView extends InitializableView {
 		toolbar.add(deleteButton, "growx");
 	}
 	
+
+
 	private final class AfterDatePickedListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Date bDate = beforeDate.getDate();
 			Date aDate = afterDate.getDate();
 			
-			if(aDate != null) {
-				if(bDate.after(aDate)) {
+			if(aDate != null && bDate != null) {
+				if(aDate.after(bDate)) {
 					feedbackLabel.setText("Ungültiger Datumsbereich");
 				} else {
-					//mailingService call betweenSearch
+					try {
+						tableModel.clear();
+						tableModel.addMailings(mailingService.getBetweenDates(aDate, bDate));
+				} catch (ServiceException e1) {
+					log.warn(e1.getLocalizedMessage());
+					feedbackLabel.setText("Es passierte ein Fehler beim Auswerten der Abfrage");
 				}
-			} else if (bDate != null) {
-				//mailingService call beforeSearch
+				}
+			} else if (aDate != null) {
+				try {
+					tableModel.clear();
+					tableModel.addMailings(mailingService.getAfterDate(aDate));
+				} catch (ServiceException e1) {
+					log.warn(e1.getLocalizedMessage());
+					feedbackLabel.setText("Es passierte ein Fehler beim Auswerten der Abfrage");
+				}
 			}
 		}
 	}
@@ -166,14 +213,26 @@ public class FindMailingsView extends InitializableView {
 			Date aDate = afterDate.getDate();
 			Date bDate = beforeDate.getDate();
 			
-			if(bDate != null) {
-				if(bDate.after(aDate)) {
+			if(aDate != null && bDate != null) {
+				if(aDate.after(bDate)) {
 					feedbackLabel.setText("Ungültiger Datumsbereich");
 				} else {
-					//mailingService call betweenSearch
+					try {
+						tableModel.clear();
+						tableModel.addMailings(mailingService.getBetweenDates(aDate, bDate));
+					} catch (ServiceException e1) {
+						log.warn(e1.getLocalizedMessage());
+						feedbackLabel.setText("Es passierte ein Fehler beim Auswerten der Abfrage");
+					}
 				}
-			} else if (aDate != null) {
-				//mailingService call afterSearch
+			} else if (bDate != null) {
+				try {
+					tableModel.clear();
+					tableModel.addMailings(mailingService.getBeforeDate(bDate));
+				} catch (ServiceException e1) {
+					log.warn(e1.getLocalizedMessage());
+					feedbackLabel.setText("Es passierte ein Fehler beim Auswerten der Abfrage");
+				}
 			}
 		}
 	}
@@ -192,9 +251,12 @@ public class FindMailingsView extends InitializableView {
 			if((selectedRow = mailingsTable.getSelectedRow()) != -1){
 				Mailing mailing = tableModel.getRow(selectedRow);
 				try {
+					int dialogResult = JOptionPane.showConfirmDialog (contentPanel, "Wollen sie diese Aussendung wirklich löschen?", "Löschen", JOptionPane.YES_NO_OPTION);
+					if(dialogResult == JOptionPane.YES_OPTION){
 					mailingService.delete(mailing);
 					tableModel.removeMailing(mailing);
 					feedbackLabel.setText("Aussendung wurde gelöscht.");
+				}
 				} catch (ServiceException e1) {
 					log.warn(e1.getLocalizedMessage());
 					feedbackLabel.setText("Ein Fehler trat während des Löschens auf");
@@ -230,6 +292,8 @@ public class FindMailingsView extends InitializableView {
 						feedbackLabel.setText("Die Aussendung konnte nicht wiederhergestellt werden.");
 					}
 				}
+			} else {
+				feedbackLabel.setText("Zum Wiederherstellen muss zuerst eine Aussendung mit Vorlage ausgewählt werden.");
 			}
 			
 		}
@@ -247,6 +311,33 @@ public class FindMailingsView extends InitializableView {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
+			int rowIndex = mailingsTable.getSelectedRow();
+			if(rowIndex != -1) {
+				Mailing selectedMailing = tableModel.getRow(rowIndex);
+				
+				Action viewToRemoveAction = viewActionFactory.getRemovePersonFromMailingViewAction(selectedMailing, tableModel);
+				
+				viewToRemoveAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+			}
+		}
+	}
+	
+	private final class FilterSelectedAction implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			selectedFilter = (Filter) filterCombo.getModel().getSelectedItem();
+
+			if(selectedFilter != null) {
+				
+				tableModel.clear();
+				try {
+					tableModel.addMailings(mailingService.getByFilter(selectedFilter));
+				} catch (ServiceException e1) {
+					log.warn(e1.getLocalizedMessage());
+					feedbackLabel.setText("Es passierte ein Fehler während der Auswertung des Filters.");
+				}
+				
+			}
 		}
 	}
 }

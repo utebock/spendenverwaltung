@@ -39,21 +39,21 @@ public abstract class AbstractConfirmationTemplateDAOTest {
 	@Transactional
 	public void createWithNullParameter_ThrowsException()
 			throws PersistenceException {
-		confirmationTemplateDAO.insert(null);
+		confirmationTemplateDAO.insertOrUpdate(null);
 	}
 
 	@Test(expected = PersistenceException.class)
 	@Transactional
 	public void createWithInvalidStateParameter_ThrowsException()
 			throws PersistenceException {
-		confirmationTemplateDAO.insert(new ConfirmationTemplate());
+		confirmationTemplateDAO.insertOrUpdate(new ConfirmationTemplate());
 	}
 
 	@Test
 	@Transactional
 	public void createWithValidParameter_ReturnsSavedConfirmationTemplate() {
 		try {
-			confirmationTemplateDAO.insert(ct1);
+			confirmationTemplateDAO.insertOrUpdate(ct1);
 
 			ConfirmationTemplate savedCt = confirmationTemplateDAO.getByID(ct1.getId());
 			assert (savedCt.equals(ct1));
@@ -78,7 +78,7 @@ public abstract class AbstractConfirmationTemplateDAOTest {
 	@Transactional
 	public void deleteWithValidParameter_RemovesEntity() {
 		try {
-			confirmationTemplateDAO.insert(ct1);
+			confirmationTemplateDAO.insertOrUpdate(ct1);
 			confirmationTemplateDAO.delete(ct1);
 			List<ConfirmationTemplate> allConfirmationTemplatees = confirmationTemplateDAO
 					.getAll();
@@ -97,8 +97,8 @@ public abstract class AbstractConfirmationTemplateDAOTest {
 	@Transactional(readOnly = true)
 	public void getAll_ReturnsAllEntities() {
 		try {
-			confirmationTemplateDAO.insert(ct1);
-			confirmationTemplateDAO.insert(ct2);
+			confirmationTemplateDAO.insertOrUpdate(ct1);
+			confirmationTemplateDAO.insertOrUpdate(ct2);
 
 			List<ConfirmationTemplate> confirmationTemplateList = confirmationTemplateDAO
 					.getAll();
@@ -129,7 +129,7 @@ public abstract class AbstractConfirmationTemplateDAOTest {
 	public void getWithValidId_ReturnsEntity() {
 
 		try {
-			confirmationTemplateDAO.insert(ct1);
+			confirmationTemplateDAO.insertOrUpdate(ct1);
 			ConfirmationTemplate foundConfirmationTemplate = confirmationTemplateDAO
 					.getByID(ct1.getId());
 
@@ -138,6 +138,14 @@ public abstract class AbstractConfirmationTemplateDAOTest {
 		} catch (PersistenceException e) {
 			fail();
 		}
+	}
+	
+	@Test(expected = PersistenceException.class)
+	@Transactional
+	public void InsertTwoTemplatesWithSameName_ThrowsException() throws PersistenceException{
+		confirmationTemplateDAO.insertOrUpdate(ct1);
+		ct2.setName(ct1.getName());
+		confirmationTemplateDAO.insertOrUpdate(ct2);
 	}
 
 	@Before
