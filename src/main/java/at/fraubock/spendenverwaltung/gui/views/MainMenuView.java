@@ -206,7 +206,7 @@ public class MainMenuView extends InitializableView {
 		createConfirm.setAction(viewActionFactory.getCreateDonationConfirmationViewAction());
 		obtainConfirm.setAction( viewActionFactory.getFindDonationConfirmationViewAction());
 		mailings.setAction(viewActionFactory.getCreateMailingsViewAction());
-		showSendings.setAction(viewActionFactory.getFindMailingsViewAction());
+		showSendings.setAction(viewActionFactory.getFindMailingsViewAction(null));
 		confirmSendings.setAction(viewActionFactory.getConfirmMailingsViewAction());
 		progress.setAction(viewActionFactory.getDonationProgressStatsViewAction());
 		statsSendings.setAction(viewActionFactory.getShowMailingStatsViewAction());

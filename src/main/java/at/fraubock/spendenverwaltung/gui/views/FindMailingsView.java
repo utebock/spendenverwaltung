@@ -31,7 +31,6 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
-import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.FilterType;
 
 public class FindMailingsView extends InitializableView {
@@ -44,7 +43,6 @@ public class FindMailingsView extends InitializableView {
 	private ComponentFactory componentFactory;
 	private ViewActionFactory viewActionFactory;
 	
-	private IPersonService personService;
 	private IMailingService mailingService;
 	private IFilterService filterService;
 	
@@ -64,13 +62,13 @@ public class FindMailingsView extends InitializableView {
 	
 	
 	public FindMailingsView(ViewActionFactory viewActionFactory, ComponentFactory componentFactory,
-			IPersonService personService, IMailingService mailingService, IFilterService filterService) {
+			 IMailingService mailingService, IFilterService filterService, MailingTableModel tableModel) {
 		
 		this.viewActionFactory = viewActionFactory;
 		this.componentFactory = componentFactory;
 		this.mailingService = mailingService;
-		this.personService = personService;
 		this.filterService = filterService;
+		this.tableModel = tableModel;
 		
 		setUpLayout();
 	}
@@ -80,7 +78,9 @@ public class FindMailingsView extends InitializableView {
 		
 		this.add(contentPanel);
 		
-		tableModel = new MailingTableModel();
+		if(tableModel == null) {
+			tableModel = new MailingTableModel();
+		}
 		mailingsTable = new JTable(tableModel);
 		mailingsTable.setFillsViewportHeight(true);
 		JScrollPane scrollPane = new JScrollPane(mailingsTable);
@@ -135,13 +135,15 @@ public class FindMailingsView extends InitializableView {
 	}
 	
 	private void initTable() {
-		tableModel.clear();
-		try {
-			tableModel.addMailings(mailingService.getAllConfirmed());
-			mailingsTable.setAutoCreateRowSorter(true);
-		} catch (ServiceException e) {
-			log.warn(e.getLocalizedMessage());
-			JOptionPane.showMessageDialog(this, "Ein Fehler trat während der Initialisierung der Tabelle auf");
+		if(tableModel.getRowCount() == 0) { 
+			tableModel.clear();
+			try {
+				tableModel.addMailings(mailingService.getAllConfirmed());
+				mailingsTable.setAutoCreateRowSorter(true);
+			} catch (ServiceException e) {
+				log.warn(e.getLocalizedMessage());
+				JOptionPane.showMessageDialog(this, "Ein Fehler trat während der Initialisierung der Tabelle auf");
+			}
 		}
 	}
 	
@@ -249,9 +251,12 @@ public class FindMailingsView extends InitializableView {
 			if((selectedRow = mailingsTable.getSelectedRow()) != -1){
 				Mailing mailing = tableModel.getRow(selectedRow);
 				try {
+					int dialogResult = JOptionPane.showConfirmDialog (contentPanel, "Wollen sie diese Aussendung wirklich löschen?", "Löschen", JOptionPane.YES_NO_OPTION);
+					if(dialogResult == JOptionPane.YES_OPTION){
 					mailingService.delete(mailing);
 					tableModel.removeMailing(mailing);
 					feedbackLabel.setText("Aussendung wurde gelöscht.");
+				}
 				} catch (ServiceException e1) {
 					log.warn(e1.getLocalizedMessage());
 					feedbackLabel.setText("Ein Fehler trat während des Löschens auf");
@@ -287,6 +292,8 @@ public class FindMailingsView extends InitializableView {
 						feedbackLabel.setText("Die Aussendung konnte nicht wiederhergestellt werden.");
 					}
 				}
+			} else {
+				feedbackLabel.setText("Zum Wiederherstellen muss zuerst eine Aussendung mit Vorlage ausgewählt werden.");
 			}
 			
 		}
@@ -304,6 +311,14 @@ public class FindMailingsView extends InitializableView {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
+			int rowIndex = mailingsTable.getSelectedRow();
+			if(rowIndex != -1) {
+				Mailing selectedMailing = tableModel.getRow(rowIndex);
+				
+				Action viewToRemoveAction = viewActionFactory.getRemovePersonFromMailingViewAction(selectedMailing, tableModel);
+				
+				viewToRemoveAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+			}
 		}
 	}
 	
@@ -321,6 +336,7 @@ public class FindMailingsView extends InitializableView {
 					log.warn(e1.getLocalizedMessage());
 					feedbackLabel.setText("Es passierte ein Fehler während der Auswertung des Filters.");
 				}
+				
 			}
 		}
 	}

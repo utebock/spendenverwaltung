@@ -136,4 +136,13 @@ public interface IMailingDAO {
 	 */
 	List<Mailing> getMailingsByFilter(Filter filter) throws PersistenceException;
 
+	/**
+	 * deletes one person from a mailing
+	 * 
+	 * @param person
+	 * @param mailing
+	 * @throws PersistenceException 
+	 */
+	public void deletePersonFromMailing(Person person, Mailing mailing) throws PersistenceException;
+
 }
