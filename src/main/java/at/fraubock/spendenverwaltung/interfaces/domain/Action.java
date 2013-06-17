@@ -43,22 +43,28 @@ public class Action {
 	}
 
 	public enum Entity {
-		PERSON("persons"), ADDRESSES("addresses"), LIVES_AT("livesat"), IMPORT(
-				"imports"), DONATION("donations"), CRITERION("criterion"), FILTER(
-				"filter"), MAILING("mailings"), SENT_MAILING("sent_mailings"), MAILING_TEMPLATE(
-				"mailing_templates"), DONATION_CONFIRMATION_TEMPLATE(
-				"donation_confirmation_templates"), DONATION_CONFIRMATION(
-				"donation_confirmations");
+		PERSON("persons","Person"), ADDRESSES("addresses","Adresse"), LIVES_AT("livesat","livesat"), IMPORT(
+				"imports","Import"), DONATION("donations","Spende"), CRITERION("criterion","criterion"), FILTER(
+				"filter","Filter"), MAILING("mailings","Aussendung"), SENT_MAILING("sent_mailings","sent_mailings"), MAILING_TEMPLATE(
+				"mailing_templates","Aussendungsvorlage"), DONATION_CONFIRMATION_TEMPLATE(
+				"donation_confirmation_templates","Spendenbestätigungsvorlage"), DONATION_CONFIRMATION(
+				"donation_confirmations","Spendenbestätigung");
 
 		private String name;
+		private String displayableName;
 
-		private Entity(String name) {
+		private Entity(String name, String displayableName) {
 			this.name = name;
+			this.displayableName = displayableName;
 		}
 
 		@Override
 		public String toString() {
 			return name;
+		}
+		
+		public String getDisplayableName() {
+			return displayableName;
 		}
 		
 		public static Entity getByName(String name) {
