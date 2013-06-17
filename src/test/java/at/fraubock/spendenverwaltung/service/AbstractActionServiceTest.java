@@ -5,8 +5,11 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +19,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Action;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IActionService;
+import at.fraubock.spendenverwaltung.util.Pager;
 
 public abstract class AbstractActionServiceTest {
 
@@ -131,5 +135,34 @@ public abstract class AbstractActionServiceTest {
 	 * testing find
 	 */
 
-	//TODO pager
+	@Test
+	public void getAllAsPager_ReturnsPager() {
+		try {
+			List<Action> list1 = new ArrayList<Action>();
+			list1.add(newAction);
+			list1.add(newAction2);
+			
+			List<Action> list2 = new ArrayList<Action>();
+			list2.add(newActionCreated);
+			when(actionDAO.getAllWithLimitedResult(0, 2)).thenReturn(list1);
+			when(actionDAO.getAllWithLimitedResult(1, 2)).thenReturn(list2);
+			
+			Pager<Action> pager = actionService.getAllAsPager(2);
+			
+			List<Action> page = pager.getPage(0);
+			assert(pager.getNumberOfPages()==2);
+			assert(pager.getCurrentPosition()==0);
+			assert(page.size()==2 && page.contains(newAction) && page.contains(newAction2));
+			
+			List<Action> page2 = pager.getPage(1);
+			assert(pager.getNumberOfPages()==2);
+			assert(pager.getCurrentPosition()==1);
+			assert(page2.size()==1 && page2.contains(newActionCreated));
+			
+		} catch (ServiceException e) {
+			fail();
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
 }

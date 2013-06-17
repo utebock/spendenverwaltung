@@ -2,6 +2,8 @@ package at.fraubock.spendenverwaltung.dao;
 
 import static org.junit.Assert.fail;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -20,6 +22,7 @@ import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Action;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
+import at.fraubock.spendenverwaltung.util.ActionAttribute;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/testspring.xml")
@@ -46,7 +49,11 @@ public class AbstractActionDAOTest {
 		action.setEntity(Action.Entity.PERSON);
 		action.setEntityId(1);
 		action.setType(Action.Type.INSERT);
-		action.setTime(new Date());
+		try {
+			action.setTime(new SimpleDateFormat("dd.MM.yyyy").parse("12.10.2010"));
+		} catch (ParseException e) {
+			fail();
+		}
 		action.setPayload("payload");
 
 		action2 = new Action();
@@ -54,7 +61,11 @@ public class AbstractActionDAOTest {
 		action2.setEntity(Action.Entity.DONATION);
 		action2.setEntityId(2);
 		action2.setType(Action.Type.DELETE);
-		action2.setTime(new Date());
+		try {
+			action2.setTime(new SimpleDateFormat("dd.MM.yyyy").parse("10.10.2010"));
+		} catch (ParseException e) {
+			fail();
+		}
 		action2.setPayload("payload2");
 	}
 
@@ -132,6 +143,72 @@ public class AbstractActionDAOTest {
 
 			List<Action> allActions = actionDAO.getAll();
 			assert (allActions != null && allActions.size() == 2);
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+	
+
+	@Test
+	@Transactional(readOnly = true)
+	public void getAllWithLimitedResult_ReturnsEntitiesFromTo() {
+		try {
+			actionDAO.insert(action);
+			actionDAO.insert(action2);
+
+			List<Action> allActions = actionDAO.getAllWithLimitedResult(0,1);
+			List<Action> allActions2 = actionDAO.getAllWithLimitedResult(1,1);
+			
+			assert (allActions.size() == 1 && allActions.contains(action));
+			assert (allActions2.size() == 1 && allActions2.contains(action2));
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+
+	@Test
+	@Transactional(readOnly = true)
+	public void getLimitedResultByAttributeLike_ReturnsEntities() {
+		try {
+			actionDAO.insert(action);
+			actionDAO.insert(action2);
+
+			List<Action> allActions = actionDAO.getLimitedResultByAttributeLike(ActionAttribute.ACTOR,"actor",0,2);
+			List<Action> allActions2 = actionDAO.getLimitedResultByAttributeLike(ActionAttribute.TIME,"10.10",1,1);
+			
+			assert (allActions.size() == 2 && allActions.contains(action) && allActions.contains(action2));
+			assert (allActions2.size() == 1 && allActions2.contains(action2));
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+	
+	@Test
+	@Transactional(readOnly = true)
+	public void getCountResultsOfAll_ReturnsAmountOverAll() {
+		try {
+			actionDAO.insert(action);
+			actionDAO.insert(action2);
+
+			long amount = actionDAO.countResultsOfAll();
+			
+			assert (amount==2);
+		} catch (PersistenceException e) {
+			fail();
+		}
+	}
+	
+	
+	@Test
+	@Transactional(readOnly = true)
+	public void getCountResultsOfByAttribute_ReturnsAmountOverAttributeLike() {
+		try {
+			actionDAO.insert(action);
+			actionDAO.insert(action2);
+
+			long amount = actionDAO.countResultsOfAttributeLike(ActionAttribute.TIME,"10.10");
+			
+			assert (amount==1);
 		} catch (PersistenceException e) {
 			fail();
 		}
