@@ -10,6 +10,7 @@ import at.fraubock.spendenverwaltung.gui.MainFilterView;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.MailingTableModel;
 import at.fraubock.spendenverwaltung.gui.components.PersonTableModel;
+import at.fraubock.spendenverwaltung.gui.components.UnconfirmedMailingTableModel;
 import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.service.IActionService;
@@ -93,6 +94,10 @@ public class ViewActionFactory {
 		return new DisplayViewAction(new RemovePersonsFromMailingView(this, new ComponentFactory(), personService, mailingService, mailing, tableModel));
 	}
 	
+	public Action getRemovePersonFromMailingViewAction(Mailing mailing, UnconfirmedMailingTableModel tableModel) {
+		return new DisplayViewAction(new RemovePersonsFromMailingView(this, new ComponentFactory(), personService, mailingService, mailing, tableModel));
+	}
+	
 	public Action getHistoryViewAction() {
 		DisplayViewAction action = new DisplayViewAction(new HistoryView(this, actionService), "");
 		action.putValue(Action.NAME, "Historie");
@@ -127,13 +132,8 @@ public class ViewActionFactory {
 		return new DisplayViewAction(new FindMailingsView(this, new ComponentFactory(), mailingService, filterService, tableModel), "/images/showNotifications.jpg");
 	}
 	
-	public Action getConfirmMailingsViewAction() {
-		return new DisplayViewAction(new ConfirmMailingsView(this, new ComponentFactory(), mailingService), "/images/confirmSendings.jpg");
-	}
-	
-	//TODO richtige view returnen!
-	public Action getDeleteMailingsViewAction() {
-		return new DisplayViewAction(new CreatePersonView(new ComponentFactory(), this, personService, addressService, donationService, new PersonTableModel()), "/images/deleteNotifications.jpg");
+	public Action getConfirmMailingsViewAction(UnconfirmedMailingTableModel parentMailingTableModel) {
+		return new DisplayViewAction(new ConfirmMailingsView(this, new ComponentFactory(), mailingService, parentMailingTableModel), "/images/confirmSendings.jpg");
 	}
 	
 	public Action getDonationProgressStatsViewAction() {

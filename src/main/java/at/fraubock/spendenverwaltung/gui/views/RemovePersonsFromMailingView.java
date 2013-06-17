@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.MailingTableModel;
 import at.fraubock.spendenverwaltung.gui.components.PersonTableModel;
+import at.fraubock.spendenverwaltung.gui.components.UnconfirmedMailingTableModel;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
@@ -54,7 +55,8 @@ public class RemovePersonsFromMailingView extends InitializableView {
 	
 	private Mailing mailing;
 	
-	private MailingTableModel parentTableModel;
+	private MailingTableModel parentMailingTableModel;
+	private UnconfirmedMailingTableModel unconfirmedMailingTableModel;
 	
 	private JLabel feedbackLabel;
 	
@@ -66,7 +68,20 @@ public class RemovePersonsFromMailingView extends InitializableView {
 		this.mailingService = mailingService;
 		this.personService = personService;
 		this.mailing = mailing;
-		this.parentTableModel = parentTableModel;
+		this.parentMailingTableModel = parentTableModel;
+		
+		setUpLayout();
+	}
+	
+	public RemovePersonsFromMailingView(ViewActionFactory viewActionFactory, ComponentFactory componentFactory,
+			IPersonService personService, IMailingService mailingService, Mailing mailing, UnconfirmedMailingTableModel unconfirmedMailingTableModel) {
+		
+		this.viewActionFactory = viewActionFactory;
+		this.componentFactory = componentFactory;
+		this.mailingService = mailingService;
+		this.personService = personService;
+		this.mailing = mailing;
+		this.unconfirmedMailingTableModel = unconfirmedMailingTableModel;
 		
 		setUpLayout();
 	}
@@ -113,11 +128,18 @@ public class RemovePersonsFromMailingView extends InitializableView {
 	
 	private void addComponentsToToolbar(JToolBar toolbar) {
 		
-		backButton = new JButton();
-		Action getBack = viewActionFactory.getFindMailingsViewAction(parentTableModel);
-		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
-		backButton.setAction(getBack);
-
+		if(parentMailingTableModel != null) {
+			backButton = new JButton();
+			Action getBack = viewActionFactory.getFindMailingsViewAction(parentMailingTableModel);
+			getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
+			backButton.setAction(getBack);
+		} else if(unconfirmedMailingTableModel != null) {
+			backButton = new JButton();
+			Action getBack = viewActionFactory.getConfirmMailingsViewAction(unconfirmedMailingTableModel);
+			getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
+			backButton.setAction(getBack);
+		}
+		
 		deleteButton = new JButton();
 		deleteButton.setFont(new Font("Bigger", Font.PLAIN, 13));
 		DeleteAction deleteAction = new DeleteAction();
