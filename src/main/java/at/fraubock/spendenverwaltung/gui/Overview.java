@@ -18,6 +18,7 @@ import net.miginfocom.swing.MigLayout;
 
 import org.apache.log4j.Logger;
 
+import at.fraubock.spendenverwaltung.gui.components.PersonTableModel;
 import at.fraubock.spendenverwaltung.gui.views.FindPersonsView;
 import at.fraubock.spendenverwaltung.gui.views.ImportValidationView;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;

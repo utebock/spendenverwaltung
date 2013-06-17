@@ -23,6 +23,7 @@ import net.miginfocom.swing.MigLayout;
 import org.apache.log4j.Logger;
 
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
+import at.fraubock.spendenverwaltung.gui.components.FilterTableModel;
 import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
 import at.fraubock.spendenverwaltung.gui.views.InitializableView;
 import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
@@ -39,7 +40,6 @@ public class MainFilterView extends InitializableView {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = Logger.getLogger(MainFilterView.class);
 	private IFilterService filterService;
-	private Overview overview;
 	private ComponentBuilder builder;
 	private ViewActionFactory viewActionFactory;
 	private FilterTableModel filterModel;
@@ -260,15 +260,4 @@ public class MainFilterView extends InitializableView {
 					"Fehler", JOptionPane.ERROR_MESSAGE);
 		}
 	}
-
-	public void returnTo() {
-		this.removeAll();
-		this.revalidate();
-		this.repaint();
-		overview.removeAll();
-		overview.revalidate();
-		overview.repaint();
-		overview.setUp();
-	}
-
 }

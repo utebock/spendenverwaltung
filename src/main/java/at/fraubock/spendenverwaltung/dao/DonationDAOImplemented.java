@@ -26,7 +26,6 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Import;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
-import at.fraubock.spendenverwaltung.service.DonationValidator;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
 import at.fraubock.spendenverwaltung.util.FilterToSqlBuilder;
 

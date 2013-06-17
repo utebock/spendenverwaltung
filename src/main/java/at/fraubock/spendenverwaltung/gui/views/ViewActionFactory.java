@@ -7,9 +7,10 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 
 import at.fraubock.spendenverwaltung.gui.MainFilterView;
-import at.fraubock.spendenverwaltung.gui.PersonTableModel;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
+import at.fraubock.spendenverwaltung.gui.components.PersonTableModel;
 import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
+import at.fraubock.spendenverwaltung.interfaces.service.IActionService;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
@@ -43,9 +44,10 @@ public class ViewActionFactory {
 	IMailingService mailingService;
 	IUserService userService;
 	IImportService importService;
+	IActionService actionService;
 
 	public ViewActionFactory(ViewDisplayer viewDisplayer, IPersonService personService, IDonationService donationService,
-			IFilterService filterService, IAddressService addressService, IMailingService mailingService, IUserService userService, IImportService importService) {
+			IFilterService filterService, IAddressService addressService, IMailingService mailingService, IUserService userService, IImportService importService, IActionService actionService) {
 		
 		this.viewDisplayer = viewDisplayer;
 		this.personService = personService;
@@ -55,6 +57,7 @@ public class ViewActionFactory {
 		this.filterService = filterService;
 		this.userService = userService;
 		this.importService = importService;
+		this.actionService = actionService;
 	}
 	
 	/**
@@ -82,6 +85,13 @@ public class ViewActionFactory {
 	
 	public Action getMainFilterViewAction() {
 		return new DisplayViewAction(new MainFilterView(new ComponentFactory(), this, filterService), "/images/filter.jpg");
+	}
+	
+	public Action getHistoryViewAction() {
+		DisplayViewAction action = new DisplayViewAction(new HistoryView(this, actionService), "");
+		action.putValue(Action.NAME, "Historie");
+		action.putValue(Action.SMALL_ICON, null);
+		return action;
 	}
 	
 	//TODO richtige view returnen!

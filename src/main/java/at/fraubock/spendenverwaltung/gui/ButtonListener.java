@@ -130,7 +130,7 @@ public class ButtonListener implements ActionListener{
 			//filterPersons.returnTo();
 		}
 		if(cmd.equals("return_to_overview")){
-			filterOverview.returnTo();
+//			filterOverview.returnTo();
 		}
 		if(cmd.equals("add_filter")){
 //			filterOverview.createFilter((JButton)e.getSource());

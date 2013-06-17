@@ -1,4 +1,4 @@
-package at.fraubock.spendenverwaltung.gui;
+package at.fraubock.spendenverwaltung.gui.components;
 
 import java.util.List;
 import java.util.Vector;
