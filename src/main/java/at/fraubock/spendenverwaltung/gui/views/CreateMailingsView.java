@@ -191,73 +191,6 @@ public class CreateMailingsView extends InitializableView {
 		feedbackLabel = componentFactory.createLabel("");
 		feedbackLabel.setFont(new Font("Headline", Font.PLAIN, 16));
 		contentPanel.add(feedbackLabel);
-		
-
-
-
-//		// reproduce mailed documents
-//		reproduceTitle = componentFactory
-//				.createLabel("Postalische Aussendungen wiederherstellen");
-//		reproduceTitle.setFont(new Font("Headline", Font.PLAIN, 16));
-//		createReproducePanel.add(reproduceTitle, "gapbottom 30,wrap");
-//
-//		List<Mailing> mailings = null;
-//		try {
-//			mailings = mailingService.getAll();
-//		} catch (ServiceException e) {
-//			JOptionPane.showMessageDialog(null,
-//					"Ein Fehler trat beim Laden der Aussendungen auf.");
-//			log.error("Error retrieving mailings: " + e.getMessage());
-//		}
-//
-//		List<PostalMailingPicker> postalMailings = new ArrayList<PostalMailingPicker>();
-//		for (Mailing m : mailings) {
-//			if (m.getMedium() == Mailing.Medium.POSTAL) {
-//				postalMailings.add(new PostalMailingPicker(m));
-//			}
-//		}
-//
-//		final JComboBox<PostalMailingPicker> sentMailingsDD = new JComboBox<PostalMailingPicker>(
-//				new SimpleComboBoxModel<PostalMailingPicker>(postalMailings));
-//
-//		createReproducePanel.add(sentMailingsDD, "wrap");
-//
-//		JButton reproduceDocument = new JButton();
-//		reproduceDocument.setAction(new AbstractAction(
-//				"Aussendung wiederherstellen") {
-//			private static final long serialVersionUID = 1L;
-//
-//			@Override
-//			public void actionPerformed(ActionEvent arg0) {
-//				PostalMailingPicker mailingChoice = (PostalMailingPicker) sentMailingsDD
-//						.getSelectedItem();
-//
-//				if (mailingChoice == null) {
-//					JOptionPane.showMessageDialog(CreateMailingsView.this,
-//							"Bitte w�hlen Sie eine Aussendung aus.", "Info",
-//							JOptionPane.INFORMATION_MESSAGE);
-//				}
-//				
-//				Mailing mailing = mailingChoice.getMailing();
-//
-//
-//				try {
-//					mailingService.reproduceDocument(mailing);
-//				} catch (ServiceException e) {
-//					JOptionPane
-//							.showMessageDialog(
-//									CreateMailingsView.this,
-//									"Die Aussendung konnte nicht wiederhergestellt werden.",
-//									"Error", JOptionPane.ERROR_MESSAGE);
-//					log.error("Mailing could not be reproduced.mailing_id='"
-//							+ mailing.getId() + "', error was: "
-//							+ e.getMessage());
-//				}
-//			}
-//
-//		});
-//		createReproducePanel.add(reproduceDocument, "wrap, gaptop 10");
-
 	}
 
 	// adds actions to the buttons
@@ -387,7 +320,16 @@ public class CreateMailingsView extends InitializableView {
 			mailing.setDate(postalDatePicker.getDate());
 			mailing.setType((Mailing.MailingType) postalMailingTypeChooser
 					.getSelectedItem());
-			
+
+//			if(templateFile != null) {
+//				log.debug("Template file size "+templateFile.length());
+//				MailingTemplate template = new MailingTemplate();
+//				template.setFile(templateFile);
+//				template.setFileName(templateFile.getName());
+//				mailing.setTemplate(template);
+//			} else {
+//				log.debug("Template file was null");
+//			}
 
 			try {
 				mailingService.insertOrUpdate(mailing);
@@ -446,28 +388,4 @@ public class CreateMailingsView extends InitializableView {
 			}	
 		}
 	}
-//	private class PostalMailingPicker {
-//
-//		private Mailing mailing;
-//
-//		public PostalMailingPicker(Mailing mailing) {
-//			this.mailing = mailing;
-//		}
-//
-//		@Override
-//		public String toString() {
-//			String res = "";
-//			res += new SimpleDateFormat("dd.MM.yyyy").format(mailing.getDate())
-//					+ " - ";
-//			res += mailing.getType() + " - ";
-//			res += mailing.getTemplate().getFileName();
-//
-//			return res;
-//		}
-//
-//		public Mailing getMailing() {
-//			return mailing;
-//		}
-//	}
-
 }

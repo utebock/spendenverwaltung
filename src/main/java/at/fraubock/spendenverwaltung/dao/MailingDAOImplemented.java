@@ -179,6 +179,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 				// create
 
 				if (mailing.getTemplate() != null) {
+					log.debug("Inserting mailing template");
 					mailingTemplateDao.insert(mailing.getTemplate());
 				}
 
@@ -478,6 +479,23 @@ public class MailingDAOImplemented implements IMailingDAO {
 			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
 		}
+	}
+	
+	@Override
+	public List<Mailing> getMailingsByFilter(Filter filter) {
+		List<Mailing> results;
+		
+		if(!filter.getType().equals(FilterType.MAILING)) {
+			return null;
+		} else {
+			//gotta change the filters to only search confirmed mailings...
+			String sql = filterToSqlBuilder.createSqlStatement(filter);
+			MailingMapper mapper = new MailingMapper();
+			results = jdbcTemplate.query(sql, mapper);
+		}
+		
+		return results;
+		
 	}
 
 	@Override

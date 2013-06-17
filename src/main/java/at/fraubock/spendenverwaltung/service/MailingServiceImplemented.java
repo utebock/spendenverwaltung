@@ -11,6 +11,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.MailingTemplate;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.UnconfirmedMailing;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
@@ -183,6 +184,12 @@ public class MailingServiceImplemented implements IMailingService {
 			throw new ServiceException(e);
 		}
 		return errors;
+	}
+
+	@Override
+	public List<Mailing> getByFilter(Filter filter) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	

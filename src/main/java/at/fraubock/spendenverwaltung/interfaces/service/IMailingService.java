@@ -4,6 +4,7 @@ import java.util.List;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.UnconfirmedMailing;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 
 public interface IMailingService {
@@ -124,4 +125,10 @@ public interface IMailingService {
 	 * @throws ServiceException
 	 */
 	public int exportEMailsToMailChimp(Mailing mailing, String mailChimpListId) throws ServiceException;
+	
+	/**
+	 * returns all mailings that match a specific mailing filter
+	 * 
+	 */
+	public List<Mailing> getByFilter(Filter filter);
 }

@@ -212,8 +212,9 @@ public class MailingTemplateDAOImplemented implements IMailingTemplateDAO {
 
 			ps.setString(1, mt.getFileName());
 			try {
-				ps.setBinaryStream(2, new FileInputStream(mt.getFile()),(int) mt
-						.getFile().length());
+				FileInputStream stream = new FileInputStream(mt.getFile());
+				ps.setBinaryStream(2, stream, (int)mt.getFile().length());
+				log.debug("File length in PSC: "+(int)mt.getFile().length());
 			} catch (FileNotFoundException e) {
 				log.error("The file with path='"
 						+ mt.getFile().getAbsolutePath()

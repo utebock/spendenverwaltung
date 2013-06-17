@@ -115,7 +115,7 @@ public class ConfirmMailingsView extends InitializableView {
 		DeleteAction deleteAction = new DeleteAction();
 		deleteButton.setAction(deleteAction);
 
-		toolbar.add(backButton, "growx");
+		toolbar.add(backButton, "split 4, growx");
 		toolbar.add(confirmButton, "split 4, growx");
 		toolbar.add(confirmAllButton, "growx");
 		toolbar.add(deleteButton, "growx");

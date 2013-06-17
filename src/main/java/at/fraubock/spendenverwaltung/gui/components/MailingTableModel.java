@@ -92,4 +92,12 @@ public class MailingTableModel extends AbstractTableModel {
 		}
 	}
 
+	public Mailing getRow(int rowIndex) {
+		if(rowIndex < 0 || rowIndex >= getRowCount()) {
+			return null;
+		}
+		
+		return mailings.get(rowIndex);
+	}
+
 }
