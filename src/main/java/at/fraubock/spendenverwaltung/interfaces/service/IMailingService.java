@@ -134,9 +134,41 @@ public interface IMailingService {
 	 */
 	public List<Mailing> getByFilter(Filter filter) throws ServiceException;
 	
+	/**
+	 * returns mailings that happened before or on the same day as date
+	 * 
+	 * @param date
+	 * @return
+	 * @throws ServiceException
+	 */
 	public List<Mailing> getBeforeDate(Date date) throws ServiceException;
 	
+	/**
+	 * returns mailings that happened after or on the same day as date
+	 * 
+	 * @param date
+	 * @return
+	 * @throws ServiceException
+	 */
 	public List<Mailing> getAfterDate(Date date) throws ServiceException;
 	
+	/**
+	 * returns mailings created between (including the specific days) before and after
+	 * 
+	 * @param before
+	 * @param after
+	 * @return
+	 * @throws ServiceException
+	 */
 	public List<Mailing> getBetweenDates(Date before, Date after) throws ServiceException;
+
+	/**
+	 * deletes one person from a mailing
+	 * 
+	 * @param person
+	 * @param mailing
+	 * @throws ServiceException
+	 */
+	void deletePersonFromMailing(Person person, Mailing mailing)
+			throws ServiceException;
 }

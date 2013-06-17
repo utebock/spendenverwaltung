@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.UnconfirmedMailingTableModel;
+import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.UnconfirmedMailing;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
@@ -46,10 +47,11 @@ public class ConfirmMailingsView extends InitializableView {
 	private JToolBar toolbar;
 	
 	public ConfirmMailingsView(ViewActionFactory viewActionFactory,
-			ComponentFactory componentFactory, IMailingService mailingService) {
+			ComponentFactory componentFactory, IMailingService mailingService, UnconfirmedMailingTableModel tableModel) {
 		this.viewActionFactory = viewActionFactory;
 		this.componentFactory = componentFactory;
 		this.mailingService = mailingService;
+		this.tableModel = tableModel;
 		
 		setUpLayout();
 	}
@@ -59,7 +61,9 @@ public class ConfirmMailingsView extends InitializableView {
 		
 		this.add(contentPanel);
 		
-		tableModel = new UnconfirmedMailingTableModel();
+		if(tableModel == null) {
+			tableModel = new UnconfirmedMailingTableModel();
+		}
 		unconfirmedTable = new JTable(tableModel);
 		unconfirmedTable.setFillsViewportHeight(true);
 		JScrollPane scrollPane = new JScrollPane(unconfirmedTable);
@@ -83,13 +87,14 @@ public class ConfirmMailingsView extends InitializableView {
 	}
 	
 	private void initTable() {
-		tableModel.clear();
-		try {
-			tableModel.addUnconfirmedMailings(mailingService.getUnconfirmedMailingsWithCreator());
-			unconfirmedTable.setAutoCreateRowSorter(true);
-		} catch (ServiceException e) {
-			log.warn(e.getLocalizedMessage());
-			JOptionPane.showMessageDialog(this, "Ein Fehler tritt während der Initialisierung der Tabelle auf");
+		if(tableModel.getRowCount() == 0) {
+			try {
+				tableModel.addUnconfirmedMailings(mailingService.getUnconfirmedMailingsWithCreator());
+				unconfirmedTable.setAutoCreateRowSorter(true);
+			} catch (ServiceException e) {
+				log.warn(e.getLocalizedMessage());
+				JOptionPane.showMessageDialog(this, "Ein Fehler tritt während der Initialisierung der Tabelle auf");
+			}
 		}
 	}
 	
@@ -109,15 +114,21 @@ public class ConfirmMailingsView extends InitializableView {
 		confirmAllButton.setFont(new Font("Bigger", Font.PLAIN, 13));
 		ConfirmAllAction confirmAllAction = new ConfirmAllAction();
 		confirmAllButton.setAction(confirmAllAction);
+		
+		JButton removePersonsButton = new JButton();
+		removePersonsButton.setFont(new Font("Bigger", Font.PLAIN, 13));
+		RemovePersonsAction removePersonsAction = new RemovePersonsAction();
+		removePersonsButton.setAction(removePersonsAction);
 
 		JButton deleteButton = new JButton();
 		deleteButton.setFont(new Font("Bigger", Font.PLAIN, 13));
 		DeleteAction deleteAction = new DeleteAction();
 		deleteButton.setAction(deleteAction);
 
-		toolbar.add(backButton, "split 4, growx");
-		toolbar.add(confirmButton, "split 4, growx");
+		toolbar.add(backButton, "split 5, growx");
+		toolbar.add(confirmButton, "growx");
 		toolbar.add(confirmAllButton, "growx");
+		toolbar.add(removePersonsButton, "growx");
 		toolbar.add(deleteButton, "growx");
 	}
 	
@@ -197,4 +208,28 @@ public class ConfirmMailingsView extends InitializableView {
 		}	
 	}
 	
+	private final class RemovePersonsAction extends AbstractAction {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public RemovePersonsAction() {
+			super("Personen Entfernen");
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			
+			int rowIndex = unconfirmedTable.getSelectedRow();
+			if(rowIndex != -1) {
+				Mailing selectedMailing = tableModel.getRow(rowIndex).getMailing();
+				
+				Action viewToRemoveAction = viewActionFactory.getRemovePersonFromMailingViewAction(selectedMailing, tableModel);
+				
+				viewToRemoveAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+			}
+		}
+		
+	}
 }

@@ -8,14 +8,14 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 public interface IConfirmationTemplateDAO {
 
 	/**
-	 * Inserts a new {@link ConfirmationTemplate} to the persistence layer (if its 
-	 * id is null or not yet existent)
+	 * Inserts a new {@link ConfirmationTemplate} to the persistence layer, or updates it if 
+	 * id is already set. Template name has to be unique.
 	 * @param template
 	 * 			ConfirmationTemplate to be inserted
 	 * @throws PersistenceException
 	 * 			if communication to the underlying persistence system failed
 	 */
-	public void insert(ConfirmationTemplate template) throws PersistenceException;
+	public void insertOrUpdate(ConfirmationTemplate template) throws PersistenceException;
 	
 	/**
 	 * Deletes an ConfirmationTemplate from the underlying persistence layer.

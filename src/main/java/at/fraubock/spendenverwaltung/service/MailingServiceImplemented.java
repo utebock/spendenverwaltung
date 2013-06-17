@@ -14,7 +14,6 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.UnconfirmedMailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.ConnectedCriterion;
-import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
@@ -132,6 +131,16 @@ public class MailingServiceImplemented implements IMailingService {
 			throws ServiceException {
 		try {
 			return mailingDAO.getConfirmedMailingsByPerson(person);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
+	
+	@Override
+	@Transactional
+	public void deletePersonFromMailing(Person person, Mailing mailing) throws ServiceException {
+		try {
+			mailingDAO.deletePersonFromMailing(person, mailing);
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}

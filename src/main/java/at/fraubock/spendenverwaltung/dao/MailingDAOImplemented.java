@@ -583,6 +583,37 @@ public class MailingDAOImplemented implements IMailingDAO {
 			return person;
 		}
 	}
+	
+	/**
+	 * deletes one person from the specified mailing
+	 * @throws PersistenceException 
+	 */
+	@Override
+	public void deletePersonFromMailing(Person person, Mailing mailing) throws PersistenceException {
+		if(person == null) {
+			log.warn("Person was null in deletePersonFromMailing");
+			return;
+		}
+		if(mailing == null) {
+			log.warn("Mailing was null in deletePersonFromMailing");
+			return;
+		}
+		if(person.getId() == null) {
+			log.warn("Person id was null in deletePersonFromMailing");
+			return;
+		}
+		if(mailing.getId() == null) {
+			log.warn("Mailing id was null in deletePersonFromMailing");
+			return;
+		}
+		
+		try {
+			jdbcTemplate.update("DELETE FROM sent_mailings WHERE person_id=? AND mailing_id=?", new Object[]{person.getId(), mailing.getId()});
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
+	}
 
 
 }

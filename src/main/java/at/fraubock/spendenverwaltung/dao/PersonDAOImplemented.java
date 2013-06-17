@@ -575,8 +575,6 @@ public class PersonDAOImplemented implements IPersonDAO {
 		log.debug("Entering getPersonsByMailing with param " + mailing);
 
 		try {
-			MailingDAOImplemented.validate(mailing);
-
 			List<Person> persons = jdbcTemplate.query(
 					"SELECT ps.* FROM persons ps, sent_mailings se "
 							+ "WHERE ps.id=se.person_id AND se.mailing_id=?",
@@ -592,8 +590,6 @@ public class PersonDAOImplemented implements IPersonDAO {
 			return persons;
 		} catch (DataAccessException e) {
 			log.warn(e.getLocalizedMessage());
-			throw new PersistenceException(e);
-		} catch (ValidationException e) {
 			throw new PersistenceException(e);
 		}
 	}
