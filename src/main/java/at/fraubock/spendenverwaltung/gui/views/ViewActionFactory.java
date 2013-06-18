@@ -13,6 +13,7 @@ import at.fraubock.spendenverwaltung.gui.components.PersonTableModel;
 import at.fraubock.spendenverwaltung.gui.components.UnconfirmedMailingTableModel;
 import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
+import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.service.IActionService;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
@@ -80,6 +81,18 @@ public class ViewActionFactory {
 	
 	public Action getFindPersonsViewAction() {
 		return new DisplayViewAction(new FindPersonsView(personService, addressService, donationService, filterService, new ComponentFactory(), this, new PersonTableModel()), "/images/getPersons.jpg");
+	}
+	
+	public Action getFindPersonsViewAction(PersonTableModel personTableModel) {
+		return new DisplayViewAction(new FindPersonsView(personService, addressService, donationService, filterService, new ComponentFactory(), this, personTableModel));
+	}
+	
+	public Action getPersonAddressesViewAction(PersonTableModel personTableModel, Person selectedPerson) {
+		return new DisplayViewAction(new PersonAddressesView(this, new ComponentFactory(), personService, addressService, selectedPerson, personTableModel));
+	}
+	
+	public Action getPersonDonationsViewAction(PersonTableModel personTableModel, Person selectedPerson) {
+		return new DisplayViewAction(new PersonDonationsView(this, new ComponentFactory(), donationService, addressService, selectedPerson, personTableModel));
 	}
 	
 	public Action getFindPersonsView() {
@@ -174,4 +187,6 @@ public class ViewActionFactory {
 			viewDisplayer.changeView(view);
 		}
 	}
+
+
 }
