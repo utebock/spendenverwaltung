@@ -9,6 +9,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultCellEditor;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -170,6 +171,7 @@ public class ImportValidationView extends InitializableView {
 
 		CancelButtonListener cancelAction = new CancelButtonListener();
 		cancelAction.putValue(Action.NAME, "Abbrechen");
+		cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
 		backBtn = new JButton();
 		backBtn.setAction(cancelAction);
 		matchPanel.add(backBtn, "");

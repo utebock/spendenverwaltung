@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -57,6 +58,7 @@ public class ImportDataView extends InitializableView {
 			importBtn.setAction(new ImportDataAction());
 			Action cancelAction = viewActionFactory.getMainMenuViewAction();
 			cancelAction.putValue(Action.NAME, "Abbrechen");
+			cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
 			backBtn.setAction(cancelAction);
 	}
 	
