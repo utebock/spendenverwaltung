@@ -615,5 +615,17 @@ public class MailingDAOImplemented implements IMailingDAO {
 		}
 	}
 
+	@Override
+	public int getSize(Mailing mailing) throws PersistenceException {
+		String select = "SELECT COUNT(*) FROM sent_mailings WHERE mailing_id=?";
+		try{
+			return jdbcTemplate.queryForObject(select, new Object[]{ mailing.getId() }, Integer.class);
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
+		
+	}
+
 
 }

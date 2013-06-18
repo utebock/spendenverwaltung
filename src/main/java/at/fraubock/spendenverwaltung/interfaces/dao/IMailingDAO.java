@@ -144,5 +144,13 @@ public interface IMailingDAO {
 	 * @throws PersistenceException 
 	 */
 	public void deletePersonFromMailing(Person person, Mailing mailing) throws PersistenceException;
+	
+	/**
+	 * returns the number of persons who got this mailing
+	 * 
+	 * @param mailing
+	 * @throws PersistenceException
+	 */
+	public int getSize(Mailing mailing) throws PersistenceException;
 
 }

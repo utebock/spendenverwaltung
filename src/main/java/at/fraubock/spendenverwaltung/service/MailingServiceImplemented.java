@@ -274,4 +274,13 @@ public class MailingServiceImplemented implements IMailingService {
 			throw new ServiceException(e);
 		}
 	}
+
+	@Override
+	public int getSize(Mailing mailing) throws ServiceException {
+		try {
+			return mailingDAO.getSize(mailing);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
 }
