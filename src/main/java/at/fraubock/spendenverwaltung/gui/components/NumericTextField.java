@@ -76,7 +76,24 @@ public class NumericTextField extends CustomTextField implements
 	 */
 	public long getHundredths() {
 		return (long)(getNumericValue()*100);
+	}
 
+	/**
+	 * setter for hundredths, uses setNumericValue(long)
+	 * @param hundredths
+	 */
+	public void setHundredths(long hundredths) {
+		this.setNumericValue(hundredths);
+	}
+
+	/**
+	 * setNumericValue taking long as an argument instead of a double
+	 * 
+	 * @param value
+	 */
+	public void setNumericValue(long value) {
+		NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
+		this.setText(nf.format((value/100)).replace(".", ""));
 	}
 
 	/**

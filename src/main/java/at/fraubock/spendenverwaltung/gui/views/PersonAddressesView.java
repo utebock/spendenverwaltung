@@ -36,7 +36,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 public class PersonAddressesView extends InitializableView {
 
 	private static final long serialVersionUID = 1L;
-	private static final Logger log = Logger.getLogger(FindPersonsView.class);
+	private static final Logger log = Logger.getLogger(PersonAddressesView.class);
 	
 	private ComponentFactory componentFactory;
 	private ViewActionFactory viewActionFactory;
@@ -121,7 +121,7 @@ public class PersonAddressesView extends InitializableView {
 	private void addComponentsToToolbar(JToolBar toolbar) {
 		
 		backButton = new JButton();
-		Action getBack = viewActionFactory.getMainMenuViewAction();
+		Action getBack = viewActionFactory.getFindPersonsViewAction(personTableModel);
 		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
 		backButton.setAction(getBack);
 		
@@ -293,7 +293,7 @@ public class PersonAddressesView extends InitializableView {
 			int row = addressesTable.getSelectedRow();
 			if(row != -1) {
 				Address address = addressTableModel.getAddressRow(row);
-				int dialogResult = JOptionPane.showConfirmDialog (contentPanel, "Wollen sie diese Aussendung wirklich löschen?", "Löschen", JOptionPane.YES_NO_OPTION);
+				int dialogResult = JOptionPane.showConfirmDialog (contentPanel, "Wollen sie diese Adresse wirklich löschen?", "Löschen", JOptionPane.YES_NO_OPTION);
 
 				if(dialogResult == JOptionPane.YES_OPTION) {
 					try {
@@ -443,14 +443,14 @@ public class PersonAddressesView extends InitializableView {
 					editAddressFrame.dispose();
 				}
 		
-				if(streetField.validateContents()==true){
+				if(streetField.validateContents()){
 					address.setStreet(streetField.getText());
 				} else{
 					validation = false;
 					validationFeedbackLabel.setText("Bitte korrigieren Sie Ihre Eingabe: Stra\u00DFe");
 				}
 				
-				if(postalField.validateContents()==true){
+				if(postalField.validateContents()){
 					address.setPostalCode(postalField.getText());
 				}
 				else{
@@ -458,7 +458,7 @@ public class PersonAddressesView extends InitializableView {
 					validationFeedbackLabel.setText("Bitte korrigieren Sie Ihre Eingabe: PLZ");
 				}
 			
-				if(cityField.validateContents()==true){
+				if(cityField.validateContents()){
 					address.setCity(cityField.getText());
 				}
 				else{
@@ -466,7 +466,7 @@ public class PersonAddressesView extends InitializableView {
 					validationFeedbackLabel.setText("Bitte korrigieren Sie Ihre Eingabe: Ort");
 				}
 
-				if(countryField.validateContents()==true){
+				if(countryField.validateContents()){
 					address.setCountry(countryField.getText());
 				} else{
 					validation = false;
@@ -477,17 +477,19 @@ public class PersonAddressesView extends InitializableView {
 				selectedPerson.setMainAddress(address);
 			}
 			
-			try{
-				address = addressService.update(address);
-			
-				personService.update(selectedPerson);
-				addressTableModel.fireTableDataChanged();
+			if(validation) { 
+				try{
+					address = addressService.update(address);
 				
-				feedbackLabel.setText("Adresse erfolgreich geändert.");
-				editAddressFrame.dispose();
-			} catch(ServiceException ex){
-				log.warn(ex.getLocalizedMessage());
-				validationFeedbackLabel.setText("Ein unerwarter Fehler ist aufgetreten! Bitte kontaktieren Sie Ihren Administrator.");
+					personService.update(selectedPerson);
+					addressTableModel.fireTableDataChanged();
+					
+					feedbackLabel.setText("Adresse erfolgreich geändert.");
+					editAddressFrame.dispose();
+				} catch(ServiceException ex){
+					log.warn(ex.getLocalizedMessage());
+					validationFeedbackLabel.setText("Ein unerwarter Fehler ist aufgetreten! Bitte kontaktieren Sie Ihren Administrator.");
+				}
 			}
 		}
 		}
