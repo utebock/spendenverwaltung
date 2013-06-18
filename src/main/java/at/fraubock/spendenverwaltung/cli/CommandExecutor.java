@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -17,10 +16,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 
-import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
-import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
-import at.fraubock.spendenverwaltung.interfaces.domain.Person;
-import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IActionService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
@@ -297,67 +292,45 @@ public class CommandExecutor {
 							+ "\" is no supported import file style");
 				}
 			} else if (cmd.hasOption("f")) {
-				String filterId = cmd.getOptionValue("f");
-				Filter f;
+				int filterId;
 				try {
-					f = filterService.getByID(Integer.parseInt(filterId));
+					filterId = Integer.parseInt(cmd.getOptionValue("f"));
 				} catch (NumberFormatException e) {
 					throw new ParseException(e.getLocalizedMessage());
 				}
-				if (f == null)
-					throw new ParseException(
-							"There is no filter with the specified id.");
 				String outputFileName = cmd.getOptionValue("o");
 				File file = outputFileName == null ? null : new File(
 						outputFileName);
-				switch (f.getType()) {
-				case ADDRESS:
-					throw new ParseException(
-							"The specified filter is of type address, which is not permitted.");
-				case DONATION: {
-					List<Donation> entities = donationService.getByFilter(f);
-					if (file == null)
-						out.print(donationService.convertToCSV(entities));
-					else
-						donationService.saveAsCSV(entities, file);
-				}
-					break;
-				case MAILING: {
-					List<Mailing> entities = mailingService.getByFilter(f);
-					if (file == null)
-						out.print(mailingService.convertToCSV(entities));
-					else
-						mailingService.saveAsCSV(entities, file);
-				}
-					break;
-				case PERSON: {
-					List<Person> entities = personService.getByFilter(f);
-					if (file == null)
-						out.print(personService.convertToCSV(entities));
-					else
-						personService.saveAsCSV(entities, file);
-				}
-					break;
+				if (file == null) {
+					String csv = filterService
+							.convertResultsToCSVById(filterId);
+					if (csv == null)
+						throw new ParseException(
+								"There is no filter with the specified id.");
+					out.print(csv);
+				} else {
+					filterService.saveResultsAsCSVById(filterId, file);
 				}
 			} else if (cmd.hasOption("m")) {
-				String mailingId = cmd.getOptionValue("m");
-				Mailing m;
+				int mailingId;
 				try {
-					m = mailingService.getById(Integer.parseInt(mailingId));
+					mailingId = Integer.parseInt(cmd.getOptionValue("m"));
 				} catch (NumberFormatException e) {
 					throw new ParseException(e.getLocalizedMessage());
 				}
-				if (m == null)
-					throw new ParseException(
-							"There is no mailing with the specified id.");
 				String outputFileName = cmd.getOptionValue("o");
 				File file = outputFileName == null ? null : new File(
 						outputFileName);
-				List<Person> receivers = personService.getPersonsByMailing(m);
-				if (file == null)
-					out.print(personService.convertToCSV(receivers));
-				else
-					personService.saveAsCSV(receivers, file);
+				if (file == null) {
+					String csv = mailingService
+							.convertReceiversToCSVById(mailingId);
+					if (csv == null)
+						throw new ParseException(
+								"There is no mailing with the specified id.");
+					out.print(csv);
+				} else {
+					mailingService.saveReceiversAsCSVById(mailingId, file);
+				}
 			} else if (cmd.hasOption("c")) {
 				int confirmationId;
 				try {
