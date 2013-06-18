@@ -9,6 +9,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.UnconfirmedMailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 
 public interface IMailingService {
@@ -230,4 +231,12 @@ public interface IMailingService {
 	 */
 	void deletePersonFromMailing(Person person, Mailing mailing)
 			throws ServiceException;
+	
+	/**
+	 * returns the number of persons who got this mailing
+	 * 
+	 * @param mailing
+	 * @throws ServiceException
+	 */
+	public int getSize(Mailing mailing) throws ServiceException;
 }

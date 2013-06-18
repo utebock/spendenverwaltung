@@ -142,7 +142,7 @@ public class ViewActionFactory {
 	
 	//TODO richtige view returnen!
 	public Action getShowMailingStatsViewAction() {
-		return new DisplayViewAction(new CreatePersonView(new ComponentFactory(), this, personService, addressService, donationService, new PersonTableModel()), "/images/statisticsNotification.jpg");
+		return new DisplayViewAction(new MailingStatsView(new ComponentFactory(), this, mailingService, filterService), "/images/statisticsNotification.jpg");
 	}
 	
 	//TODO richtige view returnen!

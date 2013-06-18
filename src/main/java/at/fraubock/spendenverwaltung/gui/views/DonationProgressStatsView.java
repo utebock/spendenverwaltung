@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -26,7 +27,10 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.Month;
 import org.jfree.data.time.Quarter;
@@ -390,9 +394,31 @@ public class DonationProgressStatsView extends InitializableView {
 		}
 	}
 
+	private JFreeChart createLineChart(DefaultCategoryDataset dataSet) {
+		// ChartFactory.createLineChart(title, categoryAxisLabel,
+		// valueAxisLabel, dataset, orientation, legend, tooltips, urls)
+		chart = ChartFactory.createLineChart(null, null, null, dataSet,
+				PlotOrientation.VERTICAL, true, true, false);
+		CategoryPlot plot = chart.getCategoryPlot();
+		plot.setBackgroundPaint(Color.white);
+		plot.setDomainGridlinePaint(Color.white);
+		plot.setRangeGridlinePaint(Color.white);
+		return chart;
+	}
+
+	private JFreeChart createBarChart(DefaultCategoryDataset dataSet) {
+		chart = ChartFactory.createBarChart(null, null, null, dataSet,
+				PlotOrientation.VERTICAL, true, true, false);
+		CategoryPlot plot = chart.getCategoryPlot();
+		plot.setBackgroundPaint(Color.lightGray);
+		plot.setDomainGridlinePaint(Color.white);
+		plot.setRangeGridlinePaint(Color.white);
+		return chart;
+	}
+
 	private JFreeChart createTimeSeriesChart(XYDataset dataset) {
-		final JFreeChart chart = ChartFactory.createTimeSeriesChart(null,
-				"Datum", "Betrag", dataset, true, true, false);
+		final JFreeChart chart = ChartFactory.createXYLineChart(null, "Datum",
+				"Betrag", dataset, PlotOrientation.VERTICAL, true, true, false);
 		final XYItemRenderer renderer = chart.getXYPlot().getRenderer();
 		final StandardXYToolTipGenerator g = new StandardXYToolTipGenerator(
 				StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,

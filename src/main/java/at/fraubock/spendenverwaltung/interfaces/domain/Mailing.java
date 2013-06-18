@@ -56,6 +56,11 @@ public class Mailing {
 				throw new IllegalArgumentException("No such MailingType");
 			}
 		}
+		
+		public static String[] toStringArray(){
+			return new String[]{ "allgemeiner Dankesbrief", "Dankesbrief", "Dauerspender Dankesbrief", "Einzelspenden Dankesbrief", 
+					"Infomaterial", "Spendenaufruf", "Spendenbrief" };
+		}
 
 	}
 

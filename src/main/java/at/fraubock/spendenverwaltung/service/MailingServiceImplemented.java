@@ -346,4 +346,12 @@ public class MailingServiceImplemented implements IMailingService {
 		personService.saveAsCSV(personService.getPersonsByMailing(m), csvFile);
 		return true;
 	}
+
+	public int getSize(Mailing mailing) throws ServiceException {
+		try {
+			return mailingDAO.getSize(mailing);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
 }
