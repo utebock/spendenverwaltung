@@ -1,8 +1,11 @@
 package at.fraubock.spendenverwaltung.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jfree.util.Log;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,14 +18,85 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.to.FilterTO;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.FilterInUseException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
+import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
+import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
+import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
+import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
+
+import com.sun.xml.internal.txw2.IllegalSignatureException;
 
 public class FilterServiceImplemented implements IFilterService {
 
 	private IFilterDAO filterDAO;
 	private IMountedFilterCriterionDAO mountedCritDAO;
+
+	private IAddressService addressService;
+	private IPersonService personService;
+	private IDonationService donationService;
+	private IMailingService mailingService;
+
+	/**
+	 * @return the addressService
+	 */
+	public IAddressService getAddressService() {
+		return addressService;
+	}
+
+	/**
+	 * @param addressService
+	 *            the addressService to set
+	 */
+	public void setAddressService(IAddressService addressService) {
+		this.addressService = addressService;
+	}
+
+	/**
+	 * @return the personService
+	 */
+	public IPersonService getPersonService() {
+		return personService;
+	}
+
+	/**
+	 * @param personService
+	 *            the personService to set
+	 */
+	public void setPersonService(IPersonService personService) {
+		this.personService = personService;
+	}
+
+	/**
+	 * @return the donationService
+	 */
+	public IDonationService getDonationService() {
+		return donationService;
+	}
+
+	/**
+	 * @param donationService
+	 *            the donationService to set
+	 */
+	public void setDonationService(IDonationService donationService) {
+		this.donationService = donationService;
+	}
+
+	/**
+	 * @return the mailingService
+	 */
+	public IMailingService getMailingService() {
+		return mailingService;
+	}
+
+	/**
+	 * @param mailingService
+	 *            the mailingService to set
+	 */
+	public void setMailingService(IMailingService mailingService) {
+		this.mailingService = mailingService;
+	}
 
 	public IFilterDAO getFilterDAO() {
 
@@ -166,6 +240,57 @@ public class FilterServiceImplemented implements IFilterService {
 
 	public void setMountedCritDAO(IMountedFilterCriterionDAO mountedCritDAO) {
 		this.mountedCritDAO = mountedCritDAO;
+	}
+
+	@Override
+	@Transactional(readOnly = true, rollbackFor = Throwable.class)
+	public String convertResultsToCSVById(int id) throws ServiceException {
+		Filter f = getByID(id);
+		if (f == null)
+			return null;
+		switch (f.getType()) {
+		case ADDRESS:
+			// TODO
+			break;
+		case DONATION:
+			return donationService.convertToCSV(donationService.getByFilter(f));
+		case MAILING:
+			return mailingService.convertToCSV(mailingService.getByFilter(f));
+		case PERSON:
+			return personService.convertToCSV(personService.getByFilter(f));
+		}
+		// we should never get here
+		String msg = "Programming error: This code should not be reached. The filter "
+				+ f + " is of an illegal type.";
+		Log.error(msg);
+		throw new IllegalSignatureException(msg);
+	}
+
+	@Override
+	public boolean saveResultsAsCSVById(int id, File csvFile)
+			throws ServiceException, IOException {
+		Filter f = getByID(id);
+		if (f == null)
+			return false;
+		switch (f.getType()) {
+		case ADDRESS:
+			// TODO
+			break; // TODO switch to return true
+		case DONATION:
+			donationService.saveAsCSV(donationService.getByFilter(f), csvFile);
+			return true;
+		case MAILING:
+			mailingService.saveAsCSV(mailingService.getByFilter(f), csvFile);
+			return true;
+		case PERSON:
+			personService.saveAsCSV(personService.getByFilter(f), csvFile);
+			return true;
+		}
+		// we should never get here
+		String msg = "Programming error: This code should not be reached. The filter "
+				+ f + " is of an illegal type.";
+		Log.error(msg);
+		throw new IllegalSignatureException(msg);
 	}
 
 }

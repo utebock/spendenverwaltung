@@ -138,6 +138,7 @@
 		class="at.fraubock.spendenverwaltung.service.MailingServiceImplemented">
 		<property name="mailingDAO" ref="mailingDao" />
 		<property name="personDAO" ref="personDao" />
+		<property name="personService" ref="personService" />
 	</bean>
 	<bean id="userService"
 		class="at.fraubock.spendenverwaltung.service.UserServiceImplemented">

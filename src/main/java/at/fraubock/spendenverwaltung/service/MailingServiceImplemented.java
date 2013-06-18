@@ -22,6 +22,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Property
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
+import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
 import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
@@ -35,6 +36,22 @@ public class MailingServiceImplemented implements IMailingService {
 
 	private IMailingDAO mailingDAO;
 	private IPersonDAO personDAO;
+	private IPersonService personService;
+
+	/**
+	 * @return the personService
+	 */
+	public IPersonService getPersonService() {
+		return personService;
+	}
+
+	/**
+	 * @param personService
+	 *            the personService to set
+	 */
+	public void setPersonService(IPersonService personService) {
+		this.personService = personService;
+	}
 
 	public void setMailingDAO(IMailingDAO mailingDAO) {
 		this.mailingDAO = mailingDAO;
@@ -301,10 +318,32 @@ public class MailingServiceImplemented implements IMailingService {
 			log.warn(
 					"CSV data could not be written to "
 							+ csvFile.getAbsolutePath(), e);
+			throw e;
 		} finally {
 			if (writer != null)
 				writer.close();
 		}
 
+	}
+
+	@Override
+	@Transactional(readOnly = true, rollbackFor = Throwable.class)
+	public String convertReceiversToCSVById(int mailingId)
+			throws ServiceException {
+		Mailing m = getById(mailingId);
+		if (m == null)
+			return null;
+		return personService.convertToCSV(personService.getPersonsByMailing(m));
+	}
+
+	@Override
+	@Transactional(readOnly = true, rollbackFor = Throwable.class)
+	public boolean saveReceiversAsCSVById(int mailingId, File csvFile)
+			throws IOException, ServiceException {
+		Mailing m = getById(mailingId);
+		if (m == null)
+			return false;
+		personService.saveAsCSV(personService.getPersonsByMailing(m), csvFile);
+		return true;
 	}
 }
