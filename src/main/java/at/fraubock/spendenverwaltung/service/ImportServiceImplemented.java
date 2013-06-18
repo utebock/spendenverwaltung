@@ -20,6 +20,8 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IImportDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
@@ -53,6 +55,8 @@ public class ImportServiceImplemented implements IImportService {
 	private static final Logger log = Logger
 			.getLogger(ImportServiceImplemented.class);
 
+	@Override
+	@Transactional(rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public void nativeImport(File file) throws ServiceException, IOException {
 		Map<String, String> columnMapping;
 		int rowCount = 0;
@@ -61,10 +65,10 @@ public class ImportServiceImplemented implements IImportService {
 		Address address;
 		List<Donation> donationList;
 		List<Address> addresses;
-		
+
 		Import imp;
 		List<ImportRow> importRows = null;
-		
+
 		// set up formats for date and amount parsing
 		NumberFormat f = NumberFormat.getInstance(Locale.GERMAN);
 		if (!(f instanceof DecimalFormat)) {
@@ -80,13 +84,13 @@ public class ImportServiceImplemented implements IImportService {
 
 		log.debug("Native import with CSV: " + file);
 
-		//Read mapping config and read CSV
+		// Read mapping config and read CSV
 		columnMapping = readMappingConfig("native_import_config.properties");
 		importRows = CSVImport.readCSVWithMapping(file, columnMapping);
-		
+
 		donationList = new ArrayList<Donation>(importRows.size());
-		
-		//Create import (domain)
+
+		// Create import (domain)
 		imp = new Import();
 		imp.setImportDate(new Date());
 		imp.setSource("native");
@@ -94,11 +98,11 @@ public class ImportServiceImplemented implements IImportService {
 
 		createImport(imp);
 
-		//Read all rows
+		// Read all rows
 		for (ImportRow row : importRows) {
 			try {
 				rowCount++;
-				
+
 				// Person
 				person = new Person();
 				person.setGivenName(row.getGivenName());
@@ -119,11 +123,13 @@ public class ImportServiceImplemented implements IImportService {
 				try {
 					donation.setDate(dateFormat.parse(row.getDate()));
 				} catch (ParseException e) {
-					String msg = "An error occurred during date parsing in row "+rowCount+". The date has to be in dd.MM.yyyy format";
+					String msg = "An error occurred during date parsing in row "
+							+ rowCount
+							+ ". The date has to be in dd.MM.yyyy format";
 					log.warn(msg);
 					throw new ServiceException(msg, e);
 				}
-				
+
 				BigDecimal n = (BigDecimal) df.parse(row.getAmount(),
 						new ParsePosition(0));
 				n = n.multiply(new BigDecimal(100));
@@ -139,27 +145,28 @@ public class ImportServiceImplemented implements IImportService {
 				address.setPostalCode(row.getPostcode());
 				address.setCountry(row.getCountry());
 
-				//Connect domains
+				// Connect domains
 				person.setMainAddress(address);
-				
+
 				donation.setDonator(person);
 				donation.setSource(imp);
-				
+
 				donationList.add(donation);
-				
+
 			} catch (IllegalArgumentException | NullPointerException e) {
-				String msg = "Error during native CSV Import in row " + rowCount;
+				String msg = "Error during native CSV Import in row "
+						+ rowCount;
 				log.error(msg);
 				throw new ServiceException(msg, e);
 			}
-			
-			//Save data
-			for(Donation d : donationList){
+
+			// Save data
+			for (Donation d : donationList) {
 				person = d.getDonator();
-				
-				//Address
+
+				// Address
 				address = person.getMainAddress();
-				if(address.getId()==null){
+				if (address.getId() == null) {
 					address = addressService.create(address);
 				}
 				addresses = person.getAddresses();
@@ -167,14 +174,17 @@ public class ImportServiceImplemented implements IImportService {
 				person.setAddresses(addresses);
 				person.setMainAddress(address);
 
-				log.debug("Person: "+person.getGivenName()+" "+person.getSurname()+" "+person.getEmail()+" id:"+person.getId()+" mainaddressid:"+person.getMainAddress().getId());
-				//Person
-				if(person.getId()==null){
+				log.debug("Person: " + person.getGivenName() + " "
+						+ person.getSurname() + " " + person.getEmail()
+						+ " id:" + person.getId() + " mainaddressid:"
+						+ person.getMainAddress().getId());
+				// Person
+				if (person.getId() == null) {
 					person = personService.create(person);
 				}
 				d.setDonator(person);
-				
-				//Donation
+
+				// Donation
 				donationService.create(d);
 			}
 		}
@@ -213,6 +223,7 @@ public class ImportServiceImplemented implements IImportService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public Import createImport(Import i) throws ServiceException {
 		try {
 			importDAO.insertOrUpdate(i);
@@ -223,6 +234,7 @@ public class ImportServiceImplemented implements IImportService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public void hypoImport(File file) throws ServiceException, IOException {
 		List<ImportRow> rowList;
 		try {
@@ -298,11 +310,13 @@ public class ImportServiceImplemented implements IImportService {
 		}
 	}
 
+	@Override
+	@Transactional(rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public void smsImport(File file) throws ServiceException, IOException {
-		
+
 		List<ImportRow> rowList;
 		rowList = CSVImport.readSmsCsv(file);
-	
+
 		Import i = new Import();
 		i.setImportDate(new Date());
 		i.setSource("SMS-Export");
@@ -365,11 +379,11 @@ public class ImportServiceImplemented implements IImportService {
 				throw t;
 			}
 		}
-		
+
 	}
 
-
 	@Override
+	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public List<Import> getAllUnconfirmed() throws ServiceException {
 		try {
 			return importDAO.getAllUnconfirmed();
@@ -377,7 +391,7 @@ public class ImportServiceImplemented implements IImportService {
 			return new ArrayList<Import>();
 		}
 	}
-	
+
 	public IImportDAO getImportDAO() {
 		return importDAO;
 	}

@@ -32,7 +32,7 @@ public class ActionServiceImplemented implements IActionService {
 	}
 
 	@Override
-	@Transactional(isolation = Isolation.SERIALIZABLE)
+	@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public Action create(Action a) throws ServiceException {
 		try {
 			actionDAO.insert(a);
@@ -43,7 +43,7 @@ public class ActionServiceImplemented implements IActionService {
 	}
 
 	@Override
-	@Transactional(isolation = Isolation.SERIALIZABLE)
+	@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public void delete(Action a) throws ServiceException {
 		try {
 			actionDAO.delete(a);
@@ -53,7 +53,6 @@ public class ActionServiceImplemented implements IActionService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public Pager<Action> getAllAsPager(final int pageSizeParam)
 			throws ServiceException {
 		Pager<Action> pager = new Pager<Action>() {
@@ -63,6 +62,7 @@ public class ActionServiceImplemented implements IActionService {
 			private int position = 0;
 
 			@Override
+			@Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true, rollbackFor = Throwable.class)
 			public List<Action> getPage(int index) throws ServiceException {
 				this.position = index;
 				try {
@@ -79,6 +79,7 @@ public class ActionServiceImplemented implements IActionService {
 			}
 
 			@Override
+			@Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true, rollbackFor = Throwable.class)
 			public long getNumberOfPages() throws ServiceException {
 				long count;
 				try {
@@ -99,9 +100,9 @@ public class ActionServiceImplemented implements IActionService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
-	public Pager<Action> getAttributeLikeAsPager(final ActionAttribute attributeParam,
-			final String valueParam, final int pageSizeParam) throws ServiceException {
+	public Pager<Action> getAttributeLikeAsPager(
+			final ActionAttribute attributeParam, final String valueParam,
+			final int pageSizeParam) throws ServiceException {
 		Pager<Action> pager = new Pager<Action>() {
 
 			private IActionDAO actionDAO = ActionServiceImplemented.this.actionDAO;
@@ -111,11 +112,12 @@ public class ActionServiceImplemented implements IActionService {
 			private String value = valueParam;
 
 			@Override
+			@Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true, rollbackFor = Throwable.class)
 			public List<Action> getPage(int index) throws ServiceException {
 				this.position = index;
 				try {
-					return actionDAO.getLimitedResultByAttributeLike(attribute, value, position
-							* pageSize, pageSize);
+					return actionDAO.getLimitedResultByAttributeLike(attribute,
+							value, position * pageSize, pageSize);
 				} catch (PersistenceException e) {
 					throw new ServiceException(e);
 				}
@@ -127,10 +129,12 @@ public class ActionServiceImplemented implements IActionService {
 			}
 
 			@Override
+			@Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true, rollbackFor = Throwable.class)
 			public long getNumberOfPages() throws ServiceException {
 				long count;
 				try {
-					count = actionDAO.countResultsOfAttributeLike(attribute, value);
+					count = actionDAO.countResultsOfAttributeLike(attribute,
+							value);
 
 					long mod = count % pageSize;
 
