@@ -287,14 +287,7 @@ public class CliAppTest {
 
 	@Test
 	public void optionF() throws Exception {
-		Filter personFilter = new Filter();
-		personFilter.setId(13);
-		personFilter.setType(FilterType.PERSON);
-		doReturn(personFilter).when(filterService).getByID(13);
-		doReturn(Collections.<List<Person>> emptyList()).when(personService)
-				.getByFilter(personFilter);
-		doReturn("bla").when(personService).convertToCSV(
-				anyListOf(Person.class));
+		doReturn("bla").when(filterService).convertResultsToCSVById(13);
 
 		CommandExecutor exec = new CommandExecutor(new String[] { "-f", "13" },
 				new PrintStream(out), new PrintStream(err));
@@ -313,9 +306,7 @@ public class CliAppTest {
 		assertEquals("bla", out.toString());
 		assertEquals("", err.toString());
 
-		verify(filterService, times(1)).getByID(13);
-		verify(personService, times(1)).getByFilter(personFilter);
-		verify(personService, times(1)).convertToCSV(anyListOf(Person.class));
+		verify(filterService, times(1)).convertResultsToCSVById(13);
 		verifyNoMoreInteractions(actionService, donationService, filterService,
 				importService, mailingService, personService);
 	}
