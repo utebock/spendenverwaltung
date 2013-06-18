@@ -44,7 +44,7 @@ public class DonationServiceImplemented implements IDonationService {
 	}
 
 	@Override
-	@Transactional(isolation = Isolation.SERIALIZABLE)
+	@Transactional(rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public Donation create(Donation d) throws ServiceException {
 		try {
 			donationDAO.insertOrUpdate(d);
@@ -55,7 +55,7 @@ public class DonationServiceImplemented implements IDonationService {
 	}
 
 	@Override
-	@Transactional(isolation = Isolation.SERIALIZABLE)
+	@Transactional(rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public Donation update(Donation d) throws ServiceException {
 		try {
 			donationDAO.insertOrUpdate(d);
@@ -66,7 +66,7 @@ public class DonationServiceImplemented implements IDonationService {
 	}
 
 	@Override
-	@Transactional(isolation = Isolation.SERIALIZABLE)
+	@Transactional(rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public void delete(Donation d) throws ServiceException {
 		try {
 			donationDAO.delete(d);
@@ -76,7 +76,7 @@ public class DonationServiceImplemented implements IDonationService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public Donation getByID(int id) throws ServiceException {
 		try {
 			return donationDAO.getByID(id);
@@ -86,7 +86,7 @@ public class DonationServiceImplemented implements IDonationService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public List<Donation> getByPerson(Person p) throws ServiceException {
 		try {
 			return donationDAO.getByPerson(p);
@@ -96,7 +96,7 @@ public class DonationServiceImplemented implements IDonationService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public List<Donation> getUnconfirmed(Import toImport)
 			throws ServiceException {
 		try {
@@ -124,7 +124,7 @@ public class DonationServiceImplemented implements IDonationService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public List<Donation> getByFilter(Filter filter) throws ServiceException {
 		try {
 			return donationDAO.getByFilter(filter);
@@ -166,6 +166,7 @@ public class DonationServiceImplemented implements IDonationService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public void setImportToNull(List<Donation> donationList)
 			throws ServiceException {
 		try {
@@ -176,6 +177,7 @@ public class DonationServiceImplemented implements IDonationService {
 	}
 
 	@Override
+	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public boolean donationExists(Donation donation) throws ServiceException {
 		try {
 			return donationDAO.donationExists(donation);

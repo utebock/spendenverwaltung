@@ -108,7 +108,7 @@ public class FilterServiceImplemented implements IFilterService {
 	}
 
 	@Override
-	@Transactional(isolation = Isolation.SERIALIZABLE)
+	@Transactional(rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public Filter create(FilterTO f) throws ServiceException {
 		try {
 			Filter filter = createFilterFromTransferObject(f);
@@ -120,7 +120,7 @@ public class FilterServiceImplemented implements IFilterService {
 	}
 
 	@Override
-	@Transactional(isolation = Isolation.SERIALIZABLE)
+	@Transactional(rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public Filter update(Filter f, FilterTO to) throws ServiceException {
 		try {
 			Filter filter = create(to);
@@ -135,7 +135,7 @@ public class FilterServiceImplemented implements IFilterService {
 	}
 
 	@Override
-	@Transactional(isolation = Isolation.SERIALIZABLE)
+	@Transactional(rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public void delete(Filter f) throws ServiceException, FilterInUseException {
 		try {
 			for (Integer id : mountedCritDAO.getAllMountedFilterIds()) {
@@ -152,7 +152,7 @@ public class FilterServiceImplemented implements IFilterService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public List<Filter> getAll() throws ServiceException {
 		List<Filter> list = null;
 		try {
@@ -164,6 +164,7 @@ public class FilterServiceImplemented implements IFilterService {
 	}
 
 	@Override
+	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public List<Filter> getAllByFilter(FilterType type) throws ServiceException {
 		List<Filter> list = new ArrayList<Filter>();
 		try {
@@ -180,7 +181,7 @@ public class FilterServiceImplemented implements IFilterService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public List<Filter> getAllByAnonymous(boolean anonymous)
 			throws ServiceException {
 		List<Filter> list = new ArrayList<Filter>();
@@ -193,7 +194,7 @@ public class FilterServiceImplemented implements IFilterService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public Filter getByID(int id) throws ServiceException {
 		Filter filter = null;
 		try {
@@ -243,7 +244,7 @@ public class FilterServiceImplemented implements IFilterService {
 	}
 
 	@Override
-	@Transactional(readOnly = true, rollbackFor = Throwable.class)
+	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public String convertResultsToCSVById(int id) throws ServiceException {
 		Filter f = getByID(id);
 		if (f == null)

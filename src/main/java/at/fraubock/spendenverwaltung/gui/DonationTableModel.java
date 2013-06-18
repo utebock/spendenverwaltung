@@ -1,6 +1,7 @@
 package at.fraubock.spendenverwaltung.gui;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JOptionPane;
@@ -32,6 +33,10 @@ public class DonationTableModel extends AbstractTableModel{
 	public void removeDonation (int row){
 		donations.remove(row);
 		fireTableDataChanged();
+	}
+	
+	public List<Donation> getDonations() {
+		return donations;
 	}
 	
 	public Donation getDonationRow(int rowIndex){
@@ -120,6 +125,10 @@ public class DonationTableModel extends AbstractTableModel{
 			case 0: return false;
 			default: return true;
 		}
+	}
+
+	public void clear() {
+		donations = new Vector<Donation>();
 	}
 }
 
