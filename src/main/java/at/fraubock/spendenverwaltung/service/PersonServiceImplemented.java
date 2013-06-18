@@ -144,7 +144,7 @@ public class PersonServiceImplemented implements IPersonService {
 			throw new IllegalArgumentException("Argument must not be null.");
 		}
 
-		String csv = "Vorname;Nachname;E-Mail;Geschlecht;Titel;Unternehmen;Telephon;Empf�ngt E-Mail;Empf�ngt Post;Notiz;Land;Stadt;PLZ;Strasse\n";
+		String csv = "Vorname;Nachname;E-Mail;Geschlecht;Titel;Unternehmen;Telephon;Empf\u00E4ngt E-Mail;Empf\u00E4ngt Post;Notiz;Land;Stadt;PLZ;Strasse\n";
 
 		for (Person p : persons) {
 			csv += p.getGivenName() + ";";

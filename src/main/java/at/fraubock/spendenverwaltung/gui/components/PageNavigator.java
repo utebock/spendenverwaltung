@@ -45,8 +45,6 @@ public class PageNavigator extends JPanel {
 		navigation.add(last);
 
 		add(navigation);
-
-		drawNavigation();
 	}
 
 	private void drawNavigation() {

@@ -60,7 +60,7 @@ public class CreateFilter extends JPanel {
 	private List<CriterionSelector> selectors = new ArrayList<CriterionSelector>();
 	private List<JButton> minusButtons = new ArrayList<JButton>();
 	
-	JComboBox privacyComboBox;
+	private JComboBox<String> privacyComboBox;
 	
 	public CreateFilter(FilterType type, IFilterService filterService,
 			MainFilterView overview, ViewActionFactory viewActionFactory) {
@@ -151,7 +151,7 @@ public class CreateFilter extends JPanel {
 
 		// Combobox for filter privacy setting
 		if((editFilter != null && CurrentUser.userName.equals(editFilter.getOwner())) || editFilter == null){
-			privacyComboBox = new JComboBox(FilterPrivacyStatus.toStringArray());
+			privacyComboBox = new JComboBox<String>(FilterPrivacyStatus.toStringArray());
 			this.add(privacyComboBox, "wrap");
 			
 			if(editFilter != null)

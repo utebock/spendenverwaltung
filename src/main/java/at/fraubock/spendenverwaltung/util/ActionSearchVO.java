@@ -2,6 +2,7 @@ package at.fraubock.spendenverwaltung.util;
 
 import java.util.Date;
 
+import at.fraubock.spendenverwaltung.interfaces.domain.Action;
 import at.fraubock.spendenverwaltung.interfaces.domain.Action.Entity;
 import at.fraubock.spendenverwaltung.interfaces.domain.Action.Type;
 
@@ -9,7 +10,11 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Action.Type;
  * value object storing values for searching {@link Action} entities. a null
  * value means that the attribute should not be considered. all attributes meant
  * to be connected conjunctively (AND).
- *
+ * 
+ * @NOTE the string in <code>actor</code> and <code>payload</code> will match if
+ *       it is <b>contained</b> in the action's value (they don't have to be
+ *       equal)
+ * 
  * @author philipp muhoray
  * 
  */

@@ -75,6 +75,14 @@ public abstract class AbstractMailingServiceTest {
 		validMailingThree.setFilter(validFilter);
 
 		invalidMailing = new Mailing();
+		
+		String fs = File.separator;
+		MailingTemplate mt = new MailingTemplate();
+		File f = new File("src" + fs + "test" + fs + "resources" + fs
+				+ "examplemailing2.docx");
+		mt.setFile(f);
+		mt.setFileName(f.getName());
+		validMailingTwo.setTemplate(mt);
 	}
 
 	@Test
@@ -250,7 +258,7 @@ public abstract class AbstractMailingServiceTest {
 	public void createCSVWithEmptyList_ReturnsCSVString() {
 		List<Mailing> list = new ArrayList<Mailing>();
 		String csv = mailingService.convertToCSV(list);
-		assertTrue(csv.equals("Datum;Art;Medium;\n"));
+		assertTrue(csv.equals("Datum;Art;Medium;Vorlage\n"));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -263,17 +271,10 @@ public abstract class AbstractMailingServiceTest {
 	public void reproduceDocumentWithValidArgument_ProducesDocument()
 			throws ServiceException {
 		try {
-			String fs = File.separator;
-			MailingTemplate mt = new MailingTemplate();
-			File f = new File("src" + fs + "test" + fs + "resources" + fs
-					+ "examplemailing2.docx");
-			mt.setFile(f);
-			mt.setFileName(f.getName());
-			validMailing.setTemplate(mt);
 
-			mailingService.reproduceDocument(validMailing);
+			mailingService.reproduceDocument(validMailingTwo);
 
-			verify(personDAO).getPersonsByMailing(validMailing);
+			verify(personDAO).getPersonsByMailing(validMailingTwo);
 			// TODO how to mock a static method?
 			// (MailingTemplateUtil#createMailingWithDocxTemplate())
 		} catch (PersistenceException e) {
@@ -281,7 +282,7 @@ public abstract class AbstractMailingServiceTest {
 		}
 	}
 
-	private String csvExpected = "Datum;Art;Medium;\n12.06.2013;Dankesbrief;E-Mail;\n13.06.2013;Infomaterial;Postalisch;\n"
-			+ "14.06.2013;Einzelspenden Dankesbrief;E-Mail;\n";
+	private String csvExpected = "Datum;Art;Medium;Vorlage\n12.06.2013;Dankesbrief;E-Mail;-\n13.06.2013;Infomaterial;Postalisch;examplemailing2.docx\n"
+			+ "14.06.2013;Einzelspenden Dankesbrief;E-Mail;-\n";
 
 }
