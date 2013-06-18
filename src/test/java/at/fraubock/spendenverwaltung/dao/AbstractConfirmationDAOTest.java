@@ -144,9 +144,39 @@ public abstract class AbstractConfirmationDAOTest {
 	public void deleteWithValidShouldDelete() throws PersistenceException{
 		assertTrue(confirmationDao.getAll().size()==0);
 		confirmationDao.insertOrUpdate(c1);
-		assertTrue(confirmationDao.getAll().size()==1);
+		confirmationDao.insertOrUpdate(c2);
+		assertTrue(confirmationDao.getAll().size()==2);
 		confirmationDao.delete(c1);
+		confirmationDao.delete(c2);
 		assertTrue(confirmationDao.getAll().size()==0);
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void getByTemplateWithNull_shouldThrowException() throws PersistenceException{
+		confirmationDao.getByConfirmationTemplate(null);
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void getByTemplateWithTemplateWithNOID_shouldThrowException() throws PersistenceException{
+		confirmationDao.getByConfirmationTemplate(template);
+	}
+	
+	@Test
+	@Transactional
+	public void getByTemplate_ShouldReturn() throws PersistenceException{
+		ConfirmationTemplate template2 = new ConfirmationTemplate();
+		template2.setFile(template.getFile());
+		template2.setName("Template2");
+		
+		confirmationDao.insertOrUpdate(c1);
+		confirmationDao.insertOrUpdate(c2);
+		assertEquals(confirmationDao.getByConfirmationTemplate(template).size(),2);
+		
+		c2.setTemplate(template2);
+		confirmationDao.insertOrUpdate(c2);
+		assertEquals(confirmationDao.getByConfirmationTemplate(template).size(),1);
+		assertEquals(confirmationDao.getByConfirmationTemplate(template2).size(),1);
+		
 	}
 	
 	public static void initData() throws PersistenceException{
