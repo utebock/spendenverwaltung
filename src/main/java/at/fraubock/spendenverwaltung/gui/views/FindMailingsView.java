@@ -4,6 +4,9 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -12,6 +15,7 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -19,6 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
+import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXDatePicker;
@@ -89,6 +94,7 @@ public class FindMailingsView extends InitializableView {
 		toolbar = new JToolBar();
 		contentPanel.add(toolbar, "wrap, growx");
 		contentPanel.add(scrollPane, "wrap, growx");
+		contentPanel.add(createExportButton(), "wrap");
 		
 		afterDateLabel = componentFactory.createLabel("Nach Datum");
 		contentPanel.add(afterDateLabel, "split 4");
@@ -298,6 +304,58 @@ public class FindMailingsView extends InitializableView {
 			
 		}
 		
+	}
+	
+	private JButton createExportButton() {
+		JButton export = new JButton("Liste exportieren");
+
+		final JFileChooser fileChooser = new JFileChooser();
+
+		export.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				List<Mailing> mailings = ((MailingTableModel) mailingsTable.getModel())
+						.getMailings();
+
+				String csv = mailingService.convertToCSV(mailings);
+
+				fileChooser.setSelectedFile(new File("aussendungen.csv"));
+				fileChooser.setFileFilter(new FileFilter() {
+
+					@Override
+					public boolean accept(File f) {
+						return f.getName().toLowerCase().endsWith(".csv")
+								|| f.isDirectory();
+					}
+
+					@Override
+					public String getDescription() {
+						return "CSV Dateien(*.csv)";
+					}
+
+				});
+
+				if (fileChooser.showSaveDialog(FindMailingsView.this) == JFileChooser.APPROVE_OPTION) {
+					File file = fileChooser.getSelectedFile();
+					FileWriter writer = null;
+					try {
+						writer = new FileWriter(file);
+						writer.write(csv);
+						writer.flush();
+						writer.close();
+					} catch (IOException e) {
+						JOptionPane.showMessageDialog(FindMailingsView.this,
+								"Die Datei konnte nicht beschrieben werden.",
+								"Error", JOptionPane.ERROR_MESSAGE);
+						log.error("File could not be written to. path='"
+								+ file.getAbsolutePath() + "', text='" + csv
+								+ "'");
+					}
+				}
+			}
+		});
+		return export;
 	}
 	
 	private final class ViewPersonsAction extends AbstractAction {

@@ -3,6 +3,7 @@ package at.fraubock.spendenverwaltung.interfaces.service;
 import at.fraubock.spendenverwaltung.interfaces.domain.Action;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.util.ActionAttribute;
+import at.fraubock.spendenverwaltung.util.ActionSearchVO;
 import at.fraubock.spendenverwaltung.util.Pager;
 
 /**
@@ -60,4 +61,8 @@ public interface IActionService {
 	public Pager<Action> getAttributeLikeAsPager(
 			final ActionAttribute attributeParam, final String valueParam,
 			final int pageSizeParam) throws ServiceException;
+	
+	public Pager<Action> getAttributesLikeAsPager(
+			final ActionSearchVO searchVOParam, final int pageSizeParam)
+			throws ServiceException;
 }

@@ -176,14 +176,15 @@ public class MailingServiceImplemented implements IMailingService {
 			throw new IllegalArgumentException("Argument must not be null.");
 		}
 
-		String csv = "Datum;Art;Medium;\n";
+		String csv = "Datum;Art;Medium;Vorlage\n";
 
 		for (Mailing m : mailings) {
 			csv += m.getDate() == null ? "n.v." : (new SimpleDateFormat(
 					"dd.MM.yyyy").format(m.getDate())) + ";";
 			csv += m.getType().getName() + ";";
-			csv += (m.getMedium() == Mailing.Medium.POSTAL ? "Postalisch"
-					: "E-Mail") + ";\n";
+			csv += (m.getMedium() == Mailing.Medium.POSTAL ? ("Postalisch;" + m
+					.getTemplate().getFileName()) : "E-Mail;-");
+			csv += "\n";
 		}
 		return csv;
 	}

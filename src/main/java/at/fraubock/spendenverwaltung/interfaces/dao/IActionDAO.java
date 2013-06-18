@@ -5,6 +5,7 @@ import java.util.List;
 import at.fraubock.spendenverwaltung.interfaces.domain.Action;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.util.ActionAttribute;
+import at.fraubock.spendenverwaltung.util.ActionSearchVO;
 
 /**
  * interface to the data source for {@link Action} entities.
@@ -84,7 +85,7 @@ public interface IActionDAO {
 	 *         where attribute LIKE value
 	 * @throws PersistenceException
 	 */
-	public List<Action> getLimitedResultByAttributeLike(
+	public List<Action> getLimitedResultByAttributesLike(
 			ActionAttribute attribute, String value, int offset, int count)
 			throws PersistenceException;
 
@@ -101,4 +102,11 @@ public interface IActionDAO {
 	 */
 	public long countResultsOfAttributeLike(ActionAttribute attribute,
 			String value) throws PersistenceException;
+
+	public List<Action> getLimitedResultByAttributesLike(
+			ActionSearchVO searchVO, int offset, int count)
+			throws PersistenceException;
+
+	public long countResultsOfAttributesLike(ActionSearchVO searchVO)
+			throws PersistenceException;
 }

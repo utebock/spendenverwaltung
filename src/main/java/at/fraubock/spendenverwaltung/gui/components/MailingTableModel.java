@@ -99,5 +99,9 @@ public class MailingTableModel extends AbstractTableModel {
 		
 		return mailings.get(rowIndex);
 	}
+	
+	public List<Mailing> getMailings() {
+		return mailings;
+	}
 
 }

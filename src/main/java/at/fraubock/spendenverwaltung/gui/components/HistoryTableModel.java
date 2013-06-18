@@ -36,9 +36,9 @@ public class HistoryTableModel extends AbstractTableModel implements
 		case 0:
 			return action.getActor();
 		case 1:
-			return action.getType().getDisplayableName();
+			return action.getType().toString();
 		case 2:
-			return action.getEntity().getDisplayableName();
+			return action.getEntity().toString();
 		case 3:
 			return action.getTime();
 		case 4:

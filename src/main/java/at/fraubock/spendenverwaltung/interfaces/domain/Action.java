@@ -26,16 +26,16 @@ public class Action {
 
 		@Override
 		public String toString() {
-			return name;
+			return displayableName;
 		}
 
-		public String getDisplayableName() {
-			return displayableName;
+		public String getName() {
+			return name;
 		}
 
 		public static Type getByName(String name) {
 			for (Type type : Type.values()) {
-				if (type.toString().equals(name)) {
+				if (type.getName().equals(name)) {
 					return type;
 				}
 			}
@@ -64,16 +64,16 @@ public class Action {
 
 		@Override
 		public String toString() {
-			return name;
+			return displayableName;
 		}
 
-		public String getDisplayableName() {
-			return displayableName;
+		public String getName() {
+			return name;
 		}
 
 		public static Entity getByName(String name) {
 			for (Entity entity : Entity.values()) {
-				if (entity.toString().equals(name)) {
+				if (entity.getName().equals(name)) {
 					return entity;
 				}
 			}

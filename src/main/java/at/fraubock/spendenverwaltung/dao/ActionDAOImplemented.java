@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -16,12 +18,14 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.util.StringUtils;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IActionDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Action;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
 import at.fraubock.spendenverwaltung.util.ActionAttribute;
+import at.fraubock.spendenverwaltung.util.ActionSearchVO;
 
 /**
  * implementation of {@link IActionDAO}
@@ -35,6 +39,8 @@ public class ActionDAOImplemented implements IActionDAO {
 			.getLogger(ActionDAOImplemented.class);
 
 	private JdbcTemplate jdbcTemplate;
+	private List<String> values;
+	private String where;
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -98,8 +104,8 @@ public class ActionDAOImplemented implements IActionDAO {
 					Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, action.getActor());
 			ps.setTimestamp(2, new Timestamp(action.getTime().getTime()));
-			ps.setString(3, action.getType().toString());
-			ps.setString(4, action.getEntity().toString());
+			ps.setString(3, action.getType().getName());
+			ps.setString(4, action.getEntity().getName());
 			ps.setInt(5, action.getEntityId());
 			ps.setString(6, action.getPayload());
 			return ps;
@@ -193,28 +199,29 @@ public class ActionDAOImplemented implements IActionDAO {
 	}
 
 	@Override
-	public List<Action> getLimitedResultByAttributeLike(ActionAttribute attribute,
-			String value, int offset, int count) throws PersistenceException {
+	public List<Action> getLimitedResultByAttributesLike(
+			ActionAttribute attribute, String value, int offset, int count)
+			throws PersistenceException {
 
 		if (attribute == null || value == null) {
-			log.error("Error executing getLimitedResultByAttributeLike: " +
-					"attribute and/or value were null");
+			log.error("Error executing getLimitedResultByAttributeLike: "
+					+ "attribute and/or value were null");
 			throw new IllegalArgumentException(
 					"attribute and value must both be set");
 		}
 
-		log.info("Reading Actions for attribute='" + attribute.getName() + "', value='"
-				+ value + "'");
-		
+		log.info("Reading Actions for attribute='" + attribute.getName()
+				+ "', value='" + value + "'");
+
 		String name = attribute.getName();
-		if(attribute==ActionAttribute.TIME) {
-			name = "DATE_FORMAT("+name+", '%d.%m.%Y')";
+		if (attribute == ActionAttribute.TIME) {
+			name = "DATE_FORMAT(" + name + ", '%d.%m.%Y')";
 		}
 		try {
-			return jdbcTemplate.query("select * from actions where "
-					+ name + " LIKE ? ORDER BY time DESC LIMIT " + offset
-							+ ", " + count,
-					new Object[] { "%"+value+"%" }, new ActionMapper());
+			return jdbcTemplate.query("select * from actions where " + name
+					+ " LIKE ? ORDER BY time DESC LIMIT " + offset + ", "
+					+ count, new Object[] { "%" + value + "%" },
+					new ActionMapper());
 		} catch (DataAccessException e) {
 			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
@@ -222,25 +229,110 @@ public class ActionDAOImplemented implements IActionDAO {
 	}
 
 	@Override
-	public long countResultsOfAttributeLike(ActionAttribute attribute, String value)
+	public List<Action> getLimitedResultByAttributesLike(
+			ActionSearchVO searchVO, int offset, int count)
 			throws PersistenceException {
-		log.info("Counting Actions for attribute='" + attribute.getName() + "', value='"
-				+ value + "'");
+
+		if (searchVO == null) {
+			log.error("Error executing getLimitedResultByAttributesLike: "
+					+ "searchVO was null");
+			throw new IllegalArgumentException("searchVO must not be null");
+		}
 		
+		log.info("Reading Actions for searchVO:" + searchVO);
+		
+		setWhereAndValues(searchVO);
+		
+		try {
+			return jdbcTemplate.query("select * from actions" + this.where
+					+ " ORDER BY time DESC LIMIT " + offset + ", " + count,
+					this.values.toArray(), new ActionMapper());
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
+	}
+
+	@Override
+	public long countResultsOfAttributeLike(ActionAttribute attribute,
+			String value) throws PersistenceException {
+		log.info("Counting Actions for attribute='" + attribute.getName()
+				+ "', value='" + value + "'");
+
 		String name = attribute.getName();
-		if(attribute==ActionAttribute.TIME) {
-			name = "DATE_FORMAT("+name+", '%d.%m.%Y')";
+		if (attribute == ActionAttribute.TIME) {
+			name = "DATE_FORMAT(" + name + ", '%d.%m.%Y')";
 		}
 		try {
-			return jdbcTemplate.queryForObject("select count(*) from actions where "
-					+ name + " LIKE ? ORDER BY time DESC",
-					new Object[] { "%"+value+"%" },Integer.class);
+			return jdbcTemplate.queryForObject(
+					"select count(*) from actions where " + name
+							+ " LIKE ? ORDER BY time DESC", new Object[] { "%"
+							+ value + "%" }, Integer.class);
 		} catch (DataAccessException e) {
 			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
 		}
 	}
 	
+	@Override
+	public long countResultsOfAttributesLike(ActionSearchVO searchVO)
+			throws PersistenceException {
+		log.info("Counting Actions for searchVO:" + searchVO);
+
+		setWhereAndValues(searchVO);
+		
+		try {
+			return jdbcTemplate.queryForObject("select count(*) from actions" + this.where
+					+ " ORDER BY time DESC ",
+					this.values.toArray(), Integer.class);
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
+	}
+	
+	
+	private void setWhereAndValues(ActionSearchVO searchVO) {
+		List<String> values = new ArrayList<String>();
+		String where = "";
+		if (searchVO.getActor() != null) {
+			where += "actor LIKE ? and ";
+			values.add("%" + searchVO.getActor() + "%");
+		}
+
+		if (searchVO.getEntity() != null) {
+			where += "entity = ? and ";
+			values.add(searchVO.getEntity().getName());
+		}
+
+		if (searchVO.getType() != null) {
+			where += "type = ? and ";
+			values.add(searchVO.getType().getName());
+		}
+
+		if (searchVO.getPayload() != null) {
+			where += "payload LIKE ? and ";
+			values.add("%" + searchVO.getPayload() + "%");
+		}
+
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		if (searchVO.getFrom() != null) {
+			where += "DATE(time) >= DATE(?) and ";
+			values.add(sdf.format(searchVO.getFrom()));
+		}
+
+		if (searchVO.getTo() != null) {
+			where += "DATE(time) <= DATE(?) and ";
+			values.add(sdf.format(searchVO.getTo()));
+		}
+		
+		if(!StringUtils.isEmpty(where)) {
+			where = " where " +  where.substring(0, where.lastIndexOf(" and "));
+		}
+		
+		this.where = where;
+		this.values = values;
+	}
 
 	private class ActionMapper implements RowMapper<Action> {
 

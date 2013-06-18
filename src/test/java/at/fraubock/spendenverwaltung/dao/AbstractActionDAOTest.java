@@ -173,8 +173,8 @@ public class AbstractActionDAOTest {
 			actionDAO.insert(action);
 			actionDAO.insert(action2);
 
-			List<Action> allActions = actionDAO.getLimitedResultByAttributeLike(ActionAttribute.ACTOR,"actor",0,2);
-			List<Action> allActions2 = actionDAO.getLimitedResultByAttributeLike(ActionAttribute.TIME,"10.10",1,1);
+			List<Action> allActions = actionDAO.getLimitedResultByAttributesLike(ActionAttribute.ACTOR,"actor",0,2);
+			List<Action> allActions2 = actionDAO.getLimitedResultByAttributesLike(ActionAttribute.TIME,"10.10",1,1);
 			
 			assert (allActions.size() == 2 && allActions.contains(action) && allActions.contains(action2));
 			assert (allActions2.size() == 1 && allActions2.contains(action2));
