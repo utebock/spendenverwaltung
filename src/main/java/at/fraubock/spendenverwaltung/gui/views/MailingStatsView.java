@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -22,13 +23,17 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import org.apache.log4j.Logger;
+import org.jdesktop.swingx.JXDatePicker;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.DefaultKeyedValues;
@@ -81,6 +86,11 @@ public class MailingStatsView extends InitializableView {
 	private JComboBox<String> mailingTypes;
 	private ChartPanel chartPanel;
 	private List<Mailing> mailingList;
+	private JXDatePicker fromDatePicker;
+	private JXDatePicker toDatePicker;
+	private JLabel fromLabel;
+	private JLabel toLabel;
+	private JLabel infoLabel;
 
 	private JPanel plotPanel;
 
@@ -118,16 +128,28 @@ public class MailingStatsView extends InitializableView {
 		mailingTypeLabel = componentFactory.createLabel("Aussendungstyp ausw\u00E4hlen:");
 		
 		mailingTypes = new JComboBox<String>(MailingType.toStringArray());
-		operationsPanel.add(mailingTypeLabel, "split 2");
+		operationsPanel.add(mailingTypeLabel, "");
 		operationsPanel.add(mailingTypes, "wrap");
 		
-
+		fromLabel = componentFactory.createLabel("Datum von:");
+		fromDatePicker = new JXDatePicker(new java.util.Date());
+		operationsPanel.add(fromLabel);
+		operationsPanel.add(fromDatePicker, "wrap");
+		
+		toLabel = componentFactory.createLabel("Datum bis:");
+		toDatePicker = new JXDatePicker(new java.util.Date());
+		operationsPanel.add(toLabel);
+		operationsPanel.add(toDatePicker, "wrap");
+		
 		submit = new JButton();
 		cancel = new JButton();
-		operationsPanel.add(submit, "split 2");
+		operationsPanel.add(submit, "");
 		operationsPanel.add(cancel, "wrap 20px");
+		
+		infoLabel = componentFactory.createLabel("Für diesen Aussendungstyp existieren noch keine bestätigten Aussendungen.");
+		infoLabel.setFont(new Font("Dialog", Font.PLAIN, 16));
 
-		operationsPanel.add(plotPanel);
+		operationsPanel.add(plotPanel, "span 2");
 	}
 
 	private List<Mailing> getMailings() {
@@ -135,8 +157,20 @@ public class MailingStatsView extends InitializableView {
 		filter.setType(FilterType.MAILING);
 		
 		PropertyCriterion criterionType = new PropertyCriterion();
+		PropertyCriterion criterionFrom = new PropertyCriterion();
+		PropertyCriterion criterionTo = new PropertyCriterion();
+		
 		criterionType.compare(FilterProperty.MAILING_TYPE, RelationalOperator.EQUALS, mailingTypes.getSelectedItem().toString());
-		filter.setCriterion(criterionType);
+		criterionFrom.compare(FilterProperty.MAILING_DATE, RelationalOperator.GREATER_EQ, fromDatePicker.getDate());
+		criterionTo.compare(FilterProperty.MAILING_DATE, RelationalOperator.LESS_EQ, toDatePicker.getDate());
+		
+		ConnectedCriterion connected1 = new ConnectedCriterion();
+		connected1.connect(criterionFrom, LogicalOperator.AND, criterionTo);
+		
+		ConnectedCriterion connected2 = new ConnectedCriterion();
+		connected2.connect(connected1, LogicalOperator.AND, criterionType);
+		
+		filter.setCriterion(connected2);
 		
 		try {
 			mailingList = mailingService.getByFilter(filter);
@@ -175,14 +209,18 @@ public class MailingStatsView extends InitializableView {
 	        DefaultKeyedValues data = new DefaultKeyedValues();
 	        int maxY = 0;
 	        
+	        //get size of each mailing and put it with the date of the mailing in the collection
 	        for(Mailing m : mailingList){
 	        	try {
 	        		int mailingSize = mailingService.getSize(m);
+	        		if(data.getKeys().contains(m.getDate()))
+	        			mailingSize = data.getValue(m.getDate()).intValue() + mailingSize;
 	        		
 	        		if(mailingSize > maxY)
 	        			maxY = mailingSize;
 	        		
-					data.addValue(m.getDate(), mailingSize);
+	        		if(mailingSize > 0)
+	        			data.addValue(m.getDate(), mailingSize);
 				} catch (ServiceException e1) {
 					e1.printStackTrace();
 					return;
@@ -190,22 +228,46 @@ public class MailingStatsView extends InitializableView {
 	        }
 
 	        CategoryDataset dataset = DatasetUtilities.createCategoryDataset("Anzahl Aussendungen", data);
-	        JFreeChart chart = ChartFactory.createBarChart("Anzahl Aussendungen","Date","Anzahl Aussendungen",dataset,PlotOrientation.VERTICAL,true,true,false);
+	        JFreeChart chart = ChartFactory.createBarChart("Aussendungsentwicklung","Datum","Anzahl Aussendungen",dataset,PlotOrientation.VERTICAL,false,true,false);
+	        chart.setBackgroundPaint(new Color(238, 238, 238));
 	        
 	        //Switch from a Bar Rendered to a LineAndShapeRenderer so the chart looks like an XYChart
-	        LineAndShapeRenderer renderer = new LineAndShapeRenderer();
-	        renderer.setBaseLinesVisible(true); //TUrn of the lines
 	        CategoryPlot plot = (CategoryPlot) chart.getPlot();
-	        plot.setRenderer(0, renderer);
+	        plot.setBackgroundAlpha((float) 0.2);
+	       
+	        
+	        BarRenderer renderer = (BarRenderer) plot.getRenderer();
+	        renderer.setMaximumBarWidth(.1);
+	        renderer.setSeriesPaint(0, new Color(229,222,107));
+	        renderer.setDrawBarOutline(false);
 
 	        NumberAxis numberAxis = (NumberAxis)plot.getRangeAxis();        
 	        numberAxis.setRange(new Range(0,maxY)); 
-
+	        numberAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+	        
+	        CategoryAxis domainAxis = plot.getDomainAxis();
+	        
+	        double rotation = 0;
+	        if(data.getKeys().size() > 7)
+	        	rotation = Math.PI / 6.0;
+	        else if(data.getKeys().size() > 20)
+	        	rotation = Math.PI/2;
+	        
+	        if(rotation != 0){
+		        domainAxis.setCategoryLabelPositions(
+		            CategoryLabelPositions.createUpRotationLabelPositions(rotation)
+		        );
+	        }
+	        
 			chartPanel = new ChartPanel(chart);
 			chartPanel.setPreferredSize(new Dimension(700, 270));
 			plotPanel.removeAll();
 			plotPanel.repaint();
-			plotPanel.add(chartPanel);
+			
+			if(mailingList.isEmpty())
+				plotPanel.add(infoLabel);
+			else
+				plotPanel.add(chartPanel);
 			plotPanel.validate();
 		}
 	}
