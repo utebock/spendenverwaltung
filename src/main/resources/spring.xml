@@ -158,4 +158,8 @@
 		<property name="addressService" ref="addressService" />
 		<property name="donationService" ref="donationService" />
 	</bean>
+	<bean id="mailChimpService"
+		class="at.fraubock.spendenverwaltung.service.MailChimpServiceImplemented">
+	</bean>
+	
 </beans>

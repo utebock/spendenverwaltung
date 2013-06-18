@@ -19,6 +19,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
+import at.fraubock.spendenverwaltung.interfaces.service.IMailChimpService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.interfaces.service.IUserService;
@@ -49,9 +50,11 @@ public class ViewActionFactory {
 	IUserService userService;
 	IImportService importService;
 	IActionService actionService;
+	IMailChimpService mailChimpService;
 
 	public ViewActionFactory(ViewDisplayer viewDisplayer, IPersonService personService, IDonationService donationService,
-			IFilterService filterService, IAddressService addressService, IMailingService mailingService, IUserService userService, IImportService importService, IActionService actionService) {
+			IFilterService filterService, IAddressService addressService, IMailingService mailingService, IUserService userService, 
+			IImportService importService, IActionService actionService, IMailChimpService mailChimpService) {
 		
 		this.viewDisplayer = viewDisplayer;
 		this.personService = personService;
@@ -62,6 +65,7 @@ public class ViewActionFactory {
 		this.userService = userService;
 		this.importService = importService;
 		this.actionService = actionService;
+		this.mailChimpService = mailChimpService;
 	}
 	
 	/**
@@ -138,7 +142,7 @@ public class ViewActionFactory {
 	}
 	
 	public Action getCreateMailingsViewAction() {
-		return new DisplayViewAction(new CreateMailingsView(this, new ComponentFactory(), mailingService, filterService, personService), "/images/eNotification.jpg");
+		return new DisplayViewAction(new CreateMailingsView(this, new ComponentFactory(), mailingService, filterService, personService, mailChimpService), "/images/eNotification.jpg");
 	}
 
 	public Action getFindMailingsViewAction(MailingTableModel tableModel) {

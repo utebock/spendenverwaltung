@@ -32,12 +32,12 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
+import at.fraubock.spendenverwaltung.interfaces.service.IMailChimpService.MailChimpListItem;
+import at.fraubock.spendenverwaltung.interfaces.service.IMailChimpService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.MailingTemplateUtil;
-import at.fraubock.spendenverwaltung.util.MailChimp;
-import at.fraubock.spendenverwaltung.util.MailChimp.MailChimpListItem;
 
 /**
  * 
@@ -57,6 +57,7 @@ public class CreateMailingsView extends InitializableView {
 	private IMailingService mailingService;
 	private IFilterService filterService;
 	private IPersonService personService;
+	private IMailChimpService mailChimpService;
 	private JXDatePicker emailDatePicker;
 	private JXDatePicker postalDatePicker;
 
@@ -73,7 +74,7 @@ public class CreateMailingsView extends InitializableView {
 			postalFilterLabel, emailTypeLabel, postalTypeLabel, emailDateLabel,
 			postalDateLabel, feedbackLabel, outputNameLabel, emailMailChimpLabel;
 	JButton createEMailingButton, createPostalMailingButton, fileChooserButton,
-			cancelEMailingButton, cancelPostalMailingButton;
+			cancelEMailingButton, cancelPostalMailingButton, emailMailChimpApiButton;
 	JSeparator separator;
 	
 	StringTextField outputNameField;
@@ -86,12 +87,13 @@ public class CreateMailingsView extends InitializableView {
 
 	public CreateMailingsView(ViewActionFactory viewActionFactory,
 			ComponentFactory componentFactory, IMailingService mailingService,
-			IFilterService filterService, IPersonService personService) {
+			IFilterService filterService, IPersonService personService, IMailChimpService mailChimpService) {
 		this.viewActionFactory = viewActionFactory;
 		this.componentFactory = componentFactory;
 		this.mailingService = mailingService;
 		this.filterService = filterService;
 		this.personService = personService;
+		this.mailChimpService = mailChimpService;
 		setUpLayout();
 	}
 
@@ -145,8 +147,11 @@ public class CreateMailingsView extends InitializableView {
 		// buttons
 		createEMailingButton = new JButton("Anlegen");
 		cancelEMailingButton = new JButton("Abbrechen");
+		emailMailChimpApiButton = new JButton("MailChimp API Key");
 		createEMailingPanel.add(cancelEMailingButton, "split 2");
-		createEMailingPanel.add(createEMailingButton, "wrap");
+		createEMailingPanel.add(createEMailingButton);
+		createEMailingPanel.add(emailMailChimpApiButton, "wrap");
+		
 
 		// set up postal mailing panel layout
 		postalTitle = componentFactory
@@ -228,6 +233,7 @@ public class CreateMailingsView extends InitializableView {
 			cancelEMailingButton.setAction(cancelAction);
 			cancelPostalMailingButton.setAction(cancelAction);
 			fileChooserButton.setAction(new ChoosePostalTemplateAction());
+			emailMailChimpApiButton.setAction(new ChangeMailChimpApiKeyAction());
 			
 		} catch (ServiceException e) {
 			JOptionPane
@@ -237,7 +243,7 @@ public class CreateMailingsView extends InitializableView {
 		
 		try{
 			//Load lists from MailChimp
-			emailMailChimpListChooser.setModel(new SimpleComboBoxModel<MailChimpListItem>(MailChimp.getLists()));
+			emailMailChimpListChooser.setModel(new SimpleComboBoxModel<MailChimpListItem>(mailChimpService.getLists()));
 		}
 		catch(ServiceException e){
 			JOptionPane.showMessageDialog(null, "Ein Fehler trat bei der Kommunikation mit MailChimp auf");
@@ -278,8 +284,10 @@ public class CreateMailingsView extends InitializableView {
 				
 				List<Person> recipients = personService.getPersonsByMailing(mailing);
 				
-				errors = mailingService.exportEMailsToMailChimp(mailing, 
-						((MailChimpListItem)emailMailChimpListChooser.getSelectedItem()).getId());
+				errors = mailChimpService.addPersonsToList(
+						((MailChimpListItem)emailMailChimpListChooser.getSelectedItem()).getId(),
+						personService.getPersonsByMailing(mailing));
+						
 				feedbackLabel.setText("Aussendung wurde erstellt.");
 				if(errors==0){
 					JOptionPane.showMessageDialog(null,
@@ -387,5 +395,33 @@ public class CreateMailingsView extends InitializableView {
 				log.debug("Set template file");
 			}	
 		}
+	}
+	
+	private final class ChangeMailChimpApiKeyAction extends AbstractAction{
+
+		private static final long serialVersionUID = 1L;
+		
+		public ChangeMailChimpApiKeyAction(){
+			super("MailChimp API Key ändern");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String newKey = JOptionPane.showInputDialog("Geben Sie einen gültigen MailChimp API Key ein");
+			if(newKey!=null&&!newKey.isEmpty()){
+				try {
+					mailChimpService.setAPIKey(newKey);
+					feedbackLabel.setText("Der eingegebene MailChimp API Key wurde gespeichert");
+
+					//Reaload lists from MailChimp
+					emailMailChimpListChooser.setModel(new SimpleComboBoxModel<MailChimpListItem>(mailChimpService.getLists()));
+				} catch (ServiceException e1) {
+					log.debug("MailChimp API Key was invalid");
+					feedbackLabel.setText("Der eingegebene MailChimp API Key ist ungültig");
+				}
+			}
+			
+		}
+		
 	}
 }

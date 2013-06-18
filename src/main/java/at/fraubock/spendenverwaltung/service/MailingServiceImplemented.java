@@ -21,12 +21,12 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Connecte
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
+import at.fraubock.spendenverwaltung.interfaces.service.IMailChimpService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
 import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
-import at.fraubock.spendenverwaltung.util.MailChimp;
 import at.fraubock.spendenverwaltung.util.MailingTemplateUtil;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
@@ -37,6 +37,7 @@ public class MailingServiceImplemented implements IMailingService {
 	private IMailingDAO mailingDAO;
 	private IPersonDAO personDAO;
 	private IPersonService personService;
+	private IMailChimpService mailChimpService;
 
 	/**
 	 * @return the personService
@@ -59,6 +60,10 @@ public class MailingServiceImplemented implements IMailingService {
 
 	public void setPersonDAO(IPersonDAO personDAO) {
 		this.personDAO = personDAO;
+	}
+
+	public void setMailChimpService(IMailChimpService mailChimpService) {
+		this.mailChimpService = mailChimpService;
 	}
 
 	@Override
@@ -212,21 +217,6 @@ public class MailingServiceImplemented implements IMailingService {
 				throw new ServiceException(e);
 			}
 		}
-	}
-
-	@Override
-	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
-	public int exportEMailsToMailChimp(Mailing mailing, String mailChimpListId)
-			throws ServiceException {
-		int errors = 0;
-
-		try {
-			errors = MailChimp.addPersonsToList(mailChimpListId,
-					personDAO.getPersonsByMailing(mailing));
-		} catch (PersistenceException e) {
-			throw new ServiceException(e);
-		}
-		return errors;
 	}
 
 	@Override

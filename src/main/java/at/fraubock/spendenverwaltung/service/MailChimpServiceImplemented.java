@@ -1,9 +1,9 @@
-package at.fraubock.spendenverwaltung.util;
+package at.fraubock.spendenverwaltung.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
+import java.util.prefs.Preferences;
 
 import org.apache.log4j.Logger;
 
@@ -18,52 +18,33 @@ import com.ecwid.mailchimp.method.list.ListsResult;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
+import at.fraubock.spendenverwaltung.interfaces.service.IMailChimpService;
 
 /**
  * 
  * @author romanvoglhuber
  *
  */
-public class MailChimp {
+public class MailChimpServiceImplemented implements IMailChimpService{
 	
-	private static final Logger log = Logger.getLogger(MailChimp.class);
-	private static MailChimpClient mailChimp= null;
-	private static String apiKey;
-	private static Boolean double_optin;
-	private static Boolean update_extisting;
+	private static final Logger log = Logger.getLogger(MailChimpServiceImplemented.class);
+	private MailChimpClient mailChimp= null;
+	private String apiKey;
+	private final Boolean double_optin = false; //Dont send double optin requests to new e-mail addresses
+	private final Boolean update_extisting = true; //update old data
 	
-	/**
-	 * Reads API-Key and options from mailchimp.properties and initialize MailChimpClient
-	 * @throws ServiceException
-	 */
-	private static void init() throws ServiceException{
-		Properties prop = new Properties();
-		if(mailChimp==null){
-			try {
-				prop.load(MailChimp.class.getClassLoader().getResourceAsStream("mailchimp.properties"));
-			} catch (IOException e) {
-				log.error(e.getMessage());
-				throw new ServiceException("Error loading mailjimp.properties File");
-			}
-			
-			double_optin = Boolean.parseBoolean(prop.getProperty("double_optin"));
-			update_extisting = Boolean.parseBoolean(prop.getProperty("update_existing"));
-			apiKey = prop.getProperty("apiKey");
-			mailChimp = new MailChimpClient();
-		}
+	
+	public MailChimpServiceImplemented(){	
+		mailChimp = new MailChimpClient();
+		
+		Preferences prefs = Preferences.userNodeForPackage(MailChimpServiceImplemented.class);
+		
+		//Default API Key is set now and can be removed later
+		apiKey = prefs.get("apiKey", "a66d44c0489c37f1960447b70ee480c7-us7");
 	}
 	
-	/**
-	 * Adds e-mail address, givenname and surname from personlist to a mailchimp list
-	 * @param listId
-	 * 			ID of a mailchimp list
-	 * @param persons
-	 * 			List of Persons
-	 * @return
-	 * 			Returns the amount of errors from mailchimp (invalid e-mailaddress, ...)
-	 * @throws ServiceException
-	 */
-	public static int addPersonsToList(String listId, List<Person> persons) throws ServiceException{
+	
+	public int addPersonsToList(String listId, List<Person> persons) throws ServiceException{
 		List<MergeVars> subscribers = new ArrayList<MergeVars>();
 		ListBatchSubscribeResult result;
 		ListBatchSubscribeMethod subscribeMethod;
@@ -72,9 +53,6 @@ public class MailChimp {
 		}
 		
 		log.debug("Add "+persons+" to MailChimp list "+listId);
-		
-		if(mailChimp == null)
-			init();
 		
 		subscribeMethod = new ListBatchSubscribeMethod();
 		subscribeMethod.apikey = apiKey;
@@ -101,21 +79,12 @@ public class MailChimp {
 	}
 	
 	
-	/**
-	 * Returns a Map<String, String> of MailChimp lists
-	 * Key = listID
-	 * Value = list name
-	 * @return
-	 * @throws ServiceException
-	 */
-	public static List<MailChimpListItem> getLists() throws ServiceException{
+	
+	public List<MailChimpListItem> getLists() throws ServiceException{
 		List<MailChimpListItem> list = new ArrayList<MailChimpListItem>();
 		ListsResult result;
 		
 		log.debug("Get MailChimp Lists");
-		
-		if(mailChimp == null)
-			init();
 		
 		ListsMethod listsMethod = new ListsMethod();
 		listsMethod.apikey = apiKey;
@@ -135,9 +104,33 @@ public class MailChimp {
 	}
 	
 	
-	public static class MergeVars extends MailChimpObject {
-		private static final long serialVersionUID = 1L;
+	@Override
+	public void setAPIKey(String apiKey) throws ServiceException {
+		ListsMethod listsMethod = new ListsMethod();
+		listsMethod.apikey = apiKey;
 		
+		try {
+			mailChimp.execute(listsMethod);
+		} catch (IOException | MailChimpException e) {
+			throw new ServiceException(e);
+		}
+		catch(IllegalArgumentException e){
+			throw new ServiceException("API key invalid");
+		}
+		
+		this.apiKey = apiKey;
+		Preferences prefs = Preferences.userNodeForPackage(MailChimpServiceImplemented.class);
+		
+		//save in preference
+		prefs.put("apiKey", apiKey);
+	}
+	
+	
+	
+	
+	public static class MergeVars extends MailChimpObject {
+		
+		private static final long serialVersionUID = 1L;
 		@Field
 	    public String EMAIL, FNAME, LNAME;
 
@@ -149,37 +142,9 @@ public class MailChimp {
 	        this.LNAME = lname;
 	    }
 	}
+
+
 	
-	public static class MailChimpListItem{
-		private String id, name;
-		
-		public MailChimpListItem(String id, String name){
-			this.id = id;
-			this.name = name;
-		}
-
-		public String getId() {
-			return id;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public void setId(String id) {
-			this.id = id;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-		
-		@Override
-		public String toString(){
-			return name;
-		}
-		
-	}
 
 }
 

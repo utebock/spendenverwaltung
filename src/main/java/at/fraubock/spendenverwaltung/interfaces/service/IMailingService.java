@@ -173,18 +173,6 @@ public interface IMailingService {
 			throws ServiceException;
 
 	/**
-	 * Exports the email addresses of all persons in the mailing to MailChimp
-	 * 
-	 * @param mailing
-	 * @param mailChimpListId
-	 *            ID of the list at MailChimp
-	 * @return returns the amount of errors during import at MailChimp
-	 * @throws ServiceException
-	 */
-	public int exportEMailsToMailChimp(Mailing mailing, String mailChimpListId)
-			throws ServiceException;
-
-	/**
 	 * returns all mailings that match a specific mailing filter
 	 * 
 	 * @throws ServiceException
@@ -239,4 +227,5 @@ public interface IMailingService {
 	 * @throws ServiceException
 	 */
 	public int getSize(Mailing mailing) throws ServiceException;
+	
 }
