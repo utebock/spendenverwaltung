@@ -68,6 +68,8 @@ public class PersonAddressesView extends InitializableView {
 		this.addressService = addressService;
 		this.selectedPerson = selectedPerson;
 		this.personTableModel = personTableModel;
+		
+		setUpLayout();
 	}
 	
 	public void setUpLayout() {
@@ -75,6 +77,7 @@ public class PersonAddressesView extends InitializableView {
 		
 		this.add(contentPanel);
 		
+		addressTableModel = new AddressTableModel();
 		addressesTable = new JTable(addressTableModel);
 		addressesTable.setFillsViewportHeight(true);
 		JScrollPane scrollPane = new JScrollPane(addressesTable);
@@ -84,8 +87,8 @@ public class PersonAddressesView extends InitializableView {
 		contentPanel.add(toolbar, "wrap, growx");
 
 		mainAddressLabel = componentFactory.createLabel("");
-		feedbackLabel.setFont(new Font("Headline", Font.PLAIN, 16));
-		contentPanel.add(mainAddressLabel);
+		mainAddressLabel.setFont(new Font("Headline", Font.PLAIN, 13));
+		contentPanel.add(mainAddressLabel, "wrap");
 		
 		contentPanel.add(scrollPane, "wrap, growx");
 		
@@ -107,7 +110,10 @@ public class PersonAddressesView extends InitializableView {
 		
 		if(selectedPerson != null) {
 			if(selectedPerson.getMainAddress() != null) {
-				mainAddressLabel.setText(selectedPerson.getMainAddress().toString());
+				mainAddressLabel.setText("Hauptadresse: "+selectedPerson.getMainAddress().getStreet() + " " +
+						selectedPerson.getMainAddress().getPostalCode() + " " +
+						selectedPerson.getMainAddress().getCity() + " " +
+						selectedPerson.getMainAddress().getCountry());
 			} else {
 				mainAddressLabel.setText("Keine Hauptaddresse vorhanden");
 			}
@@ -119,6 +125,9 @@ public class PersonAddressesView extends InitializableView {
 	}
 	
 	private void addComponentsToToolbar(JToolBar toolbar) {
+		
+		toolbar.setFloatable(false);
+		toolbar.setRollover(true);
 		
 		backButton = new JButton();
 		Action getBack = viewActionFactory.getFindPersonsViewAction(personTableModel);
@@ -149,6 +158,10 @@ public class PersonAddressesView extends InitializableView {
 	
 	private final class AddAction extends AbstractAction{
 		private static final long serialVersionUID = 1L;
+		
+		public AddAction() {
+			super("Neue Adresse");
+		}
 
 		private JFrame addAddressFrame;
 		private JPanel addAddressPanel;
@@ -208,6 +221,7 @@ public class PersonAddressesView extends InitializableView {
 			addAddressFrame.pack();
 			addAddressFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			addAddressFrame.setVisible(true);
+			
 			}
 		
 			private final class SubmitAction extends AbstractAction {

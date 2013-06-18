@@ -20,6 +20,8 @@ import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 
+import net.miginfocom.swing.MigLayout;
+
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXDatePicker;
 
@@ -74,6 +76,7 @@ public class FindMailingsView extends InitializableView {
 	}
 	
 	public void setUpLayout() {
+		this.setLayout(new MigLayout());
 		contentPanel = componentFactory.createPanel(800, 800);
 		
 		this.add(contentPanel);
@@ -87,7 +90,7 @@ public class FindMailingsView extends InitializableView {
 		scrollPane.setPreferredSize(new Dimension(700, 550));
 		
 		toolbar = new JToolBar();
-		contentPanel.add(toolbar, "wrap, growx");
+		contentPanel.add(toolbar, "span, growx, wrap");
 		contentPanel.add(scrollPane, "wrap, growx");
 		
 		afterDateLabel = componentFactory.createLabel("Nach Datum");
@@ -148,7 +151,9 @@ public class FindMailingsView extends InitializableView {
 	}
 	
 	private void addComponentsToToolbar(JToolBar toolbar) {
-
+		toolbar.setFloatable(false);
+		toolbar.setRollover(true);
+		
 		JButton backButton = new JButton();
 		Action getBack = viewActionFactory.getMainMenuViewAction();
 		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
@@ -170,7 +175,7 @@ public class FindMailingsView extends InitializableView {
 		deleteButton.setAction(deleteAction);
 
 		toolbar.add(backButton, "split 4, growx");
-		toolbar.add(reproduceButton, "split 4, growx");
+		toolbar.add(reproduceButton, "growx");
 		toolbar.add(viewPersonsButton, "growx");
 		toolbar.add(deleteButton, "growx");
 	}

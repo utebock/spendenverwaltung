@@ -12,6 +12,7 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -81,6 +82,8 @@ public class PersonDonationsView extends InitializableView {
 		this.donationService = donationService;
 		this.selectedPerson = selectedPerson;
 		this.personTableModel = personTableModel;
+		
+		setUpLayout();
 	}
 	
 	public void setUpLayout() {
@@ -88,30 +91,34 @@ public class PersonDonationsView extends InitializableView {
 		
 		this.add(contentPanel);
 		
+		toolbar = new JToolBar();
+		contentPanel.add(toolbar, "spanx, wrap, growx");
+
+		donationTotalLabel = componentFactory.createLabel("");
+		donationTotalLabel.setFont(new Font("Headline", Font.PLAIN, 13));
+		contentPanel.add(donationTotalLabel, "wrap");
+		
+		donationTableModel = new DonationTableModel();
 		donationsTable = new JTable(donationTableModel);
 		donationsTable.setFillsViewportHeight(true);
+		donationsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
 		JScrollPane scrollPane = new JScrollPane(donationsTable);
 		scrollPane.setPreferredSize(new Dimension(700, 550));
 		
-		toolbar = new JToolBar();
-		contentPanel.add(toolbar, "wrap, growx");
-
-		donationTotalLabel = componentFactory.createLabel("");
-		feedbackLabel.setFont(new Font("Headline", Font.PLAIN, 16));
-		contentPanel.add(donationTotalLabel);
-		
-		contentPanel.add(scrollPane, "wrap, growx");
-		
-		donationsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		contentPanel.add(scrollPane, "wrap");
 		
 		start = new JXDatePicker();
 		start.addActionListener(new StartDateSelectedListener());
 		end = new JXDatePicker();
 		end.addActionListener(new EndDateSelectedListener());
 		
+		contentPanel.add(start, "split 2");
+		contentPanel.add(end, "wrap");
+		
 		feedbackLabel = componentFactory.createLabel("");
-		feedbackLabel.setFont(new Font("Headline", Font.PLAIN, 16));
-		contentPanel.add(feedbackLabel);
+		feedbackLabel.setFont(new Font("Headline", Font.PLAIN, 13));
+		contentPanel.add(feedbackLabel, "wrap");
 	}
 	
 	@Override
@@ -126,36 +133,36 @@ public class PersonDonationsView extends InitializableView {
 	}
 	
 	public void initTable() {
-		donationsTable = new JTable(donationTableModel);
-		
 		if(selectedPerson != null) {
 			if(selectedPerson.getMainAddress() != null) {
 				donationTotalLabel.setText(selectedPerson.getMainAddress().toString());
-				try {
-					List<Donation> donationList = donationService.getByPerson(selectedPerson);
-										
-					for(Donation entry : donationList) {
-						currentTotal += entry.getAmount();
-						donationTableModel.addDonation(entry);
-					}
-	
-					setTotalLabel();
-				} catch (ServiceException e) {
-					log.warn(e.getLocalizedMessage());
-					feedbackLabel.setText("Es passierte ein Fehler beim Laden der Spenden.");
-				}
-			} else {
-				//should not happen but feedback just in case.
-				feedbackLabel.setText("Es wurde keine Person ausgewählt");
-			}	
+			}
+		} else {
+			feedbackLabel.setText("Es wurde keine Person ausgewählt");
+		}
+		
+		try {
+			List<Donation> donationList = donationService.getByPerson(selectedPerson);
+								
+			for(Donation entry : donationList) {
+				currentTotal += entry.getAmount();
+				donationTableModel.addDonation(entry);
+			}
+
+			setTotalLabel();
+		} catch (ServiceException e) {
+			log.warn(e.getLocalizedMessage());
+			feedbackLabel.setText("Es passierte ein Fehler beim Laden der Spenden.");
 		}
 	}
 	
 	private void addComponentsToToolbar(JToolBar toolbar) {
 		
+		toolbar.setFloatable(false);
+		toolbar.setRollover(true);
+		
 		backButton = new JButton();
 		
-		//TODO change to findPersonsView
 		Action getBack = viewActionFactory.getFindPersonsViewAction(personTableModel);
 		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
 		backButton.setAction(getBack);
@@ -195,7 +202,7 @@ public class PersonDonationsView extends InitializableView {
 	
 	private final class AddAction extends AbstractAction {
 		
-		private JFrame addDonationFrame;
+		private JDialog addDonationFrame;
 		private JPanel addDonationPanel;
 		
 		private JLabel donationTypeLabel;
@@ -228,8 +235,9 @@ public class PersonDonationsView extends InitializableView {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			addDonationFrame = new JFrame("Neue Spende");
-			addDonationPanel = componentFactory.createPanel(250, 200);
+			addDonationFrame = new JDialog();
+			addDonationFrame.setLocation(300, 300);
+			addDonationPanel = componentFactory.createPanel(300, 250);
 			
 			//add combobox + label
 			donationTypeLabel = componentFactory.createLabel("Spendenart");
@@ -259,11 +267,12 @@ public class PersonDonationsView extends InitializableView {
 			addDonationPanel.add(noteLabel, "split 2");
 			addDonationPanel.add(noteField, "wrap");
 			
-			submitButton = new JButton(new SubmitAction());
-			cancelButton = new JButton(new CancelAction());		
+			submitButton = new JButton(new SubmitAddAction());
+			cancelButton = new JButton(new AddCancelAction());		
 			addDonationPanel.add(cancelButton, "split 2");
 			addDonationPanel.add(submitButton, "wrap");
 			
+			validationFeedbackLabel = componentFactory.createLabel("");
 			addDonationPanel.add(validationFeedbackLabel, "wrap");
 			addDonationFrame.add(addDonationPanel);
 			addDonationFrame.pack();
@@ -271,10 +280,14 @@ public class PersonDonationsView extends InitializableView {
 			addDonationFrame.setVisible(true);
 		}	
 		
-		private final class SubmitAction extends AbstractAction {
+		private final class SubmitAddAction extends AbstractAction {
 
 			private static final long serialVersionUID = 1L;
 
+			public SubmitAddAction() {
+				super("Anlegen");
+			}
+			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Donation donation = new Donation();
@@ -331,10 +344,14 @@ public class PersonDonationsView extends InitializableView {
 			}
 		}
 		
-		private final class	CancelAction extends AbstractAction {
+		private final class	AddCancelAction extends AbstractAction {
 
 			private static final long serialVersionUID = 1L;
 
+			public AddCancelAction() {
+				super("Abbrechen");
+			}
+			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				addDonationFrame.dispose();
@@ -345,7 +362,7 @@ public class PersonDonationsView extends InitializableView {
 	
 	private final class EditAction extends AbstractAction {
 		
-		private JFrame editDonationFrame;
+		private JDialog editDonationFrame;
 		private JPanel editDonationPanel;
 		
 		private JLabel donationTypeLabel;
@@ -390,7 +407,7 @@ public class PersonDonationsView extends InitializableView {
 			
 			selectedDonation = donationTableModel.getDonationRow(selectedRow);
 			
-			editDonationFrame = new JFrame("Neue Spende");
+			editDonationFrame = new JDialog();
 			editDonationPanel = componentFactory.createPanel(250, 200);
 			
 			//add combobox + label
@@ -431,8 +448,8 @@ public class PersonDonationsView extends InitializableView {
 			editDonationPanel.add(noteLabel, "split 2");
 			editDonationPanel.add(noteField, "wrap");
 			
-			submitButton = new JButton(new SubmitAction());
-			cancelButton = new JButton(new CancelAction());		
+			submitButton = new JButton(new SubmitEditAction());
+			cancelButton = new JButton(new CancelEditAction());		
 			editDonationPanel.add(cancelButton, "split 2");
 			editDonationPanel.add(submitButton, "wrap");
 			
@@ -443,9 +460,13 @@ public class PersonDonationsView extends InitializableView {
 			editDonationFrame.setVisible(true);
 		}	
 		
-		private final class SubmitAction extends AbstractAction {
+		private final class SubmitEditAction extends AbstractAction {
 
 			private static final long serialVersionUID = 1L;
+			
+			public SubmitEditAction() {
+				super("Anlegen");
+			}
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -504,9 +525,13 @@ public class PersonDonationsView extends InitializableView {
 			}
 		}
 		
-		private final class	CancelAction extends AbstractAction {
+		private final class	CancelEditAction extends AbstractAction {
 
 			private static final long serialVersionUID = 1L;
+			
+			public CancelEditAction() {
+				super("Abbrechen");
+			}
 
 			@Override
 			public void actionPerformed(ActionEvent e) {

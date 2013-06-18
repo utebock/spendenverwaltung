@@ -99,7 +99,9 @@ public class ConfirmMailingsView extends InitializableView {
 	}
 	
 	private void addComponentsToToolbar(JToolBar toolbar) {
-
+		toolbar.setFloatable(false);
+		toolbar.setRollover(true);
+		
 		JButton backButton = new JButton();
 		Action getBack = viewActionFactory.getMainMenuViewAction();
 		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
