@@ -1,10 +1,9 @@
 package at.fraubock.spendenverwaltung.cli;
 
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
 
 /**
  * Class providing main method for starting the CLI application of
@@ -19,8 +18,12 @@ public class App {
 		ApplicationContext context = new ClassPathXmlApplicationContext(
 				"/spring.xml");
 
-		int err = (new CommandExecutor(context.getBean("importService",
-				IImportService.class), args, System.out, System.err)).execute();
+		CommandExecutor ex = new CommandExecutor(args, System.out, System.err);
+
+		context.getAutowireCapableBeanFactory().autowireBeanProperties(ex,
+				AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
+
+		int err = (ex).execute();
 		if (err != 0)
 			System.exit(err);
 

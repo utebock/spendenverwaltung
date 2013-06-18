@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -16,8 +17,17 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 
+import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
+import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
+import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
+import at.fraubock.spendenverwaltung.interfaces.service.IActionService;
+import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
+import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
+import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
+import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 /**
  * An instance of this class provides the functionality to parse arguments,
@@ -30,7 +40,12 @@ public class CommandExecutor {
 
 	private static final Logger log = Logger.getLogger(CommandExecutor.class);
 
+	private IActionService actionService;
+	private IDonationService donationService;
+	private IFilterService filterService;
 	private IImportService importService;
+	private IMailingService mailingService;
+	private IPersonService personService;
 
 	private String[] args;
 	private PrintStream out, err;
@@ -55,10 +70,9 @@ public class CommandExecutor {
 			+ "You should have received a copy of the application's manual.";
 
 	/**
-	 * Constructor.
+	 * Constructor. The services must be set by accessing the setters prior to
+	 * invoking {@link #execute()}.
 	 * 
-	 * @param importService
-	 *            the import service that provides the business logic
 	 * @param args
 	 *            the command arguments the execution is based on
 	 * @param out
@@ -66,16 +80,108 @@ public class CommandExecutor {
 	 * @param err
 	 *            a print stream which error output will be written to
 	 */
-	public CommandExecutor(IImportService importService, String[] args,
-			PrintStream out, PrintStream err) {
-		this.importService = importService;
+	public CommandExecutor(String[] args, PrintStream out, PrintStream err) {
 		this.args = args;
 		this.out = out;
 		this.err = err;
 	}
 
 	/**
+	 * @return the actionService
+	 */
+	public IActionService getActionService() {
+		return actionService;
+	}
+
+	/**
+	 * @param actionService
+	 *            the actionService to set
+	 */
+	public void setActionService(IActionService actionService) {
+		this.actionService = actionService;
+	}
+
+	/**
+	 * @return the donationService
+	 */
+	public IDonationService getDonationService() {
+		return donationService;
+	}
+
+	/**
+	 * @param donationService
+	 *            the donationService to set
+	 */
+	public void setDonationService(IDonationService donationService) {
+		this.donationService = donationService;
+	}
+
+	/**
+	 * @return the filterService
+	 */
+	public IFilterService getFilterService() {
+		return filterService;
+	}
+
+	/**
+	 * @param filterService
+	 *            the filterService to set
+	 */
+	public void setFilterService(IFilterService filterService) {
+		this.filterService = filterService;
+	}
+
+	/**
+	 * @return the importService
+	 */
+	public IImportService getImportService() {
+		return importService;
+	}
+
+	/**
+	 * @param importService
+	 *            the importService to set
+	 */
+	public void setImportService(IImportService importService) {
+		this.importService = importService;
+	}
+
+	/**
+	 * @return the mailingService
+	 */
+	public IMailingService getMailingService() {
+		return mailingService;
+	}
+
+	/**
+	 * @param mailingService
+	 *            the mailingService to set
+	 */
+	public void setMailingService(IMailingService mailingService) {
+		this.mailingService = mailingService;
+	}
+
+	/**
+	 * @return the personService
+	 */
+	public IPersonService getPersonService() {
+		return personService;
+	}
+
+	/**
+	 * @param personService
+	 *            the personService to set
+	 */
+	public void setPersonService(IPersonService personService) {
+		this.personService = personService;
+	}
+
+	/**
 	 * executes the command and writes normal and error output.
+	 * 
+	 * Prior to calling this method, the servicesm ust have been set using the
+	 * setters.
+	 * 
 	 * 
 	 * @return 0 if the execution finished successfully or an error code if it
 	 *         has not
@@ -93,6 +199,48 @@ public class CommandExecutor {
 				"import a CSV file containing donations");
 		importOption.setArgName("FILE");
 		mutexActions.addOption(importOption);
+		Option filterOption = new Option(
+				"f",
+				"filter-results",
+				true,
+				"prints the results of the person/mailing/donation filter with the id ID in a CSV structure. May be used with the -o option to write to a file instead.");
+		filterOption.setArgName("ID");
+		mutexActions.addOption(filterOption);
+		Option mailingOption = new Option(
+				"m",
+				"mailing-recvrs",
+				true,
+				"prints the receivers of the mailing with the id ID in a CSV structure.  May be used with the -o option to write to a file instead.");
+		mailingOption.setArgName("ID");
+		mutexActions.addOption(mailingOption);
+		Option donationConfirmationPDFOption = new Option(
+				"c",
+				"confirmation-pdf",
+				true,
+				"Must be used with the -o option. Writes the donation confirmation PDF of the confirmation with the id ID to the file specified with the -o option.");
+		donationConfirmationPDFOption.setArgName("ID");
+		mutexActions.addOption(donationConfirmationPDFOption);
+		Option mailingPDFOption = new Option(
+				"p",
+				"mailing-pdf",
+				true,
+				"Must be used with the -o option. Writes the mailings PDF of the mailing with the id ID to the file specified with the -o option.");
+		mailingPDFOption.setArgName("ID");
+		mutexActions.addOption(mailingPDFOption);
+		Option mailchimpOption = new Option(
+				"s",
+				"send-mailchimp",
+				true,
+				"Sends the list of receivers of the mailing with the id ID to a list of your mailchimp account. Use with the options --api-key and --listid.");
+		mailchimpOption.setArgName("ID");
+		mutexActions.addOption(mailchimpOption);
+		Option actionsOption = new Option(
+				"a",
+				"actions",
+				true,
+				"Prints a history of actions. The history will go back only DAYS number of days. If DAYS is set to 0, the history will not be limited in time back.");
+		actionsOption.setArgName("DAYS");
+		mutexActions.addOption(actionsOption);
 
 		options.addOptionGroup(mutexActions);
 		OptionBuilder.withLongOpt("style");
@@ -101,12 +249,27 @@ public class CommandExecutor {
 		OptionBuilder.hasArg();
 		OptionBuilder.withArgName("STYLE");
 		options.addOption(OptionBuilder.create());
+		Option outputOption = new Option("o", "output", true,
+				"use with -f, -m, -c, -p: uses the given file FILE as output file");
+		outputOption.setArgName("FILE");
+		options.addOption(outputOption);
+		OptionBuilder.withLongOpt("api-key");
+		OptionBuilder
+				.withDescription("use with -s: use KEY as your account's MailChimp API key");
+		OptionBuilder.hasArg();
+		OptionBuilder.withArgName("KEY");
+		options.addOption(OptionBuilder.create());
+		OptionBuilder.withLongOpt("listid");
+		OptionBuilder
+				.withDescription("use with -s: use ID as your MailChimp account's list id");
+		OptionBuilder.hasArg();
+		OptionBuilder.withArgName("ID");
+		options.addOption(OptionBuilder.create());
 
 		// parse:
 		CommandLineParser parser = new GnuParser();
 		try {
 			CommandLine cmd = parser.parse(options, args);
-
 			// see which option has been chosen and execute:
 			if (cmd.hasOption("h")) {
 				PrintWriter pw = new PrintWriter(out);
@@ -133,6 +296,119 @@ public class CommandExecutor {
 					throw new ParseException("\"" + importStyle
 							+ "\" is no supported import file style");
 				}
+			} else if (cmd.hasOption("f")) {
+				String filterId = cmd.getOptionValue("f");
+				Filter f;
+				try {
+					f = filterService.getByID(Integer.parseInt(filterId));
+				} catch (NumberFormatException e) {
+					throw new ParseException(e.getLocalizedMessage());
+				}
+				if (f == null)
+					throw new ParseException(
+							"There is no filter with the specified id.");
+				String outputFileName = cmd.getOptionValue("o");
+				File file = outputFileName == null ? null : new File(
+						outputFileName);
+				switch (f.getType()) {
+				case ADDRESS:
+					throw new ParseException(
+							"The specified filter is of type address, which is not permitted.");
+				case DONATION: {
+					List<Donation> entities = donationService.getByFilter(f);
+					if (file == null)
+						out.print(donationService.convertToCSV(entities));
+					else
+						donationService.saveAsCSV(entities, file);
+				}
+					break;
+				case MAILING: {
+					List<Mailing> entities = mailingService.getByFilter(f);
+					if (file == null)
+						out.print(mailingService.convertToCSV(entities));
+					else
+						mailingService.saveAsCSV(entities, file);
+				}
+					break;
+				case PERSON: {
+					List<Person> entities = personService.getByFilter(f);
+					if (file == null)
+						out.print(personService.convertToCSV(entities));
+					else
+						personService.saveAsCSV(entities, file);
+				}
+					break;
+				}
+			} else if (cmd.hasOption("m")) {
+				String mailingId = cmd.getOptionValue("m");
+				Mailing m;
+				try {
+					m = mailingService.getById(Integer.parseInt(mailingId));
+				} catch (NumberFormatException e) {
+					throw new ParseException(e.getLocalizedMessage());
+				}
+				if (m == null)
+					throw new ParseException(
+							"There is no mailing with the specified id.");
+				String outputFileName = cmd.getOptionValue("o");
+				File file = outputFileName == null ? null : new File(
+						outputFileName);
+				List<Person> receivers = personService.getPersonsByMailing(m);
+				if (file == null)
+					out.print(personService.convertToCSV(receivers));
+				else
+					personService.saveAsCSV(receivers, file);
+			} else if (cmd.hasOption("c")) {
+				int confirmationId;
+				try {
+					confirmationId = Integer.parseInt(cmd.getOptionValue("c"));
+				} catch (NumberFormatException e) {
+					throw new ParseException(e.getLocalizedMessage());
+				}
+				String outputFileName = cmd.getOptionValue("o");
+				if (outputFileName == null)
+					throw new ParseException(
+							"The output file name must be specified using the -o option.");
+				File file = new File(outputFileName);
+				throw new ServiceException("not yet implemented"); // TODO
+			} else if (cmd.hasOption("p")) {
+				int mailingId;
+				try {
+					mailingId = Integer.parseInt(cmd.getOptionValue("p"));
+				} catch (NumberFormatException e) {
+					throw new ParseException(e.getLocalizedMessage());
+				}
+				String outputFileName = cmd.getOptionValue("o");
+				if (outputFileName == null)
+					throw new ParseException(
+							"The output file name must be specified using the -o option.");
+				File file = new File(outputFileName);
+				throw new ServiceException("not yet implemented"); // TODO
+			} else if (cmd.hasOption("s")) {
+				if (!cmd.hasOption("api-key"))
+					throw new ParseException(
+							"API key must be specified using the --api-key option.");
+				if (!cmd.hasOption("listid"))
+					throw new ParseException(
+							"List ID must be specified using the --listid option.");
+				int mailingId, apiKey, listid;
+				try {
+					mailingId = Integer.parseInt(cmd.getOptionValue("p"));
+					apiKey = Integer.parseInt(cmd.getOptionValue("api-key"));
+					listid = Integer.parseInt(cmd.getOptionValue("listid"));
+				} catch (NumberFormatException e) {
+					throw new ParseException(e.getLocalizedMessage());
+				}
+				throw new ServiceException("not yet implemented"); // TODO
+			} else if (cmd.hasOption("a")) {
+				int daysBack;
+				try {
+					daysBack = Integer.parseInt(cmd.getOptionValue("a"));
+				} catch (NumberFormatException e) {
+					throw new ParseException(e.getLocalizedMessage());
+				}
+
+				throw new ServiceException("not yet implemented"); // TODO
 			} else {
 				throw new ParseException("No valid option passed.");
 			}
@@ -160,5 +436,4 @@ public class CommandExecutor {
 		}
 		return 0;
 	}
-
 }
