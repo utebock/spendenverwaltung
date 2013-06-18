@@ -3,6 +3,7 @@ package at.fraubock.spendenverwaltung.interfaces.dao;
 import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Confirmation;
+import at.fraubock.spendenverwaltung.interfaces.domain.ConfirmationTemplate;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 
 /**
@@ -51,4 +52,12 @@ public interface IConfirmationDAO {
 	 *             if communication to the underlying persistence system failed
 	 */
 	public Confirmation getById(int id) throws PersistenceException;
+	
+	/**
+	 * Retrievs all confirmations with the given template stored in the underlying persistence layer 
+	 * @param template
+	 * 			ConfirmationTemplate with valid id
+	 * @return
+	 */
+	public List<Confirmation> getByConfirmationTemplate(ConfirmationTemplate template) throws PersistenceException;
 }

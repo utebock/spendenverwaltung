@@ -24,6 +24,7 @@ import at.fraubock.spendenverwaltung.interfaces.dao.IConfirmationTemplateDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IDonationDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Confirmation;
+import at.fraubock.spendenverwaltung.interfaces.domain.ConfirmationTemplate;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
 
@@ -154,6 +155,10 @@ public class ConfirmationDAOImplemented implements IConfirmationDAO {
 			else{
 				//update
 
+				if(c.getTemplate()!=null&&c.getTemplate().getId()==null){
+					confirmationTemplateDao.insertOrUpdate(c.getTemplate());
+				}
+				
 				String update = "update donation_confirmations set personid = ?, template = ?, confirmation_date = ? where id = ?";
 
 				Object [] values = { c.getPerson().getId(), c.getTemplate().getId(), new java.sql.Date(c.getDate().getTime()), c.getId()};
@@ -276,8 +281,8 @@ public class ConfirmationDAOImplemented implements IConfirmationDAO {
 						"SELECT c.*, s.donationid, m.from_date, m.to_date " +
 						"FROM donation_confirmations c " +
 							"left outer join single_donation_confirmation s on c.id = s.id " +
-							"left outer join multiple_donations_confirmation m on c.id = m.id" +
-						" WHERE c.id=?",
+							"left outer join multiple_donations_confirmation m on c.id = m.id " +
+						"WHERE c.id=?",
 						new Object[] { id }, mapper);
 
 				Integer tmplId = mapper.getTemplateIds().get(c.getId());
@@ -303,6 +308,50 @@ public class ConfirmationDAOImplemented implements IConfirmationDAO {
 				// return null if query returns 0 rows
 				return null;
 			}
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
+	}
+	
+	@Override
+	public List<Confirmation> getByConfirmationTemplate(ConfirmationTemplate template) throws PersistenceException {
+		if(template==null || template.getId() == null){
+			throw new IllegalArgumentException("Template and template id must not be null");
+		}
+		
+		try {
+			log.debug("Entering getByConfirmationTemplate");
+			ConfirmationMapper mapper = new ConfirmationMapper();
+			List<Confirmation> confirmations = jdbcTemplate.query(
+							"SELECT c.*, s.donationid, m.from_date, m.to_date " +
+							"FROM donation_confirmations c " +
+								"left outer join single_donation_confirmation s on c.id = s.id " +
+								"left outer join multiple_donations_confirmation m on c.id = m.id " +
+								"WHERE c.template = ?"
+							, new Object[]{template.getId()}, mapper);
+
+			for (Confirmation c : confirmations) {
+				Integer tmplId = mapper.getTemplateIds().get(c.getId());
+				if(tmplId != null){
+					c.setTemplate(confirmationTemplateDao.getByID(tmplId));
+				}
+				
+				Integer personId = mapper.getPersonIds().get(c.getId());
+				if(personId != null){
+					c.setPerson(personDao.getById(personId));
+				}
+				
+				if(c.getFromDate() == null && c.getToDate() == null){
+					Integer donationId = mapper.getDonationIds().get(c.getId());
+					if(donationId != null){
+						c.setDonation(donationDao.getByID(donationId));
+					}
+				}
+			}
+
+			log.debug("Returning from getByConfirmationTemplate");
+			return confirmations;
 		} catch (DataAccessException e) {
 			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
@@ -351,4 +400,6 @@ public class ConfirmationDAOImplemented implements IConfirmationDAO {
 		}
 
 	}
+
+	
 }
