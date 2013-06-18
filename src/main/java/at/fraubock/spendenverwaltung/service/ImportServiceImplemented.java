@@ -292,21 +292,7 @@ public class ImportServiceImplemented implements IImportService {
 
 		// now, save donations
 		for (Donation d : donations) {
-			try {
-				donationService.create(d);
-			} catch (Throwable t) {
-				log.debug("reverting import...");
-				int last = donations.indexOf(d);
-				for (int index = 0; index < last; ++index) {
-					try {
-						donationService.delete(donations.get(index));
-					} catch (Throwable t2) {
-						log.debug("deletion of previously-inserted donation failed: "
-								+ t2.getMessage());
-					}
-				}
-				throw t;
-			}
+			donationService.create(d);
 		}
 	}
 
@@ -363,21 +349,7 @@ public class ImportServiceImplemented implements IImportService {
 
 		// now, save donations
 		for (Donation d : donations) {
-			try {
-				donationService.create(d);
-			} catch (Throwable t) {
-				log.debug("reverting import...");
-				int last = donations.indexOf(d);
-				for (int index = 0; index < last; ++index) {
-					try {
-						donationService.delete(donations.get(index));
-					} catch (Throwable t2) {
-						log.debug("deletion of previously-inserted donation failed: "
-								+ t2.getMessage());
-					}
-				}
-				throw t;
-			}
+			donationService.create(d);
 		}
 
 	}
