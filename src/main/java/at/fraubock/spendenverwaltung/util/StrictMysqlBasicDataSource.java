@@ -15,6 +15,8 @@ public class StrictMysqlBasicDataSource extends BasicDataSource {
 	public StrictMysqlBasicDataSource() {
 		super.setDriverClassName("com.mysql.jdbc.Driver");
 		super.addConnectionProperty("innodb_strict_mode", "on");
+		super.setTestOnBorrow(true);
+		super.setTestOnReturn(true);
 	}
 
 }

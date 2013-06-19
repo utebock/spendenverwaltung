@@ -25,7 +25,6 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter.FilterPrivacyStatus;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.service.FilterValidator;
-import at.fraubock.spendenverwaltung.util.CurrentUser;
 import at.fraubock.spendenverwaltung.util.FilterType;
 
 public class FilterDAOImplemented implements IFilterDAO {
@@ -63,19 +62,37 @@ public class FilterDAOImplemented implements IFilterDAO {
 	public void delete(Filter f) throws PersistenceException {
 		try {
 			validator.validate(f);
-			String deleteFilters = "delete from filter where id = ?";
+
+			boolean rightsOk = jdbcTemplate
+					.queryForObject(
+							"SELECT (privacy_status = ? OR owner = SUBSTRING_INDEX(USER(),'@',1)) FROM filter WHERE id = ?",
+							new Object[] {
+									Filter.FilterPrivacyStatus.READ_UPDATE_DELETE
+											.toString(), f.getId() },
+							new int[] { Types.VARCHAR, Types.INTEGER },
+							Boolean.class);
+			if (!rightsOk) {
+				throw new PersistenceException("You have no right to delete "
+						+ f);
+			}
 
 			Object[] params = new Object[] { f.getId() };
-
 			int[] types = new int[] { Types.INTEGER };
-
-			jdbcTemplate.update(deleteFilters, params, types);
+			jdbcTemplate.update("delete from filter where id = ?", params,
+					types);
 
 			if (f.getCriterion() != null) {
 				abstractCritDAO.delete(f.getCriterion());
 			}
+		} catch (IncorrectResultSizeDataAccessException e) {
+			if (e.getActualSize() == 0) {
+				throw new PersistenceException("No filter with the given id", e);
+			} else {
+				log.error("Code that should not be reached.", e);
+				throw e;
+			}
 		} catch (DataAccessException e) {
-			log.warn(e.getLocalizedMessage());
+			log.warn(e.getMessage());
 			throw new PersistenceException(e);
 		}
 	}
@@ -85,9 +102,10 @@ public class FilterDAOImplemented implements IFilterDAO {
 		try {
 			// FIXME order alphabetically by name?
 			FilterMapper mapper = new FilterMapper();
-			String select = "SELECT * FROM filter WHERE owner = ? OR privacy_status NOT LIKE 'privat' ORDER BY id DESC";
+			String select = "SELECT * FROM filter WHERE owner = SUBSTRING_INDEX(USER(),'@',1) OR privacy_status != ? ORDER BY id DESC";
 			List<Filter> filterList = jdbcTemplate.query(select,
-					new Object[] { CurrentUser.userName }, mapper);
+					new Object[] { FilterPrivacyStatus.PRIVATE.toString() },
+					new int[] { Types.VARCHAR }, mapper);
 			for (Filter result : filterList) {
 				Integer critId = mapper.getCriterionId().get(result.getId());
 				if (critId != null) {
@@ -109,12 +127,13 @@ public class FilterDAOImplemented implements IFilterDAO {
 				throw new IllegalArgumentException("Id must not be less than 0");
 			}
 
-			String select = "select * from filter where id = ?";
+			String select = "select * from filter where id = ? AND (owner = SUBSTRING_INDEX(USER(),'@',1) OR privacy_status != ? )";
 			Filter result = null;
 			try {
 				FilterMapper mapper = new FilterMapper();
-				result = jdbcTemplate.queryForObject(select,
-						new Object[] { id }, mapper);
+				result = jdbcTemplate.queryForObject(select, new Object[] { id,
+						FilterPrivacyStatus.PRIVATE.toString() }, new int[] {
+						Types.INTEGER, Types.VARCHAR }, mapper);
 
 				Integer criterionId = mapper.getCriterionId().get(
 						result.getId());
@@ -136,6 +155,13 @@ public class FilterDAOImplemented implements IFilterDAO {
 
 	/* mappers for inserting and reading this entity */
 
+	/**
+	 * when creating a prepared statement, the filter's owner will be set to the
+	 * current user's username.
+	 * 
+	 * @author manuel-bichler
+	 * 
+	 */
 	private class CreateFilterStatementCreator implements
 			PreparedStatementCreator {
 
@@ -145,7 +171,7 @@ public class FilterDAOImplemented implements IFilterDAO {
 			this.filter = filter;
 		}
 
-		private String createFilter = "insert into filter (type,name,anonymous,criterion,privacy_status,owner) values (?, ?, ?, ?, ?, ?)";
+		private String createFilter = "insert into filter (type,name,anonymous,criterion,privacy_status,owner) values (?, ?, ?, ?, ?, SUBSTRING_INDEX(USER(),'@',1))";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
@@ -161,7 +187,7 @@ public class FilterDAOImplemented implements IFilterDAO {
 				ps.setInt(4, filter.getCriterion().getId());
 			}
 			ps.setString(5, filter.getPrivacyStatus().getName());
-			ps.setString(6, CurrentUser.userName);
+			filter.setOwner(connection.getMetaData().getUserName());
 			return ps;
 		}
 	}
@@ -177,7 +203,8 @@ public class FilterDAOImplemented implements IFilterDAO {
 			filter.setAnonymous(rs.getBoolean("anonymous"));
 
 			filter.setType(FilterType.getTypeForString(rs.getString("type")));
-			filter.setPrivacyStatus(FilterPrivacyStatus.getByName(rs.getString("privacy_status")));
+			filter.setPrivacyStatus(FilterPrivacyStatus.getByName(rs
+					.getString("privacy_status")));
 			filter.setOwner(rs.getString("owner"));
 			Integer crit_id = rs.getInt("criterion");
 			if (!rs.wasNull()) {
