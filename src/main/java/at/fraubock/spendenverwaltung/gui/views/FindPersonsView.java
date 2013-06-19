@@ -30,8 +30,6 @@ import net.miginfocom.swing.MigLayout;
 
 import org.apache.log4j.Logger;
 
-import at.fraubock.spendenverwaltung.gui.AddAttributes;
-import at.fraubock.spendenverwaltung.gui.EditPerson;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.PersonTableModel;
@@ -62,7 +60,8 @@ public class FindPersonsView extends InitializableView {
 	private JScrollPane scrollPane;
 	private List<Person> personList;
 	private JToolBar toolbar;
-	private JButton editButton, deleteButton, viewAddressesButton, viewDonationsButton;
+	private JButton editButton, deleteButton, viewAddressesButton,
+			viewDonationsButton;
 	private JComboBox<Filter> filterCombo;
 	private JButton backButton;
 	private JPanel overviewPanel;
@@ -93,7 +92,7 @@ public class FindPersonsView extends InitializableView {
 		this.setLayout(new MigLayout());
 		overviewPanel = componentFactory.createPanel(800, 800);
 		this.add(overviewPanel);
-		
+
 		toolbar = new JToolBar();
 		toolbar.setFloatable(false);
 		toolbar.setRollover(true);
@@ -103,34 +102,33 @@ public class FindPersonsView extends InitializableView {
 		overviewPanel.add(label, "split2");
 		initTable();
 		overviewPanel.add(filterCombo, "growx, wrap");
-		
+
 		quickSearchLabel = componentFactory.createLabel("Schnellsuche");
 		quickSearchField = new JTextField(30);
 		quickSearchField.addActionListener(new QuickSearchAction());
-		
+
 		overviewPanel.add(quickSearchLabel, "split 2");
 		overviewPanel.add(quickSearchField, "wrap");
-		
+
 		overviewPanel.add(scrollPane, "wrap");
-		
+
 		JButton exportButton = new JButton("Liste exportieren");
 		exportButton.setFont(new Font("Bigger", Font.PLAIN, 13));
 		final JFileChooser fileChooser = new JFileChooser();
 		exportButton.addActionListener(new exportActionListener(fileChooser));
 		overviewPanel.add(exportButton, "wrap");
-		
+
 		feedbackLabel = componentFactory.createLabel("");
 		feedbackLabel.setFont(new Font("Bigger", Font.PLAIN, 13));
-		
+
 		overviewPanel.add(feedbackLabel, "wrap");
 	}
 
-	
 	public void initTable() {
-		if(personModel == null) {
+		if (personModel == null) {
 			personModel = new PersonTableModel();
-		}		
-		
+		}
+
 		showTable = new JTable(personModel);
 		showTable.setFillsViewportHeight(true);
 		showTable.setAutoCreateRowSorter(true);
@@ -143,7 +141,7 @@ public class FindPersonsView extends InitializableView {
 		log.info("PersonFilter-List: " + personFilters.size());
 		try {
 			personFilters.addAll(filterService
-					.getAllByFilter(FilterType.PERSON));
+					.getAllByFilter(FilterType.PERSON).a);
 		} catch (ServiceException e) {
 			log.warn(e.getLocalizedMessage());
 			JOptionPane.showMessageDialog(this,
@@ -151,7 +149,7 @@ public class FindPersonsView extends InitializableView {
 					JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		
+
 		filterCombo = new JComboBox<Filter>(new SimpleComboBoxModel<Filter>(
 				personFilters));
 		filterCombo.addActionListener(new ActionListener() {
@@ -162,26 +160,24 @@ public class FindPersonsView extends InitializableView {
 		});
 	}
 
-	
 	private void addComponentsToToolbar(JToolBar toolbar) {
-		
+
 		backButton = new JButton();
 		Action getBack = viewActionFactory.getMainMenuViewAction();
-		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
+		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass()
+				.getResource("/images/backButton.jpg")));
 		backButton.setAction(getBack);
-		
-		
+
 		viewAddressesButton = new JButton();
 		viewAddressesButton.setFont(new Font("Bigger", Font.PLAIN, 13));
 		ViewAddressesAction viewAddressesAction = new ViewAddressesAction();
-		viewAddressesAction.putValue(Action.NAME,
-				"Adressen anzeigen");
+		viewAddressesAction.putValue(Action.NAME, "Adressen anzeigen");
 		viewAddressesButton.setAction(viewAddressesAction);
-		
+
 		viewDonationsButton = new JButton();
 		viewDonationsButton.setFont(new Font("Bigger", Font.PLAIN, 13));
 		ViewDonationsAction viewDonationsAction = new ViewDonationsAction();
-		viewDonationsAction.putValue(Action.NAME,"Spenden anzeigen");
+		viewDonationsAction.putValue(Action.NAME, "Spenden anzeigen");
 		viewDonationsButton.setAction(viewDonationsAction);
 
 		editButton = new JButton();
@@ -197,13 +193,13 @@ public class FindPersonsView extends InitializableView {
 		deleteAction.putValue(Action.NAME,
 				"<html>&nbsp;Person l\u00F6schen</html>");
 		deleteButton.setAction(deleteAction);
-		
+
 		toolbar.add(backButton, "split 4, growx");
 		toolbar.add(viewAddressesButton);
 		toolbar.add(viewDonationsButton);
 		toolbar.add(editButton);
 		toolbar.add(deleteButton);
-		
+
 	}
 
 	public PersonTableModel getPersonModel() {
@@ -244,36 +240,43 @@ public class FindPersonsView extends InitializableView {
 	private final class QuickSearchAction implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if(quickSearchField.getText().equals("")) {
+			if (quickSearchField.getText().equals("")) {
 				return;
 			} else {
 				Filter quickSearchFilter = new Filter();
 				quickSearchFilter.setType(FilterType.PERSON);
-				
+
 				PropertyCriterion likeFirstName = new PropertyCriterion();
-				likeFirstName.compare(FilterProperty.PERSON_GIVENNAME, RelationalOperator.LIKE, quickSearchField.getText());
-				
+				likeFirstName.compare(FilterProperty.PERSON_GIVENNAME,
+						RelationalOperator.LIKE, quickSearchField.getText());
+
 				PropertyCriterion likeSurname = new PropertyCriterion();
-				likeSurname.compare(FilterProperty.PERSON_SURNAME, RelationalOperator.LIKE, quickSearchField.getText());
-				
+				likeSurname.compare(FilterProperty.PERSON_SURNAME,
+						RelationalOperator.LIKE, quickSearchField.getText());
+
 				PropertyCriterion likeCompany = new PropertyCriterion();
-				likeCompany.compare(FilterProperty.PERSON_COMPANY, RelationalOperator.LIKE, quickSearchField.getText());
-				
+				likeCompany.compare(FilterProperty.PERSON_COMPANY,
+						RelationalOperator.LIKE, quickSearchField.getText());
+
 				ConnectedCriterion firstNameOrSurname = new ConnectedCriterion();
-				firstNameOrSurname.connect(likeFirstName, LogicalOperator.OR, likeSurname);
-				
+				firstNameOrSurname.connect(likeFirstName, LogicalOperator.OR,
+						likeSurname);
+
 				ConnectedCriterion companyOrNames = new ConnectedCriterion();
-				companyOrNames.connect(firstNameOrSurname, LogicalOperator.OR, likeCompany);
-				
+				companyOrNames.connect(firstNameOrSurname, LogicalOperator.OR,
+						likeCompany);
+
 				quickSearchFilter.setCriterion(companyOrNames);
-				
+
 				try {
-					List<Person> results = personService.getByFilter(quickSearchFilter);
+					List<Person> results = personService
+							.getByFilter(quickSearchFilter);
 					personModel.clear();
 					personModel.addAll(results);
 				} catch (ServiceException e1) {
 					log.warn(e1.getLocalizedMessage());
-					feedbackLabel.setText("Ein Fehler passierte während der Schnellsuche.");
+					feedbackLabel
+							.setText("Ein Fehler passierte während der Schnellsuche.");
 				}
 			}
 		}
@@ -322,44 +325,47 @@ public class FindPersonsView extends InitializableView {
 							"Die Datei konnte nicht beschrieben werden.",
 							"Error", JOptionPane.ERROR_MESSAGE);
 					log.error("File could not be written to. path='"
-							+ file.getAbsolutePath() + "', text='" + csv
-							+ "'");
+							+ file.getAbsolutePath() + "', text='" + csv + "'");
 				}
 			}
 		}
 	}
 
-	//TODO CHANGE TO EDIT ONLY THE SELECTED PERSON IN A NEW JDIALOG
+	// TODO CHANGE TO EDIT ONLY THE SELECTED PERSON IN A NEW JDIALOG
 	private final class EditAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-//			FindPersonsView findPersonsView = new FindPersonsView(personService, addressService, donationService, filterService, componentFactory, viewActionFactory, personModel);
-//			Person p; int row = showTable.getSelectedRow(); 
-//			if (row == -1) {
-//				JOptionPane.showMessageDialog(overviewPanel,
-//						"Bitte Person zum Bearbeiten ausw\u00E4hlen."); return; }
-//			
-//			int id = (Integer) personModel.getValueAt(row, 3);
-//			
-//			try { 
-//				p = personService.getById(id); 
-//			} catch (ServiceException ex) { 
-//				JOptionPane.showMessageDialog( overviewPanel,
-//						"Ein unerwarter Fehler ist aufgetreten! Bitte kontaktieren Sie Ihren Administrator.",
-//						"Fehler", JOptionPane.ERROR_MESSAGE); ex.printStackTrace();
-//						log.error(ex);
-//			 return; 
-//			 }
-//			  
-//			 EditPerson ep = new EditPerson(componentFactory, viewActionFactory, p, personService, addressService, findPersonsView, personModel); 
-//			 removeAll(); 
-//			 revalidate();
-//			 repaint(); 
-//			 add(ep);
-			 }
+			// FindPersonsView findPersonsView = new
+			// FindPersonsView(personService, addressService, donationService,
+			// filterService, componentFactory, viewActionFactory, personModel);
+			// Person p; int row = showTable.getSelectedRow();
+			// if (row == -1) {
+			// JOptionPane.showMessageDialog(overviewPanel,
+			// "Bitte Person zum Bearbeiten ausw\u00E4hlen."); return; }
+			//
+			// int id = (Integer) personModel.getValueAt(row, 3);
+			//
+			// try {
+			// p = personService.getById(id);
+			// } catch (ServiceException ex) {
+			// JOptionPane.showMessageDialog( overviewPanel,
+			// "Ein unerwarter Fehler ist aufgetreten! Bitte kontaktieren Sie Ihren Administrator.",
+			// "Fehler", JOptionPane.ERROR_MESSAGE); ex.printStackTrace();
+			// log.error(ex);
+			// return;
+			// }
+			//
+			// EditPerson ep = new EditPerson(componentFactory,
+			// viewActionFactory, p, personService, addressService,
+			// findPersonsView, personModel);
+			// removeAll();
+			// revalidate();
+			// repaint();
+			// add(ep);
+		}
 	}
 
 	private final class DeleteAction extends AbstractAction {
@@ -370,7 +376,8 @@ public class FindPersonsView extends InitializableView {
 			Person p;
 			int row = showTable.getSelectedRow();
 			if (row == -1) {
-				feedbackLabel.setText("Bitte Person zum L\u00F6schen ausw\u00E4hlen.");
+				feedbackLabel
+						.setText("Bitte Person zum L\u00F6schen ausw\u00E4hlen.");
 				return;
 			}
 
@@ -388,16 +395,17 @@ public class FindPersonsView extends InitializableView {
 					personModel.removePerson(row);
 					feedbackLabel.setText("Person wurde gel\u00F6scht.");
 				} catch (ServiceException ex) {
-					feedbackLabel.setText("Ein unerwarter Fehler ist während der Löschoperation aufgetreten.");
+					feedbackLabel
+							.setText("Ein unerwarter Fehler ist während der Löschoperation aufgetreten.");
 					log.warn(ex.getLocalizedMessage());
 				}
 			}
 		}
 	}
-	
+
 	/**
-	 * this action is required in order to check whether a person has been selected before
-	 * entering the other view
+	 * this action is required in order to check whether a person has been
+	 * selected before entering the other view
 	 */
 	private final class ViewAddressesAction extends AbstractAction {
 
@@ -408,23 +416,26 @@ public class FindPersonsView extends InitializableView {
 			Person p;
 			int row = showTable.getSelectedRow();
 			if (row == -1) {
-				feedbackLabel.setText("Es muss eine Person ausgewählt werden bevor die Addressen angezeigt werden können.");
+				feedbackLabel
+						.setText("Es muss eine Person ausgewählt werden bevor die Addressen angezeigt werden können.");
 				return;
 			}
 
 			p = personModel.getPersonRow(row);
-			
-			log.debug("Person is "+p);
-			
-			Action switchView = viewActionFactory.getPersonAddressesViewAction(personModel, p);
-			switchView.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+
+			log.debug("Person is " + p);
+
+			Action switchView = viewActionFactory.getPersonAddressesViewAction(
+					personModel, p);
+			switchView.actionPerformed(new ActionEvent(this,
+					ActionEvent.ACTION_PERFORMED, null));
 		}
-		
+
 	}
-	
+
 	/**
-	 * this action is required in order to check whether a person has been selected before
-	 * entering the other view
+	 * this action is required in order to check whether a person has been
+	 * selected before entering the other view
 	 */
 	private final class ViewDonationsAction extends AbstractAction {
 
@@ -438,17 +449,20 @@ public class FindPersonsView extends InitializableView {
 			Person p;
 			int row = showTable.getSelectedRow();
 			if (row == -1) {
-				feedbackLabel.setText("Es muss eine Person ausgewählt werden bevor die Spenden angezeigt werden können.");
+				feedbackLabel
+						.setText("Es muss eine Person ausgewählt werden bevor die Spenden angezeigt werden können.");
 				return;
 			}
 
 			p = personModel.getPersonRow(row);
 
-			log.debug("Person is "+p);
+			log.debug("Person is " + p);
 
-			Action switchView = viewActionFactory.getPersonDonationsViewAction(personModel, p);
-			switchView.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+			Action switchView = viewActionFactory.getPersonDonationsViewAction(
+					personModel, p);
+			switchView.actionPerformed(new ActionEvent(this,
+					ActionEvent.ACTION_PERFORMED, null));
 		}
-		
+
 	}
 }

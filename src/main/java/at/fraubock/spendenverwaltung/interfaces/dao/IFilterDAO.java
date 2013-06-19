@@ -58,4 +58,14 @@ public interface IFilterDAO {
 	 */
 	public Filter getById(int id) throws PersistenceException;
 
+	/**
+	 * 
+	 * @return name of the user currently connected to the underlying
+	 *         persistence system. Must be equal to {@link Filter#getOwner()}
+	 *         for filters that are owned by the ivoking user
+	 * @throws PersistenceException
+	 *             if communication to the underlying persistence system failed
+	 */
+	public String getCurrentUserName() throws PersistenceException;
+
 }

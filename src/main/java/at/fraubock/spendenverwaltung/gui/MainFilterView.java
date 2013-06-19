@@ -3,7 +3,6 @@ package at.fraubock.spendenverwaltung.gui;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -28,10 +27,12 @@ import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
 import at.fraubock.spendenverwaltung.gui.views.InitializableView;
 import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter.FilterPrivacyStatus;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.FilterInUseException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.util.FilterType;
+import at.fraubock.spendenverwaltung.util.Pair;
 
 public class MainFilterView extends InitializableView {
 
@@ -44,6 +45,7 @@ public class MainFilterView extends InitializableView {
 	private JTable showTable;
 	private JScrollPane scrollPane;
 	private List<Filter> filterList;
+	private String userName;
 	private JPanel panel;
 	private JToolBar toolbar;
 	private JButton personFilter;
@@ -149,20 +151,19 @@ public class MainFilterView extends InitializableView {
 				Filter filter = filterModel.getFilterRow(showTable
 						.getSelectedRow());
 
-				/*
-				 * if(filter.getOwner().equals(CurrentUser.userName) ||
-				 * filter.getPrivacyStatus() == FilterPrivacyStatus.READ_UPDATE
-				 * || filter.getPrivacyStatus() ==
-				 * FilterPrivacyStatus.READ_UPDATE_DELETE){
-				 */
-				createFilter(filter.getType(), filter);
-				/*
-				 * } else{ JOptionPane.showMessageDialog(MainFilterView.this,
-				 * "Sie sind nicht berechtigt diesen Filter zu bearbeiten");
-				 * return; }
-				 */
-				// TODO the above has been commented out because getting the
-				// current username is not doable at the moment.
+				if (filter.getOwner().equals(userName)
+						|| filter.getPrivacyStatus() == FilterPrivacyStatus.READ_UPDATE
+						|| filter.getPrivacyStatus() == FilterPrivacyStatus.READ_UPDATE_DELETE) {
+
+					createFilter(filter.getType(), filter);
+
+				} else {
+					JOptionPane
+							.showMessageDialog(MainFilterView.this,
+									"Sie sind nicht berechtigt diesen Filter zu bearbeiten");
+					return;
+				}
+
 			}
 
 		});
@@ -194,10 +195,11 @@ public class MainFilterView extends InitializableView {
 	}
 
 	private void getFilter() {
-		filterList = new ArrayList<Filter>();
-
 		try {
-			filterList = filterService.getAllByAnonymous(false);
+			Pair<List<Filter>, String> filterPair = filterService
+					.getAllByAnonymous(false);
+			filterList = filterPair.a;
+			userName = filterPair.b;
 			log.info("List " + filterList.size() + " filter");
 		} catch (ServiceException e) {
 			JOptionPane
@@ -236,14 +238,12 @@ public class MainFilterView extends InitializableView {
 
 		Filter filter = filterModel.getFilterRow(showTable.getSelectedRow());
 
-		/*
-		 * if (!filter.getOwner().equals(CurrentUser.userName) &&
-		 * filter.getPrivacyStatus() != FilterPrivacyStatus.READ_UPDATE_DELETE)
-		 * { JOptionPane.showMessageDialog(MainFilterView.this,
-		 * "Sie sind nicht berechtigt diesen Filter zu löschen"); return; }
-		 */
-		// TODO the above has been commented out because getting the
-		// current username is not doable at the moment.
+		if (!filter.getOwner().equals(userName)
+				&& filter.getPrivacyStatus() != FilterPrivacyStatus.READ_UPDATE_DELETE) {
+			JOptionPane.showMessageDialog(MainFilterView.this,
+					"Sie sind nicht berechtigt diesen Filter zu löschen");
+			return;
+		}
 
 		int answer = JOptionPane.showConfirmDialog(this,
 				"Wollen Sie den Filter " + filter.getName()

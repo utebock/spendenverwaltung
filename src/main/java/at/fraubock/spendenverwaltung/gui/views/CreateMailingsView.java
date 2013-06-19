@@ -63,15 +63,15 @@ public class CreateMailingsView extends InitializableView {
 	private JXDatePicker postalDatePicker;
 	private JComboBox<SupportedFileFormat> fileFormatBox;
 	private JLabel fileFormatLabel;
-	
-	public enum SupportedFileFormat{
+
+	public enum SupportedFileFormat {
 		PDF, DOCX
 	}
 
 	// personfilters
 	private Filter selectedEmailFilter;
 	private Filter selectedPostalFilter;
-	
+
 	private File templateFile;
 
 	JPanel contentPanel, createEMailingPanel, createPostalMailingPanel,
@@ -79,22 +79,24 @@ public class CreateMailingsView extends InitializableView {
 
 	JLabel emailTitle, postalTitle, reproduceTitle, emailFilterLabel,
 			postalFilterLabel, emailTypeLabel, postalTypeLabel, emailDateLabel,
-			postalDateLabel, feedbackLabel, outputNameLabel, emailMailChimpLabel;
+			postalDateLabel, feedbackLabel, outputNameLabel,
+			emailMailChimpLabel;
 	JButton createEMailingButton, createPostalMailingButton, fileChooserButton,
-			cancelEMailingButton, cancelPostalMailingButton, emailMailChimpApiButton;
+			cancelEMailingButton, cancelPostalMailingButton,
+			emailMailChimpApiButton;
 	JSeparator separator;
-	
+
 	StringTextField outputNameField;
 
 	JComboBox<Filter> eMailingPersonFilterChooser, postalPersonFilterChooser;
 	JComboBox<Mailing.MailingType> eMailingTypeChooser,
 			postalMailingTypeChooser;
 	JComboBox<MailChimpListItem> emailMailChimpListChooser;
-	
 
 	public CreateMailingsView(ViewActionFactory viewActionFactory,
 			ComponentFactory componentFactory, IMailingService mailingService,
-			IFilterService filterService, IPersonService personService, IMailChimpService mailChimpService) {
+			IFilterService filterService, IPersonService personService,
+			IMailChimpService mailChimpService) {
 		this.viewActionFactory = viewActionFactory;
 		this.componentFactory = componentFactory;
 		this.mailingService = mailingService;
@@ -143,13 +145,12 @@ public class CreateMailingsView extends InitializableView {
 		emailDatePicker = new JXDatePicker(new java.util.Date());
 		createEMailingPanel.add(emailDateLabel);
 		createEMailingPanel.add(emailDatePicker, "wrap");
-		
-		//MailChimp listChooser
+
+		// MailChimp listChooser
 		emailMailChimpLabel = componentFactory.createLabel("MailChimp List");
 		emailMailChimpListChooser = new JComboBox<MailChimpListItem>();
 		createEMailingPanel.add(emailMailChimpLabel);
 		createEMailingPanel.add(emailMailChimpListChooser, "wrap");
-		
 
 		// buttons
 		createEMailingButton = new JButton("Anlegen");
@@ -158,7 +159,6 @@ public class CreateMailingsView extends InitializableView {
 		createEMailingPanel.add(cancelEMailingButton, "split 2");
 		createEMailingPanel.add(createEMailingButton);
 		createEMailingPanel.add(emailMailChimpApiButton, "wrap");
-		
 
 		// set up postal mailing panel layout
 		postalTitle = componentFactory
@@ -185,26 +185,27 @@ public class CreateMailingsView extends InitializableView {
 		postalDatePicker = new JXDatePicker(new java.util.Date());
 		createPostalMailingPanel.add(postalDateLabel);
 		createPostalMailingPanel.add(postalDatePicker, "wrap");
-		
+
 		fileFormatLabel = componentFactory.createLabel("Abspeichern als");
-		fileFormatBox = new JComboBox<SupportedFileFormat>(SupportedFileFormat.values());
+		fileFormatBox = new JComboBox<SupportedFileFormat>(
+				SupportedFileFormat.values());
 		createPostalMailingPanel.add(fileFormatLabel, "");
 		createPostalMailingPanel.add(fileFormatBox, "wrap");
-		
+
 		outputNameLabel = componentFactory.createLabel("Dokumentname");
 		outputNameField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
 		createPostalMailingPanel.add(outputNameLabel);
 		createPostalMailingPanel.add(outputNameField, "wrap");
-		
+
 		fileChooserButton = new JButton("Auswählen");
 		createPostalMailingPanel.add(fileChooserButton, "wrap");
-		
+
 		// buttons
 		createPostalMailingButton = new JButton("Anlegen");
 		cancelPostalMailingButton = new JButton("Abbrechen");
 		createPostalMailingPanel.add(cancelPostalMailingButton, "split 2");
 		createPostalMailingPanel.add(createPostalMailingButton, "wrap");
-		
+
 		feedbackLabel = componentFactory.createLabel("");
 		feedbackLabel.setFont(new Font("Headline", Font.PLAIN, 16));
 		contentPanel.add(feedbackLabel);
@@ -215,7 +216,7 @@ public class CreateMailingsView extends InitializableView {
 
 		List<Filter> personFilters;
 		try {
-			personFilters = filterService.getAllByFilter(FilterType.PERSON);
+			personFilters = filterService.getAllByFilter(FilterType.PERSON).a;
 
 			eMailingPersonFilterChooser
 					.setModel(new SimpleComboBoxModel<Filter>(personFilters));
@@ -242,26 +243,30 @@ public class CreateMailingsView extends InitializableView {
 
 			Action cancelAction = viewActionFactory.getMainMenuViewAction();
 			cancelAction.putValue(Action.NAME, "Abbrechen");
-			cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
+			cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass()
+					.getResource("/images/backButton.jpg")));
 			cancelEMailingButton.setAction(cancelAction);
 			cancelPostalMailingButton.setAction(cancelAction);
 			fileChooserButton.setAction(new ChoosePostalTemplateAction());
-			emailMailChimpApiButton.setAction(new ChangeMailChimpApiKeyAction());
-			
+			emailMailChimpApiButton
+					.setAction(new ChangeMailChimpApiKeyAction());
+
 		} catch (ServiceException e) {
 			JOptionPane
 					.showMessageDialog(null,
 							"Ein Fehler trat beim Initialisieren der Personenfilter auf.");
 		}
-		
-		try{
-			//Load lists from MailChimp
-			emailMailChimpListChooser.setModel(new SimpleComboBoxModel<MailChimpListItem>(mailChimpService.getLists()));
+
+		try {
+			// Load lists from MailChimp
+			emailMailChimpListChooser
+					.setModel(new SimpleComboBoxModel<MailChimpListItem>(
+							mailChimpService.getLists()));
+		} catch (ServiceException e) {
+			JOptionPane.showMessageDialog(null,
+					"Ein Fehler trat bei der Kommunikation mit MailChimp auf");
 		}
-		catch(ServiceException e){
-			JOptionPane.showMessageDialog(null, "Ein Fehler trat bei der Kommunikation mit MailChimp auf");
-		}
-		
+
 	}
 
 	private final class CreateEMailingAction extends AbstractAction {
@@ -281,8 +286,7 @@ public class CreateMailingsView extends InitializableView {
 				JOptionPane.showMessageDialog(null,
 						"Es muss ein Personenfilter ausgewählt werden!");
 				return;
-			}
-			else if(emailMailChimpListChooser.getSelectedItem()==null){
+			} else if (emailMailChimpListChooser.getSelectedItem() == null) {
 				JOptionPane.showMessageDialog(null,
 						"Es muss eine MailChimp Liste ausgewählt werden!");
 				return;
@@ -294,27 +298,34 @@ public class CreateMailingsView extends InitializableView {
 					.getSelectedItem());
 			try {
 				mailingService.insertOrUpdate(mailing);
-				
-				List<Person> recipients = personService.getPersonsByMailing(mailing);
-				
+
+				List<Person> recipients = personService
+						.getPersonsByMailing(mailing);
+
 				errors = mailChimpService.addPersonsToList(
-						((MailChimpListItem)emailMailChimpListChooser.getSelectedItem()).getId(),
-						personService.getPersonsByMailing(mailing));
-						
+						((MailChimpListItem) emailMailChimpListChooser
+								.getSelectedItem()).getId(), personService
+								.getPersonsByMailing(mailing));
+
 				feedbackLabel.setText("Aussendung wurde erstellt.");
-				if(errors==0){
-					JOptionPane.showMessageDialog(null,
-						"Es wurden "+recipients.size()+" Personen der MailChimp Liste hinzugefügt!");
-				}
-				else if(errors>0){
-					JOptionPane.showMessageDialog(null,
-							"Es gab "+errors+" fehlerhafte Datensätze beim Hinzufügen zu MailChimp!");
+				if (errors == 0) {
+					JOptionPane.showMessageDialog(null, "Es wurden "
+							+ recipients.size()
+							+ " Personen der MailChimp Liste hinzugefügt!");
+				} else if (errors > 0) {
+					JOptionPane
+							.showMessageDialog(
+									null,
+									"Es gab "
+											+ errors
+											+ " fehlerhafte Datensätze beim Hinzufügen zu MailChimp!");
 				}
 			} catch (ServiceException e1) {
 				log.error(e1.getMessage() + " occured in CreateMailings");
-				feedbackLabel.setText("Ein Fehler ist während der Erstellung dieser Aussendung aufgetreten.");
+				feedbackLabel
+						.setText("Ein Fehler ist während der Erstellung dieser Aussendung aufgetreten.");
 			}
-			
+
 		}
 
 	}
@@ -342,59 +353,67 @@ public class CreateMailingsView extends InitializableView {
 			mailing.setType((Mailing.MailingType) postalMailingTypeChooser
 					.getSelectedItem());
 
-//			if(templateFile != null) {
-//				log.debug("Template file size "+templateFile.length());
-//				MailingTemplate template = new MailingTemplate();
-//				template.setFile(templateFile);
-//				template.setFileName(templateFile.getName());
-//				mailing.setTemplate(template);
-//			} else {
-//				log.debug("Template file was null");
-//			}
+			// if(templateFile != null) {
+			// log.debug("Template file size "+templateFile.length());
+			// MailingTemplate template = new MailingTemplate();
+			// template.setFile(templateFile);
+			// template.setFileName(templateFile.getName());
+			// mailing.setTemplate(template);
+			// } else {
+			// log.debug("Template file was null");
+			// }
 
 			try {
 				mailingService.insertOrUpdate(mailing);
 				feedbackLabel.setText("Aussendung wurde erstellt.");
-				
-				if(templateFile != null) {
+
+				if (templateFile != null) {
 					String name = "";
 					String fileName = outputNameField.getText();
-					SupportedFileFormat selectedFileFormat = (SupportedFileFormat) fileFormatBox.getSelectedItem();
-					
-					if(outputNameField.getText().isEmpty()) {
-						if(selectedFileFormat == SupportedFileFormat.DOCX)
-							name = "./vorlage"+(new Date())+".docx";
-						else if(selectedFileFormat == SupportedFileFormat.PDF)
-							name = "./vorlage"+(new Date())+".pdf";
+					SupportedFileFormat selectedFileFormat = (SupportedFileFormat) fileFormatBox
+							.getSelectedItem();
+
+					if (outputNameField.getText().isEmpty()) {
+						if (selectedFileFormat == SupportedFileFormat.DOCX)
+							name = "./vorlage" + (new Date()) + ".docx";
+						else if (selectedFileFormat == SupportedFileFormat.PDF)
+							name = "./vorlage" + (new Date()) + ".pdf";
 					} else {
-						if(selectedFileFormat == SupportedFileFormat.DOCX){
-							if(!fileName.endsWith(".docx"))
+						if (selectedFileFormat == SupportedFileFormat.DOCX) {
+							if (!fileName.endsWith(".docx"))
 								name = "./" + fileName.concat(".docx");
 							else
 								name = "./" + fileName;
-						} else if(selectedFileFormat == SupportedFileFormat.PDF){
-							if(!fileName.endsWith(".pdf"))
+						} else if (selectedFileFormat == SupportedFileFormat.PDF) {
+							if (!fileName.endsWith(".pdf"))
 								name = "./" + fileName.concat(".pdf");
 							else
 								name = "./" + fileName;
 						}
 					}
-					
-					List<Person> recipients = personService.getPersonsByMailing(mailing);
-					
-					if(recipients.isEmpty()) {
-						feedbackLabel.setText("Der Personenfilter enthielt keine erreichbaren Personen.");
+
+					List<Person> recipients = personService
+							.getPersonsByMailing(mailing);
+
+					if (recipients.isEmpty()) {
+						feedbackLabel
+								.setText("Der Personenfilter enthielt keine erreichbaren Personen.");
 						mailingService.delete(mailing);
-					} else {					
-						MailingTemplateUtil.createMailingWithDocxTemplate(templateFile, personService.getPersonsByMailing(mailing), name);
+					} else {
+						MailingTemplateUtil.createMailingWithDocxTemplate(
+								templateFile,
+								personService.getPersonsByMailing(mailing),
+								name);
 					}
 				}
 			} catch (ServiceException e1) {
 				log.error(e1 + " occured in CreateMailingsView");
-				feedbackLabel.setText("Ein Fehler ist während der Erstellung dieser Aussendung aufgetreten.");
+				feedbackLabel
+						.setText("Ein Fehler ist während der Erstellung dieser Aussendung aufgetreten.");
 			} catch (IOException e1) {
 				log.error(e1 + " occured in CreateMailingsView");
-				feedbackLabel.setText("Ein Fehler ist während der Erstellung des PDFs aufgetreten.");
+				feedbackLabel
+						.setText("Ein Fehler ist während der Erstellung des PDFs aufgetreten.");
 			}
 		}
 
@@ -403,54 +422,59 @@ public class CreateMailingsView extends InitializableView {
 	private final class ChoosePostalTemplateAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
-		
+
 		public ChoosePostalTemplateAction() {
 			super("Vorlage auswählen");
 		}
-		
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JFileChooser fileChooser = new JFileChooser();
-			
+
 			FileNameExtensionFilter filter = new FileNameExtensionFilter(
-				        "docx", "docx");
-			
+					"docx", "docx");
+
 			fileChooser.setFileFilter(filter);
-			
+
 			int returnval = fileChooser.showOpenDialog(contentPanel);
-			
-			if(returnval == JFileChooser.APPROVE_OPTION) {
+
+			if (returnval == JFileChooser.APPROVE_OPTION) {
 				templateFile = fileChooser.getSelectedFile();
 				log.debug("Set template file");
-			}	
+			}
 		}
 	}
-	
-	private final class ChangeMailChimpApiKeyAction extends AbstractAction{
+
+	private final class ChangeMailChimpApiKeyAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
-		
-		public ChangeMailChimpApiKeyAction(){
+
+		public ChangeMailChimpApiKeyAction() {
 			super("MailChimp API Key ändern");
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String newKey = JOptionPane.showInputDialog("Geben Sie einen gültigen MailChimp API Key ein");
-			if(newKey!=null&&!newKey.isEmpty()){
+			String newKey = JOptionPane
+					.showInputDialog("Geben Sie einen gültigen MailChimp API Key ein");
+			if (newKey != null && !newKey.isEmpty()) {
 				try {
 					mailChimpService.setAPIKey(newKey);
-					feedbackLabel.setText("Der eingegebene MailChimp API Key wurde gespeichert");
+					feedbackLabel
+							.setText("Der eingegebene MailChimp API Key wurde gespeichert");
 
-					//Reaload lists from MailChimp
-					emailMailChimpListChooser.setModel(new SimpleComboBoxModel<MailChimpListItem>(mailChimpService.getLists()));
+					// Reaload lists from MailChimp
+					emailMailChimpListChooser
+							.setModel(new SimpleComboBoxModel<MailChimpListItem>(
+									mailChimpService.getLists()));
 				} catch (ServiceException e1) {
 					log.debug("MailChimp API Key was invalid");
-					feedbackLabel.setText("Der eingegebene MailChimp API Key ist ungültig");
+					feedbackLabel
+							.setText("Der eingegebene MailChimp API Key ist ungültig");
 				}
 			}
-			
+
 		}
-		
+
 	}
 }
