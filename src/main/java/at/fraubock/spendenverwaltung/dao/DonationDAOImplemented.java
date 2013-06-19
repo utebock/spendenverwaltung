@@ -229,7 +229,7 @@ public class DonationDAOImplemented implements IDonationDAO {
 				throw new IllegalArgumentException("Passed person was invalid");
 			}
 
-			String select = "select * from donations where personid = ? ORDER BY id DESC";
+			String select = "select * from validated_donations where personid = ? ORDER BY id DESC";
 
 			List<Donation> donations = jdbcTemplate.query(select,
 					new Object[] { p.getId() }, new DonationMapper());
