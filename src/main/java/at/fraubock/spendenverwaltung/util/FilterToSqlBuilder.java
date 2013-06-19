@@ -22,9 +22,11 @@ public class FilterToSqlBuilder {
 	private FilterValidator validator;
 
 	/**
-	 * creates the SQL statement for the given filter
+	 * creates the SQL statement for the given filter, on confirmed/validated
+	 * items only
 	 * 
 	 * @param filter
+	 *            the filter to create the SQL statement from
 	 * @return sql statement
 	 */
 	public String createSqlStatement(Filter filter) {
@@ -71,13 +73,15 @@ public class FilterToSqlBuilder {
 
 		// determine the value the property will be compared to
 		if (prop.getNumValue() != null) {
-			stmt += escapeSQL(""+prop.getNumValue());
+			stmt += escapeSQL("" + prop.getNumValue());
 		} else if (prop.getStrValue() != null) {
 			String percent = "";
-			if(!prop.getStrValue().contains("%") && prop.getRelationalOperator() == RelationalOperator.LIKE) {
-				percent="%";
+			if (!prop.getStrValue().contains("%")
+					&& prop.getRelationalOperator() == RelationalOperator.LIKE) {
+				percent = "%";
 			}
-			stmt += "'" + percent + escapeSQL(prop.getStrValue()) + percent + "'";
+			stmt += "'" + percent + escapeSQL(prop.getStrValue()) + percent
+					+ "'";
 		} else if (prop.getDateValue() != null) {
 			stmt += "DATE('"
 					+ new SimpleDateFormat("yyyy-MM-dd").format(prop
@@ -96,8 +100,8 @@ public class FilterToSqlBuilder {
 				operator = RelationalOperator.GREATER;
 			}
 			stmt = prop.getProperty() + " " + operator.toExpression()
-					+ " DATE_SUB(DATE(NOW()),INTERVAL " + escapeSQL(""+prop.getDaysBack())
-					+ " DAY)";
+					+ " DATE_SUB(DATE(NOW()),INTERVAL "
+					+ escapeSQL("" + prop.getDaysBack()) + " DAY)";
 		} else {
 			throw new IllegalArgumentException(
 					"No value for PropertyCriterion provided. Type='"
@@ -141,14 +145,14 @@ public class FilterToSqlBuilder {
 		// set wanted result for comparison
 		if (criterion.getCount() != null) {
 			select += "count(*) from ";
-			constraint += " " + escapeSQL(""+criterion.getCount());
+			constraint += " " + escapeSQL("" + criterion.getCount());
 		} else if (criterion.getProperty() != null) {
 			if (criterion.getSum() != null) {
 				select += "sum(" + criterion.getProperty() + ") from ";
-				constraint += escapeSQL(""+criterion.getSum());
+				constraint += escapeSQL("" + criterion.getSum());
 			} else if (criterion.getAvg() != null) {
 				select += "avg(" + criterion.getProperty() + ") from ";
-				constraint += escapeSQL(""+criterion.getAvg());
+				constraint += escapeSQL("" + criterion.getAvg());
 			}
 		}
 
@@ -175,7 +179,7 @@ public class FilterToSqlBuilder {
 			statement = mountSameTypes(mountLevel, statement);
 
 		} else if (thisType == FilterType.PERSON) {
-			
+
 			if (mountedType == FilterType.DONATION) {
 				statement = mountDonationToPerson(mountLevel, statement);
 			} else if (mountedType == FilterType.MAILING) {
@@ -183,9 +187,9 @@ public class FilterToSqlBuilder {
 			} else if (mountedType == FilterType.ADDRESS) {
 				statement = mountAddressToPerson(mountLevel, statement);
 			}
-			
+
 		} else if (thisType == FilterType.DONATION) {
-			
+
 			if (mountedType == FilterType.PERSON) {
 				statement = mountPersonToDonation(mountLevel, statement);
 			} else {
@@ -194,7 +198,7 @@ public class FilterToSqlBuilder {
 		}
 
 		else if (thisType == FilterType.MAILING) {
-			
+
 			if (mountedType == FilterType.PERSON) {
 				statement = mountPersonToMailing(mountLevel, statement);
 			} else {
@@ -225,15 +229,15 @@ public class FilterToSqlBuilder {
 	private String mountSameTypes(int mountLevel, String statement) {
 		// types are the same. only consider entries with same id as top
 		// select
-		return statement += " where mount" + (mountLevel) + ".id=mount" + (mountLevel - 1)
-				+ ".id";
+		return statement += " where mount" + (mountLevel) + ".id=mount"
+				+ (mountLevel - 1) + ".id";
 	}
 
 	private String mountDonationToPerson(int mountLevel, String statement) {
 		// donation. only consider those where their personid
 		// is equal to the top selects' id
-		return statement += " where mount" + (mountLevel - 1) + ".id=mount" + (mountLevel)
-				+ ".personid";
+		return statement += " where mount" + (mountLevel - 1) + ".id=mount"
+				+ (mountLevel) + ".personid";
 	}
 
 	private String mountMailingToPerson(int mountLevel, String statement) {
@@ -242,9 +246,9 @@ public class FilterToSqlBuilder {
 		// from this join we have to keep only the mailings where person_id
 		// is the id of the top select's id
 		// (since top select is type person)
-		return statement +=
-				" join sent_mailings as sent on mount"+mountLevel+".id=sent.mailing_id where sent.person_id=mount"
-						+ (mountLevel-1) + ".id";
+		return statement += " join sent_mailings as sent on mount" + mountLevel
+				+ ".id=sent.mailing_id where sent.person_id=mount"
+				+ (mountLevel - 1) + ".id";
 	}
 
 	private String mountAddressToPerson(int mountLevel, String statement) {
@@ -253,7 +257,8 @@ public class FilterToSqlBuilder {
 		// from this join we have to keep only the addresses where pid
 		// is the id of the top select's id
 		// (since top select is type person)
-		return statement += " join livesat on mount"+mountLevel+".id=aid where pid=mount" + (mountLevel-1) + ".id";
+		return statement += " join livesat on mount" + mountLevel
+				+ ".id=aid where pid=mount" + (mountLevel - 1) + ".id";
 	}
 
 	private String mountPersonToDonation(int mountLevel, String statement) {
@@ -266,15 +271,15 @@ public class FilterToSqlBuilder {
 
 	private String mountPersonToMailing(int mountLevel, String statement) {
 		// see mountMailingToPerson (just with switched ids)
-		return statement +=	" join sent_mailings as sent on mount"+mountLevel+".id=sent.person_id where sent.mailing_id=mount"
-						+ (mountLevel-1) + ".id";
+		return statement += " join sent_mailings as sent on mount" + mountLevel
+				+ ".id=sent.person_id where sent.mailing_id=mount"
+				+ (mountLevel - 1) + ".id";
 	}
-	
+
 	private void illegalMounting(FilterType thisType, FilterType mountedType) {
 		throw new IllegalArgumentException(
 				"Mounting failed due to invalid combination of types. This type='"
-						+ thisType + "', mounted type='" + mountedType
-						+ "'");
+						+ thisType + "', mounted type='" + mountedType + "'");
 	}
 
 	public FilterValidator getValidator() {
@@ -284,11 +289,11 @@ public class FilterToSqlBuilder {
 	public void setValidator(FilterValidator validator) {
 		this.validator = validator;
 	}
-	
+
 	public static String escapeSQL(String value) {
 		String escaped = value;
-		escaped = value.replace("\\","\\\\"); // replace \ with \\
-		escaped = escaped.replace("'","\\'"); // replace ' with \'
+		escaped = value.replace("\\", "\\\\"); // replace \ with \\
+		escaped = escaped.replace("'", "\\'"); // replace ' with \'
 		return escaped;
 	}
 
