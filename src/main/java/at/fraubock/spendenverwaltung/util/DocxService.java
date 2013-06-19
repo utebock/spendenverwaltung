@@ -17,6 +17,7 @@ import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.PartName;
 import org.docx4j.openpackaging.parts.WordprocessingML.AlternativeFormatInputPart;
+import org.docx4j.openpackaging.parts.WordprocessingML.DocumentSettingsPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.relationships.Relationship;
 import org.docx4j.wml.CTAltChunk;
@@ -47,7 +48,11 @@ public class DocxService {
             }
         }
 
+		
         if (target != null) {
+    		DocumentSettingsPart settingsPart = target.getMainDocumentPart().getDocumentSettingsPart();
+    		settingsPart.getJaxbElement().setMailMerge(null);
+    		
             target.save(generated);
             return new FileInputStream(generated);
         } else {
