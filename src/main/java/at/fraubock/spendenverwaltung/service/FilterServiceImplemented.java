@@ -3,6 +3,7 @@ package at.fraubock.spendenverwaltung.service;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.jfree.util.Log;
@@ -25,6 +26,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
+import at.fraubock.spendenverwaltung.util.Pair;
 
 import com.sun.xml.internal.txw2.IllegalSignatureException;
 
@@ -153,46 +155,51 @@ public class FilterServiceImplemented implements IFilterService {
 
 	@Override
 	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
-	public List<Filter> getAll() throws ServiceException {
+	public Pair<List<Filter>, String> getAll() throws ServiceException {
 		List<Filter> list = null;
+		String uName = null;
 		try {
 			list = filterDAO.getAll();
+			uName = filterDAO.getCurrentUserName();
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
-		return list;
+		return new Pair<List<Filter>, String>(list, uName);
 	}
 
 	@Override
 	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
-	public List<Filter> getAllByFilter(FilterType type)
+	public Pair<List<Filter>, String> getAllByFilter(FilterType type)
 			throws ServiceException {
 		List<Filter> list = new ArrayList<Filter>();
+		String uName;
 		try {
 			for (Filter filter : filterDAO.getAll()) {
-				if (filter.getType() == type
-						&& !filter.isAnonymous()) {
+				if (filter.getType() == type && !filter.isAnonymous()) {
 					list.add(filter);
 				}
 			}
+			uName = filterDAO.getCurrentUserName();
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
 
-		return list;
+		return new Pair<List<Filter>, String>(list, uName);
 	}
 
 	@Override
 	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
-	public List<Filter> getAllByAnonymous(boolean anonymous)
+	public Pair<List<Filter>, String> getAllByAnonymous(boolean anonymous)
 			throws ServiceException {
-		List<Filter> list = new ArrayList<Filter>();
-		for (Filter f : getAll()) {
-			if (f.isAnonymous() == anonymous) {
-				list.add(f);
+		Pair<List<Filter>, String> allPair = getAll();
+		Iterator<Filter> i = allPair.a.iterator();
+		while (i.hasNext()) {
+			Filter f = i.next();
+			if (f.isAnonymous() != anonymous) {
+				i.remove();
 			}
 		}
-		return list;
+		return allPair;
 	}
 
 	@Override

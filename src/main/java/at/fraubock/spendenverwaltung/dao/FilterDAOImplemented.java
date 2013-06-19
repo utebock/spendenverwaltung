@@ -244,4 +244,15 @@ public class FilterDAOImplemented implements IFilterDAO {
 	public void setAbstractCritDAO(AbstractCriterionDAO abstractCritDAO) {
 		this.abstractCritDAO = abstractCritDAO;
 	}
+
+	@Override
+	public String getCurrentUserName() throws PersistenceException {
+		try {
+			return jdbcTemplate.queryForObject(
+					"SELECT SUBSTRING_INDEX(USER(),'@',1)", String.class);
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
+	}
 }

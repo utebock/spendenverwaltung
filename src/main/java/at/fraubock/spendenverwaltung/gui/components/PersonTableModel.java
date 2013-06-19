@@ -12,7 +12,7 @@ public class PersonTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
 
 	private String[] columnNames = new String[] { "Vorname",
-			"Nachname", "Adresse" };
+			"Nachname", "Firma", "Adresse" };
 	private Vector<Person> persons = new Vector<Person>();
 
 	public void addPerson(Person person) {
@@ -49,9 +49,14 @@ public class PersonTableModel extends AbstractTableModel {
 		switch(columnIndex){
 			case 0: return person.getGivenName();
 			case 1: return person.getSurname();
-			case 2: return person.getAddresses().isEmpty()?"keine Adresse vorhanden":
+			case 2: if(!(person.getCompany() == null)) {
+						if(!person.getCompany().isEmpty()) {
+							return person.getCompany();
+						}
+					}
+					return "Keine Firma";
+			case 3: return person.getAddresses().isEmpty()?"keine Adresse vorhanden":
 				person.getAddresses().get(0).getStreet();
-			case 3: return person.getId();
 			default: return null;
 		}
 	}
@@ -66,7 +71,7 @@ public class PersonTableModel extends AbstractTableModel {
 		case 2:
 			return String.class;
 		case 3:
-			return Integer.class;
+			return String.class;
 		}
 		return null;
 	}
@@ -88,5 +93,11 @@ public class PersonTableModel extends AbstractTableModel {
 	
 	public List<Person> getPersons() {
 		return persons;
+	}
+
+	public void addAll(List<Person> results) {
+		persons = new Vector<Person>();
+		persons.addAll(results);
+		fireTableDataChanged();
 	}
 }

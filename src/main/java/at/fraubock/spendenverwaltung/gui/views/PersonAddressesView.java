@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -10,6 +11,7 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -18,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 
@@ -68,6 +71,8 @@ public class PersonAddressesView extends InitializableView {
 		this.addressService = addressService;
 		this.selectedPerson = selectedPerson;
 		this.personTableModel = personTableModel;
+		
+		setUpLayout();
 	}
 	
 	public void setUpLayout() {
@@ -75,21 +80,22 @@ public class PersonAddressesView extends InitializableView {
 		
 		this.add(contentPanel);
 		
+		addressTableModel = new AddressTableModel();
 		addressesTable = new JTable(addressTableModel);
+		addressesTable.setAutoCreateRowSorter(true);
+		addressesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		addressesTable.setFillsViewportHeight(true);
+		
 		JScrollPane scrollPane = new JScrollPane(addressesTable);
 		scrollPane.setPreferredSize(new Dimension(700, 550));
-		
 		toolbar = new JToolBar();
 		contentPanel.add(toolbar, "wrap, growx");
 
 		mainAddressLabel = componentFactory.createLabel("");
-		feedbackLabel.setFont(new Font("Headline", Font.PLAIN, 16));
-		contentPanel.add(mainAddressLabel);
+		mainAddressLabel.setFont(new Font("Headline", Font.PLAIN, 13));
+		contentPanel.add(mainAddressLabel, "wrap");
 		
 		contentPanel.add(scrollPane, "wrap, growx");
-		
-		addressesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
 		feedbackLabel = componentFactory.createLabel("");
 		feedbackLabel.setFont(new Font("Headline", Font.PLAIN, 16));
@@ -102,12 +108,13 @@ public class PersonAddressesView extends InitializableView {
 		addComponentsToToolbar(toolbar);
 	}
 	
-	public void initTable() {
-		addressesTable = new JTable(addressTableModel);
-		
+	public void initTable() {		
 		if(selectedPerson != null) {
 			if(selectedPerson.getMainAddress() != null) {
-				mainAddressLabel.setText(selectedPerson.getMainAddress().toString());
+				mainAddressLabel.setText("Hauptadresse: "+selectedPerson.getMainAddress().getStreet() + " " +
+						selectedPerson.getMainAddress().getPostalCode() + " " +
+						selectedPerson.getMainAddress().getCity() + " " +
+						selectedPerson.getMainAddress().getCountry());
 			} else {
 				mainAddressLabel.setText("Keine Hauptaddresse vorhanden");
 			}
@@ -119,6 +126,9 @@ public class PersonAddressesView extends InitializableView {
 	}
 	
 	private void addComponentsToToolbar(JToolBar toolbar) {
+		
+		toolbar.setFloatable(false);
+		toolbar.setRollover(true);
 		
 		backButton = new JButton();
 		Action getBack = viewActionFactory.getFindPersonsViewAction(personTableModel);
@@ -149,8 +159,12 @@ public class PersonAddressesView extends InitializableView {
 	
 	private final class AddAction extends AbstractAction{
 		private static final long serialVersionUID = 1L;
+		
+		public AddAction() {
+			super("Neue Adresse");
+		}
 
-		private JFrame addAddressFrame;
+		private JDialog addAddressDialog;
 		private JPanel addAddressPanel;
 		private JLabel addressStreetLabel;
 		private StringTextField streetField;
@@ -164,50 +178,64 @@ public class PersonAddressesView extends InitializableView {
 		private JLabel addressCountryLabel;
 		private StringTextField countryField;
 		
+		private JLabel setAsMainAddress;
+		private JCheckBox mainAddress;
+		
 		private JLabel validationFeedbackLabel;
 		private JButton submitButton;
 		private JButton cancelButton;
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			addAddressFrame = new JFrame("Neue Adresse");
-			addAddressPanel = componentFactory.createPanel(250, 200);
+			addAddressDialog = new JDialog(SwingUtilities.getWindowAncestor(contentPanel), Dialog.ModalityType.APPLICATION_MODAL);
+			addAddressDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			addAddressPanel = componentFactory.createPanel(300, 250);
 			
 			addressStreetLabel = componentFactory.createLabel("Stra\u00DFe: ");
 			streetField = new StringTextField(ComponentConstants.MEDIUM_TEXT, false);
 			
-			addAddressPanel.add(addressStreetLabel, "");
-			addAddressPanel.add(streetField, "wrap 0px");
+			addAddressPanel.add(addressStreetLabel, "split 2");
+			addAddressPanel.add(streetField, "wrap");
 
 			addressPostalLabel = componentFactory.createLabel("PLZ: ");
 			postalField = new NumericTextField(ComponentConstants.SHORT_TEXT, false);
-			addAddressPanel.add(addressPostalLabel, "");
-			addAddressPanel.add(postalField, "wrap 0px, growx");
+			addAddressPanel.add(addressPostalLabel, "split 2");
+			addAddressPanel.add(postalField, "wrap, growx");
 
 			addressCityLabel = componentFactory.createLabel("Ort: ");
 			cityField = new StringTextField(ComponentConstants.MEDIUM_TEXT, false);
-			addAddressPanel.add(addressCityLabel, "");
-			addAddressPanel.add(cityField, "wrap 0px");
+			addAddressPanel.add(addressCityLabel, "split 2");
+			addAddressPanel.add(cityField, "wrap");
 
 			addressCountryLabel = componentFactory.createLabel("Land: ");
 			countryField = new StringTextField(ComponentConstants.MEDIUM_TEXT, false);
 			
-			addAddressPanel.add(addressCountryLabel, "");
-			addAddressPanel.add(countryField, "wrap 0px");
+			addAddressPanel.add(addressCountryLabel, "split 2");
+			addAddressPanel.add(countryField, "wrap");
 			
+			setAsMainAddress = componentFactory.createLabel("Erstwohnsitz: ");
+			mainAddress = componentFactory.createCheckbox();
+			mainAddress.setSelected(false);
+			
+			addAddressPanel.add(setAsMainAddress, "split 2");
+			addAddressPanel.add(mainAddress, "wrap");
+			
+			cancelButton = new JButton();
 			cancelButton.setAction(new CancelAction());
 			addAddressPanel.add(cancelButton, "split 2");
 			
+			submitButton = new JButton();
 			submitButton.setAction(new SubmitAction());
 			addAddressPanel.add(submitButton, "wrap");
 			
 			validationFeedbackLabel = componentFactory.createLabel("");
 			addAddressPanel.add(validationFeedbackLabel);
 			
-			addAddressFrame.add(addAddressPanel);
-			addAddressFrame.pack();
-			addAddressFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			addAddressFrame.setVisible(true);
+			addAddressDialog.add(addAddressPanel);
+			addAddressDialog.pack();
+			addAddressDialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(contentPanel));
+			addAddressDialog.setVisible(true);
+			
 			}
 		
 			private final class SubmitAction extends AbstractAction {
@@ -215,7 +243,7 @@ public class PersonAddressesView extends InitializableView {
 				private static final long serialVersionUID = 1L;
 
 				public SubmitAction() {
-					super("Anlegen");
+					super("Neue Adresse");
 				}
 				
 				@Override
@@ -223,45 +251,59 @@ public class PersonAddressesView extends InitializableView {
 					boolean validationSucceeded = true;
 					
 					Address address = new Address();
-					if(streetField.validateContents()==false){
+					if(!streetField.validateContents()){
 						validationFeedbackLabel.setText("Bitte korrigieren Sie Ihre Eingabe: Stra\u00DFe");
 						validationSucceeded = false;
 					}
-					if(postalField.validateContents()==false){
+					if(!postalField.validateContents()){
 						validationFeedbackLabel.setText("Bitte \u00FCberpr\u00FCfen Sie Ihre Eingabe: PLZ");
 						validationSucceeded = false;
 					}
-					if(cityField.validateContents()==false){
+					if(!cityField.validateContents()){
 						validationFeedbackLabel.setText("Bitte \u00FCberpr\u00FCfen Sie Ihre Eingabe: Ort");
 						validationSucceeded = false;
 					}
-					if(countryField.validateContents()==false){
+					if(!countryField.validateContents()){
 						validationFeedbackLabel.setText("Bitte \u00FCberpr\u00FCfen Sie Ihre Eingabe: Land");
 						validationSucceeded = false;
 					}
 					
-					if(validationSucceeded)
+					if(validationSucceeded) {
+						
 						address.setStreet(streetField.getText());
 						address.setPostalCode(postalField.getText());
 						address.setCity(cityField.getText());
 						address.setCountry(countryField.getText());
 						
 						try{
-							Address createdAddress = addressService.create(address);
-							addressTableModel.addAddress(createdAddress);
+							address = addressService.create(address);
+							
+							addressTableModel.addAddress(address);
+							
+							//TODO this results in two main addresses...
 							
 							List<Address> addressesList = selectedPerson.getAddresses();
-							addressesList.add(createdAddress);
+							addressesList.add(address);
 							selectedPerson.setAddresses(addressesList);
+							
+							if(mainAddress.isSelected()){
+								selectedPerson.setMainAddress(address);
+							}
+							
 							personService.update(selectedPerson);
 							
 							feedbackLabel.setText("Adresse erfolgreich angelegt.");
-							addAddressFrame.dispose();
+							mainAddressLabel.setText("Hauptadresse: "+selectedPerson.getMainAddress().getStreet() + " " +
+									selectedPerson.getMainAddress().getPostalCode() + " " +
+									selectedPerson.getMainAddress().getCity() + " " +
+									selectedPerson.getMainAddress().getCountry());
+							addAddressDialog.dispose();
 						}
 						catch(ServiceException ex){
 							log.warn(ex.getLocalizedMessage()); 
 							validationFeedbackLabel.setText("Ein unerwarter Fehler ist aufgetreten! Bitte kontaktieren Sie Ihren Administrator.");
 						}
+					}
 				}
 			}
 
@@ -275,7 +317,7 @@ public class PersonAddressesView extends InitializableView {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					addAddressFrame.dispose();
+					addAddressDialog.dispose();
 				}	
 			}
 	}
@@ -321,7 +363,7 @@ public class PersonAddressesView extends InitializableView {
 		private static final long serialVersionUID = 1L;
 		
 		
-		private JFrame editAddressFrame;
+		private JDialog editAddressDialog;
 		private JPanel editAddressPanel;
 		private JLabel addressStreetLabel;
 		private StringTextField streetField;
@@ -360,31 +402,32 @@ public class PersonAddressesView extends InitializableView {
 			
 			address = addressTableModel.getAddressRow(row);
 			
-			editAddressFrame = new JFrame("Adresse bearbeiten");
+			editAddressDialog = new JDialog(SwingUtilities.getWindowAncestor(contentPanel), Dialog.ModalityType.APPLICATION_MODAL);
+			editAddressDialog.setLocation(300, 300);
 			editAddressPanel = componentFactory.createPanel(500, 200);
 			
 			addressStreetLabel = componentFactory.createLabel("Stra\u00DFe: ");
 			streetField = new StringTextField(ComponentConstants.MEDIUM_TEXT, false);
 			streetField.setText(address.getStreet());
-			editAddressPanel.add(addressStreetLabel, "");
+			editAddressPanel.add(addressStreetLabel, "split 2");
 			editAddressPanel.add(streetField, "wrap 0px, growx");
 
 			addressPostalLabel = componentFactory.createLabel("PLZ: ");
 			postalField = new NumericTextField(ComponentConstants.SHORT_TEXT, false);
 			postalField.setText(address.getPostalCode());
-			editAddressPanel.add(addressPostalLabel, "");
+			editAddressPanel.add(addressPostalLabel, "split 2");
 			editAddressPanel.add(postalField, "wrap 0px, growx");
 
 			addressCityLabel = componentFactory.createLabel("Ort: ");
 			cityField = new StringTextField(ComponentConstants.MEDIUM_TEXT, false);
 			cityField.setText(address.getCity());
-			editAddressPanel.add(addressCityLabel, "");
+			editAddressPanel.add(addressCityLabel, "split 2");
 			editAddressPanel.add(cityField, "wrap 0px, growx");
 
 			addressCountryLabel = componentFactory.createLabel("Land: ");
 			countryField = new StringTextField(ComponentConstants.MEDIUM_TEXT, false);
 			countryField.setText(address.getCountry());
-			editAddressPanel.add(addressCountryLabel, "");
+			editAddressPanel.add(addressCountryLabel, "split 2");
 			editAddressPanel.add(countryField, "wrap 0px, growx");
 			
 			setAsMainAddress = componentFactory.createLabel("Erstwohnsitz: ");
@@ -397,40 +440,45 @@ public class PersonAddressesView extends InitializableView {
 				mainAddress.setSelected(false);
 			}
 			
-			editAddressPanel.add(setAsMainAddress);
-			editAddressPanel.add(mainAddress, "wrap 0px");
+			editAddressPanel.add(setAsMainAddress, "split 2");
+			editAddressPanel.add(mainAddress, "wrap");
 			
-			cancelButton.setAction(new CancelAction());
+			cancelButton = new JButton();
+			cancelButton.setAction(new CancelEditAction());
 			editAddressPanel.add(cancelButton, "split 2");
 			
-			submitButton.setAction(new SubmitAction());
+			submitButton = new JButton();
+			submitButton.setAction(new SubmitEditAction());
 			editAddressPanel.add(submitButton, "wrap");
 			
-			editAddressFrame.add(editAddressPanel);
-			editAddressFrame.pack();
-			editAddressFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			editAddressFrame.setVisible(true);
+			validationFeedbackLabel = componentFactory.createLabel("");
+			editAddressPanel.add(validationFeedbackLabel, "wrap");
+			
+			editAddressDialog.add(editAddressPanel);
+			editAddressDialog.pack();
+			editAddressDialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(contentPanel));
+			editAddressDialog.setVisible(true);
 		}
 		
-		private final class CancelAction extends AbstractAction {
+		private final class CancelEditAction extends AbstractAction {
 			
 			private static final long serialVersionUID = 1L;
 			
-			public CancelAction() {
+			public CancelEditAction() {
 				super("Abbrechen");
 			}
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				editAddressFrame.dispose();
+				editAddressDialog.dispose();
 			}	
 		}
 		
-		private final class SubmitAction extends AbstractAction {
+		private final class SubmitEditAction extends AbstractAction {
 			
 			private static final long serialVersionUID = 1L;
 			
-			public SubmitAction() {
+			public SubmitEditAction() {
 				super("Speichern");
 			}
 
@@ -440,7 +488,7 @@ public class PersonAddressesView extends InitializableView {
 				
 				if(address == null) {
 					feedbackLabel.setText("Addresse war nicht gesetzt beim bearbeiten");
-					editAddressFrame.dispose();
+					editAddressDialog.dispose();
 				}
 		
 				if(streetField.validateContents()){
@@ -473,19 +521,25 @@ public class PersonAddressesView extends InitializableView {
 					validationFeedbackLabel.setText("Bitte korrigieren Sie Ihre Eingabe: Land");
 				}
 			
-			if(mainAddress.isSelected()){
-				selectedPerson.setMainAddress(address);
-			}
-			
-			if(validation) { 
+				if(validation) { 
 				try{
+					
+					if(mainAddress.isSelected()){
+						selectedPerson.setMainAddress(address);
+					}
+					
 					address = addressService.update(address);
 				
 					personService.update(selectedPerson);
 					addressTableModel.fireTableDataChanged();
 					
 					feedbackLabel.setText("Adresse erfolgreich geändert.");
-					editAddressFrame.dispose();
+					editAddressDialog.dispose();
+					
+					mainAddressLabel.setText("Hauptadresse: "+selectedPerson.getMainAddress().getStreet() + " " +
+							selectedPerson.getMainAddress().getPostalCode() + " " +
+							selectedPerson.getMainAddress().getCity() + " " +
+							selectedPerson.getMainAddress().getCountry());
 				} catch(ServiceException ex){
 					log.warn(ex.getLocalizedMessage());
 					validationFeedbackLabel.setText("Ein unerwarter Fehler ist aufgetreten! Bitte kontaktieren Sie Ihren Administrator.");

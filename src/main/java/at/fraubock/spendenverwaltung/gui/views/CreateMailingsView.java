@@ -206,7 +206,7 @@ public class CreateMailingsView extends InitializableView {
 
 		List<Filter> personFilters;
 		try {
-			personFilters = filterService.getAllByFilter(FilterType.PERSON);
+			personFilters = filterService.getAllByFilter(FilterType.PERSON).a;
 
 			eMailingPersonFilterChooser
 					.setModel(new SimpleComboBoxModel<Filter>(personFilters));

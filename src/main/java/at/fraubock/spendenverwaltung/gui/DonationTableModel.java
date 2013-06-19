@@ -4,13 +4,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.table.AbstractTableModel;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
-import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
-import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 
 public class DonationTableModel extends AbstractTableModel{
 
@@ -18,20 +14,24 @@ public class DonationTableModel extends AbstractTableModel{
 	
 	private String[] columnNames = new String[]{"Betrag", "Datum", "Widmung", "Typ", "Notiz"};
 	private Vector<Donation> donations = new Vector<Donation>();
-	private IDonationService donationService;
-	private JPanel parent;
 
-	public DonationTableModel(JPanel parent, IDonationService donationService){
-		this.parent = parent;
-		this.donationService = donationService;
-	}
-	
 	public void addDonation (Donation donation){
 		donations.add(donation);
+		fireTableDataChanged();
 	}
 	
 	public void removeDonation (int row){
 		donations.remove(row);
+		fireTableDataChanged();
+	}
+	
+	public void addDonations(List<Donation> donations) {
+		donations.addAll(donations);
+		fireTableDataChanged();
+	}
+	
+	public void clear() {
+		donations = new Vector<Donation>();
 		fireTableDataChanged();
 	}
 	
@@ -49,6 +49,11 @@ public class DonationTableModel extends AbstractTableModel{
 	}
 	
 	@Override
+	public int getColumnCount() {
+		return columnNames.length;
+	}
+	
+	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		Donation donation = (Donation)donations.get(rowIndex);
 		
@@ -61,36 +66,6 @@ public class DonationTableModel extends AbstractTableModel{
 			default: return null;
 		}
 	}
-	
-    public void setValueAt(Object value, int rowIndex, int columnIndex) {
-        Donation updateDonation = donations.get(rowIndex);
-        
-        switch(columnIndex){
-        	case 0: updateDonation.setAmount((Long) value);
-        			break;
-        	case 1: updateDonation.setDate((Date) value);
-					break;
-        	case 2: updateDonation.setDedication((String) value);
-					break;
-        	case 3: updateDonation.setType((Donation.DonationType) value);
-					break;
-        	case 4: updateDonation.setNote((String) value);
-					break;
-        }
-        
-			try {
-				updateDonation = donationService.update(updateDonation);
-			} catch (ServiceException e) {
-				JOptionPane.showMessageDialog(parent, "Updating Donation failed", "Error", JOptionPane.ERROR_MESSAGE);
-		        e.printStackTrace();
-		        return;
-			}
-		
-		JOptionPane.showMessageDialog(parent, "Successfully updated donation", "Information", JOptionPane.INFORMATION_MESSAGE);
-	    
-		donations.set(rowIndex, updateDonation);
-        fireTableCellUpdated(rowIndex, columnIndex);
-    }
 	
 	public Class<?> getColumnClass(int col) {
 		
@@ -109,10 +84,7 @@ public class DonationTableModel extends AbstractTableModel{
 		return null;
 	}
 
-	@Override
-	public int getColumnCount() {
-		return columnNames.length;
-	}
+
 	
 	@Override
 	public String getColumnName(int col) {
@@ -121,14 +93,7 @@ public class DonationTableModel extends AbstractTableModel{
 
 	@Override
 	public boolean isCellEditable(int row, int col) {
-		switch(col){
-			case 0: return false;
-			default: return true;
-		}
-	}
-
-	public void clear() {
-		donations = new Vector<Donation>();
+		return false;
 	}
 }
 

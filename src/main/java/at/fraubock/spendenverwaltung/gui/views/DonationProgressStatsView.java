@@ -120,7 +120,7 @@ public class DonationProgressStatsView extends InitializableView {
 
 		try {
 			donationFilters.addAll(filterService
-					.getAllByFilter(FilterType.DONATION));
+					.getAllByFilter(FilterType.DONATION).a);
 		} catch (ServiceException e) {
 			JOptionPane.showMessageDialog(this,
 					"Ein unerwarteter Fehler ist aufgetreten.", "Error",

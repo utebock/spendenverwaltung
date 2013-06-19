@@ -75,7 +75,8 @@ public interface IDonationDAO {
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
-	public List<Donation> getUnconfirmed(Import toImport) throws PersistenceException;
+	public List<Donation> getUnconfirmed(Import toImport)
+			throws PersistenceException;
 
 	/**
 	 * Retrieves all unconfirmed donations stored in the underlying persistence
@@ -103,15 +104,15 @@ public interface IDonationDAO {
 	public Donation getByID(int id) throws PersistenceException;
 
 	/**
-	 * Retrieves donations by the given person
+	 * Retrieves confirmed donations by the given person
 	 * 
 	 * @param donator
 	 *            the person having commissioned the desired donations. This
 	 *            person must have an id, i.e. must have been persisted or
 	 *            retrieved by an {@link IPersonDAO} prior to calling this
 	 *            method.
-	 * @return a list of all donations by the given person, sorted by id
-	 *         descending, including their donator and import (if any)
+	 * @return a list of all confirmed donations by the given person, sorted by
+	 *         id descending, including their donator and import (if any)
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
@@ -119,17 +120,17 @@ public interface IDonationDAO {
 			throws PersistenceException;
 
 	/**
-	 * Retrieves donations matching the given filter
+	 * Retrieves confirmed donations matching the given filter
 	 * 
 	 * @param filter
 	 *            the filter to be used
-	 * @return a list of all those donations matching the given filter, sorted
-	 *         by id descending, including their donators
+	 * @return a list of all those confirmed donations matching the given
+	 *         filter, sorted by id descending, including their donators
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
-	 public List<Donation> getByFilter(Filter filter)
-	 throws PersistenceException;
+	public List<Donation> getByFilter(Filter filter)
+			throws PersistenceException;
 
 	/**
 	 * Calculates the sum of the donations matching the given filter.
