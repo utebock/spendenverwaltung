@@ -134,7 +134,7 @@ public class AddAttributes extends JPanel{
 		this.filterPersons = filterPersons;
 		this.componentFactory = componentFactory;
 		this.viewActionFactory = viewActionFactory;
-		donationModel = new DonationTableModel(this, donationService);
+		donationModel = new DonationTableModel();
 		addressModel = new AddressTableModel();
 		setUpPerson();
 		setUpAddressTable();

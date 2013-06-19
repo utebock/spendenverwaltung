@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -12,6 +13,7 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -20,6 +22,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXDatePicker;
@@ -81,6 +84,8 @@ public class PersonDonationsView extends InitializableView {
 		this.donationService = donationService;
 		this.selectedPerson = selectedPerson;
 		this.personTableModel = personTableModel;
+		
+		setUpLayout();
 	}
 	
 	public void setUpLayout() {
@@ -88,30 +93,35 @@ public class PersonDonationsView extends InitializableView {
 		
 		this.add(contentPanel);
 		
+		toolbar = new JToolBar();
+		contentPanel.add(toolbar, "spanx, wrap, growx");
+
+		donationTotalLabel = componentFactory.createLabel("");
+		donationTotalLabel.setFont(new Font("Headline", Font.PLAIN, 13));
+		contentPanel.add(donationTotalLabel, "wrap");
+		
+		donationTableModel = new DonationTableModel();
 		donationsTable = new JTable(donationTableModel);
+		donationsTable.setAutoCreateRowSorter(true);
 		donationsTable.setFillsViewportHeight(true);
+		donationsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
 		JScrollPane scrollPane = new JScrollPane(donationsTable);
 		scrollPane.setPreferredSize(new Dimension(700, 550));
 		
-		toolbar = new JToolBar();
-		contentPanel.add(toolbar, "wrap, growx");
-
-		donationTotalLabel = componentFactory.createLabel("");
-		feedbackLabel.setFont(new Font("Headline", Font.PLAIN, 16));
-		contentPanel.add(donationTotalLabel);
-		
-		contentPanel.add(scrollPane, "wrap, growx");
-		
-		donationsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		contentPanel.add(scrollPane, "wrap");
 		
 		start = new JXDatePicker();
 		start.addActionListener(new StartDateSelectedListener());
 		end = new JXDatePicker();
 		end.addActionListener(new EndDateSelectedListener());
 		
+		contentPanel.add(start, "split 2");
+		contentPanel.add(end, "wrap");
+		
 		feedbackLabel = componentFactory.createLabel("");
-		feedbackLabel.setFont(new Font("Headline", Font.PLAIN, 16));
-		contentPanel.add(feedbackLabel);
+		feedbackLabel.setFont(new Font("Headline", Font.PLAIN, 13));
+		contentPanel.add(feedbackLabel, "wrap");
 	}
 	
 	@Override
@@ -126,36 +136,36 @@ public class PersonDonationsView extends InitializableView {
 	}
 	
 	public void initTable() {
-		donationsTable = new JTable(donationTableModel);
-		
 		if(selectedPerson != null) {
 			if(selectedPerson.getMainAddress() != null) {
 				donationTotalLabel.setText(selectedPerson.getMainAddress().toString());
-				try {
-					List<Donation> donationList = donationService.getByPerson(selectedPerson);
-										
-					for(Donation entry : donationList) {
-						currentTotal += entry.getAmount();
-						donationTableModel.addDonation(entry);
-					}
-	
-					setTotalLabel();
-				} catch (ServiceException e) {
-					log.warn(e.getLocalizedMessage());
-					feedbackLabel.setText("Es passierte ein Fehler beim Laden der Spenden.");
-				}
-			} else {
-				//should not happen but feedback just in case.
-				feedbackLabel.setText("Es wurde keine Person ausgewählt");
-			}	
+			}
+		} else {
+			feedbackLabel.setText("Es wurde keine Person ausgewählt");
+		}
+		
+		try {
+			List<Donation> donationList = donationService.getByPerson(selectedPerson);
+								
+			for(Donation entry : donationList) {
+				currentTotal += entry.getAmount();
+				donationTableModel.addDonation(entry);
+			}
+
+			setTotalLabel();
+		} catch (ServiceException e) {
+			log.warn(e.getLocalizedMessage());
+			feedbackLabel.setText("Es passierte ein Fehler beim Laden der Spenden.");
 		}
 	}
 	
 	private void addComponentsToToolbar(JToolBar toolbar) {
 		
+		toolbar.setFloatable(false);
+		toolbar.setRollover(true);
+		
 		backButton = new JButton();
 		
-		//TODO change to findPersonsView
 		Action getBack = viewActionFactory.getFindPersonsViewAction(personTableModel);
 		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
 		backButton.setAction(getBack);
@@ -193,9 +203,87 @@ public class PersonDonationsView extends InitializableView {
 		toolbar.add(deleteDonation, "growx");	
 	}
 	
+	private final class StartDateSelectedListener implements ActionListener {
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			feedbackLabel.setText("");
+
+			Date startDate = start.getDate();
+			Date endDate = end.getDate();
+			
+			try {
+				List<Donation> donations = donationService.getByPerson(selectedPerson);
+			
+				if(startDate != null && endDate != null) {
+					if(startDate.after(endDate)) {
+						feedbackLabel.setText("Ungültiger Datumsbereich");
+					} else {
+						donationTableModel.clear();
+						for(Donation entry : donations) {
+							if(entry.getDate().before(endDate) && entry.getDate().after(startDate)) {
+								donationTableModel.addDonation(entry);
+							}
+						}
+					}
+				} else if (startDate != null) {
+					
+					donationTableModel.clear();
+					for(Donation entry : donations) {
+						if(entry.getDate().after(startDate)) {
+							donationTableModel.addDonation(entry);
+						}
+					}
+				} else {
+					feedbackLabel.setText("Es wurde kein Datum ausgewählt");
+				}
+			} catch (ServiceException e2) {
+				log.warn(e2.getLocalizedMessage());
+				feedbackLabel.setText("Es passierte ein Fehler beim Initialisieren der Tabelle.");
+			}
+		}
+	}
+	
+	private final class EndDateSelectedListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			feedbackLabel.setText("");
+
+			Date startDate = start.getDate();
+			Date endDate = end.getDate();
+			
+			try {
+				List<Donation> donations = donationService.getByPerson(selectedPerson);
+			
+				if(startDate != null && endDate != null) {
+					if(startDate.after(endDate)) {
+						feedbackLabel.setText("Ungültiger Datumsbereich");
+					} else {
+						donationTableModel.clear();
+						for(Donation entry : donations) {
+							if(entry.getDate().before(endDate) && entry.getDate().after(startDate)) {
+								donationTableModel.addDonation(entry);
+							}
+						}
+					}
+				} else if (endDate != null) {
+					donationTableModel.clear();
+					for(Donation entry : donations) {
+						if(entry.getDate().before(endDate)) {
+							donationTableModel.addDonation(entry);
+						}
+					}
+				}
+			} catch (ServiceException e2) {
+				log.warn(e2.getLocalizedMessage());
+				feedbackLabel.setText("Es passierte ein Fehler beim Initialisieren der Tabelle.");
+			}
+		}
+	}
+	
 	private final class AddAction extends AbstractAction {
 		
-		private JFrame addDonationFrame;
+		private JDialog addDonationDialog;
 		private JPanel addDonationPanel;
 		
 		private JLabel donationTypeLabel;
@@ -218,19 +306,21 @@ public class PersonDonationsView extends InitializableView {
 		private JButton submitButton;
 		private JButton cancelButton;
 		
-		
 		private static final long serialVersionUID = 1L;
 		
 		public AddAction() {
 			super("Neue Spende");
-			setUpLayout();
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			addDonationFrame = new JFrame("Neue Spende");
-			addDonationPanel = componentFactory.createPanel(250, 200);
-			
+			feedbackLabel.setText("");
+
+			addDonationDialog = new JDialog(SwingUtilities.getWindowAncestor(contentPanel), Dialog.ModalityType.APPLICATION_MODAL);
+			addDonationDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+			addDonationPanel = componentFactory.createPanel(300, 250);
+
 			//add combobox + label
 			donationTypeLabel = componentFactory.createLabel("Spendenart");
 			donationTypeCombo = new JComboBox<Donation.DonationType>(new SimpleComboBoxModel<>(Donation.DonationType.values()));
@@ -259,24 +349,30 @@ public class PersonDonationsView extends InitializableView {
 			addDonationPanel.add(noteLabel, "split 2");
 			addDonationPanel.add(noteField, "wrap");
 			
-			submitButton = new JButton(new SubmitAction());
-			cancelButton = new JButton(new CancelAction());		
+			submitButton = new JButton(new SubmitAddAction());
+			cancelButton = new JButton(new CancelAddAction());		
 			addDonationPanel.add(cancelButton, "split 2");
 			addDonationPanel.add(submitButton, "wrap");
 			
+			validationFeedbackLabel = componentFactory.createLabel("");
 			addDonationPanel.add(validationFeedbackLabel, "wrap");
-			addDonationFrame.add(addDonationPanel);
-			addDonationFrame.pack();
-			addDonationFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			addDonationFrame.setVisible(true);
+			addDonationDialog.add(addDonationPanel);
+			addDonationDialog.pack();
+			addDonationDialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(contentPanel));
+			addDonationDialog.setVisible(true);
 		}	
 		
-		private final class SubmitAction extends AbstractAction {
+		private final class SubmitAddAction extends AbstractAction {
 
 			private static final long serialVersionUID = 1L;
 
+			public SubmitAddAction() {
+				super("Anlegen");
+			}
+			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				
 				Donation donation = new Donation();
 				donation.setDonator(selectedPerson);
 				
@@ -322,7 +418,7 @@ public class PersonDonationsView extends InitializableView {
 						//update total label
 						currentTotal += donation.getAmount();
 						setTotalLabel();
-						addDonationFrame.dispose();						
+						addDonationDialog.dispose();						
 					} catch (ServiceException e1) {
 						log.warn(e1.getLocalizedMessage());
 						feedbackLabel.setText("Es passierte ein Fehler beim erstellen der Spende.");
@@ -331,13 +427,17 @@ public class PersonDonationsView extends InitializableView {
 			}
 		}
 		
-		private final class	CancelAction extends AbstractAction {
+		private final class	CancelAddAction extends AbstractAction {
 
 			private static final long serialVersionUID = 1L;
 
+			public CancelAddAction() {
+				super("Abbrechen");
+			}
+			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				addDonationFrame.dispose();
+				addDonationDialog.dispose();
 			}
 			
 		}
@@ -345,7 +445,7 @@ public class PersonDonationsView extends InitializableView {
 	
 	private final class EditAction extends AbstractAction {
 		
-		private JFrame editDonationFrame;
+		private JDialog editDonationDialog;
 		private JPanel editDonationPanel;
 		
 		private JLabel donationTypeLabel;
@@ -376,12 +476,12 @@ public class PersonDonationsView extends InitializableView {
 		
 		public EditAction() {
 			super("Spende bearbeiten");
-			setUpLayout();
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-					
+			feedbackLabel.setText("");
+			
 			selectedRow = donationsTable.getSelectedRow();
 			if(selectedRow == -1) {
 				feedbackLabel.setText("Eine Spende muss zum bearbeiten ausgewählt werden.");
@@ -389,9 +489,11 @@ public class PersonDonationsView extends InitializableView {
 			}
 			
 			selectedDonation = donationTableModel.getDonationRow(selectedRow);
-			
-			editDonationFrame = new JFrame("Neue Spende");
-			editDonationPanel = componentFactory.createPanel(250, 200);
+					
+			editDonationDialog = new JDialog(SwingUtilities.getWindowAncestor(contentPanel), Dialog.ModalityType.APPLICATION_MODAL);
+			editDonationDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+			editDonationPanel = componentFactory.createPanel(300, 250);
 			
 			//add combobox + label
 			donationTypeLabel = componentFactory.createLabel("Spendenart");
@@ -431,21 +533,27 @@ public class PersonDonationsView extends InitializableView {
 			editDonationPanel.add(noteLabel, "split 2");
 			editDonationPanel.add(noteField, "wrap");
 			
-			submitButton = new JButton(new SubmitAction());
-			cancelButton = new JButton(new CancelAction());		
+			submitButton = new JButton(new SubmitEditAction());
+			cancelButton = new JButton(new CancelEditAction());		
 			editDonationPanel.add(cancelButton, "split 2");
 			editDonationPanel.add(submitButton, "wrap");
-			
+				
+			validationFeedbackLabel = componentFactory.createLabel("");
+
 			editDonationPanel.add(validationFeedbackLabel, "wrap");
-			editDonationFrame.add(editDonationPanel);
-			editDonationFrame.pack();
-			editDonationFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			editDonationFrame.setVisible(true);
+			editDonationDialog.add(editDonationPanel);
+			editDonationDialog.pack();
+			editDonationDialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(contentPanel));
+			editDonationDialog.setVisible(true);
 		}	
 		
-		private final class SubmitAction extends AbstractAction {
+		private final class SubmitEditAction extends AbstractAction {
 
 			private static final long serialVersionUID = 1L;
+			
+			public SubmitEditAction() {
+				super("Anlegen");
+			}
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -491,11 +599,11 @@ public class PersonDonationsView extends InitializableView {
 						donationService.update(donation);
 						donationTableModel.removeDonation(selectedRow);
 						donationTableModel.addDonation(donation);
-						feedbackLabel.setText("Spende wurde erstellt.");
+						feedbackLabel.setText("Spende wurde geändert.");
 						//update total label
 						currentTotal += donation.getAmount();
 						setTotalLabel();
-						editDonationFrame.dispose();						
+						editDonationDialog.dispose();						
 					} catch (ServiceException e1) {
 						log.warn(e1.getLocalizedMessage());
 						feedbackLabel.setText("Es passierte ein Fehler beim bearbeiten der Spende.");
@@ -504,15 +612,19 @@ public class PersonDonationsView extends InitializableView {
 			}
 		}
 		
-		private final class	CancelAction extends AbstractAction {
+		private final class	CancelEditAction extends AbstractAction {
 
 			private static final long serialVersionUID = 1L;
+			
+			public CancelEditAction() {
+				super("Abbrechen");
+			}
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				//was subtracted earlier
 				currentTotal += selectedDonation.getAmount();
-				editDonationFrame.dispose();
+				editDonationDialog.dispose();
 			}
 			
 		}
@@ -528,6 +640,8 @@ public class PersonDonationsView extends InitializableView {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			feedbackLabel.setText("");
+			
 			int selectedRow = donationsTable.getSelectedRow();
 			if(selectedRow == -1) {
 				feedbackLabel.setText("Eine Spende muss zum bearbeiten ausgewählt werden.");
@@ -541,8 +655,10 @@ public class PersonDonationsView extends InitializableView {
 			if(dialogResult == JOptionPane.YES_OPTION) {
 				try {
 					donationService.delete(donation);
+					currentTotal -= donation.getAmount();
 					donationTableModel.removeDonation(selectedRow);
 					feedbackLabel.setText("Spende wurde gelöscht.");
+					setTotalLabel();
 				} catch (ServiceException e1) {
 					log.warn(e1.getLocalizedMessage());
 					feedbackLabel.setText("Spende konnte nicht gelöscht werden.");
@@ -556,7 +672,7 @@ public class PersonDonationsView extends InitializableView {
 		private static final long serialVersionUID = 1L;
 		
 		public ConfirmAction() {
-			super("Spende bestätigen");
+			super("Spendenbestätigung");
 		}
 
 		@Override
@@ -570,7 +686,7 @@ public class PersonDonationsView extends InitializableView {
 		private static final long serialVersionUID = 1L;
 		
 		public ConfirmAllAction() {
-			super("Alle Spenden bestätigen");
+			super("Spendenbestätigung für Alle");
 		}
 
 		@Override
@@ -578,79 +694,6 @@ public class PersonDonationsView extends InitializableView {
 			//TODO alldonationconfirmation logic
 		}	
 	}
-	
-	private final class StartDateSelectedListener implements ActionListener {
-		
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			Date startDate = start.getDate();
-			Date endDate = end.getDate();
-			
-			try {
-				List<Donation> donations = donationService.getByPerson(selectedPerson);
-			
-				if(startDate != null && endDate != null) {
-					if(startDate.after(endDate)) {
-						feedbackLabel.setText("Ungültiger Datumsbereich");
-					} else {
-						donationTableModel.clear();
-						for(Donation entry : donations) {
-							if(entry.getDate().before(endDate) && entry.getDate().after(startDate)) {
-								donationTableModel.addDonation(entry);
-							}
-						}
-					}
-				} else if (startDate != null) {
-					
-					donationTableModel.clear();
-					for(Donation entry : donations) {
-						if(entry.getDate().after(startDate)) {
-							donationTableModel.addDonation(entry);
-						}
-					}
-				}
-			} catch (ServiceException e2) {
-				log.warn(e2.getLocalizedMessage());
-				feedbackLabel.setText("Es passierte ein Fehler beim Initialisieren der Tabelle.");
-			}
-		}
-	}
-	
-	private final class EndDateSelectedListener implements ActionListener {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			Date startDate = start.getDate();
-			Date endDate = end.getDate();
-			
-			try {
-				List<Donation> donations = donationService.getByPerson(selectedPerson);
-			
-				if(startDate != null && endDate != null) {
-					if(startDate.after(endDate)) {
-						feedbackLabel.setText("Ungültiger Datumsbereich");
-					} else {
-						donationTableModel.clear();
-						for(Donation entry : donations) {
-							if(entry.getDate().before(endDate) && entry.getDate().after(startDate)) {
-								donationTableModel.addDonation(entry);
-							}
-						}
-					}
-				} else if (endDate != null) {
-					donationTableModel.clear();
-					for(Donation entry : donations) {
-						if(entry.getDate().before(endDate)) {
-							donationTableModel.addDonation(entry);
-						}
-					}
-				}
-			} catch (ServiceException e2) {
-				log.warn(e2.getLocalizedMessage());
-				feedbackLabel.setText("Es passierte ein Fehler beim Initialisieren der Tabelle.");
-			}
-		}
-	}
-	
 	
 	
 }
