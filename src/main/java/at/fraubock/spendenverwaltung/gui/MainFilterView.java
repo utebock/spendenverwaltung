@@ -158,9 +158,9 @@ public class MainFilterView extends InitializableView {
 					createFilter(filter.getType(), filter);
 
 				} else {
-					JOptionPane
-							.showMessageDialog(MainFilterView.this,
-									"Sie sind nicht berechtigt diesen Filter zu bearbeiten");
+					JOptionPane.showMessageDialog(MainFilterView.this,
+							"Sie sind nicht berechtigt diesen Filter zu bearbeiten. Er geh\u00f6rt "
+									+ filter.getOwner());
 					return;
 				}
 
@@ -241,7 +241,8 @@ public class MainFilterView extends InitializableView {
 		if (!filter.getOwner().equals(userName)
 				&& filter.getPrivacyStatus() != FilterPrivacyStatus.READ_UPDATE_DELETE) {
 			JOptionPane.showMessageDialog(MainFilterView.this,
-					"Sie sind nicht berechtigt diesen Filter zu löschen");
+					"Sie sind nicht berechtigt diesen Filter zu löschen. Er geh\u00f6rt "
+							+ filter.getOwner());
 			return;
 		}
 
