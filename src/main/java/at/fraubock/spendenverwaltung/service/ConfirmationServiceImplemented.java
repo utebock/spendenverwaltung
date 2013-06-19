@@ -32,7 +32,49 @@ public class ConfirmationServiceImplemented implements IConfirmationService {
 	}
 
 	@Override
+	@Transactional(isolation = Isolation.READ_UNCOMMITTED, rollbackFor = Throwable.class)
+	public Confirmation insertOrUpdate(Confirmation confirmation)
+			throws ServiceException {
+		try {
+			confirmationDAO.insertOrUpdate(confirmation);
+			return confirmation;
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
+
+	@Override
 	@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
+	public Confirmation getById(int id) throws ServiceException {
+			try {
+				return confirmationDAO.getById(id);
+			} catch (PersistenceException e) {
+				throw new ServiceException(e);
+			}
+	}
+
+	@Override
+	@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
+	public void delete(Confirmation confirmation) throws ServiceException {
+		try {
+			confirmationDAO.delete(confirmation);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
+
+	@Override
+	@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
+	public List<Confirmation> getAll() throws ServiceException {
+		try {
+			return confirmationDAO.getAll();
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+	}
+	
+	@Override
+	@Transactional(isolation = Isolation.READ_UNCOMMITTED, rollbackFor = Throwable.class)
 	public ConfirmationTemplate insertOrUpdateConfirmationTemplate(ConfirmationTemplate template)
 			throws ServiceException {
 		try{
@@ -65,6 +107,7 @@ public class ConfirmationServiceImplemented implements IConfirmationService {
 	}
 
 	@Override
+	@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public void delete(ConfirmationTemplate template) throws ServiceException {
 		try {
 			if(confirmationDAO.getByConfirmationTemplate(template).isEmpty()){
@@ -78,5 +121,7 @@ public class ConfirmationServiceImplemented implements IConfirmationService {
 		}
 		
 	}
+
+	
 
 }

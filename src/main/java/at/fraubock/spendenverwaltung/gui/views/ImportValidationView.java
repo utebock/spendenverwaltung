@@ -1,6 +1,7 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -77,6 +78,7 @@ public class ImportValidationView extends InitializableView {
 	private JComboBox conflictComboBox;
 	private JComboBox importComboBox;
 	private ComponentFactory componentFactory;
+	private JLabel infoLabel;
 	private ViewActionFactory actionFactory;
 
 	public ImportValidationView(IPersonService personService, IAddressService addressService, IDonationService donationService, IImportService importService, ComponentFactory componentFactory, ViewActionFactory actionFactory){
@@ -139,55 +141,67 @@ public class ImportValidationView extends InitializableView {
 		    return;
 		}
 		
-		
-		importComboBox = new JComboBox();
-		int counter = 1;
-		for(Import i : imports){
-			importComboBox.addItem(counter + ": " + i.getSource() + ": " + i.getImportDate());
-			counter ++;
-		}
-
-		importComboBox.addActionListener(new ImportComboBoxListener(this));
-		add(importComboBox, "wrap");
-		
-		conflictLabel = builder.createLabel("Konflikte:");
-		conflictPanel.add(conflictLabel, "wrap");
-		
-		newLabel = builder.createLabel("Liste neuer Spender:");
-		newPanel.add(newLabel, "wrap");
-		
-		matchLabel = builder.createLabel("Liste zugewiesener Spender:");
-		matchPanel.add(matchLabel, "wrap");
-		
-		conflictPanel.add(conflictPane, "wrap, growx");
-		newPanel.add(newPane, "wrap, growx");
-		matchPanel.add(matchPane, "wrap, growx, span 2");
-
-		SaveButtonListener saveAction = new SaveButtonListener();
-		saveAction.putValue(Action.NAME, "Speichern");
-		saveBtn = new JButton();
-		saveBtn.setAction(saveAction);
-		matchPanel.add(saveBtn, "");
-
-		CancelButtonListener cancelAction = new CancelButtonListener();
-		cancelAction.putValue(Action.NAME, "Abbrechen");
-		cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
-		backBtn = new JButton();
-		backBtn.setAction(cancelAction);
-		matchPanel.add(backBtn, "");
-
-		this.add(conflictPanel, "wrap, growx");
-		this.add(newPanel, "wrap, growx");
-		this.add(matchPanel, "wrap, growx");
-		
 		if(imports.size() > 0){
-			try {
-				getData(donationService.getUnconfirmed(imports.get(0)));
-			} catch (ServiceException e) {
-				JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
-			    e.printStackTrace();
-			    return;
+			importComboBox = new JComboBox();
+			int counter = 1;
+			for(Import i : imports){
+				importComboBox.addItem(counter + ": " + i.getSource() + ": " + i.getImportDate());
+				counter ++;
 			}
+	
+			importComboBox.addActionListener(new ImportComboBoxListener(this));
+			add(importComboBox, "wrap");
+			
+			conflictLabel = builder.createLabel("Konflikte:");
+			conflictPanel.add(conflictLabel, "wrap");
+			
+			newLabel = builder.createLabel("Liste neuer Spender:");
+			newPanel.add(newLabel, "wrap");
+			
+			matchLabel = builder.createLabel("Liste zugewiesener Spender:");
+			matchPanel.add(matchLabel, "wrap");
+			
+			conflictPanel.add(conflictPane, "wrap, growx");
+			newPanel.add(newPane, "wrap, growx");
+			matchPanel.add(matchPane, "wrap, growx, span 2");
+	
+			SaveButtonListener saveAction = new SaveButtonListener();
+			saveAction.putValue(Action.NAME, "Speichern");
+			saveBtn = new JButton();
+			saveBtn.setAction(saveAction);
+			matchPanel.add(saveBtn, "");
+	
+			CancelButtonListener cancelAction = new CancelButtonListener();
+			cancelAction.putValue(Action.NAME, "Abbrechen");
+			cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
+			backBtn = new JButton();
+			backBtn.setAction(cancelAction);
+			matchPanel.add(backBtn, "");
+	
+			this.add(conflictPanel, "wrap, growx");
+			this.add(newPanel, "wrap, growx");
+			this.add(matchPanel, "wrap, growx");
+			
+			if(imports.size() > 0){
+				try {
+					getData(donationService.getUnconfirmed(imports.get(0)));
+				} catch (ServiceException e) {
+					JOptionPane.showMessageDialog(this, "An error occured. Please see console for further information", "Error", JOptionPane.ERROR_MESSAGE);
+				    e.printStackTrace();
+				    return;
+				}
+			}
+		} else{
+			infoLabel = new JLabel("Keine Importe zu validieren");
+			infoLabel.setFont(new Font("Arial", 0, 16));
+			this.add(infoLabel, "wrap, gap 40");
+			
+			CancelButtonListener cancelAction = new CancelButtonListener();
+			cancelAction.putValue(Action.NAME, "zurück");
+			cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
+			backBtn = new JButton();
+			backBtn.setAction(cancelAction);
+			this.add(backBtn, "gap 40");
 		}
 	}
 	
@@ -282,7 +296,7 @@ public class ImportValidationView extends InitializableView {
 		
 		
 		//Import is saved, go back to main menu. if there are another imports to validate, don't go back, but show the next import
-		int conflicts = conflictModel.getDonationList().size();
+		int conflicts = conflictModel.getDonationList().size() - conflictModel.getNoImportList().size() - conflictModel.getAnonymList().size();
 		
 		if(newModel.getDonationList().size() >= 1 || matchModel.getDonationList().size() >= 1){
 			if(conflicts == 0)

@@ -15,7 +15,7 @@ public interface IConfirmationDAO {
 	
 	/**
 	 * Persists a new confirmation (if its id is null or not yet existent)
-	 * or updates the confirmation with the already existent id. If the
+	 * or updates the confirmation with the already existing id. If the
 	 * confirmation is inserted, the id value will be set
 	 * @param c
 	 * 			confirmation to be inserted or updated
