@@ -9,6 +9,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.to.FilterTO;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.FilterInUseException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.util.FilterType;
+import at.fraubock.spendenverwaltung.util.Pair;
 
 /**
  * service providing functionality for {@link Filter}
@@ -49,26 +50,35 @@ public interface IFilterService {
 	public void delete(Filter f) throws ServiceException, FilterInUseException;
 
 	/**
-	 * Retrieves entire {@link Filter} table
+	 * Retrieves entire {@link Filter} table and the current user name. Using
+	 * the user name, possession of a filter may be determined.
 	 * 
-	 * @return List of all filters
+	 * @return A pair consisting of a list of all filters and the current user's
+	 *         user name.
 	 */
-	public List<Filter> getAll() throws ServiceException;
+	public Pair<List<Filter>, String> getAll() throws ServiceException;
 
 	/**
 	 * Retrieves all <b>non-anonymous</b> {@link Filter} of the given
-	 * {@link FilterType}
+	 * {@link FilterType} and the current user name. Using the user name,
+	 * possession of a filter may be determined.
 	 * 
-	 * @return List of all filters of given type that are not anonymous
+	 * 
+	 * @return A pair consisting of a list of all filters of given type that are
+	 *         not anonymous and the current user's user name.
 	 */
-	public List<Filter> getAllByFilter(FilterType type) throws ServiceException;
+	public Pair<List<Filter>, String> getAllByFilter(FilterType type)
+			throws ServiceException;
 
 	/**
-	 * Retrieves all {@link Filter} depending on their anonymous state
+	 * Retrieves all {@link Filter} depending on their anonymous state, and the
+	 * current user name. Using the user name, possession of a filter may be
+	 * determined.
 	 * 
-	 * @return List of all filters depending on their anonymous state
+	 * @return A pair consisting of a list of all filters depending on their
+	 *         anonymous state and the current user's user name.
 	 */
-	public List<Filter> getAllByAnonymous(boolean anonymous)
+	public Pair<List<Filter>, String> getAllByAnonymous(boolean anonymous)
 			throws ServiceException;
 
 	/**

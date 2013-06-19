@@ -62,9 +62,9 @@ public interface IPersonService {
 	public List<Person> getConfirmed() throws ServiceException;
 
 	/**
-	 * Retrieves {@link Person}s matching the given {@link Filter}
+	 * Retrieves confirmed {@link Person}s matching the given {@link Filter}
 	 * 
-	 * @return List of all persons matching the given filter
+	 * @return List of all confirmed persons matching the given filter
 	 */
 	public List<Person> getByFilter(Filter filter) throws ServiceException;
 

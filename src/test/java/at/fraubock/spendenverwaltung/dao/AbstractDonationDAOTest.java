@@ -175,7 +175,7 @@ public abstract class AbstractDonationDAOTest {
 		donation.setType(Donation.DonationType.BANK_TRANSFER);
 
 		donationDAO.insertOrUpdate(donation);
-		donation.setDonator(null);
+		donation.setAmount(null);
 
 		donationDAO.insertOrUpdate(donation);
 	}

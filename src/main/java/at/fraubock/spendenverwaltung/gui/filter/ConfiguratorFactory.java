@@ -54,10 +54,10 @@ public class ConfiguratorFactory {
 		this.editFilter = editFilter;
 		this.personFilters = new ArrayList<Filter>();
 		try {
-			personFilters = filterService.getAllByFilter(FilterType.PERSON);
-			mailingFilters = filterService.getAllByFilter(FilterType.MAILING);
-			donationFilters = filterService.getAllByFilter(FilterType.DONATION);
-			addressFilters = filterService.getAllByFilter(FilterType.ADDRESS);
+			personFilters = filterService.getAllByFilter(FilterType.PERSON).a;
+			mailingFilters = filterService.getAllByFilter(FilterType.MAILING).a;
+			donationFilters = filterService.getAllByFilter(FilterType.DONATION).a;
+			addressFilters = filterService.getAllByFilter(FilterType.ADDRESS).a;
 		} catch (ServiceException e) {
 			// TODO err msg + log
 		}

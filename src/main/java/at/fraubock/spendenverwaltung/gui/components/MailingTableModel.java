@@ -87,7 +87,6 @@ public class MailingTableModel extends AbstractTableModel {
 					return "Keine Vorlage vorhanden";
 				}
 			default:
-				//TODO correct return/exception
 			return null;
 		}
 	}

@@ -87,12 +87,12 @@ public interface IDonationService {
 	public DonationType getDonationTypeByIndex(int index);
 
 	/**
-	 * Retrieves donations matching the given filter
+	 * Retrieves confirmed donations matching the given filter
 	 * 
 	 * @param filter
 	 *            the filter to be used
-	 * @return a list of all those donations matching the given filter, sorted
-	 *         by id descending, including their donators
+	 * @return a list of all those confirmed donations matching the given
+	 *         filter, sorted by id descending, including their donators
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */

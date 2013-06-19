@@ -105,12 +105,12 @@ public interface IPersonDAO {
 			throws PersistenceException;
 
 	/**
-	 * Retrieves those persons matching the given filter
+	 * Retrieves those confirmed persons matching the given filter
 	 * 
 	 * @param filter
 	 *            the filter to be used
-	 * @return a list of all those persons matching the given filter, sorted by
-	 *         id descending, including their addresses
+	 * @return a list of all those confirmed persons matching the given filter,
+	 *         sorted by id descending, including their addresses
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
