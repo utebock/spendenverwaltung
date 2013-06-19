@@ -18,6 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.log4j.Logger;
@@ -186,16 +187,6 @@ public class CreateMailingsView extends InitializableView {
 		createPostalMailingPanel.add(postalDateLabel);
 		createPostalMailingPanel.add(postalDatePicker, "wrap");
 		
-		fileFormatLabel = componentFactory.createLabel("Abspeichern als");
-		fileFormatBox = new JComboBox<SupportedFileFormat>(SupportedFileFormat.values());
-		createPostalMailingPanel.add(fileFormatLabel, "");
-		createPostalMailingPanel.add(fileFormatBox, "wrap");
-		
-		outputNameLabel = componentFactory.createLabel("Dokumentname");
-		outputNameField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
-		createPostalMailingPanel.add(outputNameLabel);
-		createPostalMailingPanel.add(outputNameField, "wrap");
-		
 		fileChooserButton = new JButton("Auswählen");
 		createPostalMailingPanel.add(fileChooserButton, "wrap");
 		
@@ -262,6 +253,69 @@ public class CreateMailingsView extends InitializableView {
 			JOptionPane.showMessageDialog(null, "Ein Fehler trat bei der Kommunikation mit MailChimp auf");
 		}
 		
+	}
+	
+	private String showSaveDialog(){
+
+        JFileChooser chooser; 
+        String path = System.getProperty("user.home");
+
+        chooser = new JFileChooser(path); 
+        chooser.setDialogType(JFileChooser.SAVE_DIALOG); 
+        
+        FileFilter filterPdf = new FileFilter() {
+            public boolean accept(File f) {
+                if (f.isDirectory())
+                    return true;
+                return f.getName().toLowerCase().endsWith(".pdf");
+            }
+
+            public String getDescription() {
+                return "pdf-File (*.pdf)";
+            }
+        };
+        
+        FileFilter filterDocx = new FileFilter() {
+            public boolean accept(File f) {
+                if (f.isDirectory())
+                    return false;
+                return f.getName().toLowerCase().endsWith(".docx");
+            }
+
+            public String getDescription() {
+                return "docx-File (*.docx)";
+            }
+        };
+        
+        chooser.addChoosableFileFilter(filterPdf);
+        chooser.addChoosableFileFilter(filterDocx);
+        
+        chooser.removeChoosableFileFilter(chooser.getAcceptAllFileFilter());
+        chooser.setDialogTitle("Speichern unter..."); 
+        chooser.setFileFilter(filterPdf);
+        chooser.setVisible(true); 
+
+        int result = chooser.showSaveDialog(this); 
+
+        if (result == JFileChooser.APPROVE_OPTION) { 
+
+        	path = chooser.getSelectedFile().toString();
+            
+            if(chooser.getFileFilter().getDescription().contains("docx")){
+            	if(path.endsWith(".docx"))
+            		return path;
+            	else
+            		return path + ".docx";
+            } else if(chooser.getFileFilter().getDescription().contains("pdf")){
+            	if(path.endsWith(".pdf"))
+            		return path;
+            	else
+            		return path + ".pdf";
+            }
+            chooser.setVisible(false);
+        } 
+        chooser.setVisible(false); 
+        return ""; 
 	}
 
 	private final class CreateEMailingAction extends AbstractAction {
@@ -342,6 +396,10 @@ public class CreateMailingsView extends InitializableView {
 			mailing.setType((Mailing.MailingType) postalMailingTypeChooser
 					.getSelectedItem());
 
+			String fileName = showSaveDialog();
+			
+			if(fileName.equals(""))
+				return;
 //			if(templateFile != null) {
 //				log.debug("Template file size "+templateFile.length());
 //				MailingTemplate template = new MailingTemplate();
@@ -358,27 +416,27 @@ public class CreateMailingsView extends InitializableView {
 				
 				if(templateFile != null) {
 					String name = "";
-					String fileName = outputNameField.getText();
-					SupportedFileFormat selectedFileFormat = (SupportedFileFormat) fileFormatBox.getSelectedItem();
+//					String fileName = outputNameField.getText();
+//					SupportedFileFormat selectedFileFormat = (SupportedFileFormat) fileFormatBox.getSelectedItem();
 					
-					if(outputNameField.getText().isEmpty()) {
-						if(selectedFileFormat == SupportedFileFormat.DOCX)
-							name = "./vorlage"+(new Date())+".docx";
-						else if(selectedFileFormat == SupportedFileFormat.PDF)
-							name = "./vorlage"+(new Date())+".pdf";
-					} else {
-						if(selectedFileFormat == SupportedFileFormat.DOCX){
-							if(!fileName.endsWith(".docx"))
-								name = "./" + fileName.concat(".docx");
-							else
-								name = "./" + fileName;
-						} else if(selectedFileFormat == SupportedFileFormat.PDF){
-							if(!fileName.endsWith(".pdf"))
-								name = "./" + fileName.concat(".pdf");
-							else
-								name = "./" + fileName;
-						}
-					}
+//					if(outputNameField.getText().isEmpty()) {
+//						if(selectedFileFormat == SupportedFileFormat.DOCX)
+//							name = "./vorlage"+(new Date())+".docx";
+//						else if(selectedFileFormat == SupportedFileFormat.PDF)
+//							name = "./vorlage"+(new Date())+".pdf";
+//					} else {
+//						if(selectedFileFormat == SupportedFileFormat.DOCX){
+//							if(!fileName.endsWith(".docx"))
+//								name = "./" + fileName.concat(".docx");
+//							else
+//								name = "./" + fileName;
+//						} else if(selectedFileFormat == SupportedFileFormat.PDF){
+//							if(!fileName.endsWith(".pdf"))
+//								name = "./" + fileName.concat(".pdf");
+//							else
+//								name = "./" + fileName;
+//						}
+//					}
 					
 					List<Person> recipients = personService.getPersonsByMailing(mailing);
 					
@@ -386,7 +444,7 @@ public class CreateMailingsView extends InitializableView {
 						feedbackLabel.setText("Der Personenfilter enthielt keine erreichbaren Personen.");
 						mailingService.delete(mailing);
 					} else {					
-						MailingTemplateUtil.createMailingWithDocxTemplate(templateFile, personService.getPersonsByMailing(mailing), name);
+						MailingTemplateUtil.createMailingWithDocxTemplate(templateFile, personService.getPersonsByMailing(mailing), fileName);
 					}
 				}
 			} catch (ServiceException e1) {
