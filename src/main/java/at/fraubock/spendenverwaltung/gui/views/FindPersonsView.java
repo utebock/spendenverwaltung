@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.filechooser.FileFilter;
@@ -36,12 +37,17 @@ import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.PersonTableModel;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.ConnectedCriterion;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
+import at.fraubock.spendenverwaltung.util.FilterProperty;
 import at.fraubock.spendenverwaltung.util.FilterType;
+import at.fraubock.spendenverwaltung.util.LogicalOperator;
+import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
 public class FindPersonsView extends InitializableView {
 
@@ -63,6 +69,8 @@ public class FindPersonsView extends InitializableView {
 	private JLabel label;
 	private JLabel empty;
 	private JLabel feedbackLabel;
+	private JLabel quickSearchLabel;
+	private JTextField quickSearchField;
 	private Filter showAllFilter;
 	private ComponentFactory componentFactory;
 	private ViewActionFactory viewActionFactory;
@@ -95,8 +103,14 @@ public class FindPersonsView extends InitializableView {
 		overviewPanel.add(label, "split2");
 		initTable();
 		overviewPanel.add(filterCombo, "growx, wrap");
-		empty = componentFactory.createLabel("			");
-		overviewPanel.add(empty, "wrap");
+		
+		quickSearchLabel = componentFactory.createLabel("Schnellsuche");
+		quickSearchField = new JTextField(30);
+		quickSearchField.addActionListener(new QuickSearchAction());
+		
+		overviewPanel.add(quickSearchLabel, "split 2");
+		overviewPanel.add(quickSearchField, "wrap");
+		
 		overviewPanel.add(scrollPane, "wrap");
 		
 		JButton exportButton = new JButton("Liste exportieren");
@@ -119,6 +133,7 @@ public class FindPersonsView extends InitializableView {
 		
 		showTable = new JTable(personModel);
 		showTable.setFillsViewportHeight(true);
+		showTable.setAutoCreateRowSorter(true);
 		showTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		scrollPane = new JScrollPane(showTable);
 		scrollPane.setPreferredSize(new Dimension(700, 550));
@@ -226,6 +241,44 @@ public class FindPersonsView extends InitializableView {
 		}
 	}
 
+	private final class QuickSearchAction implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(quickSearchField.getText().equals("")) {
+				return;
+			} else {
+				Filter quickSearchFilter = new Filter();
+				quickSearchFilter.setType(FilterType.PERSON);
+				
+				PropertyCriterion likeFirstName = new PropertyCriterion();
+				likeFirstName.compare(FilterProperty.PERSON_GIVENNAME, RelationalOperator.LIKE, quickSearchField.getText());
+				
+				PropertyCriterion likeSurname = new PropertyCriterion();
+				likeSurname.compare(FilterProperty.PERSON_SURNAME, RelationalOperator.LIKE, quickSearchField.getText());
+				
+				PropertyCriterion likeCompany = new PropertyCriterion();
+				likeCompany.compare(FilterProperty.PERSON_COMPANY, RelationalOperator.LIKE, quickSearchField.getText());
+				
+				ConnectedCriterion firstNameOrSurname = new ConnectedCriterion();
+				firstNameOrSurname.connect(likeFirstName, LogicalOperator.OR, likeSurname);
+				
+				ConnectedCriterion companyOrNames = new ConnectedCriterion();
+				companyOrNames.connect(firstNameOrSurname, LogicalOperator.OR, likeCompany);
+				
+				quickSearchFilter.setCriterion(companyOrNames);
+				
+				try {
+					List<Person> results = personService.getByFilter(quickSearchFilter);
+					personModel.clear();
+					personModel.addAll(results);
+				} catch (ServiceException e1) {
+					log.warn(e1.getLocalizedMessage());
+					feedbackLabel.setText("Ein Fehler passierte während der Schnellsuche.");
+				}
+			}
+		}
+	}
+
 	private final class exportActionListener implements ActionListener {
 		private final JFileChooser fileChooser;
 
@@ -276,7 +329,7 @@ public class FindPersonsView extends InitializableView {
 		}
 	}
 
-	//TODO CHANGE TO EDIT ONLY THE SELECTED PERSON IN A NEW JFRAME
+	//TODO CHANGE TO EDIT ONLY THE SELECTED PERSON IN A NEW JDIALOG
 	private final class EditAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
