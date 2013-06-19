@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 import at.fraubock.spendenverwaltung.gui.filter.configurators.ICriterionConfigurator;
 import at.fraubock.spendenverwaltung.gui.filter.configurators.mounted.AddressConfigurator;
 import at.fraubock.spendenverwaltung.gui.filter.configurators.mounted.DonationToPersonFilterConfig;
@@ -47,18 +44,14 @@ public class ConfiguratorFactory {
 	private List<Filter> mailingFilters;
 	private List<Filter> addressFilters;
 
-	public ConfiguratorFactory(FilterType type) {
-		this(type, null);
+	public ConfiguratorFactory(FilterType type, IFilterService filterService) {
+		this(type, null, filterService);
 	}
 
-	public ConfiguratorFactory(FilterType type, Filter editFilter) {
+	public ConfiguratorFactory(FilterType type, Filter editFilter,
+			IFilterService filterService) {
 		this.type = type;
 		this.editFilter = editFilter;
-		@SuppressWarnings("resource")
-		ApplicationContext context = new ClassPathXmlApplicationContext(
-				"/spring.xml");
-		IFilterService filterService = context.getBean("filterService",
-				IFilterService.class);
 		this.personFilters = new ArrayList<Filter>();
 		try {
 			personFilters = filterService.getAllByFilter(FilterType.PERSON);

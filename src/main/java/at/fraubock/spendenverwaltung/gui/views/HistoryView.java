@@ -2,6 +2,8 @@ package at.fraubock.spendenverwaltung.gui.views;
 
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -37,7 +39,7 @@ public class HistoryView extends InitializableView {
 	private ComponentBuilder builder;
 	private JToolBar toolbar;
 	private JPanel panel;
-	private JTable showTable;
+	private JTable historyTable;
 	private JScrollPane scrollPane;
 	private HistoryTableModel historyModel;
 	private IActionService actionService;
@@ -77,23 +79,63 @@ public class HistoryView extends InitializableView {
 		
 		panel.add(new HistorySearchPanel(this), "wrap");
 
-		showTable = new JTable(historyModel = new HistoryTableModel());
-		showTable.setFillsViewportHeight(true);
-		showTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		historyTable = new JTable(historyModel = new HistoryTableModel());
+		historyTable.setFillsViewportHeight(true);
+		historyTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		historyTable.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				if(arg0.getClickCount()==2) {
+					Action a = historyModel.getActionRow(historyTable
+							.getSelectedRow());
+					
+					JOptionPane.showMessageDialog(HistoryView.this,
+							a.getPayload(), "Details",
+							JOptionPane.INFORMATION_MESSAGE);
+					
+				}
+				
+			}
+		});
 
-		showTable.getColumnModel().getColumn(0).setMinWidth(200);
-		showTable.getColumnModel().getColumn(0).setMaxWidth(200);
+		historyTable.getColumnModel().getColumn(0).setMinWidth(200);
+		historyTable.getColumnModel().getColumn(0).setMaxWidth(200);
 
-		showTable.getColumnModel().getColumn(1).setMinWidth(150);
-		showTable.getColumnModel().getColumn(1).setMaxWidth(150);
+		historyTable.getColumnModel().getColumn(1).setMinWidth(150);
+		historyTable.getColumnModel().getColumn(1).setMaxWidth(150);
 
-		showTable.getColumnModel().getColumn(2).setMinWidth(210);
-		showTable.getColumnModel().getColumn(2).setMaxWidth(210);
+		historyTable.getColumnModel().getColumn(2).setMinWidth(210);
+		historyTable.getColumnModel().getColumn(2).setMaxWidth(210);
 
-		showTable.getColumnModel().getColumn(3).setMinWidth(150);
-		showTable.getColumnModel().getColumn(3).setMaxWidth(150);
+		historyTable.getColumnModel().getColumn(3).setMinWidth(150);
+		historyTable.getColumnModel().getColumn(3).setMaxWidth(150);
 
-		scrollPane = new JScrollPane(showTable);
+		scrollPane = new JScrollPane(historyTable);
 		scrollPane.setPreferredSize(new Dimension(1200,
 				MAX_TABLE_SIZE * 18 - 17));
 		panel.add(scrollPane, "wrap");

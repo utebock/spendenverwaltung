@@ -102,4 +102,8 @@ public class HistoryTableModel extends AbstractTableModel implements
 	public void setPager(Pager<Action> pager) {
 		this.pager = pager;
 	}
+	
+	public Action getActionRow(int rowIndex){
+		return actions.get(rowIndex);
+	}
 }

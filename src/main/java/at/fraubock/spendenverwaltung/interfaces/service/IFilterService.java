@@ -55,9 +55,10 @@ public interface IFilterService {
 	public List<Filter> getAll() throws ServiceException;
 
 	/**
-	 * Retrieves all {@link Filter} of the given {@link FilterType}
+	 * Retrieves all <b>non-anonymous</b> {@link Filter} of the given
+	 * {@link FilterType}
 	 * 
-	 * @return List of all filters of given type
+	 * @return List of all filters of given type that are not anonymous
 	 */
 	public List<Filter> getAllByFilter(FilterType type) throws ServiceException;
 

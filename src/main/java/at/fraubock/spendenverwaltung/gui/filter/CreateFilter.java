@@ -78,7 +78,7 @@ public class CreateFilter extends JPanel {
 		this.filterOverview = filterOverview;
 		this.builder = new ComponentBuilder();
 		this.type = type;
-		this.factory = new ConfiguratorFactory(type, editFilter);
+		this.factory = new ConfiguratorFactory(type, editFilter,filterService);
 		this.criterionSelectorPanel = builder.createPanel(700, 500);
 
 		this.plusButton = new JButton();

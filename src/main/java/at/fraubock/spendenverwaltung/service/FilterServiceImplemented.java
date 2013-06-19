@@ -165,11 +165,13 @@ public class FilterServiceImplemented implements IFilterService {
 
 	@Override
 	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
-	public List<Filter> getAllByFilter(FilterType type) throws ServiceException {
+	public List<Filter> getAllByFilter(FilterType type)
+			throws ServiceException {
 		List<Filter> list = new ArrayList<Filter>();
 		try {
 			for (Filter filter : filterDAO.getAll()) {
-				if (filter.getType() == type) {
+				if (filter.getType() == type
+						&& !filter.isAnonymous()) {
 					list.add(filter);
 				}
 			}
