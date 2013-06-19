@@ -17,9 +17,9 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 public interface IMailingDAO {
 
 	/**
-	 * Persists a new Mailing (if its id is null or not yet existent) 
-	 * or updates the Mailing with the already existent id. If the
-	 * Mailing is inserted, the id value will be set.
+	 * Persists a new Mailing (if its id is null or not yet existent) or updates
+	 * the Mailing with the already existent id. If the Mailing is inserted, the
+	 * id value will be set.
 	 * 
 	 * @param m
 	 *            Mailing to be inserted or updated
@@ -30,7 +30,7 @@ public interface IMailingDAO {
 
 	/**
 	 * Deletes a mailing from the underlying persistence layer.
-	 *
+	 * 
 	 * @param m
 	 *            mailing to be deleted. Its id must be set, i.e. it must be
 	 *            persisted and retrievable by this DAO.
@@ -62,19 +62,19 @@ public interface IMailingDAO {
 
 	/**
 	 * Retrieves all mailings associated with a specific Person
-	 *
+	 * 
 	 * @param person
 	 *            the person to retrieve the main mailing from, must have been
 	 *            persisted or retrieved using an {@link IPersonDAO} prior to
 	 *            calling this method
 	 * @return all mailings that have been sent to the specified person or null
-	 * 			if no mailings were found
+	 *         if no mailings were found
 	 * 
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
 	public List<Mailing> getConfirmedMailingsByPerson(Person person)
-				throws PersistenceException;
+			throws PersistenceException;
 
 	/**
 	 * returns all unconfirmed mailings
@@ -91,13 +91,13 @@ public interface IMailingDAO {
 	 * @throws PersistenceException
 	 */
 	List<Mailing> getAllConfirmed() throws PersistenceException;
-	
+
 	/**
 	 * confirms a mailing
 	 * 
 	 * @throws PersistenceException
 	 */
-	
+
 	void confirmMailing(Mailing mailing) throws PersistenceException;
 
 	/**
@@ -121,6 +121,7 @@ public interface IMailingDAO {
 
 	/**
 	 * removes a specific recipient (person) from an unsent mailing
+	 * 
 	 * @param p
 	 * @param m
 	 * @throws PersistenceException
@@ -129,22 +130,26 @@ public interface IMailingDAO {
 			throws PersistenceException;
 
 	/**
-	 * returns all mailings matched by this filter
+	 * returns all confirmed mailings matched by this filter
+	 * 
 	 * @param filter
-	 * @return
-	 * @throws PersistenceException 
+	 *            a filter on mailings
+	 * @return a list of confirmed mailings matching the given filter
+	 * @throws PersistenceException
 	 */
-	List<Mailing> getMailingsByFilter(Filter filter) throws PersistenceException;
+	List<Mailing> getMailingsByFilter(Filter filter)
+			throws PersistenceException;
 
 	/**
 	 * deletes one person from a mailing
 	 * 
 	 * @param person
 	 * @param mailing
-	 * @throws PersistenceException 
+	 * @throws PersistenceException
 	 */
-	public void deletePersonFromMailing(Person person, Mailing mailing) throws PersistenceException;
-	
+	public void deletePersonFromMailing(Person person, Mailing mailing)
+			throws PersistenceException;
+
 	/**
 	 * returns the number of persons who got this mailing
 	 * 
