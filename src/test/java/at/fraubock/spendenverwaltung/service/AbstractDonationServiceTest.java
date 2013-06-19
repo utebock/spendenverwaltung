@@ -1,14 +1,13 @@
 package at.fraubock.spendenverwaltung.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -128,29 +127,22 @@ public abstract class AbstractDonationServiceTest {
 	}
 
 	@Test(expected = ServiceException.class)
-	public void createWithNullParameterShouldThrowException()
-			throws ServiceException {
-		try {
-			doThrow(new PersistenceException()).when(donationDAO)
-					.insertOrUpdate(null);
+	public void createWithNullParameterShouldThrowException() throws Exception {
 
-			donationService.create(null);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		doThrow(new PersistenceException()).when(donationDAO).insertOrUpdate(
+				null);
+
+		donationService.create(null);
+
 	}
 
 	@Test
-	public void createWithValidParameterShouldReturnDonation() {
-		try {
-			Donation returned = donationService.create(donation);
-			assertEquals(returned, donationCreated);
-			verify(donationDAO).insertOrUpdate(donation);
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void createWithValidParameterShouldReturnDonation() throws Exception {
+
+		Donation returned = donationService.create(donation);
+		assertEquals(returned, donationCreated);
+		verify(donationDAO).insertOrUpdate(donation);
+
 	}
 
 	/*
@@ -158,42 +150,34 @@ public abstract class AbstractDonationServiceTest {
 	 */
 
 	@Test(expected = ServiceException.class)
-	public void updateWithNullParameterShouldThrowException()
-			throws ServiceException {
-		try {
-			doThrow(new PersistenceException()).when(donationDAO)
-					.insertOrUpdate(null);
+	public void updateWithNullParameterShouldThrowException() throws Exception {
 
-			donationService.update(null);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		doThrow(new PersistenceException()).when(donationDAO).insertOrUpdate(
+				null);
+
+		donationService.update(null);
+
 	}
 
 	@Test(expected = ServiceException.class)
 	public void updateWithInvalidParameterShouldThrowException()
-			throws ServiceException {
-		try {
-			doThrow(new PersistenceException()).when(donationDAO)
-					.insertOrUpdate(nullDonation);
+			throws Exception {
 
-			donationService.update(nullDonation);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		doThrow(new PersistenceException()).when(donationDAO).insertOrUpdate(
+				nullDonation);
+
+		donationService.update(nullDonation);
+
 	}
 
 	@Test
-	public void updateWithValidParametersShouldReturnUpdatedDonation() {
-		try {
-			Donation returned = donationService.update(donationCreated);
-			assertEquals(returned, donationCreated);
-			verify(donationDAO).insertOrUpdate(donationCreated);
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void updateWithValidParametersShouldReturnUpdatedDonation()
+			throws Exception {
+
+		Donation returned = donationService.update(donationCreated);
+		assertEquals(returned, donationCreated);
+		verify(donationDAO).insertOrUpdate(donationCreated);
+
 	}
 
 	/*
@@ -201,27 +185,20 @@ public abstract class AbstractDonationServiceTest {
 	 */
 
 	@Test(expected = ServiceException.class)
-	public void deleteWithNullParameterShouldThrowException()
-			throws ServiceException {
-		try {
-			doThrow(new PersistenceException()).when(donationDAO).delete(null);
+	public void deleteWithNullParameterShouldThrowException() throws Exception {
 
-			donationService.delete(null);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		doThrow(new PersistenceException()).when(donationDAO).delete(null);
+
+		donationService.delete(null);
+
 	}
 
 	@Test
-	public void deleteWithValidParameterRemovesEntity() {
-		try {
-			donationService.delete(donation);
-			verify(donationDAO).delete(donation);
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void deleteWithValidParameterRemovesEntity() throws Exception {
+
+		donationService.delete(donation);
+		verify(donationDAO).delete(donation);
+
 	}
 
 	/*
@@ -229,66 +206,50 @@ public abstract class AbstractDonationServiceTest {
 	 */
 
 	@Test
-	public void getAllByPersonReturnsAllEntitiesForPerson() {
-		try {
-			List<Donation> all = new ArrayList<Donation>();
-			all.add(donation);
-			all.add(donation2);
-			when(donationDAO.getByPerson(person)).thenReturn(all);
+	public void getAllByPersonReturnsAllEntitiesForPerson() throws Exception {
 
-			List<Donation> list = donationService.getByPerson(person);
-			assert (list != null && list.size() == 2);
-			assert (list.get(0).equals(donation) && list.get(1).equals(
-					donation2));
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
+		List<Donation> all = new ArrayList<Donation>();
+		all.add(donation);
+		all.add(donation2);
+		when(donationDAO.getByPerson(person)).thenReturn(all);
+
+		List<Donation> list = donationService.getByPerson(person);
+		assertNotNull(list);
+		assertEquals(2, list.size());
+		assertEquals(donation, list.get(0));
+		assertEquals(donation2, list.get(1));
+
 	}
 
 	@Test(expected = EmptyResultDataAccessException.class)
-	public void getWithInvalidIdReturnsNull() {
-		try {
-			when(donationDAO.getByID(10000)).thenThrow(
-					new EmptyResultDataAccessException(0));
+	public void getWithInvalidIdReturnsNull() throws Exception {
 
-			donationService.getByID(10000);
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
+		when(donationDAO.getByID(10000)).thenThrow(
+				new EmptyResultDataAccessException(0));
+
+		donationService.getByID(10000);
+
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void getWithNegativeId_ThrowsException() {
-		try {
-			when(donationDAO.getByID(-1)).thenThrow(
-					new IllegalArgumentException());
+	public void getWithNegativeId_ThrowsException() throws Exception {
 
-			donationService.getByID(-1);
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
+		when(donationDAO.getByID(-1)).thenThrow(new IllegalArgumentException());
+
+		donationService.getByID(-1);
+
 	}
 
 	@Test
-	public void getWithValidIdReturnsEntity() {
-		try {
-			when(donationDAO.getByID(donationCreated.getId())).thenReturn(
-					donationCreated);
+	public void getWithValidIdReturnsEntity() throws Exception {
 
-			Donation found = donationService.getByID(donationCreated.getId());
+		when(donationDAO.getByID(donationCreated.getId())).thenReturn(
+				donationCreated);
 
-			assertEquals(donationCreated, found);
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
+		Donation found = donationService.getByID(donationCreated.getId());
+
+		assertEquals(donationCreated, found);
+
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -297,15 +258,15 @@ public abstract class AbstractDonationServiceTest {
 	}
 
 	@Test
-	public void createCSVWithValidArgument_ReturnsCSVString() {
+	public void createCSVWithValidArgument_ReturnsCSVString() throws Exception {
 		List<Donation> list = new ArrayList<Donation>();
-		try {
-			donation.setDate(new SimpleDateFormat("dd.MM.yyyy").parse("12.06.2013"));
-			donation2.setDate(new SimpleDateFormat("dd.MM.yyyy").parse("13.06.2013"));
-			donation3.setDate(new SimpleDateFormat("dd.MM.yyyy").parse("14.06.2013"));
-		} catch (ParseException e) {
-			fail();
-		}
+
+		donation.setDate(new SimpleDateFormat("dd.MM.yyyy").parse("12.06.2013"));
+		donation2.setDate(new SimpleDateFormat("dd.MM.yyyy")
+				.parse("13.06.2013"));
+		donation3.setDate(new SimpleDateFormat("dd.MM.yyyy")
+				.parse("14.06.2013"));
+
 		list.add(donation);
 		list.add(donation2);
 		list.add(donation3);

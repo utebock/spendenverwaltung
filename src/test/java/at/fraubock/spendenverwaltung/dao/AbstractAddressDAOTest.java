@@ -1,7 +1,7 @@
 package at.fraubock.spendenverwaltung.dao;
 
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
-
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/testspring.xml")
@@ -34,19 +33,21 @@ public abstract class AbstractAddressDAOTest {
 
 	@Test(expected = PersistenceException.class)
 	@Transactional
-	public void createWithNullParameter_ThrowsException() throws PersistenceException {
+	public void createWithNullParameter_ThrowsException()
+			throws PersistenceException {
 		addressDAO.insertOrUpdate(null);
 	}
 
 	@Test(expected = PersistenceException.class)
 	@Transactional
-	public void createWithInvalidStateParameter_ThrowsException() throws PersistenceException {
+	public void createWithInvalidStateParameter_ThrowsException()
+			throws PersistenceException {
 		addressDAO.insertOrUpdate(new Address()); // all values are null
 	}
 
 	@Test
 	@Transactional
-	public void createWithValidParameter_ReturnsSavedAddress() {
+	public void createWithValidParameter_ReturnsSavedAddress() throws Exception {
 
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
@@ -54,17 +55,13 @@ public abstract class AbstractAddressDAOTest {
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
-		try {
-			addressDAO.insertOrUpdate(address);
+		addressDAO.insertOrUpdate(address);
 
-			Address savedAddress = addressDAO.getByID(address.getId());
+		Address savedAddress = addressDAO.getByID(address.getId());
 
-			// check if address was saved correctly
-			assert (savedAddress.equals(address));
+		// check if address was saved correctly
+		assertTrue(savedAddress.equals(address));
 
-		} catch (PersistenceException e) {
-			fail();
-		}
 	}
 
 	/*
@@ -73,59 +70,55 @@ public abstract class AbstractAddressDAOTest {
 
 	@Test(expected = PersistenceException.class)
 	@Transactional
-	public void updateWithNullParameter_ThrowsException() throws PersistenceException {
+	public void updateWithNullParameter_ThrowsException()
+			throws PersistenceException {
 		addressDAO.insertOrUpdate(null);
 	}
 
 	@Test(expected = PersistenceException.class)
 	@Transactional
-	public void updateWithInvalidStateParameter_ThrowsException() throws PersistenceException {
+	public void updateWithInvalidStateParameter_ThrowsException()
+			throws PersistenceException {
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
 		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
-		try {
-			addressDAO.insertOrUpdate(address);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		addressDAO.insertOrUpdate(address);
+
 		address.setCity(null); // not allowed null value
 
 		addressDAO.insertOrUpdate(address);
-		
+
 	}
 
 	@Test
 	@Transactional
-	public void updateWithValidParameters_ReturnsUpdatedAddress() {
+	public void updateWithValidParameters_ReturnsUpdatedAddress()
+			throws Exception {
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
 		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
-		try {
-			addressDAO.insertOrUpdate(address);
-			address.setCity("AnotherCity");
+		addressDAO.insertOrUpdate(address);
+		address.setCity("AnotherCity");
 
-			addressDAO.insertOrUpdate(address);
-			Address updatedAddress = addressDAO.getByID(address.getId());
+		addressDAO.insertOrUpdate(address);
+		Address updatedAddress = addressDAO.getByID(address.getId());
 
-			// check if address was updated correctly
-			assert (updatedAddress.getId() == address.getId());
-			assert (updatedAddress.getStreet().equals(address.getStreet()));
-			assert (updatedAddress.getPostalCode() == address.getPostalCode());
-			assert (updatedAddress.getCountry().equals(address.getCountry()));
-			assert (!updatedAddress.getCity().equals(address.getCity())); // different
+		// check if address was updated correctly
+		assertTrue(updatedAddress.getId() == address.getId());
+		assertTrue(updatedAddress.getStreet().equals(address.getStreet()));
+		assertTrue(updatedAddress.getPostalCode() == address.getPostalCode());
+		assertTrue(updatedAddress.getCountry().equals(address.getCountry()));
+		assertTrue(!updatedAddress.getCity().equals(address.getCity())); // different
 																			// city
 
-			assert (address.getCity() == updatedAddress.getCity());
+		assertTrue(address.getCity() == updatedAddress.getCity());
 
-		} catch (PersistenceException e) {
-			fail();
-		}
 	}
 
 	/*
@@ -134,28 +127,25 @@ public abstract class AbstractAddressDAOTest {
 
 	@Test(expected = PersistenceException.class)
 	@Transactional
-	public void deleteWithNullParameter_ThrowsException() throws PersistenceException {
+	public void deleteWithNullParameter_ThrowsException()
+			throws PersistenceException {
 		addressDAO.delete(null);
 	}
 
 	@Test
 	@Transactional
-	public void deleteWithValidParameter_RemovesEntity() {
+	public void deleteWithValidParameter_RemovesEntity() throws Exception {
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
 		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
-		try {
-			addressDAO.insertOrUpdate(address);
-			addressDAO.delete(address);
-			List<Address> allAddresses = addressDAO.getAll();
-			assert (!allAddresses.contains(address));
+		addressDAO.insertOrUpdate(address);
+		addressDAO.delete(address);
+		List<Address> allAddresses = addressDAO.getAll();
+		assertTrue(!allAddresses.contains(address));
 
-		} catch (PersistenceException e) {
-			fail();
-		}
 	}
 
 	/*
@@ -164,7 +154,7 @@ public abstract class AbstractAddressDAOTest {
 
 	@Test
 	@Transactional(readOnly = true)
-	public void getAll_ReturnsAllEntities() {
+	public void getAll_ReturnsAllEntities() throws Exception {
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
 		address.setPostalCode("00000");
@@ -176,15 +166,13 @@ public abstract class AbstractAddressDAOTest {
 		address2.setPostalCode("00001");
 		address2.setCity("Testcity2");
 		address2.setCountry("Testcountry2");
-		try {
-			addressDAO.insertOrUpdate(address);
-			addressDAO.insertOrUpdate(address2);
 
-			List<Address> addressList = addressDAO.getAll();
-			assert (addressList != null && addressList.size() == 2);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		addressDAO.insertOrUpdate(address);
+		addressDAO.insertOrUpdate(address2);
+
+		List<Address> addressList = addressDAO.getAll();
+		assertTrue(addressList != null && addressList.size() == 2);
+
 	}
 
 	@Test
@@ -195,32 +183,27 @@ public abstract class AbstractAddressDAOTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	@Transactional(readOnly = true)
-	public void getWithNegativeId_ThrowsException() {
-		try {
-			addressDAO.getByID(-1);
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void getWithNegativeId_ThrowsException() throws Exception {
+
+		addressDAO.getByID(-1);
+
 	}
 
 	@Test
 	@Transactional(readOnly = true)
-	public void getWithValidId_ReturnsEntity() {
+	public void getWithValidId_ReturnsEntity() throws Exception {
 		Address address = new Address();
 		address.setStreet("Teststreet 1/1");
 		address.setPostalCode("00000");
 		address.setCity("Testcity");
 		address.setCountry("Testcountry");
 
-		try {
-			addressDAO.insertOrUpdate(address);
-			Address foundAddress = addressDAO.getByID(address.getId());
+		addressDAO.insertOrUpdate(address);
+		Address foundAddress = addressDAO.getByID(address.getId());
 
-			assert (foundAddress != null && foundAddress.getId() == address
-					.getId());
-		} catch (PersistenceException e) {
-			fail();
-		}
+		assertTrue(foundAddress != null
+				&& foundAddress.getId() == address.getId());
+
 	}
 
 }

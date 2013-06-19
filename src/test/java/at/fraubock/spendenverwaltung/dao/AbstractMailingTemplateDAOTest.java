@@ -1,7 +1,7 @@
 package at.fraubock.spendenverwaltung.dao;
 
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.List;
@@ -53,16 +53,14 @@ public abstract class AbstractMailingTemplateDAOTest {
 
 	@Test
 	@Transactional
-	public void createWithValidParameter_ReturnsSavedMailingTemplate() {
-		try {
-			mailingTemplateDAO.insert(mt);
+	public void createWithValidParameter_ReturnsSavedMailingTemplate()
+			throws PersistenceException {
 
-			MailingTemplate savedMt = mailingTemplateDAO.getByID(mt.getId());
-			assert (savedMt.equals(mt));
-		} catch (PersistenceException e) {
-			e.printStackTrace();
-			fail();
-		}
+		mailingTemplateDAO.insert(mt);
+
+		MailingTemplate savedMt = mailingTemplateDAO.getByID(mt.getId());
+		assertTrue(savedMt.equals(mt));
+
 	}
 
 	/*
@@ -78,17 +76,15 @@ public abstract class AbstractMailingTemplateDAOTest {
 
 	@Test
 	@Transactional
-	public void deleteWithValidParameter_RemovesEntity() {
-		try {
-			mailingTemplateDAO.insert(mt);
-			mailingTemplateDAO.delete(mt);
-			List<MailingTemplate> allMailingTemplatees = mailingTemplateDAO
-					.getAll();
-			assert (!allMailingTemplatees.contains(mt));
+	public void deleteWithValidParameter_RemovesEntity()
+			throws PersistenceException {
 
-		} catch (PersistenceException e) {
-			fail();
-		}
+		mailingTemplateDAO.insert(mt);
+		mailingTemplateDAO.delete(mt);
+		List<MailingTemplate> allMailingTemplatees = mailingTemplateDAO
+				.getAll();
+		assertTrue(!allMailingTemplatees.contains(mt));
+
 	}
 
 	/*
@@ -97,17 +93,15 @@ public abstract class AbstractMailingTemplateDAOTest {
 
 	@Test
 	@Transactional(readOnly = true)
-	public void getAll_ReturnsAllEntities() {
-		try {
-			mailingTemplateDAO.insert(mt);
-			mailingTemplateDAO.insert(mt2);
+	public void getAll_ReturnsAllEntities() throws PersistenceException {
 
-			List<MailingTemplate> mailingTemplateList = mailingTemplateDAO
-					.getAll();
-			assert (mailingTemplateList != null && mailingTemplateList.size() == 2);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		mailingTemplateDAO.insert(mt);
+		mailingTemplateDAO.insert(mt2);
+
+		List<MailingTemplate> mailingTemplateList = mailingTemplateDAO.getAll();
+		assertTrue(mailingTemplateList != null
+				&& mailingTemplateList.size() == 2);
+
 	}
 
 	@Test
@@ -118,42 +112,37 @@ public abstract class AbstractMailingTemplateDAOTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	@Transactional(readOnly = true)
-	public void getWithNegativeId_ThrowsException() {
-		try {
-			mailingTemplateDAO.getByID(-1);
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void getWithNegativeId_ThrowsException() throws PersistenceException {
+
+		mailingTemplateDAO.getByID(-1);
+
 	}
 
 	@Test
 	@Transactional(readOnly = true)
-	public void getWithValidId_ReturnsEntity() {
+	public void getWithValidId_ReturnsEntity() throws PersistenceException {
 
-		try {
-			mailingTemplateDAO.insert(mt);
-			MailingTemplate foundMailingTemplate = mailingTemplateDAO
-					.getByID(mt.getId());
+		mailingTemplateDAO.insert(mt);
+		MailingTemplate foundMailingTemplate = mailingTemplateDAO.getByID(mt
+				.getId());
 
-			assert (foundMailingTemplate != null && foundMailingTemplate
-					.getId() == mt.getId());
-		} catch (PersistenceException e) {
-			fail();
-		}
+		assertTrue(foundMailingTemplate != null
+				&& foundMailingTemplate.getId() == mt.getId());
+
 	}
 
 	@Before
 	public void init() {
 		String fs = File.separator;
 		mt = new MailingTemplate();
-		File f = new File(
-				"src"+fs+"test"+fs+"resources"+fs+"examplemailing2.docx");
+		File f = new File("src" + fs + "test" + fs + "resources" + fs
+				+ "examplemailing2.docx");
 		mt.setFile(f);
 		mt.setFileName(f.getName());
-		
+
 		mt2 = new MailingTemplate();
-		File f2 = new File(
-				"src"+fs+"test"+fs+"resources"+fs+"examplemailing2.docx");
+		File f2 = new File("src" + fs + "test" + fs + "resources" + fs
+				+ "examplemailing2.docx");
 		mt2.setFile(f2);
 		mt2.setFileName(f2.getName());
 	}

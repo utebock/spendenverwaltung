@@ -1,6 +1,8 @@
 package at.fraubock.spendenverwaltung.dao;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -66,78 +68,75 @@ public abstract class AbstractActionDAOTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	@Transactional(readOnly = true)
-	public void getLimitedResultWithNullValue_ThrowsException() {
-		try {
-			actionDAO.getLimitedResultByAttributes(null, 0, 0);
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void getLimitedResultWithNullValue_ThrowsException()
+			throws PersistenceException {
+
+		actionDAO.getLimitedResultByAttributes(null, 0, 0);
+
 	}
 
 	@Test
 	@Transactional(readOnly = true)
-	public void getLimitedResultByAttribute_ReturnsActions() {
-		try {
+	public void getLimitedResultByAttribute_ReturnsActions()
+			throws PersistenceException {
 
-			List<Action> allActions = actionDAO.getLimitedResultByAttributes(
-					searchVO, 0, 2);
-			List<Action> allActions2 = actionDAO.getLimitedResultByAttributes(
-					searchVO, 2, 3);
+		List<Action> allActions = actionDAO.getLimitedResultByAttributes(
+				searchVO, 0, 2);
+		List<Action> allActions2 = actionDAO.getLimitedResultByAttributes(
+				searchVO, 2, 3);
 
-			assert (allActions.size() == 2 && allActions2.size() == 2);
-			allActions.addAll(allActions2);
+		assertEquals(2, allActions.size());
+		assertEquals(2, allActions2.size());
+		allActions.addAll(allActions2);
 
-			for (Action a : allActions) {
-				assert (a.getActor().contains("ubadministrative")
-						&& a.getEntity() == Action.Entity.PERSON
-						&& a.getEntityId().equals(person.getId()) && a
-						.getPayload().contains("TestCompany"));
+		for (Action a : allActions) {
+			assertTrue(a.getActor().contains("ubadministrative"));
+			assertSame(Action.Entity.PERSON, a.getEntity());
+			assertEquals(person.getId(), a.getEntityId());
+			assertTrue(a.getPayload().contains("TestCompany"));
 
-				Calendar actDate = new GregorianCalendar();
-				actDate.setTime(a.getTime());
-				actDate.set(Calendar.HOUR_OF_DAY, 0);
-				actDate.set(Calendar.MINUTE, 0);
-				actDate.set(Calendar.SECOND, 0);
-				actDate.set(Calendar.MILLISECOND, 0);
+			Calendar actDate = new GregorianCalendar();
+			actDate.setTime(a.getTime());
+			actDate.set(Calendar.HOUR_OF_DAY, 0);
+			actDate.set(Calendar.MINUTE, 0);
+			actDate.set(Calendar.SECOND, 0);
+			actDate.set(Calendar.MILLISECOND, 0);
 
-				Calendar nowDate = new GregorianCalendar();
-				nowDate.setTime(new Date());
-				nowDate.set(Calendar.HOUR_OF_DAY, 0);
-				nowDate.set(Calendar.MINUTE, 0);
-				nowDate.set(Calendar.SECOND, 0);
-				nowDate.set(Calendar.MILLISECOND, 0);
+			Calendar nowDate = new GregorianCalendar();
+			nowDate.setTime(new Date());
+			nowDate.set(Calendar.HOUR_OF_DAY, 0);
+			nowDate.set(Calendar.MINUTE, 0);
+			nowDate.set(Calendar.SECOND, 0);
+			nowDate.set(Calendar.MILLISECOND, 0);
 
-				assert (actDate.equals(nowDate));
-				assert (a.getPayload()
-						.equals("TestTitle, GNTest, SNTest, TestCompany, "
-								+ "test@test.at, male, 01234567889, email: 1, postal: 0, note: testnote"));
-			}
-		} catch (PersistenceException e) {
-			fail();
+			assertEquals(nowDate, actDate);
+			assertEquals(
+					"TestTitle, GNTest, SNTest, TestCompany, "
+							+ "test@test.at, male, 01234567889, email: 1, postal: 0, note: testnote",
+					a.getPayload());
 		}
+
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	@Transactional(readOnly = true)
-	public void getNumberOfWithNullValue_ThrowsException() {
-		try {
-			actionDAO.getNumberOfResultsByAttributes(null);
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void getNumberOfWithNullValue_ThrowsException()
+			throws PersistenceException {
+
+		actionDAO.getNumberOfResultsByAttributes(null);
+
 	}
 
 	@Test
 	@Transactional(readOnly = true)
-	public void getNumberOfByResultyByAttributes_ReturnsAmount() {
-		try {
-			long amount = actionDAO
-					.getNumberOfResultsByAttributes(new ActionSearchVO());
+	public void getNumberOfByResultyByAttributes_ReturnsAmount()
+			throws PersistenceException {
 
-			assert (amount == 3);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		long amount = actionDAO
+				.getNumberOfResultsByAttributes(new ActionSearchVO());
+
+		assertEquals(3, amount);
+
 	}
 
 }

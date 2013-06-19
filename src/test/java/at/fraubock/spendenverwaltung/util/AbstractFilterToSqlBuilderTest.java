@@ -1,5 +1,7 @@
 package at.fraubock.spendenverwaltung.util;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,10 +54,10 @@ public abstract class AbstractFilterToSqlBuilderTest {
 		String mailingStmt = builder.createSqlStatement(mailingFilter);
 		String addressStmt = builder.createSqlStatement(addressFilter);
 
-		assert ("select * from persons".equals(personStmt));
-		assert ("select * from donations".equals(donationStmt));
-		assert ("select * from mailings".equals(mailingStmt));
-		assert ("select * from addresses".equals(addressStmt));
+		assertEquals("select * from persons", personStmt);
+		assertEquals("select * from donations", (donationStmt));
+		assertEquals("select * from mailings", (mailingStmt));
+		assertEquals("select * from addresses", (addressStmt));
 	}
 
 	/* testing property criterion statements */
@@ -71,40 +73,42 @@ public abstract class AbstractFilterToSqlBuilderTest {
 	public void personCompanyLikeString_ReturnsStatement() {
 		personFilter.setCriterion(personCompProp);
 		String personStmt = builder.createSqlStatement(personFilter);
-		assert ("select * from persons where company LIKE '%testcompany%'"
-				.equals(personStmt));
+		assertEquals(
+				"select * from persons where company LIKE '%testcompany%'",
+				(personStmt));
 	}
 
 	@Test
 	public void donationAmountLessEqualsNumeric_ReturnsStatement() {
 		donationFilter.setCriterion(donationAmountProp);
 		String donationStmt = builder.createSqlStatement(donationFilter);
-		assert ("select * from donations where amount <= 100"
-				.equals(donationStmt));
+		assertEquals("select * from donations where amount <= 100",
+				(donationStmt));
 	}
 
 	@Test
 	public void donationDateGreaterDaysBack_ReturnsStatement() {
 		donationFilter.setCriterion(donationDaysBackProp);
 		String donationStmt = builder.createSqlStatement(donationFilter);
-		assert ("select * from donations where donationdate > DATE(SUBDATE(NOW(), 25))"
-				.equals(donationStmt));
+		assertEquals(
+				"select * from donations where donationdate > DATE(SUBDATE(NOW(), 25))",
+				(donationStmt));
 	}
 
 	@Test
 	public void mailingnDateNotNull_ReturnsStatement() {
 		mailingFilter.setCriterion(mailingNotNullProp);
 		String donationStmt = builder.createSqlStatement(mailingFilter);
-		assert ("select * from mailings where date NOT NULL"
-				.equals(donationStmt));
+		assertEquals("select * from mailings where date NOT NULL",
+				(donationStmt));
 	}
 
 	@Test
 	public void isMainAddressEqualsBool_ReturnsStatement() {
 		addressFilter.setCriterion(addressIsMainProp);
 		String addressStmt = builder.createSqlStatement(addressFilter);
-		assert ("select * from addresses where isMain = true"
-				.equals(addressStmt));
+		assertEquals("select * from addresses where isMain = true",
+				(addressStmt));
 	}
 
 	/* testing connected criterion statements */
@@ -124,8 +128,9 @@ public abstract class AbstractFilterToSqlBuilderTest {
 
 		String stmt = builder.createSqlStatement(personFilter);
 
-		assert ("select * from persons where (company LIKE '%testcompany%' AND LIKE '%testcompany%')"
-				.equals(stmt));
+		assertEquals(
+				"select * from persons where (company LIKE '%testcompany%' AND LIKE '%testcompany%')",
+				(stmt));
 	}
 
 	@Test
@@ -142,8 +147,9 @@ public abstract class AbstractFilterToSqlBuilderTest {
 
 		String stmt = builder.createSqlStatement(personFilter);
 
-		assert ("select * from persons where (company LIKE '%testcompany%' AND name = 'testname') OR (company LIKE '%testcompany%' AND name = 'testname')"
-				.equals(stmt));
+		assertEquals(
+				"select * from persons where (company LIKE '%testcompany%' AND name = 'testname') OR (company LIKE '%testcompany%' AND name = 'testname')",
+				(stmt));
 	}
 
 	@Test
@@ -192,15 +198,15 @@ public abstract class AbstractFilterToSqlBuilderTest {
 		orNotCrit.connect(andCrit, LogicalOperator.OR, addressMount);
 
 		Filter mainFilter = new Filter(FilterType.PERSON, orNotCrit);
-		
-		String result = "select * from persons as mount0 where " +
-				"(((select count(*) from donations as mount1 where" +
-				" mount0.id=mount1.personid and amount <> 100.0) = 0 AND" +
-				" (select count(*) from donations as mount1 where " +
-				"mount0.id=mount1.personid) >= 1) OR (select count(*) from" +
-				" addresses join livesat on id=aid where" +
-				" pid=mount0.id and postcode = '1070') >= 1)";
-		assert (result.equals(builder.createSqlStatement(mainFilter)));
+
+		String result = "select * from persons as mount0 where "
+				+ "(((select count(*) from donations as mount1 where"
+				+ " mount0.id=mount1.personid and amount <> 100.0) = 0 AND"
+				+ " (select count(*) from donations as mount1 where "
+				+ "mount0.id=mount1.personid) >= 1) OR (select count(*) from"
+				+ " addresses join livesat on id=aid where"
+				+ " pid=mount0.id and postcode = '1070') >= 1)";
+		assertEquals(result, (builder.createSqlStatement(mainFilter)));
 
 	}
 

@@ -1,6 +1,7 @@
 package at.fraubock.spendenverwaltung.service;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -60,37 +61,35 @@ public abstract class AbstractActionServiceTest {
 	}
 
 	@Test
-	public void searchActions_ReturnsPager() {
-		try {
-			List<Action> list1 = new ArrayList<Action>();
-			list1.add(newAction);
-			list1.add(newAction2);
-			ActionSearchVO searchVO = new ActionSearchVO();
+	public void searchActions_ReturnsPager() throws PersistenceException,
+			ServiceException {
 
-			List<Action> list2 = new ArrayList<Action>();
-			list2.add(newActionCreated);
-			when(actionDAO.getLimitedResultByAttributes(searchVO, 0, 2))
-					.thenReturn(list1);
-			when(actionDAO.getLimitedResultByAttributes(searchVO, 2, 2))
-					.thenReturn(list2);
+		List<Action> list1 = new ArrayList<Action>();
+		list1.add(newAction);
+		list1.add(newAction2);
+		ActionSearchVO searchVO = new ActionSearchVO();
 
-			Pager<Action> pager = actionService.searchActions(searchVO, 2);
+		List<Action> list2 = new ArrayList<Action>();
+		list2.add(newActionCreated);
+		when(actionDAO.getLimitedResultByAttributes(searchVO, 0, 2))
+				.thenReturn(list1);
+		when(actionDAO.getLimitedResultByAttributes(searchVO, 2, 2))
+				.thenReturn(list2);
 
-			List<Action> page = pager.getPage(0);
-			assert (pager.getNumberOfPages() == 2);
-			assert (pager.getCurrentPosition() == 0);
-			assert (page.size() == 2 && page.contains(newAction) && page
-					.contains(newAction2));
+		Pager<Action> pager = actionService.searchActions(searchVO, 2);
 
-			List<Action> page2 = pager.getPage(1);
-			assert (pager.getNumberOfPages() == 2);
-			assert (pager.getCurrentPosition() == 1);
-			assert (page2.size() == 1 && page2.contains(newActionCreated));
+		List<Action> page = pager.getPage(0);
+		assertEquals(2, pager.getNumberOfPages());
+		assertEquals(0, pager.getCurrentPosition());
+		assertEquals(2, page.size());
+		assertTrue(page.contains(newAction));
+		assertTrue(page.contains(newAction2));
 
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
+		List<Action> page2 = pager.getPage(1);
+		assertEquals(2, pager.getNumberOfPages());
+		assertEquals(1, pager.getCurrentPosition());
+		assertEquals(1, page2.size());
+		assertTrue(page2.contains(newActionCreated));
+
 	}
 }

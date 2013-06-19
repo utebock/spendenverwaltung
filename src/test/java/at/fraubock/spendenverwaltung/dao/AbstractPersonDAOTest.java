@@ -121,7 +121,7 @@ public abstract class AbstractPersonDAOTest {
 		personDAO.insertOrUpdate(person);
 		Person updated = personDAO.getById(person.getId());
 
-		assert (!updated.getSurname().equals(person.getSurname()));
+		assertTrue(!updated.getSurname().equals(person.getSurname()));
 	}
 
 	@Test(expected = PersistenceException.class)
@@ -349,8 +349,8 @@ public abstract class AbstractPersonDAOTest {
 		personDAO.insertOrUpdate(person);
 
 		Person p = personDAO.getById(person.getId());
-		assert (p.getGivenName().equals(person.getGivenName()));
-		assert (p.getTelephone().equals(person.getTelephone()));
+		assertTrue(p.getGivenName().equals(person.getGivenName()));
+		assertTrue(p.getTelephone().equals(person.getTelephone()));
 	}
 
 	@Test
@@ -502,13 +502,15 @@ public abstract class AbstractPersonDAOTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	@Transactional
-	public void getByFilterWithNullParam_ThrowsException() throws PersistenceException {
+	public void getByFilterWithNullParam_ThrowsException()
+			throws PersistenceException {
 		personDAO.getByFilter(null);
 	}
-	
+
 	@Test
 	@Transactional
-	public void getByFilterWithPropertyCriterions_ReturnsOnePerson() throws PersistenceException {
+	public void getByFilterWithPropertyCriterions_ReturnsOnePerson()
+			throws PersistenceException {
 		Person person = new Person();
 		person.setGivenName("GNTest");
 		person.setSurname("SNTest");
@@ -520,55 +522,62 @@ public abstract class AbstractPersonDAOTest {
 		person.setEmailNotification(true);
 		person.setPostalNotification(false);
 		person.setNote("Testnote");
-		
+
 		personDAO.insertOrUpdate(person);
-		
-		
+
 		PropertyCriterion givenname = new PropertyCriterion();
-		givenname.compare(FilterProperty.PERSON_GIVENNAME, RelationalOperator.EQUALS, "GNTest");
+		givenname.compare(FilterProperty.PERSON_GIVENNAME,
+				RelationalOperator.EQUALS, "GNTest");
 		PropertyCriterion surname = new PropertyCriterion();
-		surname.compare(FilterProperty.PERSON_SURNAME, RelationalOperator.EQUALS, "SNTest");
+		surname.compare(FilterProperty.PERSON_SURNAME,
+				RelationalOperator.EQUALS, "SNTest");
 		PropertyCriterion email = new PropertyCriterion();
-		email.compare(FilterProperty.PERSON_EMAIL, RelationalOperator.EQUALS, "email@test.com");
+		email.compare(FilterProperty.PERSON_EMAIL, RelationalOperator.EQUALS,
+				"email@test.com");
 		PropertyCriterion sex = new PropertyCriterion();
-		sex.compare(FilterProperty.PERSON_SEX, RelationalOperator.EQUALS, "family");
+		sex.compare(FilterProperty.PERSON_SEX, RelationalOperator.EQUALS,
+				"family");
 		PropertyCriterion title = new PropertyCriterion();
-		title.compare(FilterProperty.PERSON_TITLE, RelationalOperator.EQUALS, "Testtitle");
+		title.compare(FilterProperty.PERSON_TITLE, RelationalOperator.EQUALS,
+				"Testtitle");
 		PropertyCriterion company = new PropertyCriterion();
-		company.compare(FilterProperty.PERSON_COMPANY, RelationalOperator.UNEQUAL, "TestCompany");
+		company.compare(FilterProperty.PERSON_COMPANY,
+				RelationalOperator.UNEQUAL, "TestCompany");
 		PropertyCriterion phone = new PropertyCriterion();
-		phone.compare(FilterProperty.PERSON_TELEPHONE, RelationalOperator.LIKE, "123");
+		phone.compare(FilterProperty.PERSON_TELEPHONE, RelationalOperator.LIKE,
+				"123");
 		PropertyCriterion emailNot = new PropertyCriterion();
 		emailNot.compare(FilterProperty.PERSON_WANTS_EMAIL, true);
 		PropertyCriterion mailNot = new PropertyCriterion();
 		mailNot.compare(FilterProperty.PERSON_WANTS_MAIL, false);
 		PropertyCriterion note = new PropertyCriterion();
-		note.compare(FilterProperty.PERSON_NOTE,RelationalOperator.EQUALS, "Testnote");
+		note.compare(FilterProperty.PERSON_NOTE, RelationalOperator.EQUALS,
+				"Testnote");
 
 		ConnectedCriterion con1 = new ConnectedCriterion();
-		con1.connect(givenname,LogicalOperator.AND,surname);
+		con1.connect(givenname, LogicalOperator.AND, surname);
 		ConnectedCriterion con2 = new ConnectedCriterion();
-		con2.connect(con1,LogicalOperator.AND,email);
+		con2.connect(con1, LogicalOperator.AND, email);
 		ConnectedCriterion con3 = new ConnectedCriterion();
-		con3.connect(con2,LogicalOperator.AND,sex);
+		con3.connect(con2, LogicalOperator.AND, sex);
 		ConnectedCriterion con4 = new ConnectedCriterion();
-		con4.connect(con3,LogicalOperator.AND,title);
+		con4.connect(con3, LogicalOperator.AND, title);
 		ConnectedCriterion con5 = new ConnectedCriterion();
-		con5.connect(con4,LogicalOperator.AND,company);
+		con5.connect(con4, LogicalOperator.AND, company);
 		ConnectedCriterion con6 = new ConnectedCriterion();
-		con6.connect(con5,LogicalOperator.AND,phone);
+		con6.connect(con5, LogicalOperator.AND, phone);
 		ConnectedCriterion con7 = new ConnectedCriterion();
-		con7.connect(con6,LogicalOperator.AND,emailNot);
+		con7.connect(con6, LogicalOperator.AND, emailNot);
 		ConnectedCriterion con8 = new ConnectedCriterion();
-		con8.connect(con7,LogicalOperator.AND,mailNot);
+		con8.connect(con7, LogicalOperator.AND, mailNot);
 		ConnectedCriterion con9 = new ConnectedCriterion();
-		con9.connect(con8,LogicalOperator.AND,note);
-		
-		Filter filter = new Filter(FilterType.PERSON,con9);
-		
+		con9.connect(con8, LogicalOperator.AND, note);
+
+		Filter filter = new Filter(FilterType.PERSON, con9);
+
 		List<Person> persons = personDAO.getByFilter(filter);
-		
-		assert(persons.size()==1 && persons.contains(person));
+
+		assertTrue(persons.size() == 1 && persons.contains(person));
 	}
-	
+
 }
