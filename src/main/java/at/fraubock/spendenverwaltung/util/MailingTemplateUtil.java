@@ -2,13 +2,30 @@ package at.fraubock.spendenverwaltung.util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.apache.poi.util.IOUtils;
+import org.docx4j.XmlUtils;
+import org.docx4j.jaxb.Context;
+import org.docx4j.openpackaging.contenttype.ContentType;
+import org.docx4j.openpackaging.exceptions.Docx4JException;
+import org.docx4j.openpackaging.io.SaveToZipFile;
+import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.docx4j.openpackaging.parts.PartName;
+import org.docx4j.openpackaging.parts.WordprocessingML.AlternativeFormatInputPart;
+import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
+import org.docx4j.relationships.Relationship;
+import org.docx4j.wml.CTAltChunk;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -26,6 +43,7 @@ import fr.opensagres.xdocreport.document.registry.XDocReportRegistry;
 import fr.opensagres.xdocreport.template.IContext;
 import fr.opensagres.xdocreport.template.TemplateEngineKind;
 
+import at.fraubock.spendenverwaltung.gui.views.CreateMailingsView.SupportedFileFormat;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 
@@ -37,6 +55,7 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 public class MailingTemplateUtil {
 
 	private static final Logger log = Logger.getLogger(MailingTemplateUtil.class);
+	  private static final String CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";  
 	
 	/**
 	 * Creates a pdf file from a template in docx and a person list.
@@ -62,41 +81,104 @@ public class MailingTemplateUtil {
 			throw new IllegalArgumentException("Argument is null");
 		}
 		
-		log.info("Create mailing with template "+templateFile.getName());
 		
-		try {
-			//Load Template file
-			report = XDocReportRegistry.getRegistry().loadReport(new FileInputStream(templateFile),
-					TemplateEngineKind.Velocity);
+		if(outputName.endsWith(".pdf")){
 			
-
-			//Create context to put person data into the template fields
-			context= report.createContext();
-
-			//Create a pdf for each person
-			for(Person p : personList){
-
-				context.put("person", p);
-				tempFile = File.createTempFile("MailingTemp", ".docx");
+			log.info("Create pdf mailing with template "+templateFile.getName());
+			
+			try {
+				//Load Template file
+				report = XDocReportRegistry.getRegistry().loadReport(new FileInputStream(templateFile),
+						TemplateEngineKind.Velocity);
 				
-				files.add(tempFile);
-				out = new FileOutputStream(tempFile);
-				Options options = Options.getTo(ConverterTypeTo.PDF).via(ConverterTypeVia.XWPF);
-				//set encoding for ä,ö,ü, etc.
-				OptionsHelper.setFontEncoding(options, "ISO-8859-1");
-				report.convert(context, options, out);
 
-				log.info("Created pdf: "+tempFile);				
-			}
-		
+				//Create context to put person data into the template fields
+				context= report.createContext();
+
+				//Create a pdf for each person
+				for(Person p : personList){
+
+					context.put("person", p);
+					tempFile = File.createTempFile("MailingTemp", ".docx");
+					
+					files.add(tempFile);
+					out = new FileOutputStream(tempFile);
+					Options options = Options.getTo(ConverterTypeTo.PDF).via(ConverterTypeVia.XWPF);
+					//set encoding for ä,ö,ü, etc.
+					OptionsHelper.setFontEncoding(options, "ISO-8859-1");
+					report.convert(context, options, out);
+
+					log.info("Created pdf: "+tempFile);				
+				}
 			
-		} catch (XDocReportException | NullPointerException e) {
-			log.error(e.getMessage());
-			throw new ServiceException(e);
+				
+			} catch (XDocReportException | NullPointerException e) {
+				log.error(e.getMessage());
+				throw new ServiceException(e);
+			}
+			
+			//Merge into one pdf and delete temp files
+			mergePdfs(files, new File(outputName));
+		} else if(outputName.endsWith(".docx")){
+			
+			log.info("Create docx mailing with template "+templateFile.getName());
+			
+			try {
+				//Load Template file
+				report = XDocReportRegistry.getRegistry().loadReport(new FileInputStream(templateFile),
+						TemplateEngineKind.Velocity);
+				
+
+				//Create context to put person data into the template fields
+				context= report.createContext();
+				int counter = 0;
+				
+				//Create a docx for each person
+				for(Person p : personList){
+
+				      context.put("person", p);
+
+				      //Generate report by merging Java model with the Docx
+				      out = new FileOutputStream(new File("mailing-temp"+counter+".docx"));
+				      report.process(context, out);		
+				      files.add(new File("mailing-temp"+counter+".docx"));
+				      counter++;
+				}
+			
+				
+			} catch (XDocReportException | NullPointerException e) {
+				log.error(e.getMessage());
+				throw new ServiceException(e);
+			}
+			
+			//Merge into one docx and delete temp files
+			mergeDocx(files, outputName);
 		}
-		
-		//Merge into one pdf and delete temp files
-		mergePdfs(files, new File(outputName));
+	}
+	
+	private static void mergeDocx(List<File> files, String outputName){
+        DocxService docxService = new DocxService();
+
+        // Create a list of streams to merge
+        List<InputStream> streams = new ArrayList<InputStream>();
+        for (File file : files) {
+            try {
+                streams.add(new FileInputStream(file));
+                file.delete();
+            } catch (FileNotFoundException fnfe) {
+                fnfe.printStackTrace();
+            }
+        }
+        // Merge streams
+        try {
+            FileOutputStream fos = new FileOutputStream(outputName);
+            fos.write(IOUtils.toByteArray(docxService.mergeDocx(streams, outputName)));
+            fos.close();
+        } catch (Docx4JException d4je) {
+            d4je.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
 	}
 	
 	/**

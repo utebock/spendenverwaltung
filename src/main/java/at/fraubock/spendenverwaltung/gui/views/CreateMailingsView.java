@@ -61,6 +61,12 @@ public class CreateMailingsView extends InitializableView {
 	private IMailChimpService mailChimpService;
 	private JXDatePicker emailDatePicker;
 	private JXDatePicker postalDatePicker;
+	private JComboBox<SupportedFileFormat> fileFormatBox;
+	private JLabel fileFormatLabel;
+	
+	public enum SupportedFileFormat{
+		PDF, DOCX
+	}
 
 	// personfilters
 	private Filter selectedEmailFilter;
@@ -180,7 +186,12 @@ public class CreateMailingsView extends InitializableView {
 		createPostalMailingPanel.add(postalDateLabel);
 		createPostalMailingPanel.add(postalDatePicker, "wrap");
 		
-		outputNameLabel = componentFactory.createLabel("PDF Name");
+		fileFormatLabel = componentFactory.createLabel("Abspeichern als");
+		fileFormatBox = new JComboBox<SupportedFileFormat>(SupportedFileFormat.values());
+		createPostalMailingPanel.add(fileFormatLabel, "");
+		createPostalMailingPanel.add(fileFormatBox, "wrap");
+		
+		outputNameLabel = componentFactory.createLabel("Dokumentname");
 		outputNameField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
 		createPostalMailingPanel.add(outputNameLabel);
 		createPostalMailingPanel.add(outputNameField, "wrap");
@@ -346,11 +357,27 @@ public class CreateMailingsView extends InitializableView {
 				feedbackLabel.setText("Aussendung wurde erstellt.");
 				
 				if(templateFile != null) {
-					String name;
+					String name = "";
+					String fileName = outputNameField.getText();
+					SupportedFileFormat selectedFileFormat = (SupportedFileFormat) fileFormatBox.getSelectedItem();
+					
 					if(outputNameField.getText().isEmpty()) {
-						name = "./vorlage"+(new Date())+".pdf";
+						if(selectedFileFormat == SupportedFileFormat.DOCX)
+							name = "./vorlage"+(new Date())+".docx";
+						else if(selectedFileFormat == SupportedFileFormat.PDF)
+							name = "./vorlage"+(new Date())+".pdf";
 					} else {
-						name = "./"+outputNameField.getText()+".pdf";
+						if(selectedFileFormat == SupportedFileFormat.DOCX){
+							if(!fileName.endsWith(".docx"))
+								name = "./" + fileName.concat(".docx");
+							else
+								name = "./" + fileName;
+						} else if(selectedFileFormat == SupportedFileFormat.PDF){
+							if(!fileName.endsWith(".pdf"))
+								name = "./" + fileName.concat(".pdf");
+							else
+								name = "./" + fileName;
+						}
 					}
 					
 					List<Person> recipients = personService.getPersonsByMailing(mailing);

@@ -46,8 +46,6 @@ public class EditPerson extends JPanel{
 	private JLabel salutLabel;
 	private AddressTableModel addressModel;
 	private JLabel title;
-	private JComboBox<String> titleBox;
-	
 	private JLabel company;
 	
 	private JLabel given_name;
@@ -103,6 +101,7 @@ public class EditPerson extends JPanel{
 	private JCheckBox mainAddress;
 	private JButton cancelAddr;
 	private JButton backButton;
+	private StringTextField titleField;
 
 	public EditPerson(ComponentFactory componentFactory, ViewActionFactory viewActionFactory, 
 			Person person, IPersonService personService, IAddressService addressService, FindPersonsView filterPersons, PersonTableModel personModel) {
@@ -180,43 +179,11 @@ public class EditPerson extends JPanel{
 		
 		
 		title = componentFactory.createLabel("Titel: ");
-		String[] titleCombo = new String[]{"-", "BA", "BSc", "DI", "Dr.", "Ing.", "MA", "Mag.", "MSc.", "Prof."};
-		titleBox = new JComboBox<String>(titleCombo);
-		
-		if(person.getTitle().equals("-")){
-			titleBox.setSelectedItem("-");
-		}
-		if(person.getTitle().equals("BA")){
-			titleBox.setSelectedItem("BA");
-		}
-		if(person.getTitle().equals("BSc")){
-			titleBox.setSelectedItem("BSc");
-		}
-		if(person.getTitle().equals("DI")){
-			titleBox.setSelectedItem("DI");
-		}
-		if(person.getTitle().equals("Dr.")){
-			titleBox.setSelectedItem("Dr.");
-		}
-		if(person.getTitle().equals("Ing.")){
-			titleBox.setSelectedItem("Ing.");
-		}
-		if(person.getTitle().equals("MA")){
-			titleBox.setSelectedItem("MA");
-		}
-		
-		if(person.getTitle().equals("Mag.")){
-			titleBox.setSelectedItem("Mag.");
-		}
-		if(person.getTitle().equals("MSc.")){
-			titleBox.setSelectedItem("MSc.");
-		}
-		if(person.getTitle().equals("Prof.")){
-			titleBox.setSelectedItem("Prof.");
-		}
+		titleField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
+		titleField.setText(person.getTitle());
 		
 		panel.add(title);
-		panel.add(titleBox, "wrap, growx");
+		panel.add(titleField, "wrap, growx");
 		
 		company = componentFactory.createLabel("Firma: ");
 		companyField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
@@ -345,36 +312,7 @@ public class EditPerson extends JPanel{
 		public void actionPerformed(ActionEvent e) {
 			person.setSex(Person.Sex.values()[salutation.getSelectedIndex()]);
 			
-			String title = "-";
-			
-			if(titleBox.getSelectedItem().equals("BA")){
-				title = "BA";
-			}
-			if(titleBox.getSelectedItem().equals("BSc")){
-				title = "BSc";
-			}
-			if(titleBox.getSelectedItem().equals("DI")){
-				title = "DI";
-			}
-			if(titleBox.getSelectedItem().equals("Dr.")){
-				title = "Dr.";
-			}
-			if(titleBox.getSelectedItem().equals("Ing.")){
-				title = "Ing.";
-			}
-			if(titleBox.getSelectedItem().equals("MA")){
-				title = "MA";
-			}
-			if(titleBox.getSelectedItem().equals("Mag.")){
-				title = "Mag.";
-			}
-			if(titleBox.getSelectedItem().equals("MSc")){
-				title = "MSc";
-			}
-			if(titleBox.getSelectedItem().equals("Prof.")){
-				title = "Prof.";
-			}
-			person.setTitle(title);
+			person.setTitle(titleField.getText());
 		
 			person.setCompany(companyField.getText());
 			
