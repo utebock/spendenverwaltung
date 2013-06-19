@@ -33,7 +33,6 @@ public class StartMainFrame {
 		mf.setDonationService(donationService);
 		mf.setFilterService(filterService);
 		mf.setImportService(importService);
-		mf.setUserService(userService);
 		mf.openMainWindow();
 
 		if (context != null) {

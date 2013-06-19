@@ -29,7 +29,6 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterio
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.to.FilterTO;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
-import at.fraubock.spendenverwaltung.util.CurrentUser;
 import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
 
@@ -59,9 +58,9 @@ public class CreateFilter extends JPanel {
 	private JPanel controlButtonPanel;
 	private List<CriterionSelector> selectors = new ArrayList<CriterionSelector>();
 	private List<JButton> minusButtons = new ArrayList<JButton>();
-	
+
 	private JComboBox<String> privacyComboBox;
-	
+
 	public CreateFilter(FilterType type, IFilterService filterService,
 			MainFilterView overview, ViewActionFactory viewActionFactory) {
 		this(type, filterService, overview, null, viewActionFactory);
@@ -150,15 +149,16 @@ public class CreateFilter extends JPanel {
 		// add(filterNamePanel, "wrap");
 
 		// Combobox for filter privacy setting
-		if((editFilter != null && CurrentUser.userName.equals(editFilter.getOwner())) || editFilter == null){
-			privacyComboBox = new JComboBox<String>(FilterPrivacyStatus.toStringArray());
+		if ((editFilter != null) || editFilter == null) {
+			privacyComboBox = new JComboBox<String>(
+					FilterPrivacyStatus.toStringArray());
 			this.add(privacyComboBox, "wrap");
-			
-			if(editFilter != null)
-				privacyComboBox.setSelectedItem(editFilter.getPrivacyStatus().toString());
+
+			if (editFilter != null)
+				privacyComboBox.setSelectedItem(editFilter.getPrivacyStatus()
+						.toString());
 		}
-		
-		
+
 		// create operator picker panel
 		this.operatorPicker = new JPanel();
 		final JLabel operatorLabel = new JLabel(" Kriterien erf\u00FCllt sind:");
@@ -230,7 +230,7 @@ public class CreateFilter extends JPanel {
 		minusAct.putValue(Action.SMALL_ICON, new ImageIcon(getClass()
 				.getResource("/images/minusButton.gif")));
 		minusButton.setAction(minusAct);
-		
+
 		minusButtons.add(minusButton);
 		criterionSelectorPanel.add(selectorComp, "w 700");
 		criterionSelectorPanel.add(minusButton, "wrap");
@@ -279,7 +279,8 @@ public class CreateFilter extends JPanel {
 		filter.setOperator(andOperator ? LogicalOperator.AND
 				: LogicalOperator.OR);
 		filter.setName(nameField.getText());
-		filter.setPrivacyStatus(FilterPrivacyStatus.getByName(privacyComboBox.getSelectedItem().toString()));
+		filter.setPrivacyStatus(FilterPrivacyStatus.getByName(privacyComboBox
+				.getSelectedItem().toString()));
 
 		try {
 			List<Criterion> crits = new ArrayList<Criterion>();

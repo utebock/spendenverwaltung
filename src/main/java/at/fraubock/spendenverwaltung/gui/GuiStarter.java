@@ -84,7 +84,8 @@ public class GuiStarter {
 
 		// switch to login view
 		LoginView login = new LoginView(databaseDataSource, componentFactory,
-				viewActionFactory, viewDisplayer);
+				viewActionFactory, viewDisplayer, "", "", context.getBean(
+						"defaultDatabaseUrl", String.class));
 		login.init();
 		viewDisplayer.changeView(login);
 	}
