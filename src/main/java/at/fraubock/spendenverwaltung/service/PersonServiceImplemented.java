@@ -46,7 +46,7 @@ public class PersonServiceImplemented implements IPersonService {
 	}
 
 	@Override
-	@Transactional(isolation = Isolation.SERIALIZABLE)
+	@Transactional(isolation = Isolation.READ_UNCOMMITTED, rollbackFor = Throwable.class)
 	public Person create(Person p) throws ServiceException {
 		try {
 			personDAO.insertOrUpdate(p);
@@ -57,7 +57,7 @@ public class PersonServiceImplemented implements IPersonService {
 	}
 
 	@Override
-	@Transactional(isolation = Isolation.SERIALIZABLE)
+	@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public Person update(Person p) throws ServiceException {
 		try {
 			personDAO.insertOrUpdate(p);
@@ -68,7 +68,7 @@ public class PersonServiceImplemented implements IPersonService {
 	}
 
 	@Override
-	@Transactional(isolation = Isolation.SERIALIZABLE)
+	@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public void delete(Person p) throws ServiceException {
 		try {
 			personDAO.delete(p);
@@ -79,7 +79,7 @@ public class PersonServiceImplemented implements IPersonService {
 	}
 
 	@Override
-	@Transactional(isolation = Isolation.SERIALIZABLE)
+	@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public void deleteAddressAndUpdatePerson(Address a, Person p)
 			throws ServiceException {
 		update(p);
@@ -91,7 +91,7 @@ public class PersonServiceImplemented implements IPersonService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public List<Person> getAll() throws ServiceException {
 		List<Person> list = null;
 		try {
@@ -103,7 +103,7 @@ public class PersonServiceImplemented implements IPersonService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public Person getById(int id) throws ServiceException {
 		Person person = null;
 		try {
@@ -115,7 +115,7 @@ public class PersonServiceImplemented implements IPersonService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public List<Person> getByAttributes(Person p) throws ServiceException {
 		List<Person> persons = new ArrayList<Person>();
 		try {
@@ -127,6 +127,7 @@ public class PersonServiceImplemented implements IPersonService {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public List<Person> getByFilter(Filter filter) throws ServiceException {
 		List<Person> list = null;
 		try {
@@ -143,7 +144,7 @@ public class PersonServiceImplemented implements IPersonService {
 			throw new IllegalArgumentException("Argument must not be null.");
 		}
 
-		String csv = "Vorname;Nachname;E-Mail;Geschlecht;Titel;Unternehmen;Telephon;Empf�ngt E-Mail;Empf�ngt Post;Notiz;Land;Stadt;PLZ;Strasse\n";
+		String csv = "Vorname;Nachname;E-Mail;Geschlecht;Titel;Unternehmen;Telephon;Empf\u00E4ngt E-Mail;Empf\u00E4ngt Post;Notiz;Land;Stadt;PLZ;Strasse\n";
 
 		for (Person p : persons) {
 			csv += p.getGivenName() + ";";
@@ -167,6 +168,7 @@ public class PersonServiceImplemented implements IPersonService {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public List<Person> getConfirmed() throws ServiceException {
 		List<Person> list = null;
 		try {
@@ -178,6 +180,7 @@ public class PersonServiceImplemented implements IPersonService {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public List<Person> getPersonsByMailing(Mailing mailing)
 			throws ServiceException {
 		try {

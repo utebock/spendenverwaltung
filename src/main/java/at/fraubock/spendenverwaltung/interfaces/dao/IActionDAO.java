@@ -4,7 +4,7 @@ import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Action;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
-import at.fraubock.spendenverwaltung.util.ActionAttribute;
+import at.fraubock.spendenverwaltung.util.ActionSearchVO;
 
 /**
  * interface to the data source for {@link Action} entities.
@@ -15,90 +15,33 @@ import at.fraubock.spendenverwaltung.util.ActionAttribute;
 public interface IActionDAO {
 
 	/**
-	 * Inserts a new action to the persistence layer and sets it's id.
-	 * 
-	 * @param a
-	 *            Action to be inserted
-	 * @throws PersistenceException
-	 *             if communication to the underlying persistence system failed
-	 */
-	public void insert(Action a) throws PersistenceException;
-
-	/**
-	 * Deletes an action from the underlying persistence layer.
-	 * 
-	 * @param a
-	 *            Action to be deleted. Its id must be set, i.e. it must be
-	 *            persisted or retrieved by this DAO.
-	 * @throws PersistenceException
-	 *             if communication to the underlying persistence system failed
-	 */
-	public void delete(Action a) throws PersistenceException;
-
-	/**
-	 * Retrieves all actions stored in the underlying persistence layer.
-	 * 
-	 * @return List of all actions, sorted by date descending.
-	 * @throws PersistenceException
-	 *             if communication to the underlying persistence system failed
-	 */
-	public List<Action> getAll() throws PersistenceException;
-
-	/**
 	 * Retrieves the number of actions given in <code>count</code> starting from
-	 * the given <code>offset</code>.
+	 * <code>offset</code>, whose attributes match the values given in the
+	 * {@link ActionSearchVO}
 	 * 
-	 * @param offset
-	 *            - starting from this result
-	 * @param count
-	 *            - retrieving this amount of results
-	 * @return List of actions from offset plus count, sorted by date
-	 *         descending.
-	 * @throws PersistenceException
-	 */
-	public List<Action> getAllWithLimitedResult(int offset, int count)
-			throws PersistenceException;
-
-	/**
-	 * returns the amount of all persisted actions
-	 * 
-	 * @return
-	 * @throws PersistenceException
-	 */
-	public long countResultsOfAll() throws PersistenceException;
-
-	/**
-	 * Retrieves the number of actions given in <code>count</code> starting from
-	 * <code>offset</code>, where the attribute given in the
-	 * {@link ActionAttribute} contains <code>value</code>
-	 * 
-	 * @param attribute
-	 *            - the attribute to be compared
-	 * @param value
-	 *            - the value the attribute will be compared with (LIKE)
+	 * @param searchVO
+	 *            - a value object containing the values to be searched for
 	 * @param offset
 	 *            - starting from this result
 	 * @param count
 	 *            - retrieving this amount of results
 	 * @return List of actions from offset plus count, sorted by date descending
-	 *         where attribute LIKE value
+	 *         where attributes match given values
 	 * @throws PersistenceException
 	 */
-	public List<Action> getLimitedResultByAttributeLike(
-			ActionAttribute attribute, String value, int offset, int count)
-			throws PersistenceException;
+
+	public List<Action> getLimitedResultByAttributes(ActionSearchVO searchVO,
+			int offset, int count) throws PersistenceException;
 
 	/**
-	 * returns the amount of all persisted actions where the attribute given in
-	 * the {@link ActionAttribute} contains the given <code>value</code>
+	 * returns the amount of all persisted actions whose attributes match the
+	 * values given in the {@link ActionSearchVO}
 	 * 
-	 * @param attribute
-	 *            - the attribute to be compared
-	 * @param value
-	 *            - the value the attribute will be compared with (LIKE)
+	 * @param searchVO
+	 *            - a value object containing the values to be searched for
 	 * @return - amount of persisted actions
 	 * @throws PersistenceException
 	 */
-	public long countResultsOfAttributeLike(ActionAttribute attribute,
-			String value) throws PersistenceException;
+	public long getNumberOfResultsByAttributes(ActionSearchVO searchVO)
+			throws PersistenceException;
 }

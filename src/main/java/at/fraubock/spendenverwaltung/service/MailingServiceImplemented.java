@@ -23,12 +23,12 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Connecte
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
+import at.fraubock.spendenverwaltung.interfaces.service.IMailChimpService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.FilterProperty;
 import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.LogicalOperator;
-import at.fraubock.spendenverwaltung.util.MailChimp;
 import at.fraubock.spendenverwaltung.util.MailingTemplateUtil;
 import at.fraubock.spendenverwaltung.util.RelationalOperator;
 
@@ -39,6 +39,7 @@ public class MailingServiceImplemented implements IMailingService {
 	private IMailingDAO mailingDAO;
 	private IPersonDAO personDAO;
 	private IPersonService personService;
+	private IMailChimpService mailChimpService;
 
 	/**
 	 * @return the personService
@@ -63,8 +64,12 @@ public class MailingServiceImplemented implements IMailingService {
 		this.personDAO = personDAO;
 	}
 
+	public void setMailChimpService(IMailChimpService mailChimpService) {
+		this.mailChimpService = mailChimpService;
+	}
+
 	@Override
-	@Transactional(isolation = Isolation.SERIALIZABLE)
+	@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public Mailing insertOrUpdate(Mailing m) throws ServiceException {
 		try {
 			mailingDAO.insertOrUpdate(m);
@@ -75,7 +80,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
-	@Transactional(isolation = Isolation.SERIALIZABLE)
+	@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public void delete(Mailing m) throws ServiceException {
 		try {
 			mailingDAO.delete(m);
@@ -85,7 +90,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public List<Mailing> getAll() throws ServiceException {
 		try {
 			return mailingDAO.getAll();
@@ -95,7 +100,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public List<Mailing> getAllConfirmed() throws ServiceException {
 		try {
 			return mailingDAO.getAllConfirmed();
@@ -105,7 +110,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
-	@Transactional(isolation = Isolation.SERIALIZABLE)
+	@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public void confirmMailing(Mailing mailing) throws ServiceException {
 		try {
 			mailingDAO.confirmMailing(mailing);
@@ -115,7 +120,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public List<Mailing> getAllUnconfirmed() throws ServiceException {
 		try {
 			return mailingDAO.getAllUnconfirmed();
@@ -130,7 +135,7 @@ public class MailingServiceImplemented implements IMailingService {
 	 * @returns Map of creators and mailings
 	 */
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public List<UnconfirmedMailing> getUnconfirmedMailingsWithCreator()
 			throws ServiceException {
 		try {
@@ -141,7 +146,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public Mailing getById(int id) throws ServiceException {
 		try {
 			return mailingDAO.getById(id);
@@ -151,7 +156,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public List<Mailing> getConfirmedMailingsByPerson(Person person)
 			throws ServiceException {
 		try {
@@ -162,7 +167,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public void deletePersonFromMailing(Person person, Mailing mailing)
 			throws ServiceException {
 		try {
@@ -178,20 +183,21 @@ public class MailingServiceImplemented implements IMailingService {
 			throw new IllegalArgumentException("Argument must not be null.");
 		}
 
-		String csv = "Datum;Art;Medium;\n";
+		String csv = "Datum;Art;Medium;Vorlage\n";
 
 		for (Mailing m : mailings) {
 			csv += m.getDate() == null ? "n.v." : (new SimpleDateFormat(
 					"dd.MM.yyyy").format(m.getDate())) + ";";
 			csv += m.getType().getName() + ";";
-			csv += (m.getMedium() == Mailing.Medium.POSTAL ? "Postalisch"
-					: "E-Mail") + ";\n";
+			csv += (m.getMedium() == Mailing.Medium.POSTAL ? ("Postalisch;" + m
+					.getTemplate().getFileName()) : "E-Mail;-");
+			csv += "\n";
 		}
 		return csv;
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public void reproduceDocument(Mailing mailing) throws ServiceException {
 		if (mailing == null) {
 			throw new IllegalArgumentException("Argument must not be null.");
@@ -217,20 +223,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
-	public int exportEMailsToMailChimp(Mailing mailing, String mailChimpListId)
-			throws ServiceException {
-		int errors = 0;
-
-		try {
-			errors = MailChimp.addPersonsToList(mailChimpListId,
-					personDAO.getPersonsByMailing(mailing));
-		} catch (PersistenceException e) {
-			throw new ServiceException(e);
-		}
-		return errors;
-	}
-
-	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public List<Mailing> getByFilter(Filter filter) throws ServiceException {
 		try {
 			return mailingDAO.getMailingsByFilter(filter);
@@ -240,6 +233,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public List<Mailing> getBeforeDate(Date date) throws ServiceException {
 		Filter beforeFilter = new Filter();
 		beforeFilter.setType(FilterType.MAILING);
@@ -259,6 +253,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public List<Mailing> getAfterDate(Date date) throws ServiceException {
 		Filter afterFilter = new Filter();
 		afterFilter.setType(FilterType.MAILING);
@@ -278,6 +273,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public List<Mailing> getBetweenDates(Date start, Date end)
 			throws ServiceException {
 		Filter betweenFilter = new Filter();
@@ -329,7 +325,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
-	@Transactional(readOnly = true, rollbackFor = Throwable.class)
+	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public String convertReceiversToCSVById(int mailingId)
 			throws ServiceException {
 		Mailing m = getById(mailingId);
@@ -339,7 +335,7 @@ public class MailingServiceImplemented implements IMailingService {
 	}
 
 	@Override
-	@Transactional(readOnly = true, rollbackFor = Throwable.class)
+	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public boolean saveReceiversAsCSVById(int mailingId, File csvFile)
 			throws IOException, ServiceException {
 		Mailing m = getById(mailingId);
@@ -349,6 +345,8 @@ public class MailingServiceImplemented implements IMailingService {
 		return true;
 	}
 
+	@Override
+	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public int getSize(Mailing mailing) throws ServiceException {
 		try {
 			return mailingDAO.getSize(mailing);

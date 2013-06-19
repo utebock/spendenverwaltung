@@ -1,7 +1,7 @@
 package at.fraubock.spendenverwaltung.dao;
 
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -42,40 +42,34 @@ public abstract class AbstractFilterDAOTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	@Transactional
-	public void createWithNullParameter_ThrowsException() {
-		try {
-			filterDAO.insert(null);
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void createWithNullParameter_ThrowsException()
+			throws PersistenceException {
+
+		filterDAO.insert(null);
+
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	@Transactional
-	public void createWithInvalidStateParameter_ThrowsException() {
-		try {
-			filterDAO.insert(new Filter()); // all values are null
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void createWithInvalidStateParameter_ThrowsException()
+			throws PersistenceException {
+
+		filterDAO.insert(new Filter()); // all values are null
+
 	}
 
 	@Test
 	@Transactional
-	public void createWithValidParameter_ReturnsSavedFilter() {
+	public void createWithValidParameter_ReturnsSavedFilter()
+			throws PersistenceException {
 
-		try {
-			filterDAO.insert(testFilter);
+		filterDAO.insert(testFilter);
 
-			Filter savedFilter = filterDAO.getById(testFilter.getId());
+		Filter savedFilter = filterDAO.getById(testFilter.getId());
 
-			// check if filter was saved correctly
-			assert (savedFilter.equals(testFilter));
+		// check if filter was saved correctly
+		assertTrue(savedFilter.equals(testFilter));
 
-		} catch (PersistenceException e) {
-			e.printStackTrace();
-			fail();
-		}
 	}
 
 	/*
@@ -84,28 +78,22 @@ public abstract class AbstractFilterDAOTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	@Transactional
-	public void deleteWithNullParameter_ThrowsException() {
-		try {
-			filterDAO.delete(null);
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void deleteWithNullParameter_ThrowsException()
+			throws PersistenceException {
+		filterDAO.delete(null);
+
 	}
 
 	@Test
 	@Transactional
-	public void deleteWithValidParameter_RemovesEntity() {
+	public void deleteWithValidParameter_RemovesEntity()
+			throws PersistenceException {
 
-		try {
-			filterDAO.insert(testFilter);
-			filterDAO.delete(testFilter);
-			List<Filter> allFilters = filterDAO.getAll();
-			assert (!allFilters.contains(testFilter));
+		filterDAO.insert(testFilter);
+		filterDAO.delete(testFilter);
+		List<Filter> allFilters = filterDAO.getAll();
+		assertTrue(!allFilters.contains(testFilter));
 
-		} catch (PersistenceException e) {
-			e.printStackTrace();
-			fail();
-		}
 	}
 
 	/*
@@ -114,17 +102,14 @@ public abstract class AbstractFilterDAOTest {
 
 	@Test
 	@Transactional(readOnly = true)
-	public void getAll_ReturnsAllEntities() {
+	public void getAll_ReturnsAllEntities() throws PersistenceException {
 
-		try {
-			filterDAO.insert(testFilter);
-			filterDAO.insert(testFilter2);
+		filterDAO.insert(testFilter);
+		filterDAO.insert(testFilter2);
 
-			List<Filter> allFilters = filterDAO.getAll();
-			assert (allFilters != null && allFilters.size() == 2);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		List<Filter> allFilters = filterDAO.getAll();
+		assertTrue(allFilters != null && allFilters.size() == 2);
+
 	}
 
 	@Test
@@ -135,27 +120,22 @@ public abstract class AbstractFilterDAOTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	@Transactional(readOnly = true)
-	public void getWithNegativeId_ThrowsException() {
-		try {
-			filterDAO.getById(-1);
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void getWithNegativeId_ThrowsException() throws PersistenceException {
+
+		filterDAO.getById(-1);
+
 	}
 
 	@Test
 	@Transactional(readOnly = true)
-	public void getWithValidId_ReturnsEntity() {
+	public void getWithValidId_ReturnsEntity() throws PersistenceException {
 
-		try {
-			filterDAO.insert(testFilter);
-			Filter foundFilter = filterDAO.getById(testFilter.getId());
+		filterDAO.insert(testFilter);
+		Filter foundFilter = filterDAO.getById(testFilter.getId());
 
-			assert (foundFilter != null && foundFilter.getId() == foundFilter
-					.getId());
-		} catch (PersistenceException e) {
-			fail();
-		}
+		assertTrue(foundFilter != null
+				&& foundFilter.getId() == foundFilter.getId());
+
 	}
 
 	public static void init() {

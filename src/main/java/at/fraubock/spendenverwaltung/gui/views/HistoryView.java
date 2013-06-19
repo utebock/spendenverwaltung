@@ -24,13 +24,13 @@ import at.fraubock.spendenverwaltung.gui.components.PageNavigator;
 import at.fraubock.spendenverwaltung.interfaces.domain.Action;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IActionService;
-import at.fraubock.spendenverwaltung.util.ActionAttribute;
+import at.fraubock.spendenverwaltung.util.ActionSearchVO;
 import at.fraubock.spendenverwaltung.util.Pager;
 
 public class HistoryView extends InitializableView {
 	private static final long serialVersionUID = 4106122970891943776L;
 	private static final Logger log = Logger.getLogger(HistoryView.class);
-	
+
 	private final int MAX_TABLE_SIZE = 20;
 
 	private ViewActionFactory viewActionFactory;
@@ -39,7 +39,7 @@ public class HistoryView extends InitializableView {
 	private JPanel panel;
 	private JTable showTable;
 	private JScrollPane scrollPane;
-	private HistoryTableModel historyTable;
+	private HistoryTableModel historyModel;
 	private IActionService actionService;
 	private PageNavigator navigator;
 
@@ -54,7 +54,7 @@ public class HistoryView extends InitializableView {
 	public void init() {
 
 		builder = new ComponentBuilder();
-		panel = builder.createPanel(700, 600);
+		panel = builder.createPanel(1200, 620);
 		this.add(panel);
 
 		toolbar = builder.createToolbar();
@@ -74,39 +74,42 @@ public class HistoryView extends InitializableView {
 		JLabel headline = builder.createLabel("Historie aller Aktionen");
 		headline.setFont(new Font("Headline", Font.PLAIN, 14));
 		panel.add(headline, "wrap, gapbottom 20");
-
+		
 		panel.add(new HistorySearchPanel(this), "wrap");
 
-		Pager<Action> pager;
-		try {
-			pager = actionService.getAllAsPager(MAX_TABLE_SIZE);
-			historyTable = new HistoryTableModel(pager);
-			historyTable.refreshPage();
-			showTable = new JTable(historyTable);
-		} catch (ServiceException e) {
-			JOptionPane.showMessageDialog(this,
-					"Ein unerwarteter Fehler ist aufgetreten.", "Error",
-					JOptionPane.ERROR_MESSAGE);
-			log.error("Error when loading all actions as pager or refreshing page model: "
-					+ e.getMessage());
-		}
-
+		showTable = new JTable(historyModel = new HistoryTableModel());
 		showTable.setFillsViewportHeight(true);
 		showTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		scrollPane = new JScrollPane(showTable);
-		scrollPane.setPreferredSize(new Dimension(800, MAX_TABLE_SIZE*18-17));
-		panel.add(scrollPane, "wrap");
 
-		panel.add(navigator = new PageNavigator(historyTable), "growx");
+		showTable.getColumnModel().getColumn(0).setMinWidth(200);
+		showTable.getColumnModel().getColumn(0).setMaxWidth(200);
+
+		showTable.getColumnModel().getColumn(1).setMinWidth(150);
+		showTable.getColumnModel().getColumn(1).setMaxWidth(150);
+
+		showTable.getColumnModel().getColumn(2).setMinWidth(210);
+		showTable.getColumnModel().getColumn(2).setMaxWidth(210);
+
+		showTable.getColumnModel().getColumn(3).setMinWidth(150);
+		showTable.getColumnModel().getColumn(3).setMaxWidth(150);
+
+		scrollPane = new JScrollPane(showTable);
+		scrollPane.setPreferredSize(new Dimension(1200,
+				MAX_TABLE_SIZE * 18 - 17));
+		panel.add(scrollPane, "wrap");
+		
+		panel.add(navigator = new PageNavigator(historyModel), "growx");
+		
+		applyExtendedSearch(new ActionSearchVO());
 	}
 
-	public void applySearch(ActionAttribute attributeParam, String valueParam) {
+	public void applyExtendedSearch(ActionSearchVO searchVO) {
 		Pager<Action> pager;
 		try {
-			pager = actionService.getAttributeLikeAsPager(
-					attributeParam, valueParam, MAX_TABLE_SIZE);
-			historyTable.setPager(pager);
-			historyTable.refreshPage();
+			pager = actionService.searchActions(searchVO,
+					MAX_TABLE_SIZE);
+			historyModel.setPager(pager);
+			historyModel.refreshPage();
 			navigator.modelRefreshed();
 		} catch (ServiceException e) {
 			JOptionPane.showMessageDialog(this,

@@ -21,16 +21,16 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 @ContextConfiguration("/testspring.xml")
 @TransactionConfiguration(defaultRollback = true)
 public abstract class AbstractConfirmationTemplateDAOTest {
-	
+
 	protected static IConfirmationTemplateDAO confirmationTemplateDAO;
 	private ConfirmationTemplate ct1;
 	private ConfirmationTemplate ct2;
-	
+
 	public static void setConfirmationTemplateDAO(
 			IConfirmationTemplateDAO confirmationTemplateDAO) {
 		AbstractConfirmationTemplateDAOTest.confirmationTemplateDAO = confirmationTemplateDAO;
 	}
-	
+
 	/*
 	 * testing create
 	 */
@@ -51,16 +51,15 @@ public abstract class AbstractConfirmationTemplateDAOTest {
 
 	@Test
 	@Transactional
-	public void createWithValidParameter_ReturnsSavedConfirmationTemplate() {
-		try {
-			confirmationTemplateDAO.insertOrUpdate(ct1);
+	public void createWithValidParameter_ReturnsSavedConfirmationTemplate()
+			throws Exception {
 
-			ConfirmationTemplate savedCt = confirmationTemplateDAO.getByID(ct1.getId());
-			assert (savedCt.equals(ct1));
-		} catch (PersistenceException e) {
-			e.printStackTrace();
-			fail();
-		}
+		confirmationTemplateDAO.insertOrUpdate(ct1);
+
+		ConfirmationTemplate savedCt = confirmationTemplateDAO.getByID(ct1
+				.getId());
+		assertTrue(savedCt.equals(ct1));
+
 	}
 
 	/*
@@ -76,17 +75,14 @@ public abstract class AbstractConfirmationTemplateDAOTest {
 
 	@Test
 	@Transactional
-	public void deleteWithValidParameter_RemovesEntity() {
-		try {
-			confirmationTemplateDAO.insertOrUpdate(ct1);
-			confirmationTemplateDAO.delete(ct1);
-			List<ConfirmationTemplate> allConfirmationTemplatees = confirmationTemplateDAO
-					.getAll();
-			assert (!allConfirmationTemplatees.contains(ct1));
+	public void deleteWithValidParameter_RemovesEntity() throws Exception {
 
-		} catch (PersistenceException e) {
-			fail();
-		}
+		confirmationTemplateDAO.insertOrUpdate(ct1);
+		confirmationTemplateDAO.delete(ct1);
+		List<ConfirmationTemplate> allConfirmationTemplatees = confirmationTemplateDAO
+				.getAll();
+		assertTrue(!allConfirmationTemplatees.contains(ct1));
+
 	}
 
 	/*
@@ -95,17 +91,16 @@ public abstract class AbstractConfirmationTemplateDAOTest {
 
 	@Test
 	@Transactional(readOnly = true)
-	public void getAll_ReturnsAllEntities() {
-		try {
-			confirmationTemplateDAO.insertOrUpdate(ct1);
-			confirmationTemplateDAO.insertOrUpdate(ct2);
+	public void getAll_ReturnsAllEntities() throws Exception {
 
-			List<ConfirmationTemplate> confirmationTemplateList = confirmationTemplateDAO
-					.getAll();
-			assert (confirmationTemplateList != null && confirmationTemplateList.size() == 2);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		confirmationTemplateDAO.insertOrUpdate(ct1);
+		confirmationTemplateDAO.insertOrUpdate(ct2);
+
+		List<ConfirmationTemplate> confirmationTemplateList = confirmationTemplateDAO
+				.getAll();
+		assertTrue(confirmationTemplateList != null
+				&& confirmationTemplateList.size() == 2);
+
 	}
 
 	@Test
@@ -116,33 +111,29 @@ public abstract class AbstractConfirmationTemplateDAOTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	@Transactional(readOnly = true)
-	public void getWithNegativeId_ThrowsException() {
-		try {
-			confirmationTemplateDAO.getByID(-1);
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void getWithNegativeId_ThrowsException() throws Exception {
+
+		confirmationTemplateDAO.getByID(-1);
+
 	}
 
 	@Test
 	@Transactional(readOnly = true)
-	public void getWithValidId_ReturnsEntity() {
+	public void getWithValidId_ReturnsEntity() throws Exception {
 
-		try {
-			confirmationTemplateDAO.insertOrUpdate(ct1);
-			ConfirmationTemplate foundConfirmationTemplate = confirmationTemplateDAO
-					.getByID(ct1.getId());
+		confirmationTemplateDAO.insertOrUpdate(ct1);
+		ConfirmationTemplate foundConfirmationTemplate = confirmationTemplateDAO
+				.getByID(ct1.getId());
 
-			assert (foundConfirmationTemplate != null && foundConfirmationTemplate
-					.getId() == ct1.getId());
-		} catch (PersistenceException e) {
-			fail();
-		}
+		assertTrue(foundConfirmationTemplate != null
+				&& foundConfirmationTemplate.getId() == ct1.getId());
+
 	}
-	
+
 	@Test(expected = PersistenceException.class)
 	@Transactional
-	public void InsertTwoTemplatesWithSameName_ThrowsException() throws PersistenceException{
+	public void InsertTwoTemplatesWithSameName_ThrowsException()
+			throws PersistenceException {
 		confirmationTemplateDAO.insertOrUpdate(ct1);
 		ct2.setName(ct1.getName());
 		confirmationTemplateDAO.insertOrUpdate(ct2);
@@ -152,14 +143,14 @@ public abstract class AbstractConfirmationTemplateDAOTest {
 	public void init() {
 		String fs = File.separator;
 		ct1 = new ConfirmationTemplate();
-		File f = new File(
-				"src"+fs+"test"+fs+"resources"+fs+"examplemailing.docx");
+		File f = new File("src" + fs + "test" + fs + "resources" + fs
+				+ "examplemailing.docx");
 		ct1.setFile(f);
 		ct1.setName(f.getName());
-		
+
 		ct2 = new ConfirmationTemplate();
-		File f2 = new File(
-				"src"+fs+"test"+fs+"resources"+fs+"examplemailing2.docx");
+		File f2 = new File("src" + fs + "test" + fs + "resources" + fs
+				+ "examplemailing2.docx");
 		ct2.setFile(f2);
 		ct2.setName(f2.getName());
 	}

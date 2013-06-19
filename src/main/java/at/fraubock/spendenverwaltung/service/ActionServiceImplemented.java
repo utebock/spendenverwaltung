@@ -10,7 +10,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Action;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IActionService;
-import at.fraubock.spendenverwaltung.util.ActionAttribute;
+import at.fraubock.spendenverwaltung.util.ActionSearchVO;
 import at.fraubock.spendenverwaltung.util.Pager;
 
 /**
@@ -32,42 +32,28 @@ public class ActionServiceImplemented implements IActionService {
 	}
 
 	@Override
-	@Transactional(isolation = Isolation.SERIALIZABLE)
-	public Action create(Action a) throws ServiceException {
-		try {
-			actionDAO.insert(a);
-			return a;
-		} catch (PersistenceException e) {
-			throw new ServiceException(e);
-		}
-	}
-
-	@Override
-	@Transactional(isolation = Isolation.SERIALIZABLE)
-	public void delete(Action a) throws ServiceException {
-		try {
-			actionDAO.delete(a);
-		} catch (PersistenceException e) {
-			throw new ServiceException(e);
-		}
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public Pager<Action> getAllAsPager(final int pageSizeParam)
+	public Pager<Action> searchActions(
+			final ActionSearchVO searchVOParam, final int pageSizeParam)
 			throws ServiceException {
+		
+		if(searchVOParam==null) {
+			throw new IllegalArgumentException("Argument must not be null.");
+		}
+		
 		Pager<Action> pager = new Pager<Action>() {
 
 			private IActionDAO actionDAO = ActionServiceImplemented.this.actionDAO;
 			private int pageSize = pageSizeParam;
 			private int position = 0;
+			private ActionSearchVO searchVO = searchVOParam;
 
+			@Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true, rollbackFor = Throwable.class)
 			@Override
 			public List<Action> getPage(int index) throws ServiceException {
 				this.position = index;
 				try {
-					return actionDAO.getAllWithLimitedResult(position
-							* pageSize, pageSize);
+					return actionDAO.getLimitedResultByAttributes(searchVO,
+							position * pageSize, pageSize);
 				} catch (PersistenceException e) {
 					throw new ServiceException(e);
 				}
@@ -78,59 +64,12 @@ public class ActionServiceImplemented implements IActionService {
 				return position;
 			}
 
+			@Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true, rollbackFor = Throwable.class)
 			@Override
 			public long getNumberOfPages() throws ServiceException {
 				long count;
 				try {
-					count = actionDAO.countResultsOfAll();
-
-					long mod = count % pageSize;
-
-					return mod == 0 ? (long) count / pageSize
-							: (((long) count / pageSize) + 1);
-				} catch (PersistenceException e) {
-					throw new ServiceException(e);
-				}
-			}
-
-		};
-
-		return pager;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public Pager<Action> getAttributeLikeAsPager(final ActionAttribute attributeParam,
-			final String valueParam, final int pageSizeParam) throws ServiceException {
-		Pager<Action> pager = new Pager<Action>() {
-
-			private IActionDAO actionDAO = ActionServiceImplemented.this.actionDAO;
-			private int pageSize = pageSizeParam;
-			private int position = 0;
-			private ActionAttribute attribute = attributeParam;
-			private String value = valueParam;
-
-			@Override
-			public List<Action> getPage(int index) throws ServiceException {
-				this.position = index;
-				try {
-					return actionDAO.getLimitedResultByAttributeLike(attribute, value, position
-							* pageSize, pageSize);
-				} catch (PersistenceException e) {
-					throw new ServiceException(e);
-				}
-			}
-
-			@Override
-			public int getCurrentPosition() {
-				return position;
-			}
-
-			@Override
-			public long getNumberOfPages() throws ServiceException {
-				long count;
-				try {
-					count = actionDAO.countResultsOfAttributeLike(attribute, value);
+					count = actionDAO.getNumberOfResultsByAttributes(searchVO);
 
 					long mod = count % pageSize;
 

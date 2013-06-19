@@ -19,10 +19,6 @@ public class HistoryTableModel extends AbstractTableModel implements
 	private Vector<Action> actions = new Vector<Action>();
 	private Pager<Action> pager;
 
-	public HistoryTableModel(Pager<Action> pager) {
-		this.pager = pager;
-	}
-
 	@Override
 	public int getRowCount() {
 		return actions.size();
@@ -36,9 +32,9 @@ public class HistoryTableModel extends AbstractTableModel implements
 		case 0:
 			return action.getActor();
 		case 1:
-			return action.getType().getDisplayableName();
+			return action.getType().toString();
 		case 2:
-			return action.getEntity().getDisplayableName();
+			return action.getEntity().toString();
 		case 3:
 			return action.getTime();
 		case 4:

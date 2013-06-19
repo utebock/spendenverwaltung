@@ -2,9 +2,9 @@ package at.fraubock.spendenverwaltung.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -95,43 +95,34 @@ public abstract class AbstractPersonServiceTest {
 	}
 
 	@Test(expected = ServiceException.class)
-	public void createWithNullParameter_ThrowsException()
-			throws ServiceException {
-		try {
-			doThrow(new PersistenceException()).when(personDAO).insertOrUpdate(
-					null);
-			personService.create(null);
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void createWithNullParameter_ThrowsException() throws Exception {
+
+		doThrow(new PersistenceException()).when(personDAO)
+				.insertOrUpdate(null);
+		personService.create(null);
+
 	}
 
 	@Test(expected = ServiceException.class)
 	public void createWithInvalidStateParameter_ThrowsException()
-			throws ServiceException {
-		try {
-			doThrow(new PersistenceException()).when(personDAO).insertOrUpdate(
-					nullPerson);
-			personService.create(nullPerson); // all values are null
-		} catch (PersistenceException e) {
-			fail();
-		}
+			throws Exception {
+
+		doThrow(new PersistenceException()).when(personDAO).insertOrUpdate(
+				nullPerson);
+		personService.create(nullPerson); // all values are null
+
 	}
 
 	@Test
-	public void createWithValidParameter_ReturnsSavedPerson() {
-		try {
-			person.setId(10);
-			Person returned = personService.create(person);
+	public void createWithValidParameter_ReturnsSavedPerson() throws Exception {
 
-			assertEquals(returned, personCreated);
+		person.setId(10);
+		Person returned = personService.create(person);
 
-			verify(personDAO).insertOrUpdate(person);
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
+		assertEquals(returned, personCreated);
+
+		verify(personDAO).insertOrUpdate(person);
+
 	}
 
 	/*
@@ -139,41 +130,33 @@ public abstract class AbstractPersonServiceTest {
 	 */
 
 	@Test(expected = ServiceException.class)
-	public void updateWithNullParameter_ThrowsException()
-			throws ServiceException {
-		try {
-			doThrow(new PersistenceException()).when(personDAO).insertOrUpdate(
-					null);
-			personService.update(null);
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void updateWithNullParameter_ThrowsException() throws Exception {
+
+		doThrow(new PersistenceException()).when(personDAO)
+				.insertOrUpdate(null);
+		personService.update(null);
+
 	}
 
 	@Test(expected = ServiceException.class)
 	public void updateWithInvalidStateParameter_ThrowsException()
-			throws ServiceException {
-		try {
-			doThrow(new PersistenceException()).when(personDAO).insertOrUpdate(
-					nullPerson);
-			personService.update(nullPerson);
-		} catch (PersistenceException e) {
-			fail();
-		}
+			throws Exception {
+
+		doThrow(new PersistenceException()).when(personDAO).insertOrUpdate(
+				nullPerson);
+		personService.update(nullPerson);
+
 	}
 
 	@Test
-	public void updateWithValidParameters_ReturnsUpdatedPerson() {
-		try {
-			Person returned = personService.update(personCreated);
+	public void updateWithValidParameters_ReturnsUpdatedPerson()
+			throws Exception {
 
-			assert (returned.equals(personCreated));
-			verify(personDAO).insertOrUpdate(personCreated);
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
+		Person returned = personService.update(personCreated);
+
+		assertEquals(personCreated, returned);
+		verify(personDAO).insertOrUpdate(personCreated);
+
 	}
 
 	/*
@@ -181,27 +164,20 @@ public abstract class AbstractPersonServiceTest {
 	 */
 
 	@Test(expected = ServiceException.class)
-	public void deleteWithNullParameter_ThrowsException()
-			throws ServiceException {
-		try {
-			doThrow(new PersistenceException()).when(personDAO).delete(null);
+	public void deleteWithNullParameter_ThrowsException() throws Exception {
 
-			personService.delete(null);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		doThrow(new PersistenceException()).when(personDAO).delete(null);
+
+		personService.delete(null);
+
 	}
 
 	@Test
-	public void deleteWithValidParameter_RemovesEntity() {
-		try {
-			personService.delete(person);
-			verify(personDAO).delete(person);
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void deleteWithValidParameter_RemovesEntity() throws Exception {
+
+		personService.delete(person);
+		verify(personDAO).delete(person);
+
 	}
 
 	/*
@@ -209,63 +185,50 @@ public abstract class AbstractPersonServiceTest {
 	 */
 
 	@Test
-	public void getAll_ReturnsAllEntities() {
-		try {
-			List<Person> all = new ArrayList<Person>();
-			all.add(person);
-			all.add(person2);
-			when(personDAO.getAll()).thenReturn(all);
+	public void getAll_ReturnsAllEntities() throws Exception {
 
-			List<Person> list = personService.getAll();
-			assert (list != null && list.size() == 2);
-			assert (list.get(0).equals(person) && list.get(1).equals(person2));
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
+		List<Person> all = new ArrayList<Person>();
+		all.add(person);
+		all.add(person2);
+		when(personDAO.getAll()).thenReturn(all);
+
+		List<Person> list = personService.getAll();
+		assertNotNull(list);
+		assertEquals(2, list.size());
+		assertEquals(person, list.get(0));
+		assertEquals(person2, list.get(1));
+
 	}
 
 	@Test(expected = EmptyResultDataAccessException.class)
-	public void getWithInvalidId_ThrowsException() {
-		try {
-			when(personDAO.getById(10000)).thenThrow(
-					new EmptyResultDataAccessException(0));
+	public void getWithInvalidId_ThrowsException() throws Exception {
 
-			personService.getById(10000);
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
+		when(personDAO.getById(10000)).thenThrow(
+				new EmptyResultDataAccessException(0));
+
+		personService.getById(10000);
+
 	}
 
 	@Test(expected = ServiceException.class)
-	public void getWithNegativeId_ThrowsException() throws ServiceException {
-		try {
-			when(personDAO.getById(-1)).thenThrow(new PersistenceException());
+	public void getWithNegativeId_ThrowsException() throws Exception {
 
-			personService.getById(-1);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		when(personDAO.getById(-1)).thenThrow(new PersistenceException());
+
+		personService.getById(-1);
+
 	}
 
 	@Test
-	public void getWithValidId_ReturnsEntity() {
-		try {
-			when(personDAO.getById(personCreated.getId())).thenReturn(
-					personCreated);
+	public void getWithValidId_ReturnsEntity() throws Exception {
 
-			Person found = personService.getById(personCreated.getId());
+		when(personDAO.getById(personCreated.getId()))
+				.thenReturn(personCreated);
 
-			assertThat(personCreated, is(found));
+		Person found = personService.getById(personCreated.getId());
 
-		} catch (ServiceException e) {
-			fail();
-		} catch (PersistenceException e) {
-			fail();
-		}
+		assertThat(personCreated, is(found));
+
 	}
 
 	@Test(expected = IllegalArgumentException.class)

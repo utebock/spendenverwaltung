@@ -62,8 +62,7 @@ public class CreatePersonView extends InitializableView {
 	private JLabel salutLabel;
 	
 	private JLabel title;
-	private JComboBox<String> titleBox;
-	
+
 	private JLabel company;
 	private StringTextField companyField;
 	
@@ -83,7 +82,7 @@ public class CreatePersonView extends InitializableView {
 	private StringTextField streetField;
 	
 	private JLabel postal;
-	private NumericTextField postalField;
+	private StringTextField postalField;
 	
 	private JLabel city;
 	private StringTextField cityField;
@@ -119,6 +118,8 @@ public class CreatePersonView extends InitializableView {
 	private JLabel dateLabel;
 	private JXDatePicker datePicker;
 	private JPanel overviewPanel;
+
+	private StringTextField titleField;
 
 	public CreatePersonView(ComponentFactory componentFactory, ViewActionFactory viewActionFactory, 
 			IPersonService personService, IAddressService addressService,
@@ -179,10 +180,9 @@ public class CreatePersonView extends InitializableView {
 		panel.add(salutation, "wrap");
 		
 		title = componentFactory.createLabel("Titel: ");
-		String[] titleCombo = new String[]{"-", "BA", "BSc", "DI", "Dr.", "Ing.", "MA", "Mag.", "MSc.", "Prof."};
-		titleBox = new JComboBox<String>(titleCombo);
+		titleField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
 		panel.add(title);
-		panel.add(titleBox, "wrap");
+		panel.add(titleField, "wrap");
 		
 		company = componentFactory.createLabel("Firma: ");
 		companyField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
@@ -221,7 +221,7 @@ public class CreatePersonView extends InitializableView {
 		validateablePersonComponents.add(streetField);
 
 		postal = componentFactory.createLabel("PLZ: ");
-		postalField = new NumericTextField(ComponentConstants.SHORT_TEXT);
+		postalField = new StringTextField(ComponentConstants.SHORT_TEXT);
 		panel.add(postal);
 		panel.add(postalField, "wrap, growx");
 		validateablePersonComponents.add(postalField);
@@ -238,7 +238,7 @@ public class CreatePersonView extends InitializableView {
 		panel.add(countryField, "wrap, growx");
 		validateablePersonComponents.add(countryField);
 
-		notifyType = componentFactory.createLabel("Notification Type: ");
+		notifyType = componentFactory.createLabel("Benachrichtigungstyp: ");
 		notifyMail = new JCheckBox("Email");
 		notifyPost = new JCheckBox("Postal Service");
 		panel.add(notifyType);
@@ -337,8 +337,7 @@ public class CreatePersonView extends InitializableView {
 				address = new Address();
 				
 				person.setSex(Person.Sex.values()[salutation.getSelectedIndex()]);
-				String title = (String) titleBox.getSelectedItem();
-				person.setTitle(title);
+				person.setTitle(titleField.getText());
 				person.setCompany(companyField.getText());
 				person.setGivenName(givenField.getText());
 				person.setSurname(surnameField.getText());
@@ -377,6 +376,7 @@ public class CreatePersonView extends InitializableView {
 				if(!comp.validateContents()) {
 					donationValidated = false;
 					JOptionPane.showMessageDialog(null, "Konnte Spendenh\u00F6he nicht feststellen");
+					return;
 				}
 					
 			}

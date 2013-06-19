@@ -17,12 +17,14 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 	<bean id="dataSource"
-		class="at.fraubock.spendenverwaltung.util.StrictMysqlBasicDataSource">
-		<property name="url"
-			value="jdbc:mysql://localhost:3306/ubspenderverwaltung" />
-		<property name="username" value="ubadministrative" />
-		<property name="password" value="ubadmin" />
-		<property name="defaultAutoCommit" value="true" />
+		class="at.fraubock.spendenverwaltung.util.StrictMysqlBasicDataSource"
+		lazy-init="true">
+		<!-- username, password and URL will be set by the program prior to using 
+			other beans. -->
+		<property name="defaultAutoCommit" value="false" />
+	</bean>
+	<bean id="defaultDatabaseUrl" class="java.lang.String">
+		<constructor-arg value="localhost:3306/ubspenderverwaltung" />
 	</bean>
 	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<property name="dataSource">
@@ -59,9 +61,6 @@
 	</bean>
 	<bean id="mailingTemplateDao"
 		class="at.fraubock.spendenverwaltung.dao.MailingTemplateDAOImplemented">
-		<property name="jdbcTemplate" ref="jdbcTemplate" />
-	</bean>
-	<bean id="userDao" class="at.fraubock.spendenverwaltung.dao.UserDAOImplemented">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 	</bean>
 	<bean id="abstractCritDao"
@@ -140,10 +139,6 @@
 		<property name="personDAO" ref="personDao" />
 		<property name="personService" ref="personService" />
 	</bean>
-	<bean id="userService"
-		class="at.fraubock.spendenverwaltung.service.UserServiceImplemented">
-		<property name="userDAO" ref="userDao" />
-	</bean>
 	<bean id="filterService"
 		class="at.fraubock.spendenverwaltung.service.FilterServiceImplemented">
 		<property name="filterDAO" ref="filterDao" />
@@ -158,4 +153,8 @@
 		<property name="addressService" ref="addressService" />
 		<property name="donationService" ref="donationService" />
 	</bean>
+	<bean id="mailChimpService"
+		class="at.fraubock.spendenverwaltung.service.MailChimpServiceImplemented">
+	</bean>
+
 </beans>

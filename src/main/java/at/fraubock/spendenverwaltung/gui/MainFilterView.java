@@ -28,11 +28,9 @@ import at.fraubock.spendenverwaltung.gui.filter.CreateFilter;
 import at.fraubock.spendenverwaltung.gui.views.InitializableView;
 import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
-import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter.FilterPrivacyStatus;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.FilterInUseException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
-import at.fraubock.spendenverwaltung.util.CurrentUser;
 import at.fraubock.spendenverwaltung.util.FilterType;
 
 public class MainFilterView extends InitializableView {
@@ -93,48 +91,50 @@ public class MainFilterView extends InitializableView {
 	}
 
 	private void addComponentsToToolbar(JToolBar toolbar) {
-		
+
 		backButton = new JButton();
 		Action getBack = viewActionFactory.getMainMenuViewAction();
-		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
+		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass()
+				.getResource("/images/backButton.jpg")));
 		backButton.setAction(getBack);
-		
+
 		personFilter = new JButton();
 		personFilter.setAction(new AbstractAction("Personenfilter erstellen") {
 			private static final long serialVersionUID = 7948990257221071839L;
 
 			@Override
 			public void actionPerformed(ActionEvent a) {
-				createFilter(FilterType.PERSON,null);
+				createFilter(FilterType.PERSON, null);
 			}
-			
+
 		});
 		personFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
-		
+
 		sendingsFilter = new JButton();
-		sendingsFilter.setAction(new AbstractAction("Aussendungsfilter erstellen") {
+		sendingsFilter.setAction(new AbstractAction(
+				"Aussendungsfilter erstellen") {
 			private static final long serialVersionUID = 7948990257221071839L;
 
 			@Override
 			public void actionPerformed(ActionEvent a) {
-				createFilter(FilterType.MAILING,null);
+				createFilter(FilterType.MAILING, null);
 			}
-			
+
 		});
 		sendingsFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
-		
+
 		donationFilter = new JButton();
 		donationFilter.setAction(new AbstractAction("Spendenfilter erstellen") {
 			private static final long serialVersionUID = 7948990257221071839L;
 
 			@Override
 			public void actionPerformed(ActionEvent a) {
-				createFilter(FilterType.DONATION,null);
+				createFilter(FilterType.DONATION, null);
 			}
-			
+
 		});
 		donationFilter.setFont(new Font("Bigger", Font.PLAIN, 13));
-		
+
 		edit = new JButton();
 		edit.setAction(new AbstractAction("Filter bearbeiten") {
 			private static final long serialVersionUID = 7948990257221071839L;
@@ -146,22 +146,28 @@ public class MainFilterView extends InitializableView {
 							"Bitte Filter zum Bearbeiten ausw\u00E4hlen.");
 					return;
 				}
-				Filter filter = filterModel.getFilterRow(showTable.getSelectedRow());
-				
-				if(filter.getOwner().equals(CurrentUser.userName) 
-						|| filter.getPrivacyStatus() == FilterPrivacyStatus.READ_UPDATE
-						|| filter.getPrivacyStatus() == FilterPrivacyStatus.READ_UPDATE_DELETE){
-					createFilter(filter.getType(),filter);
-				} else{
-					JOptionPane.showMessageDialog(MainFilterView.this,
-							"Sie sind nicht berechtigt diesen Filter zu bearbeiten");
-					return;
-				}
+				Filter filter = filterModel.getFilterRow(showTable
+						.getSelectedRow());
+
+				/*
+				 * if(filter.getOwner().equals(CurrentUser.userName) ||
+				 * filter.getPrivacyStatus() == FilterPrivacyStatus.READ_UPDATE
+				 * || filter.getPrivacyStatus() ==
+				 * FilterPrivacyStatus.READ_UPDATE_DELETE){
+				 */
+				createFilter(filter.getType(), filter);
+				/*
+				 * } else{ JOptionPane.showMessageDialog(MainFilterView.this,
+				 * "Sie sind nicht berechtigt diesen Filter zu bearbeiten");
+				 * return; }
+				 */
+				// TODO the above has been commented out because getting the
+				// current username is not doable at the moment.
 			}
-			
+
 		});
 		edit.setFont(new Font("Bigger", Font.PLAIN, 13));
-		
+
 		delete = new JButton();
 		delete.setAction(new AbstractAction("Filter l\u00F6schen") {
 			private static final long serialVersionUID = 7948990257221071839L;
@@ -170,17 +176,16 @@ public class MainFilterView extends InitializableView {
 			public void actionPerformed(ActionEvent a) {
 				deleteFilter();
 			}
-			
+
 		});
 		delete.setFont(new Font("Bigger", Font.PLAIN, 13));
-		
+
 		toolbar.add(backButton);
 		toolbar.add(personFilter);
 		toolbar.add(donationFilter);
 		toolbar.add(sendingsFilter);
 		toolbar.add(edit);
 		toolbar.add(delete);
-		
 
 	}
 
@@ -214,7 +219,8 @@ public class MainFilterView extends InitializableView {
 	}
 
 	public void createFilter(FilterType type, Filter filter) {
-		CreateFilter cf = new CreateFilter(type, filterService, this, filter,viewActionFactory);
+		CreateFilter cf = new CreateFilter(type, filterService, this, filter,
+				viewActionFactory);
 		removeAll();
 		revalidate();
 		repaint();
@@ -230,13 +236,15 @@ public class MainFilterView extends InitializableView {
 
 		Filter filter = filterModel.getFilterRow(showTable.getSelectedRow());
 
-		if(!filter.getOwner().equals(CurrentUser.userName) 
-				&& filter.getPrivacyStatus() != FilterPrivacyStatus.READ_UPDATE_DELETE){
-			JOptionPane.showMessageDialog(MainFilterView.this,
-					"Sie sind nicht berechtigt diesen Filter zu löschen");
-			return;
-		}
-		
+		/*
+		 * if (!filter.getOwner().equals(CurrentUser.userName) &&
+		 * filter.getPrivacyStatus() != FilterPrivacyStatus.READ_UPDATE_DELETE)
+		 * { JOptionPane.showMessageDialog(MainFilterView.this,
+		 * "Sie sind nicht berechtigt diesen Filter zu löschen"); return; }
+		 */
+		// TODO the above has been commented out because getting the
+		// current username is not doable at the moment.
+
 		int answer = JOptionPane.showConfirmDialog(this,
 				"Wollen Sie den Filter " + filter.getName()
 						+ " wirklich l\u00F6schen?");
@@ -254,10 +262,12 @@ public class MainFilterView extends InitializableView {
 					JOptionPane.ERROR_MESSAGE);
 			log.error(e);
 		} catch (FilterInUseException e) {
-			JOptionPane.showMessageDialog(this,
-					"Dieser Filter ist mit einem anderen verkn\u00FCpft. "
-							+ "Bitte l\u00F6schen Sie die Verkn\u00FCpfung zuerst.",
-					"Fehler", JOptionPane.ERROR_MESSAGE);
+			JOptionPane
+					.showMessageDialog(
+							this,
+							"Dieser Filter ist mit einem anderen verkn\u00FCpft. "
+									+ "Bitte l\u00F6schen Sie die Verkn\u00FCpfung zuerst.",
+							"Fehler", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 }

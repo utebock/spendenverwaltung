@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.gui;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -13,9 +14,9 @@ import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
+import at.fraubock.spendenverwaltung.interfaces.service.IMailChimpService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
-import at.fraubock.spendenverwaltung.interfaces.service.IUserService;
 
 public class GuiStarter {
 
@@ -44,23 +45,23 @@ public class GuiStarter {
 				IAddressService.class);
 		IMailingService mailingService = context.getBean("mailingService",
 				IMailingService.class);
-		IUserService userService = context.getBean("userService",
-				IUserService.class);
 		IImportService importService = context.getBean("importService",
 				IImportService.class);
 		IActionService actionService = context.getBean("actionService",
 				IActionService.class);
+		IMailChimpService mailChimpService = context.getBean(
+				"mailChimpService", IMailChimpService.class);
+
+		BasicDataSource databaseDataSource = context.getBean("dataSource",
+				BasicDataSource.class);
 
 		ViewDisplayer viewDisplayer = new ViewDisplayer();
 		ComponentFactory componentFactory = new ComponentFactory();
 
-		/**
-		 * 
-		 */
 		ViewActionFactory viewActionFactory = new ViewActionFactory(
 				viewDisplayer, personService, donationService, filterService,
-				addressService, mailingService, userService, importService,
-				actionService);
+				addressService, mailingService, importService, actionService,
+				mailChimpService);
 
 		// need to call mainMenu.init() after all views are set in the
 		// viewActionFactory
@@ -82,8 +83,9 @@ public class GuiStarter {
 		// viewDisplayer.changeView(mainMenu);
 
 		// switch to login view
-		LoginView login = new LoginView(userService, componentFactory,
-				viewActionFactory, viewDisplayer);
+		LoginView login = new LoginView(databaseDataSource, componentFactory,
+				viewActionFactory, viewDisplayer, "", "", context.getBean(
+						"defaultDatabaseUrl", String.class));
 		login.init();
 		viewDisplayer.changeView(login);
 	}

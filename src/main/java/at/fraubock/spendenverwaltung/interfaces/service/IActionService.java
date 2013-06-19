@@ -2,7 +2,7 @@ package at.fraubock.spendenverwaltung.interfaces.service;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Action;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
-import at.fraubock.spendenverwaltung.util.ActionAttribute;
+import at.fraubock.spendenverwaltung.util.ActionSearchVO;
 import at.fraubock.spendenverwaltung.util.Pager;
 
 /**
@@ -14,50 +14,17 @@ import at.fraubock.spendenverwaltung.util.Pager;
 public interface IActionService {
 
 	/**
-	 * Creates a new action
+	 * returns a {@link Pager} instance that pages over all actions whose
+	 * attributes match the values given in the {@link ActionSearchVO}. each
+	 * page has the size of <code>pageSizeParam</code>
 	 * 
-	 * @param a
-	 *            Action to be created
-	 * @return Fully defined action
-	 */
-	public Action create(Action a) throws ServiceException;
-
-	/**
-	 * Deletes an existing action
-	 * 
-	 * @param a
-	 *            Action to be deleted
-	 */
-	public void delete(Action a) throws ServiceException;
-
-	/**
-	 * returns a {@link Pager} instance that pages over all existent actions.
-	 * each page has the size of <code>pageSizeParam</code>
-	 * 
+	 * @param searchVO
+	 *            - a value object containing the values to be searched for
 	 * @param pageSizeParam
 	 *            - size of a single page
 	 * @return pager
 	 * @throws ServiceException
 	 */
-	public Pager<Action> getAllAsPager(final int pageSizeParam)
-			throws ServiceException;
-
-	/**
-	 * returns a {@link Pager} instance that pages over all actions where the
-	 * attribute given in the {@link ActionAttribute} contains the given
-	 * <code>valueParam</code> each page has the size of
-	 * <code>pageSizeParam</code>
-	 * 
-	 * @param attribute
-	 *            - the attribute to be compared
-	 * @param value
-	 *            - the value the attribute will be compared with (LIKE)
-	 * @param pageSizeParam
-	 *            - size of a single page
-	 * @return pager
-	 * @throws ServiceException
-	 */
-	public Pager<Action> getAttributeLikeAsPager(
-			final ActionAttribute attributeParam, final String valueParam,
+	public Pager<Action> searchActions(final ActionSearchVO searchVOParam,
 			final int pageSizeParam) throws ServiceException;
 }

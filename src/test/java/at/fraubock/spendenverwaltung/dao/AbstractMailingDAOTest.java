@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.text.ParseException;
@@ -155,21 +154,12 @@ public abstract class AbstractMailingDAOTest {
 
 		mailing.setDate(currentDate);
 
-		try {
-			assertTrue(mailingDAO != null);
-			mailingDAO.insertOrUpdate(mailing);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		assertTrue(mailingDAO != null);
+		mailingDAO.insertOrUpdate(mailing);
 
-		try {
-			Mailing result = mailingDAO.getById(mailing.getId());
+		Mailing result = mailingDAO.getById(mailing.getId());
 
-			assertEquals(result, mailing);
-
-		} catch (PersistenceException e) {
-			fail();
-		}
+		assertEquals(result, mailing);
 
 		mailing = new Mailing();
 		mailing.setMedium(Mailing.Medium.POSTAL);
@@ -180,20 +170,12 @@ public abstract class AbstractMailingDAOTest {
 		// currentDate = new Date(System.currentTimeMillis());
 		mailing.setDate(currentDate);
 
-		try {
-			mailingDAO.insertOrUpdate(mailing);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		mailingDAO.insertOrUpdate(mailing);
 
-		try {
-			Mailing result = mailingDAO.getById(mailing.getId());
+		result = mailingDAO.getById(mailing.getId());
 
-			assertEquals(result, mailing);
+		assertEquals(result, mailing);
 
-		} catch (PersistenceException e) {
-			fail();
-		}
 	}
 
 	@Test
@@ -210,23 +192,15 @@ public abstract class AbstractMailingDAOTest {
 
 		mailing.setDate(currentDate);
 
-		try {
-			mailingDAO.insertOrUpdate(mailing);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		mailingDAO.insertOrUpdate(mailing);
 
 		mailing.setType(Mailing.MailingType.DAUERSPENDER_DANKESBRIEF);
 
-		try {
-			mailingDAO.insertOrUpdate(mailing);
+		mailingDAO.insertOrUpdate(mailing);
 
-			Mailing result = mailingDAO.getById(mailing.getId());
+		Mailing result = mailingDAO.getById(mailing.getId());
 
-			assertEquals(mailing, result);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		assertEquals(mailing, result);
 
 	}
 
@@ -265,24 +239,19 @@ public abstract class AbstractMailingDAOTest {
 
 		List<Mailing> results;
 
-		try {
-			results = mailingDAO.getAll();
+		results = mailingDAO.getAll();
 
-			assertEquals(createdMailings, results);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		assertEquals(createdMailings, results);
+
 	}
 
 	@Test
 	@Transactional
-	public void getAll_shouldReturnEmptyList() {
-		try {
-			List<Mailing> results = mailingDAO.getAll();
-			assertTrue(results.isEmpty());
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void getAll_shouldReturnEmptyList() throws PersistenceException {
+
+		List<Mailing> results = mailingDAO.getAll();
+		assertTrue(results.isEmpty());
+
 	}
 
 	@Test
@@ -296,28 +265,18 @@ public abstract class AbstractMailingDAOTest {
 		mailing.setMedium(Mailing.Medium.EMAIL);
 		mailing.setType(Mailing.MailingType.ALLGEMEINER_DANKESBRIEF);
 
-		try {
-			mailingDAO.insertOrUpdate(mailing);
-		} catch (PersistenceException e1) {
-			e1.printStackTrace();
-			fail();
-		}
+		mailingDAO.insertOrUpdate(mailing);
 
-		try {
-			Mailing result = mailingDAO.getById(mailing.getId());
-			assertEquals(result, mailing);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		Mailing result = mailingDAO.getById(mailing.getId());
+		assertEquals(result, mailing);
+
 	}
 
 	@Transactional
-	public void findByInvalidId_shouldReturnNull() {
-		try {
-			assertNull(mailingDAO.getById(-1));
-		} catch (PersistenceException e) {
-			fail();
-		}
+	public void findByInvalidId_shouldReturnNull() throws PersistenceException {
+
+		assertNull(mailingDAO.getById(-1));
+
 	}
 
 	@Test
@@ -334,27 +293,16 @@ public abstract class AbstractMailingDAOTest {
 
 		Integer oldId = null;
 
-		try {
-			mailingDAO.insertOrUpdate(mailing);
-			oldId = mailing.getId();
-		} catch (PersistenceException e) {
-			fail();
-		}
+		mailingDAO.insertOrUpdate(mailing);
+		oldId = mailing.getId();
 
-		try {
-			mailingDAO.delete(mailing);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		mailingDAO.delete(mailing);
 
 		Mailing result;
 
-		try {
-			result = mailingDAO.getById(oldId);
-			assertNull(result);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		result = mailingDAO.getById(oldId);
+		assertNull(result);
+
 	}
 
 	@Test
@@ -371,31 +319,20 @@ public abstract class AbstractMailingDAOTest {
 
 		Integer oldId = null;
 
-		try {
-			mailingDAO.insertOrUpdate(mailing);
-			mailingDAO.confirmMailing(mailing);
-			oldId = mailing.getId();
-		} catch (PersistenceException e) {
-			fail();
-		}
+		mailingDAO.insertOrUpdate(mailing);
+		mailingDAO.confirmMailing(mailing);
+		oldId = mailing.getId();
 
-		try {
-			mailingDAO.delete(mailing);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		mailingDAO.delete(mailing);
 
 		Mailing result;
 
-		try {
-			result = mailingDAO.getById(oldId);
-			assertNull(result);
+		result = mailingDAO.getById(oldId);
+		assertNull(result);
 
-			List<Mailing> results = mailingDAO.getAllConfirmed();
-			assertTrue(results.isEmpty());
-		} catch (PersistenceException e) {
-			fail();
-		}
+		List<Mailing> results = mailingDAO.getAllConfirmed();
+		assertTrue(results.isEmpty());
+
 	}
 
 	@Test
@@ -412,29 +349,18 @@ public abstract class AbstractMailingDAOTest {
 
 		Integer oldId = null;
 
-		try {
-			mailingDAO.insertOrUpdate(mailing);
-			oldId = mailing.getId();
-		} catch (PersistenceException e) {
-			fail();
-		}
+		mailingDAO.insertOrUpdate(mailing);
+		oldId = mailing.getId();
 
-		try {
-			mailingDAO.delete(mailing);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		mailingDAO.delete(mailing);
 
 		Mailing result;
 
-		try {
-			result = mailingDAO.getById(oldId);
-			assertNull(result);
-			List<Mailing> results = mailingDAO.getAllUnconfirmed();
-			assertTrue(results.isEmpty());
-		} catch (PersistenceException e) {
-			fail();
-		}
+		result = mailingDAO.getById(oldId);
+		assertNull(result);
+		List<Mailing> results = mailingDAO.getAllUnconfirmed();
+		assertTrue(results.isEmpty());
+
 	}
 
 	@Test
@@ -491,63 +417,60 @@ public abstract class AbstractMailingDAOTest {
 
 	@Test
 	@Transactional
-	public void getAllConfirmed_shouldReturnEmptyList() {
-		try {
-			initData();
+	public void getAllConfirmed_shouldReturnEmptyList()
+			throws PersistenceException {
+		initData();
 
-			Mailing mailingOne = new Mailing();
+		Mailing mailingOne = new Mailing();
 
-			mailingOne.setMedium(Mailing.Medium.EMAIL);
-			mailingOne.setType(Mailing.MailingType.DANKESBRIEF);
-			mailingOne.setDate(new Date(System.currentTimeMillis()));
-			mailingOne.setFilter(filterOnePerson);
+		mailingOne.setMedium(Mailing.Medium.EMAIL);
+		mailingOne.setType(Mailing.MailingType.DANKESBRIEF);
+		mailingOne.setDate(new Date(System.currentTimeMillis()));
+		mailingOne.setFilter(filterOnePerson);
 
-			mailingDAO.insertOrUpdate(mailingOne);
-			List<Mailing> results = mailingDAO.getAll();
-			assertFalse(results.isEmpty());
-			results = mailingDAO.getAllConfirmed();
-			assertTrue(results.isEmpty());
-		} catch (PersistenceException e) {
-			fail();
-		}
+		mailingDAO.insertOrUpdate(mailingOne);
+		List<Mailing> results = mailingDAO.getAll();
+		assertFalse(results.isEmpty());
+		results = mailingDAO.getAllConfirmed();
+		assertTrue(results.isEmpty());
+
 	}
 
 	@Test
 	@Transactional
-	public void getAllConfirmed_shouldReturnOneMailing() {
-		try {
-			initData();
+	public void getAllConfirmed_shouldReturnOneMailing()
+			throws PersistenceException {
 
-			Mailing mailingOne = new Mailing();
+		initData();
 
-			mailingOne.setMedium(Mailing.Medium.EMAIL);
-			mailingOne.setType(Mailing.MailingType.DANKESBRIEF);
-			mailingOne.setDate(new Date(System.currentTimeMillis()));
-			mailingOne.setFilter(filterOnePerson);
+		Mailing mailingOne = new Mailing();
 
-			Mailing mailingTwo = new Mailing();
+		mailingOne.setMedium(Mailing.Medium.EMAIL);
+		mailingOne.setType(Mailing.MailingType.DANKESBRIEF);
+		mailingOne.setDate(new Date(System.currentTimeMillis()));
+		mailingOne.setFilter(filterOnePerson);
 
-			mailingTwo.setMedium(Mailing.Medium.POSTAL);
-			mailingTwo.setTemplate(mt2);
-			mailingTwo.setType(Mailing.MailingType.DANKESBRIEF);
-			mailingTwo.setDate(new Date(System.currentTimeMillis()));
-			mailingTwo.setFilter(filterOnePerson);
+		Mailing mailingTwo = new Mailing();
 
-			mailingDAO.insertOrUpdate(mailingOne);
-			mailingDAO.insertOrUpdate(mailingTwo);
+		mailingTwo.setMedium(Mailing.Medium.POSTAL);
+		mailingTwo.setTemplate(mt2);
+		mailingTwo.setType(Mailing.MailingType.DANKESBRIEF);
+		mailingTwo.setDate(new Date(System.currentTimeMillis()));
+		mailingTwo.setFilter(filterOnePerson);
 
-			mailingDAO.confirmMailing(mailingTwo);
+		mailingDAO.insertOrUpdate(mailingOne);
+		mailingDAO.insertOrUpdate(mailingTwo);
 
-			List<Mailing> results = mailingDAO.getAllConfirmed();
+		mailingDAO.confirmMailing(mailingTwo);
 
-			List<Mailing> expectedResults = new ArrayList<Mailing>();
-			expectedResults.add(mailingTwo);
+		List<Mailing> results = mailingDAO.getAllConfirmed();
 
-			results = mailingDAO.getAllConfirmed();
-			assertEquals(expectedResults, results);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		List<Mailing> expectedResults = new ArrayList<Mailing>();
+		expectedResults.add(mailingTwo);
+
+		results = mailingDAO.getAllConfirmed();
+		assertEquals(expectedResults, results);
+
 	}
 
 	@Test
@@ -573,41 +496,39 @@ public abstract class AbstractMailingDAOTest {
 
 	@Test
 	@Transactional
-	public void getAllUnConfirmed_shouldReturnOneMailing() {
-		try {
-			initData();
+	public void getAllUnConfirmed_shouldReturnOneMailing()
+			throws PersistenceException {
+		initData();
 
-			Mailing mailingOne = new Mailing();
+		Mailing mailingOne = new Mailing();
 
-			mailingOne.setMedium(Mailing.Medium.EMAIL);
-			mailingOne.setType(Mailing.MailingType.DANKESBRIEF);
-			mailingOne.setDate(new Date(System.currentTimeMillis()));
-			mailingOne.setFilter(filterOnePerson);
+		mailingOne.setMedium(Mailing.Medium.EMAIL);
+		mailingOne.setType(Mailing.MailingType.DANKESBRIEF);
+		mailingOne.setDate(new Date(System.currentTimeMillis()));
+		mailingOne.setFilter(filterOnePerson);
 
-			Mailing mailingTwo = new Mailing();
+		Mailing mailingTwo = new Mailing();
 
-			mailingTwo.setMedium(Mailing.Medium.POSTAL);
-			mailingTwo.setTemplate(mt2);
-			mailingTwo.setType(Mailing.MailingType.DANKESBRIEF);
-			mailingTwo.setDate(new Date(System.currentTimeMillis()));
-			mailingTwo.setFilter(filterOnePerson);
+		mailingTwo.setMedium(Mailing.Medium.POSTAL);
+		mailingTwo.setTemplate(mt2);
+		mailingTwo.setType(Mailing.MailingType.DANKESBRIEF);
+		mailingTwo.setDate(new Date(System.currentTimeMillis()));
+		mailingTwo.setFilter(filterOnePerson);
 
-			mailingDAO.insertOrUpdate(mailingOne);
-			mailingDAO.insertOrUpdate(mailingTwo);
+		mailingDAO.insertOrUpdate(mailingOne);
+		mailingDAO.insertOrUpdate(mailingTwo);
 
-			mailingDAO.confirmMailing(mailingTwo);
+		mailingDAO.confirmMailing(mailingTwo);
 
-			List<Mailing> results = mailingDAO.getAllUnconfirmed();
-			List<Mailing> expectedResults = new ArrayList<Mailing>();
+		List<Mailing> results = mailingDAO.getAllUnconfirmed();
+		List<Mailing> expectedResults = new ArrayList<Mailing>();
 
-			expectedResults.add(mailingOne);
+		expectedResults.add(mailingOne);
 
-			results = mailingDAO.getAllUnconfirmed();
+		results = mailingDAO.getAllUnconfirmed();
 
-			assertEquals(expectedResults, results);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		assertEquals(expectedResults, results);
+
 	}
 
 	@Test

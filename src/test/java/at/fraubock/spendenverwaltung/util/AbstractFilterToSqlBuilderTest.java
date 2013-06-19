@@ -1,5 +1,7 @@
 package at.fraubock.spendenverwaltung.util;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +31,7 @@ public abstract class AbstractFilterToSqlBuilderTest {
 	private PropertyCriterion donationDaysBackProp;
 	private PropertyCriterion mailingNotNullProp;
 	private PropertyCriterion addressIsMainProp;
+	private PropertyCriterion personNameProp;
 
 	public static FilterToSqlBuilder getBuilder() {
 		return builder;
@@ -52,10 +55,13 @@ public abstract class AbstractFilterToSqlBuilderTest {
 		String mailingStmt = builder.createSqlStatement(mailingFilter);
 		String addressStmt = builder.createSqlStatement(addressFilter);
 
-		assert ("select * from persons".equals(personStmt));
-		assert ("select * from donations".equals(donationStmt));
-		assert ("select * from mailings".equals(mailingStmt));
-		assert ("select * from addresses".equals(addressStmt));
+		assertEquals("select * from validated_persons as mount0", personStmt);
+		assertEquals("select * from validated_donations as mount0",
+				(donationStmt));
+		assertEquals("select * from confirmed_mailings as mount0",
+				(mailingStmt));
+		assertEquals("select * from validated_addresses as mount0",
+				(addressStmt));
 	}
 
 	/* testing property criterion statements */
@@ -71,40 +77,45 @@ public abstract class AbstractFilterToSqlBuilderTest {
 	public void personCompanyLikeString_ReturnsStatement() {
 		personFilter.setCriterion(personCompProp);
 		String personStmt = builder.createSqlStatement(personFilter);
-		assert ("select * from persons where company LIKE '%testcompany%'"
-				.equals(personStmt));
+		assertEquals(
+				"select * from validated_persons as mount0 where company LIKE '%testcompany%'",
+				(personStmt));
 	}
 
 	@Test
 	public void donationAmountLessEqualsNumeric_ReturnsStatement() {
 		donationFilter.setCriterion(donationAmountProp);
 		String donationStmt = builder.createSqlStatement(donationFilter);
-		assert ("select * from donations where amount <= 100"
-				.equals(donationStmt));
+		assertEquals(
+				"select * from validated_donations as mount0 where amount <= 100.0",
+				(donationStmt));
 	}
 
 	@Test
 	public void donationDateGreaterDaysBack_ReturnsStatement() {
 		donationFilter.setCriterion(donationDaysBackProp);
 		String donationStmt = builder.createSqlStatement(donationFilter);
-		assert ("select * from donations where donationdate > DATE(SUBDATE(NOW(), 25))"
-				.equals(donationStmt));
+		assertEquals(
+				"select * from validated_donations as mount0 where donationdate < DATE_SUB(DATE(NOW()),INTERVAL 25 DAY)",
+				(donationStmt));
 	}
 
 	@Test
 	public void mailingnDateNotNull_ReturnsStatement() {
 		mailingFilter.setCriterion(mailingNotNullProp);
 		String donationStmt = builder.createSqlStatement(mailingFilter);
-		assert ("select * from mailings where date NOT NULL"
-				.equals(donationStmt));
+		assertEquals(
+				"select * from confirmed_mailings as mount0 where mailing_date IS NOT NULL ",
+				(donationStmt));
 	}
 
 	@Test
 	public void isMainAddressEqualsBool_ReturnsStatement() {
 		addressFilter.setCriterion(addressIsMainProp);
 		String addressStmt = builder.createSqlStatement(addressFilter);
-		assert ("select * from addresses where isMain = true"
-				.equals(addressStmt));
+		assertEquals(
+				"select * from validated_addresses as mount0 where ismain = true",
+				(addressStmt));
 	}
 
 	/* testing connected criterion statements */
@@ -124,17 +135,19 @@ public abstract class AbstractFilterToSqlBuilderTest {
 
 		String stmt = builder.createSqlStatement(personFilter);
 
-		assert ("select * from persons where (company LIKE '%testcompany%' AND LIKE '%testcompany%')"
-				.equals(stmt));
+		assertEquals(
+				"select * from validated_persons as mount0 where "
+						+ "(company LIKE '%testcompany%' AND company LIKE '%testcompany%')",
+				(stmt));
 	}
 
 	@Test
 	public void connectConnectedCritWithOr_ReturnsStatement() {
 		ConnectedCriterion con1 = new ConnectedCriterion();
-		con1.connect(personCompProp, LogicalOperator.AND, personCompProp);
+		con1.connect(personCompProp, LogicalOperator.AND, personNameProp);
 
 		ConnectedCriterion con2 = new ConnectedCriterion();
-		con2.connect(personCompProp, LogicalOperator.AND, personCompProp);
+		con2.connect(personCompProp, LogicalOperator.AND, personNameProp);
 
 		ConnectedCriterion con = new ConnectedCriterion();
 		con.connect(con1, LogicalOperator.OR, con2);
@@ -142,19 +155,11 @@ public abstract class AbstractFilterToSqlBuilderTest {
 
 		String stmt = builder.createSqlStatement(personFilter);
 
-		assert ("select * from persons where (company LIKE '%testcompany%' AND name = 'testname') OR (company LIKE '%testcompany%' AND name = 'testname')"
-				.equals(stmt));
+		assertEquals(
+				"select * from validated_persons as mount0 where ((company LIKE '%testcompany%' AND givenname = 'testname') OR (company LIKE '%testcompany%' AND givenname = 'testname'))",
+				(stmt));
 	}
 
-	@Test
-	// TODO
-	public void connectMountedCritWithXor_ReturnsStatement() {
-
-	}
-
-	/* TODO testing mounted criterion statements */
-
-	/* TODO testing complex statements */
 	@Test
 	public void complex() {
 		// person has donated 100euro for each donation or lives in 1070
@@ -192,15 +197,15 @@ public abstract class AbstractFilterToSqlBuilderTest {
 		orNotCrit.connect(andCrit, LogicalOperator.OR, addressMount);
 
 		Filter mainFilter = new Filter(FilterType.PERSON, orNotCrit);
-		
-		String result = "select * from persons as mount0 where " +
-				"(((select count(*) from donations as mount1 where" +
-				" mount0.id=mount1.personid and amount <> 100.0) = 0 AND" +
-				" (select count(*) from donations as mount1 where " +
-				"mount0.id=mount1.personid) >= 1) OR (select count(*) from" +
-				" addresses join livesat on id=aid where" +
-				" pid=mount0.id and postcode = '1070') >= 1)";
-		assert (result.equals(builder.createSqlStatement(mainFilter)));
+		String stmt = builder.createSqlStatement(mainFilter);
+		String result = "select * from validated_persons as mount0 where "
+				+ "(((select count(*) from validated_donations as mount1 where"
+				+ " mount0.id=mount1.personid and amount <> 100.0) = 0 AND"
+				+ " (select count(*) from validated_donations as mount1 where "
+				+ "mount0.id=mount1.personid) >= 1) OR (select count(*) from"
+				+ " validated_addresses as mount1 join livesat on mount1.id=aid " +
+				"where pid=mount0.id and postcode = '1070') >= 1)";
+		assertEquals(result, stmt);
 
 	}
 
@@ -214,6 +219,10 @@ public abstract class AbstractFilterToSqlBuilderTest {
 		personCompProp = new PropertyCriterion();
 		personCompProp.compare(FilterProperty.PERSON_COMPANY,
 				RelationalOperator.LIKE, "testcompany");
+
+		personNameProp = new PropertyCriterion();
+		personNameProp.compare(FilterProperty.PERSON_GIVENNAME,
+				RelationalOperator.EQUALS, "testname");
 
 		donationAmountProp = new PropertyCriterion();
 		donationAmountProp.compare(FilterProperty.DONATION_AMOUNT,

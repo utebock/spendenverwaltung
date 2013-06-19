@@ -1,12 +1,9 @@
 package at.fraubock.spendenverwaltung.util;
 
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -29,7 +26,6 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 @ContextConfiguration("/testspring.xml")
 @TransactionConfiguration(defaultRollback = true)
 public abstract class AbstractStatsTest {
-	private static final Logger log = Logger.getLogger(AbstractStatsTest.class);
 
 	protected static IPersonDAO personDAO;
 	protected static IDonationDAO donationDAO;
@@ -54,7 +50,8 @@ public abstract class AbstractStatsTest {
 
 	@Test
 	@Transactional
-	public void getCountOfFilterListShoutGetCorrectCount() {
+	public void getCountOfFilterListShoutGetCorrectCount()
+			throws PersistenceException {
 		Person person = new Person();
 		Donation donation = new Donation();
 		Donation donation2 = new Donation();
@@ -79,20 +76,13 @@ public abstract class AbstractStatsTest {
 		person.setTelephone("01234567889");
 		person.setNote("Test Note");
 
-		try {
-			addressDAO.insertOrUpdate(address);
-			List<Address> addresses = new ArrayList<Address>();
-			addresses.add(address);
+		addressDAO.insertOrUpdate(address);
+		List<Address> addresses = new ArrayList<Address>();
+		addresses.add(address);
 
-			person.setAddresses(addresses);
-			person.setMainAddress(address);
-			personDAO.insertOrUpdate(person);
-		} catch (PersistenceException e) {
-			fail();
-		}
-
-		log.info("Created person: " + person.getGivenName() + " "
-				+ person.getSurname());
+		person.setAddresses(addresses);
+		person.setMainAddress(address);
+		personDAO.insertOrUpdate(person);
 
 		donation.setDonator(person);
 		donation.setAmount(100L);
@@ -101,12 +91,7 @@ public abstract class AbstractStatsTest {
 		donation.setNote("Test note");
 		donation.setType(Donation.DonationType.SMS);
 
-		try {
-			donationDAO.insertOrUpdate(donation);
-
-		} catch (PersistenceException e) {
-			fail();
-		}
+		donationDAO.insertOrUpdate(donation);
 
 		donation2.setDonator(person);
 		donation2.setAmount(200L);
@@ -115,12 +100,7 @@ public abstract class AbstractStatsTest {
 		donation2.setNote("Test note");
 		donation2.setType(Donation.DonationType.SMS);
 
-		try {
-			donationDAO.insertOrUpdate(donation2);
-
-		} catch (PersistenceException e) {
-			fail();
-		}
+		donationDAO.insertOrUpdate(donation2);
 
 		crit.setType(FilterType.DONATION);
 		crit.setProperty(FilterProperty.DONATION_AMOUNT);
@@ -131,11 +111,7 @@ public abstract class AbstractStatsTest {
 		filter.setName("Test");
 		filter.setType(FilterType.DONATION);
 
-		try {
-			filterDAO.insert(filter);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		filterDAO.insert(filter);
 
 		crit2.setType(FilterType.DONATION);
 		crit2.setProperty(FilterProperty.DONATION_AMOUNT);
@@ -146,19 +122,9 @@ public abstract class AbstractStatsTest {
 		filter2.setName("Test2");
 		filter2.setType(FilterType.DONATION);
 
-		try {
-			filterDAO.insert(filter2);
-		} catch (PersistenceException e) {
-			fail();
-		}
+		filterDAO.insert(filter2);
 
-		try {
-			donationDAO.getByFilter(filter2);
-
-		} catch (PersistenceException e) {
-			fail();
-			log.error("GetByFilter in AbsractStatsTest does not work");
-		}
+		donationDAO.getByFilter(filter2);
 
 	}
 
