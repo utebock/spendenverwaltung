@@ -174,10 +174,8 @@ public class LoginView extends InitializableView {
 		urlLabel = componentFactory.createLabel("Datenbank-URL:");
 		userField = componentFactory.createTextField(defaultUser);
 		userField.addKeyListener(new EnterKeyListener());
-		userField.setText("ubadministrative");
 		pwdField = new JPasswordField(defaultPassword);
 		pwdField.addKeyListener(new EnterKeyListener());
-		pwdField.setText("ubadmin");
 		urlField = componentFactory.createTextField(defaultUrl);
 		loginBtn = new JButton("Login");
 		cancelBtn = new JButton("Abbrechen");

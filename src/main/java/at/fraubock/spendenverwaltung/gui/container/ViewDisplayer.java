@@ -20,7 +20,6 @@ public class ViewDisplayer {
 
 	private JFrame frame;
 	private JScrollPane scrollPane;
-	private InitializableView currentView;
 	
 	public ViewDisplayer() {
 		
@@ -45,11 +44,6 @@ public class ViewDisplayer {
 		scrollPane.getViewport().removeAll();
 		scrollPane.repaint();
 		scrollPane.getViewport().add(newView);
-		currentView = newView;
-	}
-	
-	public InitializableView getCurrentView() {
-		return currentView;
 	}
 	
 	public JLayeredPane getLayeredPane() {
