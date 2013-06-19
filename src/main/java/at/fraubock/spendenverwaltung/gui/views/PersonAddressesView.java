@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -19,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 
@@ -162,7 +164,7 @@ public class PersonAddressesView extends InitializableView {
 			super("Neue Adresse");
 		}
 
-		private JDialog addAddressFrame;
+		private JDialog addAddressDialog;
 		private JPanel addAddressPanel;
 		private JLabel addressStreetLabel;
 		private StringTextField streetField;
@@ -185,8 +187,8 @@ public class PersonAddressesView extends InitializableView {
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			addAddressFrame = new JDialog();
-			addAddressFrame.setLocation(300, 300);
+			addAddressDialog = new JDialog(SwingUtilities.getWindowAncestor(contentPanel), Dialog.ModalityType.APPLICATION_MODAL);
+			addAddressDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			addAddressPanel = componentFactory.createPanel(300, 250);
 			
 			addressStreetLabel = componentFactory.createLabel("Stra\u00DFe: ");
@@ -229,10 +231,10 @@ public class PersonAddressesView extends InitializableView {
 			validationFeedbackLabel = componentFactory.createLabel("");
 			addAddressPanel.add(validationFeedbackLabel);
 			
-			addAddressFrame.add(addAddressPanel);
-			addAddressFrame.pack();
-			addAddressFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			addAddressFrame.setVisible(true);
+			addAddressDialog.add(addAddressPanel);
+			addAddressDialog.pack();
+			addAddressDialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(contentPanel));
+			addAddressDialog.setVisible(true);
 			
 			}
 		
@@ -295,7 +297,7 @@ public class PersonAddressesView extends InitializableView {
 									selectedPerson.getMainAddress().getPostalCode() + " " +
 									selectedPerson.getMainAddress().getCity() + " " +
 									selectedPerson.getMainAddress().getCountry());
-							addAddressFrame.dispose();
+							addAddressDialog.dispose();
 						}
 						catch(ServiceException ex){
 							log.warn(ex.getLocalizedMessage()); 
@@ -315,7 +317,7 @@ public class PersonAddressesView extends InitializableView {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					addAddressFrame.dispose();
+					addAddressDialog.dispose();
 				}	
 			}
 	}
@@ -361,7 +363,7 @@ public class PersonAddressesView extends InitializableView {
 		private static final long serialVersionUID = 1L;
 		
 		
-		private JDialog editAddressFrame;
+		private JDialog editAddressDialog;
 		private JPanel editAddressPanel;
 		private JLabel addressStreetLabel;
 		private StringTextField streetField;
@@ -400,8 +402,8 @@ public class PersonAddressesView extends InitializableView {
 			
 			address = addressTableModel.getAddressRow(row);
 			
-			editAddressFrame = new JDialog();
-			editAddressFrame.setLocation(300, 300);
+			editAddressDialog = new JDialog(SwingUtilities.getWindowAncestor(contentPanel), Dialog.ModalityType.APPLICATION_MODAL);
+			editAddressDialog.setLocation(300, 300);
 			editAddressPanel = componentFactory.createPanel(500, 200);
 			
 			addressStreetLabel = componentFactory.createLabel("Stra\u00DFe: ");
@@ -452,10 +454,10 @@ public class PersonAddressesView extends InitializableView {
 			validationFeedbackLabel = componentFactory.createLabel("");
 			editAddressPanel.add(validationFeedbackLabel, "wrap");
 			
-			editAddressFrame.add(editAddressPanel);
-			editAddressFrame.pack();
-			editAddressFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			editAddressFrame.setVisible(true);
+			editAddressDialog.add(editAddressPanel);
+			editAddressDialog.pack();
+			editAddressDialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(contentPanel));
+			editAddressDialog.setVisible(true);
 		}
 		
 		private final class CancelEditAction extends AbstractAction {
@@ -468,7 +470,7 @@ public class PersonAddressesView extends InitializableView {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				editAddressFrame.dispose();
+				editAddressDialog.dispose();
 			}	
 		}
 		
@@ -486,7 +488,7 @@ public class PersonAddressesView extends InitializableView {
 				
 				if(address == null) {
 					feedbackLabel.setText("Addresse war nicht gesetzt beim bearbeiten");
-					editAddressFrame.dispose();
+					editAddressDialog.dispose();
 				}
 		
 				if(streetField.validateContents()){
@@ -532,7 +534,7 @@ public class PersonAddressesView extends InitializableView {
 					addressTableModel.fireTableDataChanged();
 					
 					feedbackLabel.setText("Adresse erfolgreich geändert.");
-					editAddressFrame.dispose();
+					editAddressDialog.dispose();
 					
 					mainAddressLabel.setText("Hauptadresse: "+selectedPerson.getMainAddress().getStreet() + " " +
 							selectedPerson.getMainAddress().getPostalCode() + " " +

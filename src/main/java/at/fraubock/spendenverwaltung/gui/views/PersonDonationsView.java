@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -21,6 +22,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXDatePicker;
@@ -281,7 +283,7 @@ public class PersonDonationsView extends InitializableView {
 	
 	private final class AddAction extends AbstractAction {
 		
-		private JDialog addDonationFrame;
+		private JDialog addDonationDialog;
 		private JPanel addDonationPanel;
 		
 		private JLabel donationTypeLabel;
@@ -314,10 +316,11 @@ public class PersonDonationsView extends InitializableView {
 		public void actionPerformed(ActionEvent e) {
 			feedbackLabel.setText("");
 
-			addDonationFrame = new JDialog();
-			addDonationFrame.setLocation(300, 300);
+			addDonationDialog = new JDialog(SwingUtilities.getWindowAncestor(contentPanel), Dialog.ModalityType.APPLICATION_MODAL);
+			addDonationDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
 			addDonationPanel = componentFactory.createPanel(300, 250);
-			
+
 			//add combobox + label
 			donationTypeLabel = componentFactory.createLabel("Spendenart");
 			donationTypeCombo = new JComboBox<Donation.DonationType>(new SimpleComboBoxModel<>(Donation.DonationType.values()));
@@ -353,10 +356,10 @@ public class PersonDonationsView extends InitializableView {
 			
 			validationFeedbackLabel = componentFactory.createLabel("");
 			addDonationPanel.add(validationFeedbackLabel, "wrap");
-			addDonationFrame.add(addDonationPanel);
-			addDonationFrame.pack();
-			addDonationFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			addDonationFrame.setVisible(true);
+			addDonationDialog.add(addDonationPanel);
+			addDonationDialog.pack();
+			addDonationDialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(contentPanel));
+			addDonationDialog.setVisible(true);
 		}	
 		
 		private final class SubmitAddAction extends AbstractAction {
@@ -415,7 +418,7 @@ public class PersonDonationsView extends InitializableView {
 						//update total label
 						currentTotal += donation.getAmount();
 						setTotalLabel();
-						addDonationFrame.dispose();						
+						addDonationDialog.dispose();						
 					} catch (ServiceException e1) {
 						log.warn(e1.getLocalizedMessage());
 						feedbackLabel.setText("Es passierte ein Fehler beim erstellen der Spende.");
@@ -434,7 +437,7 @@ public class PersonDonationsView extends InitializableView {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				addDonationFrame.dispose();
+				addDonationDialog.dispose();
 			}
 			
 		}
@@ -442,7 +445,7 @@ public class PersonDonationsView extends InitializableView {
 	
 	private final class EditAction extends AbstractAction {
 		
-		private JDialog editDonationFrame;
+		private JDialog editDonationDialog;
 		private JPanel editDonationPanel;
 		
 		private JLabel donationTypeLabel;
@@ -487,8 +490,9 @@ public class PersonDonationsView extends InitializableView {
 			
 			selectedDonation = donationTableModel.getDonationRow(selectedRow);
 					
-			editDonationFrame = new JDialog();
-			editDonationFrame.setLocation(300,300);
+			editDonationDialog = new JDialog(SwingUtilities.getWindowAncestor(contentPanel), Dialog.ModalityType.APPLICATION_MODAL);
+			editDonationDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
 			editDonationPanel = componentFactory.createPanel(300, 250);
 			
 			//add combobox + label
@@ -537,10 +541,10 @@ public class PersonDonationsView extends InitializableView {
 			validationFeedbackLabel = componentFactory.createLabel("");
 
 			editDonationPanel.add(validationFeedbackLabel, "wrap");
-			editDonationFrame.add(editDonationPanel);
-			editDonationFrame.pack();
-			editDonationFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			editDonationFrame.setVisible(true);
+			editDonationDialog.add(editDonationPanel);
+			editDonationDialog.pack();
+			editDonationDialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(contentPanel));
+			editDonationDialog.setVisible(true);
 		}	
 		
 		private final class SubmitEditAction extends AbstractAction {
@@ -599,7 +603,7 @@ public class PersonDonationsView extends InitializableView {
 						//update total label
 						currentTotal += donation.getAmount();
 						setTotalLabel();
-						editDonationFrame.dispose();						
+						editDonationDialog.dispose();						
 					} catch (ServiceException e1) {
 						log.warn(e1.getLocalizedMessage());
 						feedbackLabel.setText("Es passierte ein Fehler beim bearbeiten der Spende.");
@@ -620,7 +624,7 @@ public class PersonDonationsView extends InitializableView {
 			public void actionPerformed(ActionEvent e) {
 				//was subtracted earlier
 				currentTotal += selectedDonation.getAmount();
-				editDonationFrame.dispose();
+				editDonationDialog.dispose();
 			}
 			
 		}
