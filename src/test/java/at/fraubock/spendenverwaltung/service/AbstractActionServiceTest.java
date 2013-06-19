@@ -74,7 +74,9 @@ public abstract class AbstractActionServiceTest {
 		when(actionDAO.getLimitedResultByAttributes(searchVO, 0, 2))
 				.thenReturn(list1);
 		when(actionDAO.getLimitedResultByAttributes(searchVO, 2, 2))
-				.thenReturn(list2);
+				.thenReturn(list2);		
+		when(actionDAO.getNumberOfResultsByAttributes(searchVO))
+				.thenReturn(3L);
 
 		Pager<Action> pager = actionService.searchActions(searchVO, 2);
 

@@ -119,6 +119,7 @@ public abstract class AbstractPersonDAOTest {
 		person.setSurname("New Surname");
 
 		personDAO.insertOrUpdate(person);
+		person.setSurname("Test");
 		Person updated = personDAO.getById(person.getId());
 
 		assertTrue(!updated.getSurname().equals(person.getSurname()));
