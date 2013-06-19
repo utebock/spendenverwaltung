@@ -59,8 +59,6 @@ public class DonationDAOImplemented implements IDonationDAO {
 	private static void validate(Donation d) throws ValidationException {
 		if (d == null)
 			throw new ValidationException("Donation must not be null");
-		if (d.getDonator() == null)
-			throw new ValidationException("Person must not be null");
 		if (d.getAmount() == null) {
 			throw new ValidationException("Amount must not be null");
 		} else if (d.getAmount() < 0) {
