@@ -46,22 +46,25 @@ public abstract class AbstractActionDAOTest {
 	public void setUp() throws PersistenceException {
 		person = new Person();
 		person.setSex(Person.Sex.MALE);
-		person.setCompany("TestCompany");
+		person.setCompany("TestCompany - QWERTZ1234 - TestCompany");
 		person.setTitle("TestTitle");
 		person.setGivenName("GNTest");
+		person.setEmailNotification(false);
+		person.setPostalNotification(false);
 		person.setSurname("SNTest");
 		person.setEmail("test@test.at");
 		person.setTelephone("01234567889");
 		person.setNote("testnote");
 
 		personDAO.insertOrUpdate(person);
+		person.setNote("testnote2");
 		personDAO.insertOrUpdate(person);
 		personDAO.delete(person);
 
 		searchVO = new ActionSearchVO();
 		searchVO.setActor("ubadministrative");
 		searchVO.setEntity(Action.Entity.PERSON);
-		searchVO.setPayload("TestCompany");
+		searchVO.setPayload("TestCompany - QWERTZ1234 - TestCompany");
 		searchVO.setFrom(new Date());
 		searchVO.setTo(new Date());
 	}
@@ -86,14 +89,15 @@ public abstract class AbstractActionDAOTest {
 				searchVO, 2, 3);
 
 		assertEquals(2, allActions.size());
-		assertEquals(2, allActions2.size());
+		assertEquals(1, allActions2.size());
 		allActions.addAll(allActions2);
 
 		for (Action a : allActions) {
 			assertTrue(a.getActor().contains("ubadministrative"));
 			assertSame(Action.Entity.PERSON, a.getEntity());
 			assertEquals(person.getId(), a.getEntityId());
-			assertTrue(a.getPayload().contains("TestCompany"));
+			assertTrue(a.getPayload().contains(
+					"TestCompany - QWERTZ1234 - TestCompany"));
 
 			Calendar actDate = new GregorianCalendar();
 			actDate.setTime(a.getTime());
@@ -111,8 +115,9 @@ public abstract class AbstractActionDAOTest {
 
 			assertEquals(nowDate, actDate);
 			assertEquals(
-					"TestTitle, GNTest, SNTest, TestCompany, "
-							+ "test@test.at, male, 01234567889, email: 1, postal: 0, note: testnote",
+					"TestTitle, GNTest, SNTest, TestCompany - QWERTZ1234 - TestCompany, "
+							+ "test@test.at, male, 01234567889, email: 0, postal: 0, note: testnote"
+							+ (a.getType() == Action.Type.INSERT ? "" : "2"),
 					a.getPayload());
 		}
 
@@ -122,18 +127,17 @@ public abstract class AbstractActionDAOTest {
 	@Transactional(readOnly = true)
 	public void getNumberOfWithNullValue_ThrowsException()
 			throws PersistenceException {
-
+		assert(1==2);
 		actionDAO.getNumberOfResultsByAttributes(null);
 
 	}
 
 	@Test
 	@Transactional(readOnly = true)
-	public void getNumberOfByResultyByAttributes_ReturnsAmount()
+	public void getNumberOfResultsByAttributes_ReturnsAmount()
 			throws PersistenceException {
 
-		long amount = actionDAO
-				.getNumberOfResultsByAttributes(new ActionSearchVO());
+		long amount = actionDAO.getNumberOfResultsByAttributes(searchVO);
 
 		assertEquals(3, amount);
 

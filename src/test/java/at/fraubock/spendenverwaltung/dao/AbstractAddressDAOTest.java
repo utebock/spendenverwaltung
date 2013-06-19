@@ -110,14 +110,14 @@ public abstract class AbstractAddressDAOTest {
 		Address updatedAddress = addressDAO.getByID(address.getId());
 
 		// check if address was updated correctly
-		assertTrue(updatedAddress.getId() == address.getId());
+		assertTrue(updatedAddress.getId().equals(address.getId()));
 		assertTrue(updatedAddress.getStreet().equals(address.getStreet()));
-		assertTrue(updatedAddress.getPostalCode() == address.getPostalCode());
+		assertTrue(updatedAddress.getPostalCode().equals(
+				address.getPostalCode()));
 		assertTrue(updatedAddress.getCountry().equals(address.getCountry()));
-		assertTrue(!updatedAddress.getCity().equals(address.getCity())); // different
-																			// city
+		assertTrue(updatedAddress.getCity().equals(address.getCity()));
 
-		assertTrue(address.getCity() == updatedAddress.getCity());
+		assertTrue(address.getCity().equals(updatedAddress.getCity()));
 
 	}
 
@@ -171,7 +171,7 @@ public abstract class AbstractAddressDAOTest {
 		addressDAO.insertOrUpdate(address2);
 
 		List<Address> addressList = addressDAO.getAll();
-		assertTrue(addressList != null && addressList.size() == 2);
+		assertTrue(addressList.size() == 2);
 
 	}
 
@@ -202,7 +202,7 @@ public abstract class AbstractAddressDAOTest {
 		Address foundAddress = addressDAO.getByID(address.getId());
 
 		assertTrue(foundAddress != null
-				&& foundAddress.getId() == address.getId());
+				&& foundAddress.getId().equals(address.getId()));
 
 	}
 
