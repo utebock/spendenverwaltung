@@ -18,8 +18,6 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import at.fraubock.spendenverwaltung.dao.criterion.AbstractCriterionDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IFilterDAO;
@@ -61,7 +59,6 @@ public class FilterDAOImplemented implements IFilterDAO {
 	}
 
 	@Override
-	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void delete(Filter f) throws PersistenceException {
 		try {
 			validator.validate(f);
@@ -105,7 +102,7 @@ public class FilterDAOImplemented implements IFilterDAO {
 		try {
 			// FIXME order alphabetically by name?
 			FilterMapper mapper = new FilterMapper();
-			String select = "SELECT * FROM filter WHERE owner = SUBSTRING_INDEX(USER(),'@',1) OR privacy_status IS NOT ? ORDER BY id DESC";
+			String select = "SELECT * FROM filter WHERE owner = SUBSTRING_INDEX(USER(),'@',1) OR privacy_status != ? ORDER BY id DESC";
 			List<Filter> filterList = jdbcTemplate.query(select,
 					new Object[] { FilterPrivacyStatus.PRIVATE.toString() },
 					new int[] { Types.VARCHAR }, mapper);
@@ -130,7 +127,7 @@ public class FilterDAOImplemented implements IFilterDAO {
 				throw new IllegalArgumentException("Id must not be less than 0");
 			}
 
-			String select = "select * from filter where id = ? AND (owner = SUBSTRING_INDEX(USER(),'@',1) OR privacy_status IS NOT ? )";
+			String select = "select * from filter where id = ? AND (owner = SUBSTRING_INDEX(USER(),'@',1) OR privacy_status != ? )";
 			Filter result = null;
 			try {
 				FilterMapper mapper = new FilterMapper();
