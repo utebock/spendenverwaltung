@@ -13,8 +13,8 @@ public class Action {
 	private String payload;
 
 	public enum Type {
-		INSERT("insert", "Erstellt"), UPDATE("update", "Bearbeitet"), DELETE(
-				"delete", "Gel\u00F6scht");
+		INSERT("insert", "erstellt"), UPDATE("update", "bearbeitet"), DELETE(
+				"delete", "gel\u00F6scht");
 
 		private String name;
 		private String displayableName;

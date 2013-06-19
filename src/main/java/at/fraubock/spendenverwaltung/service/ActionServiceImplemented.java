@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.service;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Isolation;
@@ -83,5 +84,16 @@ public class ActionServiceImplemented implements IActionService {
 		};
 
 		return pager;
+	}
+	
+	@Override
+	public List<Action> pollForActionSince(Date date, int amount) throws ServiceException {
+		ActionSearchVO searchVO = new ActionSearchVO();
+		searchVO.setFrom(date);
+		try {
+			return actionDAO.getLimitedResultByAttributes(searchVO, 0, amount);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
 	}
 }

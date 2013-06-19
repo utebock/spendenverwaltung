@@ -31,7 +31,6 @@ public class FilterToSqlBuilder {
 		validator.validate(filter);
 
 		String stmt = "select * from " + filter.getType() + " as mount0";
-		// TODO use only confirmed persons/addresses/donations
 
 		if (filter.getCriterion() != null) {
 			stmt += " where "
@@ -74,8 +73,10 @@ public class FilterToSqlBuilder {
 		if (prop.getNumValue() != null) {
 			stmt += escapeSQL(""+prop.getNumValue());
 		} else if (prop.getStrValue() != null) {
-			String percent = prop.getRelationalOperator() == RelationalOperator.LIKE ? "%"
-					: "";
+			String percent = "";
+			if(!prop.getStrValue().contains("%") && prop.getRelationalOperator() == RelationalOperator.LIKE) {
+				percent="%";
+			}
 			stmt += "'" + percent + escapeSQL(prop.getStrValue()) + percent + "'";
 		} else if (prop.getDateValue() != null) {
 			stmt += "DATE('"

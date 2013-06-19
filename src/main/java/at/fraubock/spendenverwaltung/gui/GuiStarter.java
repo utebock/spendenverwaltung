@@ -29,6 +29,7 @@ public class GuiStarter {
 		@SuppressWarnings("resource")
 		ApplicationContext context = new ClassPathXmlApplicationContext(
 				"/spring.xml");
+		
 		/**
 		 * when the GUI is closed, SYSTEM_EXIT is called. this shutdown hook
 		 * ensures the graceful shutdown of the context.
@@ -56,12 +57,17 @@ public class GuiStarter {
 				BasicDataSource.class);
 
 		ViewDisplayer viewDisplayer = new ViewDisplayer();
+
 		ComponentFactory componentFactory = new ComponentFactory();
 
 		ViewActionFactory viewActionFactory = new ViewActionFactory(
 				viewDisplayer, personService, donationService, filterService,
 				addressService, mailingService, importService, actionService,
 				mailChimpService);
+
+		ActionPolling polling = new ActionPolling(viewDisplayer, actionService,
+				viewActionFactory);
+		polling.start();
 
 		// need to call mainMenu.init() after all views are set in the
 		// viewActionFactory

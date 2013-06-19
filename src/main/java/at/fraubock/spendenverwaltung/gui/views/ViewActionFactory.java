@@ -213,6 +213,14 @@ public class ViewActionFactory {
 				donationService, new PersonTableModel()),
 				"/images/statisticsPerson.jpg");
 	}
+	
+	
+	public InitializableView getViewForAction(Action a) {
+		if(a instanceof DisplayViewAction) {
+			return ((DisplayViewAction)a).getView();
+		}
+		return null;
+	}
 
 	private final class DisplayViewAction extends AbstractAction {
 
@@ -237,6 +245,10 @@ public class ViewActionFactory {
 		public void actionPerformed(ActionEvent e) {
 			view.init();
 			viewDisplayer.changeView(view);
+		}
+
+		public InitializableView getView() {
+			return view;
 		}
 	}
 

@@ -9,6 +9,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -151,7 +153,16 @@ public class HistorySearchPanel extends JPanel {
 
 		searchVO.setFrom(dateFrom.getDate());
 
-		searchVO.setTo(dateTo.getDate());
+		if(dateTo.getDate()!=null) {
+			Calendar cal = new GregorianCalendar();
+			cal.setTime(dateTo.getDate());
+			cal.set(Calendar.HOUR_OF_DAY, 23);
+			cal.set(Calendar.MINUTE, 59);
+			cal.set(Calendar.SECOND, 59);
+			cal.set(Calendar.MILLISECOND, 999);
+			searchVO.setTo(cal.getTime());
+		}
+		
 
 		searchVO.setPayload(StringUtils.isEmpty(dataSearch.getText()) ? null
 				: dataSearch.getText());

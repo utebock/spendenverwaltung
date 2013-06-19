@@ -28,7 +28,8 @@ public interface IFilterService {
 	public Filter create(FilterTO f) throws ServiceException;
 
 	/**
-	 * Updates an existing filter
+	 * Updates an existing filter by deleting the given filter and creating a
+	 * new one from the given FilterTO.
 	 * 
 	 * @param d
 	 *            Filter to be updated

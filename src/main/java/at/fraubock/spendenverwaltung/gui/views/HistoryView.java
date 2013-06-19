@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -76,50 +78,50 @@ public class HistoryView extends InitializableView {
 		JLabel headline = builder.createLabel("Historie aller Aktionen");
 		headline.setFont(new Font("Headline", Font.PLAIN, 14));
 		panel.add(headline, "wrap, gapbottom 20");
-		
+
 		panel.add(new HistorySearchPanel(this), "wrap");
 
 		historyTable = new JTable(historyModel = new HistoryTableModel());
 		historyTable.setFillsViewportHeight(true);
 		historyTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		historyTable.addMouseListener(new MouseListener() {
-			
+
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void mousePressed(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void mouseExited(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				if(arg0.getClickCount()==2) {
+				if (arg0.getClickCount() == 2) {
 					Action a = historyModel.getActionRow(historyTable
 							.getSelectedRow());
-					
+
 					JOptionPane.showMessageDialog(HistoryView.this,
 							a.getPayload(), "Details",
 							JOptionPane.INFORMATION_MESSAGE);
-					
+
 				}
-				
+
 			}
 		});
 
@@ -139,17 +141,16 @@ public class HistoryView extends InitializableView {
 		scrollPane.setPreferredSize(new Dimension(1200,
 				MAX_TABLE_SIZE * 18 - 17));
 		panel.add(scrollPane, "wrap");
-		
+
 		panel.add(navigator = new PageNavigator(historyModel), "growx");
-		
+
 		applyExtendedSearch(new ActionSearchVO());
 	}
 
 	public void applyExtendedSearch(ActionSearchVO searchVO) {
 		Pager<Action> pager;
 		try {
-			pager = actionService.searchActions(searchVO,
-					MAX_TABLE_SIZE);
+			pager = actionService.searchActions(searchVO, MAX_TABLE_SIZE);
 			historyModel.setPager(pager);
 			historyModel.refreshPage();
 			navigator.modelRefreshed();
@@ -160,5 +161,51 @@ public class HistoryView extends InitializableView {
 			log.error("Error when loading all actions as pager or refreshing page model: "
 					+ e.getMessage());
 		}
+	}
+
+	public void showActions(final List<Action> list) {
+
+		Pager<Action> pager = new Pager<Action>() {
+
+			private int currentPos = 0;
+
+			@Override
+			public List<Action> getPage(int index) throws ServiceException {
+				currentPos = index;
+				List<Action> result = new ArrayList<Action>();
+
+				for (int i = index * MAX_TABLE_SIZE; i < index * MAX_TABLE_SIZE
+						+ MAX_TABLE_SIZE
+						&& i < list.size(); i++) {
+					result.add(list.get(i));
+				}
+
+				return result;
+			}
+
+			@Override
+			public int getCurrentPosition() {
+				return currentPos;
+			}
+
+			@Override
+			public long getNumberOfPages() throws ServiceException {
+				long count = list.size();
+
+				long mod = count % MAX_TABLE_SIZE;
+
+				return mod == 0 ? (long) count / MAX_TABLE_SIZE
+						: (((long) count / MAX_TABLE_SIZE) + 1);
+			}
+
+		};
+		historyModel.setPager(pager);
+		try {
+			historyModel.refreshPage();
+		} catch (ServiceException e) {
+			// should never happen since this pager can't throw a service
+			// exception
+		}
+		navigator.modelRefreshed();
 	}
 }
