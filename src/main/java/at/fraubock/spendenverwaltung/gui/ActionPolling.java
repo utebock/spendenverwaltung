@@ -1,11 +1,10 @@
 package at.fraubock.spendenverwaltung.gui;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -28,8 +27,9 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IActionService;
 
 /**
- * class for polling actions. polls for new actions and presents them to the
- * user via a notification panel (disregarding the current view)
+ * class for polling actions. polls for new actions every few seconds and
+ * presents them to the user via a notification panel (disregarding the current
+ * view)
  * 
  * @NOTE after a specified amount of errors, the polling will shut down itself.
  * 
@@ -50,6 +50,7 @@ public class ActionPolling extends Thread {
 	private Date lastPolling;
 	private int consecutivePollingErrors;
 	private NotificationPanel notificationPanel;
+	private List<Action> lastActions = new ArrayList<Action>();
 
 	public ActionPolling(ViewDisplayer viewDisplayer,
 			IActionService actionService, ViewActionFactory viewFactory) {
@@ -72,8 +73,24 @@ public class ActionPolling extends Thread {
 				serviceError = false;
 				lastPolling = new Date();
 
+				/*
+				 * note that there can be a time glitch when actions are
+				 * inserted while making a polling request. they might be
+				 * inserted in the same second as 'lastPolling' will be set,
+				 * therefore they might appear in the next polling as well. to
+				 * circumvent this, remove all actions that were present in the
+				 * last polling
+				 */
+				for (Action a : lastActions) {
+					if (actions.contains(a)) {
+						actions.remove(a);
+					}
+				}
+				lastActions = actions;
+
 				if (!actions.isEmpty()) {
 					notificationPanel.present(actions);
+					continue;
 				}
 
 			} catch (ServiceException e) {
@@ -123,13 +140,13 @@ public class ActionPolling extends Thread {
 		private ViewDisplayer viewDisplayer;
 		private ViewActionFactory viewFactory;
 		private List<Action> actions;
-		
+
 		public NotificationPanel(ViewDisplayer viewDisplayer,
 				ViewActionFactory viewFactory) {
 			this.rootLayeredPane = viewDisplayer.getLayeredPane();
 			this.viewDisplayer = viewDisplayer;
 			this.viewFactory = viewFactory;
-			
+
 			setLayout(new MigLayout());
 			rootLayeredPane.add(this, new Integer(50));
 			setBorder(BorderFactory.createTitledBorder(
@@ -142,7 +159,7 @@ public class ActionPolling extends Thread {
 			int size = actions.size();
 
 			for (Action a : actions) {
-				add(new ActionPanel(a), "wrap");
+				add(new ActionPanel(a), "wrap,growx");
 			}
 			setVisible(true);
 
@@ -212,7 +229,8 @@ public class ActionPolling extends Thread {
 
 		@Override
 		public void mouseReleased(MouseEvent arg0) {
-			HistoryView view = (HistoryView)viewFactory.getViewForAction(viewFactory.getHistoryViewAction());
+			HistoryView view = (HistoryView) viewFactory
+					.getViewForAction(viewFactory.getHistoryViewAction());
 			view.init();
 			view.showActions(actions);
 			viewDisplayer.changeView(view);
@@ -227,15 +245,16 @@ public class ActionPolling extends Thread {
 	 */
 	private class ActionPanel extends JPanel {
 		private static final long serialVersionUID = 2033492844139154802L;
-		
+
 		public ActionPanel(Action a) {
 			setLayout(new MigLayout());
-			setPreferredSize(new Dimension(280,30));
-			setBackground(new Color(245,245,245));
-			add(new JLabel(a.getActor()));
-			add(new JLabel(" hat " + a.getEntity()));
-			add(new JLabel(a.getType().toString()));
-			add(new JSeparator(), "wrap 0px, growx");
+			JPanel textPanel = new JPanel();
+			textPanel.add(new JLabel(a.getActor()));
+			textPanel.add(new JLabel(" hat " + a.getEntity()));
+			textPanel.add(new JLabel(a.getType().toString()));
+			add(textPanel, "wrap");
+			JSeparator sep = new JSeparator();
+			add(sep, "growx");
 		}
 
 	}

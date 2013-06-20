@@ -197,16 +197,10 @@ public class LoginView extends InitializableView {
 	private class EnterKeyListener implements KeyListener {
 
 		@Override
-		public void keyPressed(KeyEvent arg0) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void keyPressed(KeyEvent arg0) {}
 
 		@Override
-		public void keyReleased(KeyEvent arg0) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void keyReleased(KeyEvent arg0) {}
 
 		@Override
 		public void keyTyped(KeyEvent arg0) {
