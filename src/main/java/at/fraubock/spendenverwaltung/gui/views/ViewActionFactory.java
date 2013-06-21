@@ -77,7 +77,7 @@ public class ViewActionFactory {
 		return new DisplayViewAction(new CreatePersonView(
 				new ComponentFactory(), this, personService, addressService,
 				donationService, new PersonTableModel()),
-				"/images/createPerson.jpg");
+				"/images/createPerson.png");
 	}
 
 	public Action getMainMenuViewAction() {
@@ -89,7 +89,7 @@ public class ViewActionFactory {
 		return new DisplayViewAction(new FindPersonsView(personService,
 				addressService, donationService, filterService,
 				new ComponentFactory(), this, new PersonTableModel()),
-				"/images/getPersons.jpg");
+				"/images/showPersons.png");
 	}
 
 	public Action getFindPersonsViewAction(PersonTableModel personTableModel) {
@@ -120,7 +120,7 @@ public class ViewActionFactory {
 
 	public Action getMainFilterViewAction() {
 		return new DisplayViewAction(new MainFilterView(new ComponentFactory(),
-				this, filterService), "/images/filter.jpg");
+				this, filterService), "/images/filter.png");
 	}
 
 	public Action getRemovePersonFromMailingViewAction(Mailing mailing,
@@ -145,13 +145,13 @@ public class ViewActionFactory {
 	// TODO richtige view returnen!
 	public Action getDonationImportViewAction() {
 		return new DisplayViewAction(new ImportDataView(new ComponentFactory(),
-				this, importService), "/images/importOverview.jpg");
+				this, importService), "/images/importOverview.png");
 	}
 
 	public Action getImportValidationViewAction() {
 		return new DisplayViewAction(new ImportValidationView(personService,
 				addressService, donationService, importService,
-				new ComponentFactory(), this), "/images/importValidate.jpg");
+				new ComponentFactory(), this), "/images/importValidate.png");
 	}
 
 	// TODO richtige view returnen!
@@ -173,13 +173,13 @@ public class ViewActionFactory {
 	public Action getCreateMailingsViewAction() {
 		return new DisplayViewAction(new CreateMailingsView(this,
 				new ComponentFactory(), mailingService, filterService,
-				personService, mailChimpService), "/images/eNotification.jpg");
+				personService, mailChimpService), "/images/createNotification.png");
 	}
 
 	public Action getFindMailingsViewAction(MailingTableModel tableModel) {
 		return new DisplayViewAction(new FindMailingsView(this,
 				new ComponentFactory(), mailingService, filterService,
-				tableModel), "/images/showNotifications.jpg");
+				tableModel), "/images/showNotifications.png");
 	}
 
 	public Action getConfirmMailingsViewAction(
@@ -187,20 +187,20 @@ public class ViewActionFactory {
 		return new DisplayViewAction(
 				new ConfirmMailingsView(this, new ComponentFactory(),
 						mailingService, parentMailingTableModel),
-				"/images/confirmSendings.jpg");
+				"/images/confirmSendings.png");
 	}
 
 	public Action getDonationProgressStatsViewAction() {
 		return new DisplayViewAction(new DonationProgressStatsView(
 				new ComponentFactory(), this, donationService, filterService),
-				"/images/statisticsDonation.jpg");
+				"/images/statisticsDonation.png");
 	}
 
 	// TODO richtige view returnen!
 	public Action getShowMailingStatsViewAction() {
 		return new DisplayViewAction(new MailingStatsView(
 				new ComponentFactory(), this, mailingService, filterService),
-				"/images/statisticsNotification.jpg");
+				"/images/statisticsNotification.png");
 	}
 
 	// TODO richtige view returnen!

@@ -113,8 +113,8 @@ public class LoginView extends InitializableView {
 		String url = urlField.getText();
 
 		databaseDataSource.setUrl("jdbc:mysql://" + url);
-		databaseDataSource.setUsername("ubadministrative");
-		databaseDataSource.setPassword("ubadmin");
+		databaseDataSource.setUsername(userName);
+		databaseDataSource.setPassword(password);
 
 		try {
 			// throw away former connections in the pool that have wrong login
