@@ -139,6 +139,11 @@
 		<property name="personDAO" ref="personDao" />
 		<property name="personService" ref="personService" />
 	</bean>
+	<bean id="confirmationService"
+		class="at.fraubock.spendenverwaltung.service.ConfirmationServiceImplemented">
+		<property name="confirmationDAO" ref="confirmationDao" />
+		<property name="confirmationTemplateDAO" ref="confirmationTemplateDao" />
+	</bean>
 	<bean id="filterService"
 		class="at.fraubock.spendenverwaltung.service.FilterServiceImplemented">
 		<property name="filterDAO" ref="filterDao" />

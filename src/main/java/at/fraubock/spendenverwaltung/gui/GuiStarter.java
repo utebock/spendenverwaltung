@@ -11,6 +11,7 @@ import at.fraubock.spendenverwaltung.gui.views.LoginView;
 import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
 import at.fraubock.spendenverwaltung.interfaces.service.IActionService;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
+import at.fraubock.spendenverwaltung.interfaces.service.IConfirmationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
@@ -46,6 +47,8 @@ public class GuiStarter {
 				IAddressService.class);
 		IMailingService mailingService = context.getBean("mailingService",
 				IMailingService.class);
+		IConfirmationService confirmationService = context.getBean("confirmationService",
+				IConfirmationService.class);
 		IImportService importService = context.getBean("importService",
 				IImportService.class);
 		IActionService actionService = context.getBean("actionService",
@@ -62,7 +65,7 @@ public class GuiStarter {
 
 		ViewActionFactory viewActionFactory = new ViewActionFactory(
 				viewDisplayer, personService, donationService, filterService,
-				addressService, mailingService, importService, actionService,
+				addressService, mailingService, confirmationService, importService, actionService,
 				mailChimpService);
 
 		ActionPolling polling = new ActionPolling(viewDisplayer, actionService,
