@@ -138,11 +138,8 @@ public class ViewActionFactory {
 	}
 
 	public Action getHistoryViewAction() {
-		DisplayViewAction action = new DisplayViewAction(new HistoryView(this,
-				actionService), "");
-		action.putValue(Action.NAME, "Historie");
-		action.putValue(Action.SMALL_ICON, null);
-		return action;
+		return new DisplayViewAction(new HistoryView(this,
+				actionService), "/images/history.png");
 	}
 
 	// TODO richtige view returnen!

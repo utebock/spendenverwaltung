@@ -53,6 +53,8 @@ public class MainMenuView extends InitializableView {
 	private JButton search;
 	private JLabel searchLabel;
 	private JPanel overviewPanel;
+
+	private JLabel historyLabel;
 	
 	public MainMenuView(ViewActionFactory viewActionFactory, ComponentFactory componentFactory) {
 		/**
@@ -94,7 +96,7 @@ public class MainMenuView extends InitializableView {
 		filter = new JButton();
 		personsPanel.add(filter, "gap 35");
 		history = new JButton();
-		personsPanel.add(history, "wrap 0px, gap 38");
+		personsPanel.add(history, "wrap 0px, gap 45");
 		//button labels
 		persons = componentFactory.createLabel("Person anlegen");
 		personsPanel.add(persons);
@@ -106,6 +108,9 @@ public class MainMenuView extends InitializableView {
 		//MainFilterView
 		filterLabel = componentFactory.createLabel("Filter");
 		personsPanel.add(filterLabel, "gap 59");
+		
+		historyLabel = componentFactory.createLabel("History");
+		personsPanel.add(historyLabel, "gap 62, wrap 0px");
 		
 		//separator for next section
 		personSeparator = componentFactory.createSeparator();
