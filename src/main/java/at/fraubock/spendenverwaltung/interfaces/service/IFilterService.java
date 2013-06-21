@@ -8,8 +8,8 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.to.FilterTO;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.FilterInUseException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
-import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.Pair;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
 
 /**
  * service providing functionality for {@link Filter}

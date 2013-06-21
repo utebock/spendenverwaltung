@@ -2,6 +2,12 @@ package at.fraubock.spendenverwaltung.interfaces.domain;
 
 import java.util.Date;
 
+/**
+ * domain model representing an action performed by a user of the application
+ * 
+ * @author philipp muhoray
+ * 
+ */
 public class Action {
 
 	private Integer id;

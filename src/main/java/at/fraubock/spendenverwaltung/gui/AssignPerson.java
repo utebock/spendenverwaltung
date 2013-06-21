@@ -31,11 +31,11 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Property
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
-import at.fraubock.spendenverwaltung.util.FilterProperty;
-import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.ImportValidator.ValidationType;
-import at.fraubock.spendenverwaltung.util.LogicalOperator;
-import at.fraubock.spendenverwaltung.util.RelationalOperator;
+import at.fraubock.spendenverwaltung.util.filter.FilterProperty;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.LogicalOperator;
+import at.fraubock.spendenverwaltung.util.filter.RelationalOperator;
 
 public class AssignPerson extends JDialog {
 

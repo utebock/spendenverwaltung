@@ -22,10 +22,10 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.ConnectedCriterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
-import at.fraubock.spendenverwaltung.util.FilterProperty;
-import at.fraubock.spendenverwaltung.util.FilterType;
-import at.fraubock.spendenverwaltung.util.LogicalOperator;
-import at.fraubock.spendenverwaltung.util.RelationalOperator;
+import at.fraubock.spendenverwaltung.util.filter.FilterProperty;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.LogicalOperator;
+import at.fraubock.spendenverwaltung.util.filter.RelationalOperator;
 
 /**
  * 

@@ -18,9 +18,15 @@ import org.springframework.jdbc.support.KeyHolder;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.ConnectedCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.service.FilterValidator;
-import at.fraubock.spendenverwaltung.util.FilterType;
-import at.fraubock.spendenverwaltung.util.LogicalOperator;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.LogicalOperator;
 
+/**
+ * DAO for {@link ConnectedCriterion} entities.
+ * 
+ * @author philipp muhoray
+ * 
+ */
 public class ConnectedCriterionDAO {
 
 	private FilterValidator validator;
@@ -68,9 +74,9 @@ public class ConnectedCriterionDAO {
 					new Object[] { f.getId() }, new int[] { Types.INTEGER });
 			abstractCritDAO.delete(f.getOperand1());
 			abstractCritDAO.delete(f.getOperand2());
-	} catch (DataAccessException e) {
-		throw new PersistenceException(e);
-	}
+		} catch (DataAccessException e) {
+			throw new PersistenceException(e);
+		}
 	}
 
 	/* mappers for inserting and reading this entity */

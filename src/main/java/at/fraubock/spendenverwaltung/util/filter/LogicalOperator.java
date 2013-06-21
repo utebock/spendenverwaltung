@@ -1,4 +1,4 @@
-package at.fraubock.spendenverwaltung.util;
+package at.fraubock.spendenverwaltung.util.filter;
 
 /**
  * a logical operator used for the evaluate function in

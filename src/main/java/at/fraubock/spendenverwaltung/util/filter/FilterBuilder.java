@@ -1,4 +1,4 @@
-package at.fraubock.spendenverwaltung.util;
+package at.fraubock.spendenverwaltung.util.filter;
 
 import java.text.SimpleDateFormat;
 
@@ -10,26 +10,26 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Property
 import at.fraubock.spendenverwaltung.service.FilterValidator;
 
 /**
- * interprets a given {@link Filter} to a corresponding SQL statements.
- * executing this statement will return all entries from the filter type's table
- * matching the conditions of the filter's {@link Criterion}.
+ * interprets a given {@link Filter} to a corresponding statements. executing
+ * this statement will return all entries from the filter type's table matching
+ * the conditions of the filter's {@link Criterion}.
  * 
  * @author philipp muhoray
  * 
  */
-public class FilterToSqlBuilder {
+public class FilterBuilder {
 
 	private FilterValidator validator;
 
 	/**
-	 * creates the SQL statement for the given filter, on confirmed/validated
+	 * creates the statement for the given filter, on confirmed/validated
 	 * items only
 	 * 
 	 * @param filter
-	 *            the filter to create the SQL statement from
-	 * @return sql statement
+	 *            the filter to create the statement from
+	 * @return statement
 	 */
-	public String createSqlStatement(Filter filter) {
+	public String createStatement(Filter filter) {
 		validator.validate(filter);
 
 		String stmt = "select * from " + filter.getType() + " as mount0";

@@ -7,7 +7,7 @@ import javax.swing.JComboBox;
 
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.filter.RelationalOperatorPicker.RelationalOperatorGuiWrapper;
-import at.fraubock.spendenverwaltung.util.RelationalOperator;
+import at.fraubock.spendenverwaltung.util.filter.RelationalOperator;
 
 /**
  * GUI component for picking a {@link RelationalOperator} in the

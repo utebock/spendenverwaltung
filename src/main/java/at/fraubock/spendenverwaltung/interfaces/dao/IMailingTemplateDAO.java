@@ -5,6 +5,12 @@ import java.util.List;
 import at.fraubock.spendenverwaltung.interfaces.domain.MailingTemplate;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 
+/**
+ * interface to the data source for {@link MailingTemplate} entities.
+ * 
+ * @author philipp muhoray
+ * 
+ */
 public interface IMailingTemplateDAO {
 
 	/**

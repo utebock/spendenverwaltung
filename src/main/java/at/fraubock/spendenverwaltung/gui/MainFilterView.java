@@ -31,8 +31,8 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter.FilterPriva
 import at.fraubock.spendenverwaltung.interfaces.exceptions.FilterInUseException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
-import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.Pair;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
 
 public class MainFilterView extends InitializableView {
 

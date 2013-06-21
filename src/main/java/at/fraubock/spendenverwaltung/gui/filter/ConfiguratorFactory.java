@@ -24,8 +24,8 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
-import at.fraubock.spendenverwaltung.util.FilterProperty;
-import at.fraubock.spendenverwaltung.util.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.FilterProperty;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
 
 /**
  * creates a list of {@link ICriterionConfigurator}s for a given

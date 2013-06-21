@@ -10,8 +10,8 @@ import org.jfree.util.Log;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import at.fraubock.spendenverwaltung.dao.criterion.IMountedFilterCriterionDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IFilterDAO;
+import at.fraubock.spendenverwaltung.interfaces.dao.IMountedFilterCriterionDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.ConnectedCriterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
@@ -24,12 +24,18 @@ import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
-import at.fraubock.spendenverwaltung.util.FilterType;
-import at.fraubock.spendenverwaltung.util.LogicalOperator;
 import at.fraubock.spendenverwaltung.util.Pair;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.LogicalOperator;
 
 import com.sun.xml.internal.txw2.IllegalSignatureException;
 
+/**
+ * implementation of {@link IFilterService}
+ * 
+ * @author philipp muhoray
+ * 
+ */
 public class FilterServiceImplemented implements IFilterService {
 
 	private IFilterDAO filterDAO;

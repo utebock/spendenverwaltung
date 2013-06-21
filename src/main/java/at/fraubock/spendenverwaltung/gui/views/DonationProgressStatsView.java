@@ -41,8 +41,8 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
-import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.Pair;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
 import at.fraubock.spendenverwaltung.util.statistics.DonationTimeStatisticDatasetGenerator;
 import at.fraubock.spendenverwaltung.util.statistics.Operation;
 

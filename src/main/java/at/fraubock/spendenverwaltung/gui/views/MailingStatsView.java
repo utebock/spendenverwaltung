@@ -61,11 +61,11 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
-import at.fraubock.spendenverwaltung.util.FilterProperty;
-import at.fraubock.spendenverwaltung.util.FilterType;
-import at.fraubock.spendenverwaltung.util.LogicalOperator;
 import at.fraubock.spendenverwaltung.util.Pair;
-import at.fraubock.spendenverwaltung.util.RelationalOperator;
+import at.fraubock.spendenverwaltung.util.filter.FilterProperty;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.LogicalOperator;
+import at.fraubock.spendenverwaltung.util.filter.RelationalOperator;
 import at.fraubock.spendenverwaltung.util.statistics.DonationTimeStatisticDatasetGenerator;
 import at.fraubock.spendenverwaltung.util.statistics.Operation;
 

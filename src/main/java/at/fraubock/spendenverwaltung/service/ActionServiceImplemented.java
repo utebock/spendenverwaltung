@@ -88,6 +88,10 @@ public class ActionServiceImplemented implements IActionService {
 	
 	@Override
 	public List<Action> pollForActionSince(Date date, int amount) throws ServiceException {
+		if(date==null) {
+			throw new IllegalArgumentException("Argument must not be null.");
+		}
+		
 		ActionSearchVO searchVO = new ActionSearchVO();
 		searchVO.setFrom(date);
 		try {

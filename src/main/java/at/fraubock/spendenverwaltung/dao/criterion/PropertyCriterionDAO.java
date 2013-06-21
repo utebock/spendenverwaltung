@@ -19,10 +19,16 @@ import org.springframework.jdbc.support.KeyHolder;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.service.FilterValidator;
-import at.fraubock.spendenverwaltung.util.FilterProperty;
-import at.fraubock.spendenverwaltung.util.FilterType;
-import at.fraubock.spendenverwaltung.util.RelationalOperator;
+import at.fraubock.spendenverwaltung.util.filter.FilterProperty;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.RelationalOperator;
 
+/**
+ * DAO for {@link PropertyCriterion} entities.
+ * 
+ * @author philipp muhoray
+ * 
+ */
 public class PropertyCriterionDAO {
 
 	private FilterValidator validator;

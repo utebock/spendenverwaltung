@@ -5,8 +5,8 @@ import java.util.List;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter.FilterPrivacyStatus;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
-import at.fraubock.spendenverwaltung.util.FilterType;
-import at.fraubock.spendenverwaltung.util.LogicalOperator;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.LogicalOperator;
 
 /**
  * a transfer object for {@link Filter} entities. it takes a list of

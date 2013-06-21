@@ -38,8 +38,8 @@ import at.fraubock.spendenverwaltung.interfaces.service.IMailChimpService.MailCh
 import at.fraubock.spendenverwaltung.interfaces.service.IMailChimpService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
-import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.MailingTemplateUtil;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
 
 /**
  * 

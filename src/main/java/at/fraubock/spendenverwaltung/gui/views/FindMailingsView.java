@@ -38,7 +38,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
-import at.fraubock.spendenverwaltung.util.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
 
 public class FindMailingsView extends InitializableView {
 

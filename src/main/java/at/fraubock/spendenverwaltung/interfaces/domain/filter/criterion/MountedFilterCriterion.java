@@ -1,9 +1,9 @@
 package at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
-import at.fraubock.spendenverwaltung.util.FilterProperty;
-import at.fraubock.spendenverwaltung.util.FilterToSqlBuilder;
-import at.fraubock.spendenverwaltung.util.RelationalOperator;
+import at.fraubock.spendenverwaltung.util.filter.FilterBuilder;
+import at.fraubock.spendenverwaltung.util.filter.FilterProperty;
+import at.fraubock.spendenverwaltung.util.filter.RelationalOperator;
 
 /**
  * this class represents a {@link Criterion} that evaluates an entity based on
@@ -32,7 +32,7 @@ import at.fraubock.spendenverwaltung.util.RelationalOperator;
  * now that we can define how to evaluate the result set, we must define the
  * input set for the filter. there is no general way of doing so, each mounting
  * has to be handled separately based on the relations of the two mounted tables.
- * this is done exclusively in the {@link FilterToSqlBuilder}.
+ * this is done exclusively in the {@link FilterBuilder}.
  * 
  * for example, if a donation filter is mounted to a person filter, the SQL
  * builder decides which donations the donation filter gets as input (which will

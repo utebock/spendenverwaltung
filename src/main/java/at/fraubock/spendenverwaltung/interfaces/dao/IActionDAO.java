@@ -15,9 +15,9 @@ import at.fraubock.spendenverwaltung.util.ActionSearchVO;
 public interface IActionDAO {
 
 	/**
-	 * Retrieves the number of actions given in <code>count</code> starting from
-	 * <code>offset</code>, whose attributes match the values given in the
-	 * {@link ActionSearchVO}
+	 * Retrieves actions whose attributes match the values given in the
+	 * {@link ActionSearchVO}. retrieves <code>count</code> actions starting
+	 * from <code>offset</code>
 	 * 
 	 * @param searchVO
 	 *            - a value object containing the values to be searched for

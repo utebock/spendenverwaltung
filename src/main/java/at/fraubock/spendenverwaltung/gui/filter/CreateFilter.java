@@ -29,8 +29,8 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterio
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.to.FilterTO;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
-import at.fraubock.spendenverwaltung.util.FilterType;
-import at.fraubock.spendenverwaltung.util.LogicalOperator;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.LogicalOperator;
 
 public class CreateFilter extends JPanel {
 

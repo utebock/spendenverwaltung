@@ -13,13 +13,18 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.ConnectedCriterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
+import at.fraubock.spendenverwaltung.util.filter.FilterBuilder;
+import at.fraubock.spendenverwaltung.util.filter.FilterProperty;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.LogicalOperator;
+import at.fraubock.spendenverwaltung.util.filter.RelationalOperator;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/testspring.xml")
 @TransactionConfiguration(defaultRollback = true)
-public abstract class AbstractFilterToSqlBuilderTest {
+public abstract class AbstractFilterBuilderTest {
 
-	private static FilterToSqlBuilder builder;
+	private static FilterBuilder builder;
 
 	private Filter personFilter;
 	private Filter donationFilter;
@@ -33,27 +38,27 @@ public abstract class AbstractFilterToSqlBuilderTest {
 	private PropertyCriterion addressIsMainProp;
 	private PropertyCriterion personNameProp;
 
-	public static FilterToSqlBuilder getBuilder() {
+	public static FilterBuilder getBuilder() {
 		return builder;
 	}
 
-	public static void setBuilder(FilterToSqlBuilder builder) {
-		AbstractFilterToSqlBuilderTest.builder = builder;
+	public static void setBuilder(FilterBuilder builder) {
+		AbstractFilterBuilderTest.builder = builder;
 	}
 
 	/* testing filter statements */
 
 	@Test(expected = IllegalArgumentException.class)
 	public void createStmtWithNullParameter_ThrowsException() {
-		builder.createSqlStatement(null);
+		builder.createStatement(null);
 	}
 
 	@Test
 	public void createStmtWithEmptyFilter_ReturnsStatement() {
-		String personStmt = builder.createSqlStatement(personFilter);
-		String donationStmt = builder.createSqlStatement(donationFilter);
-		String mailingStmt = builder.createSqlStatement(mailingFilter);
-		String addressStmt = builder.createSqlStatement(addressFilter);
+		String personStmt = builder.createStatement(personFilter);
+		String donationStmt = builder.createStatement(donationFilter);
+		String mailingStmt = builder.createStatement(mailingFilter);
+		String addressStmt = builder.createStatement(addressFilter);
 
 		assertEquals("select * from validated_persons as mount0", personStmt);
 		assertEquals("select * from validated_donations as mount0",
@@ -70,13 +75,13 @@ public abstract class AbstractFilterToSqlBuilderTest {
 	public void propertyCriteriontWithNullValues_ThrowsException() {
 		PropertyCriterion personCompProp = new PropertyCriterion();
 		personFilter.setCriterion(personCompProp);
-		builder.createSqlStatement(personFilter);
+		builder.createStatement(personFilter);
 	}
 
 	@Test
 	public void personCompanyLikeString_ReturnsStatement() {
 		personFilter.setCriterion(personCompProp);
-		String personStmt = builder.createSqlStatement(personFilter);
+		String personStmt = builder.createStatement(personFilter);
 		assertEquals(
 				"select * from validated_persons as mount0 where company LIKE '%testcompany%'",
 				(personStmt));
@@ -85,7 +90,7 @@ public abstract class AbstractFilterToSqlBuilderTest {
 	@Test
 	public void donationAmountLessEqualsNumeric_ReturnsStatement() {
 		donationFilter.setCriterion(donationAmountProp);
-		String donationStmt = builder.createSqlStatement(donationFilter);
+		String donationStmt = builder.createStatement(donationFilter);
 		assertEquals(
 				"select * from validated_donations as mount0 where amount <= 100.0",
 				(donationStmt));
@@ -94,7 +99,7 @@ public abstract class AbstractFilterToSqlBuilderTest {
 	@Test
 	public void donationDateGreaterDaysBack_ReturnsStatement() {
 		donationFilter.setCriterion(donationDaysBackProp);
-		String donationStmt = builder.createSqlStatement(donationFilter);
+		String donationStmt = builder.createStatement(donationFilter);
 		assertEquals(
 				"select * from validated_donations as mount0 where donationdate < DATE_SUB(DATE(NOW()),INTERVAL 25 DAY)",
 				(donationStmt));
@@ -103,7 +108,7 @@ public abstract class AbstractFilterToSqlBuilderTest {
 	@Test
 	public void mailingnDateNotNull_ReturnsStatement() {
 		mailingFilter.setCriterion(mailingNotNullProp);
-		String donationStmt = builder.createSqlStatement(mailingFilter);
+		String donationStmt = builder.createStatement(mailingFilter);
 		assertEquals(
 				"select * from confirmed_mailings as mount0 where mailing_date IS NOT NULL ",
 				(donationStmt));
@@ -112,7 +117,7 @@ public abstract class AbstractFilterToSqlBuilderTest {
 	@Test
 	public void isMainAddressEqualsBool_ReturnsStatement() {
 		addressFilter.setCriterion(addressIsMainProp);
-		String addressStmt = builder.createSqlStatement(addressFilter);
+		String addressStmt = builder.createStatement(addressFilter);
 		assertEquals(
 				"select * from validated_addresses as mount0 where ismain = true",
 				(addressStmt));
@@ -124,7 +129,7 @@ public abstract class AbstractFilterToSqlBuilderTest {
 	public void connectedCriterionWithNullValues_ThrowsException() {
 		ConnectedCriterion con = new ConnectedCriterion();
 		personFilter.setCriterion(con);
-		builder.createSqlStatement(personFilter);
+		builder.createStatement(personFilter);
 	}
 
 	@Test
@@ -133,7 +138,7 @@ public abstract class AbstractFilterToSqlBuilderTest {
 		con.connect(personCompProp, LogicalOperator.AND, personCompProp);
 		personFilter.setCriterion(con);
 
-		String stmt = builder.createSqlStatement(personFilter);
+		String stmt = builder.createStatement(personFilter);
 
 		assertEquals(
 				"select * from validated_persons as mount0 where "
@@ -153,7 +158,7 @@ public abstract class AbstractFilterToSqlBuilderTest {
 		con.connect(con1, LogicalOperator.OR, con2);
 		personFilter.setCriterion(con);
 
-		String stmt = builder.createSqlStatement(personFilter);
+		String stmt = builder.createStatement(personFilter);
 
 		assertEquals(
 				"select * from validated_persons as mount0 where ((company LIKE '%testcompany%' AND givenname = 'testname') OR (company LIKE '%testcompany%' AND givenname = 'testname'))",
@@ -197,7 +202,7 @@ public abstract class AbstractFilterToSqlBuilderTest {
 		orNotCrit.connect(andCrit, LogicalOperator.OR, addressMount);
 
 		Filter mainFilter = new Filter(FilterType.PERSON, orNotCrit);
-		String stmt = builder.createSqlStatement(mainFilter);
+		String stmt = builder.createStatement(mainFilter);
 		String result = "select * from validated_persons as mount0 where "
 				+ "(((select count(*) from validated_donations as mount1 where"
 				+ " mount0.id=mount1.personid and amount <> 100.0) = 0 AND"

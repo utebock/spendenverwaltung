@@ -30,11 +30,11 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedF
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
-import at.fraubock.spendenverwaltung.util.FilterProperty;
-import at.fraubock.spendenverwaltung.util.FilterToSqlBuilder;
-import at.fraubock.spendenverwaltung.util.FilterType;
-import at.fraubock.spendenverwaltung.util.LogicalOperator;
-import at.fraubock.spendenverwaltung.util.RelationalOperator;
+import at.fraubock.spendenverwaltung.util.filter.FilterBuilder;
+import at.fraubock.spendenverwaltung.util.filter.FilterProperty;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.LogicalOperator;
+import at.fraubock.spendenverwaltung.util.filter.RelationalOperator;
 
 /**
  * 
@@ -49,7 +49,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 			.getLogger(MailingDAOImplemented.class);
 
 	private JdbcTemplate jdbcTemplate;
-	private FilterToSqlBuilder filterToSqlBuilder;
+	private FilterBuilder filterBuilder;
 	private IMailingTemplateDAO mailingTemplateDao;
 
 	public IMailingTemplateDAO getMailingTemplateDao() {
@@ -64,8 +64,8 @@ public class MailingDAOImplemented implements IMailingDAO {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	public void setFilterToSqlBuilder(FilterToSqlBuilder filterToSqlBuilder) {
-		this.filterToSqlBuilder = filterToSqlBuilder;
+	public void setFilterBuilder(FilterBuilder filterBuilder) {
+		this.filterBuilder = filterBuilder;
 	}
 
 	public static void validate(Mailing mailing) throws ValidationException {
@@ -260,8 +260,8 @@ public class MailingDAOImplemented implements IMailingDAO {
 				// now apply personfilter and insert relevant entries into
 				// sent_mailings
 
-				String filterStmt = filterToSqlBuilder
-						.createSqlStatement(mailing.getFilter());
+				String filterStmt = filterBuilder
+						.createStatement(mailing.getFilter());
 				List<Person> persons = jdbcTemplate.query(filterStmt,
 						new PersonIdMapper());
 				
@@ -490,7 +490,7 @@ public class MailingDAOImplemented implements IMailingDAO {
 		} else {
 			try {
 				//gotta change the filters to only search confirmed mailings...
-				String sql = filterToSqlBuilder.createSqlStatement(filter);
+				String sql = filterBuilder.createStatement(filter);
 				MailingMapper mapper = new MailingMapper();
 				results = jdbcTemplate.query(sql, mapper);
 			} catch (DataAccessException e) {
