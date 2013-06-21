@@ -173,9 +173,7 @@ public class LoginView extends InitializableView {
 		pwdLabel = componentFactory.createLabel("Passwort:");
 		urlLabel = componentFactory.createLabel("Datenbank-URL:");
 		userField = componentFactory.createTextField(defaultUser);
-		userField.addKeyListener(new EnterKeyListener());
 		pwdField = new JPasswordField(defaultPassword);
-		pwdField.addKeyListener(new EnterKeyListener());
 		urlField = componentFactory.createTextField(defaultUrl);
 		loginBtn = new JButton("Login");
 		cancelBtn = new JButton("Abbrechen");
@@ -192,23 +190,5 @@ public class LoginView extends InitializableView {
 		cancelBtn.addActionListener(new CancelAction());
 		loginBtn.addActionListener(new LoginAction(this));
 
-	}
-	
-	private class EnterKeyListener implements KeyListener {
-
-		@Override
-		public void keyPressed(KeyEvent arg0) {}
-
-		@Override
-		public void keyReleased(KeyEvent arg0) {}
-
-		@Override
-		public void keyTyped(KeyEvent arg0) {
-			if(arg0.getKeyCode()==0) {
-				loginBtn.doClick();
-			}
-			
-		}
-		
 	}
 }
