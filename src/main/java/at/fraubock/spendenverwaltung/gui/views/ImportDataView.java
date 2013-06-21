@@ -58,8 +58,9 @@ public class ImportDataView extends InitializableView {
 			importBtn.setAction(new ImportDataAction());
 			Action cancelAction = viewActionFactory.getMainMenuViewAction();
 			cancelAction.putValue(Action.NAME, "Abbrechen");
-			cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
+			cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backInButton.png")));
 			backBtn.setAction(cancelAction);
+			backBtn.setFont(new Font("bigger", Font.PLAIN, 13));
 	}
 	
 	private void setUpLayout(){
