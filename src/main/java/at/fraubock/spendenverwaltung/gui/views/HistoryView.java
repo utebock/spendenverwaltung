@@ -62,11 +62,11 @@ public class HistoryView extends InitializableView {
 
 		JButton backButton = new JButton();
 		javax.swing.Action getBack = viewActionFactory.getMainMenuViewAction();
+		getBack.putValue(javax.swing.Action.NAME, "Abbrechen");
 		getBack.putValue(javax.swing.Action.SMALL_ICON, new ImageIcon(
 				getClass().getResource("/images/backInButton.png")));
 		backButton.setAction(getBack);
-
-		//toolbar.add(backButton);
+		backButton.setFont(new Font("Bigger", Font.PLAIN, 13));
 
 		JLabel headline = componentFactory.createLabel("Verlauf aller Aktionen");
 		headline.setFont(new Font("Headline", Font.PLAIN, 14));
@@ -135,8 +135,10 @@ public class HistoryView extends InitializableView {
 				MAX_TABLE_SIZE * 18 - 17));
 		panel.add(scrollPane, "wrap");
 
-		panel.add(navigator = new PageNavigator(historyModel), "growx");
-
+		panel.add(navigator = new PageNavigator(historyModel), "growx, wrap 20px");
+		
+		//backbutton
+		panel.add(backButton);
 		applyExtendedSearch(new ActionSearchVO());
 	}
 
