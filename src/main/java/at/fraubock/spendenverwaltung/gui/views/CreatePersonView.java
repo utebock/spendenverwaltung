@@ -337,17 +337,7 @@ public class CreatePersonView extends InitializableView {
 				JOptionPane.showMessageDialog(null, "Personenfelder konnten nicht validiert werden");
 				return;
 			} else {
-				person = new Person();
-				
 				address = new Address();
-				
-				person.setSex(Person.Sex.values()[salutation.getSelectedIndex()]);
-				person.setTitle(titleField.getText());
-				person.setCompany(companyField.getText());
-				person.setGivenName(givenField.getText());
-				person.setSurname(surnameField.getText());
-				person.setTelephone(telephoneField.getText());
-				person.setEmail(emailField.getText());
 				
 				if(streetField.getText().equals("") && postalField.getText().equals("")
 						&& cityField.getText().equals("") && countryField.getText().equals("")) {
@@ -364,13 +354,29 @@ public class CreatePersonView extends InitializableView {
 					person.setMainAddress(address);
 				}
 				
-				if(notifyMail.isSelected()==true){
+				if(givenField.getText().equals("") && surnameField.getText().equals("")
+						&& companyField.getText().equals("")) {
+					JOptionPane.showMessageDialog(null, "Vorname, Nachname oder Firma müssen ausgefüllt werden.");
+					return;
+				}
+				
+				person = new Person();
+				
+				person.setSex(Person.Sex.values()[salutation.getSelectedIndex()]);
+				person.setTitle(titleField.getText());
+				person.setCompany(companyField.getText());
+				person.setGivenName(givenField.getText());
+				person.setSurname(surnameField.getText());
+				person.setTelephone(telephoneField.getText());
+				person.setEmail(emailField.getText());
+				
+				if(notifyMail.isSelected()){
 					person.setEmailNotification(true);
 				}
 				else{
 					person.setEmailNotification(false);
 				}
-				if(notifyPost.isSelected()==true){
+				if(notifyPost.isSelected()){
 					person.setPostalNotification(true);
 				}
 				else{
@@ -380,10 +386,9 @@ public class CreatePersonView extends InitializableView {
 				String note = noteText.getText();
 				person.setNote(note);
 			}
-						
+
+			
 			for(ValidateableComponent comp : validateableDonationComponents) {
-				
-				//this ONLY happens if something has been entered in the donation field
 				if(!comp.validateContents()) {
 					donationValidated = false;
 					JOptionPane.showMessageDialog(null, "Konnte Spendenh\u00F6he nicht feststellen");

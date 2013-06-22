@@ -16,6 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,8 +41,9 @@ public class CliAppTest {
 	private IImportService importService;
 	private IMailingService mailingService;
 	private IPersonService personService;
-	ByteArrayOutputStream out;
-	ByteArrayOutputStream err;
+	private ByteArrayOutputStream out;
+	private ByteArrayOutputStream err;
+	private BasicDataSource dataSource;
 
 	@Before
 	public void setUp() {
@@ -51,13 +53,51 @@ public class CliAppTest {
 		personService = mock(IPersonService.class);
 		importService = mock(IImportService.class);
 		filterService = mock(IFilterService.class);
+		dataSource = mock(BasicDataSource.class);
 		out = new ByteArrayOutputStream();
 		err = new ByteArrayOutputStream();
 	}
 
 	@Test
-	public void helpWorks() throws Exception {
-		CommandExecutor exec = new CommandExecutor(new String[] { "-h" },
+	public void databaseConnectionParametrized() throws Exception {
+		CommandExecutor exec = new CommandExecutor(new String[] { "-h",
+				"--user=unneededuser", "--password=unneededpass",
+				"--url=unneededhost:500/unneededdb" }, new PrintStream(out),
+				new PrintStream(err));
+		exec.setActionService(actionService);
+		exec.setDonationService(donationService);
+		exec.setFilterService(filterService);
+		exec.setImportService(importService);
+		exec.setMailingService(mailingService);
+		exec.setPersonService(personService);
+		exec.setDataSource(dataSource);
+		exec.setDefaultDatabaseUrl("defaultUrl");
+		int errCode = exec.execute(null);
+		out.close();
+		err.close();
+		assertEquals(0, errCode);
+		assertEquals("", err.toString());
+		assertTrue(out.toString().contains("usage:"));
+		assertTrue(out.toString().contains("-h"));
+		assertTrue(out.toString().contains("-i"));
+		assertTrue(out.toString().contains("--style"));
+		assertTrue(out.toString().contains("native"));
+		assertTrue(out.toString().contains("hypo"));
+		assertTrue(out.toString().contains("sms"));
+		assertTrue(out.toString().contains("manuelbichler@aim.com"));
+
+		verify(dataSource, times(1)).setUsername("unneededuser");
+		verify(dataSource, times(1)).setPassword("unneededpass");
+		verify(dataSource, times(1)).setUrl(
+				"jdbc:mysql://unneededhost:500/unneededdb");
+		verifyNoMoreInteractions(actionService, donationService, filterService,
+				importService, mailingService, personService, dataSource);
+	}
+
+	@Test
+	public void databaseConnectionParametrizedWithDefaultUrl() throws Exception {
+		CommandExecutor exec = new CommandExecutor(new String[] { "-h",
+				"--user=unneededuser", "--password=unneededpass", },
 				new PrintStream(out), new PrintStream(err));
 		exec.setActionService(actionService);
 		exec.setDonationService(donationService);
@@ -65,7 +105,46 @@ public class CliAppTest {
 		exec.setImportService(importService);
 		exec.setMailingService(mailingService);
 		exec.setPersonService(personService);
-		int errCode = exec.execute();
+		exec.setDataSource(dataSource);
+		exec.setDefaultDatabaseUrl("unneededhost:500/unneededdb");
+		exec.setDataSource(dataSource);
+		exec.setDefaultDatabaseUrl("defaultUrl");
+		int errCode = exec.execute(null);
+		out.close();
+		err.close();
+		assertEquals(0, errCode);
+		assertEquals("", err.toString());
+		assertTrue(out.toString().contains("usage:"));
+		assertTrue(out.toString().contains("-h"));
+		assertTrue(out.toString().contains("-i"));
+		assertTrue(out.toString().contains("--style"));
+		assertTrue(out.toString().contains("native"));
+		assertTrue(out.toString().contains("hypo"));
+		assertTrue(out.toString().contains("sms"));
+		assertTrue(out.toString().contains("manuelbichler@aim.com"));
+
+		verify(dataSource, times(1)).setUsername("unneededuser");
+		verify(dataSource, times(1)).setPassword("unneededpass");
+		verify(dataSource, times(1)).setUrl(
+				"jdbc:mysql://defaultUrl");
+		verifyNoMoreInteractions(actionService, donationService, filterService,
+				importService, mailingService, personService, dataSource);
+	}
+
+	@Test
+	public void helpWorks() throws Exception {
+		CommandExecutor exec = new CommandExecutor(new String[] { "-h",
+				"--user=unneededuser", "--password=unneededpass", },
+				new PrintStream(out), new PrintStream(err));
+		exec.setActionService(actionService);
+		exec.setDonationService(donationService);
+		exec.setFilterService(filterService);
+		exec.setImportService(importService);
+		exec.setMailingService(mailingService);
+		exec.setPersonService(personService);
+		exec.setDataSource(dataSource);
+		exec.setDefaultDatabaseUrl("defaultUrl");
+		int errCode = exec.execute(null);
 		out.close();
 		err.close();
 		assertEquals(0, errCode);
@@ -86,7 +165,8 @@ public class CliAppTest {
 
 	@Test
 	public void moreThanOneAciton_shouldFail() throws Exception {
-		CommandExecutor exec = new CommandExecutor(new String[] { "-h", "-i" },
+		CommandExecutor exec = new CommandExecutor(new String[] { "-h", "-i",
+				"--user=unneededuser", "--password=unneededpass", },
 				new PrintStream(out), new PrintStream(err));
 		exec.setActionService(actionService);
 		exec.setDonationService(donationService);
@@ -94,7 +174,9 @@ public class CliAppTest {
 		exec.setImportService(importService);
 		exec.setMailingService(mailingService);
 		exec.setPersonService(personService);
-		int errCode = exec.execute();
+		exec.setDataSource(dataSource);
+		exec.setDefaultDatabaseUrl("defaultUrl");
+		int errCode = exec.execute(null);
 		out.close();
 		err.close();
 
@@ -109,7 +191,8 @@ public class CliAppTest {
 
 	@Test
 	public void notExistentOption_shouldFail() throws Exception {
-		CommandExecutor exec = new CommandExecutor(new String[] { "-ü" },
+		CommandExecutor exec = new CommandExecutor(new String[] { "-ü",
+				"--user=unneededuser", "--password=unneededpass", },
 				new PrintStream(out), new PrintStream(err));
 		exec.setActionService(actionService);
 		exec.setDonationService(donationService);
@@ -117,7 +200,9 @@ public class CliAppTest {
 		exec.setImportService(importService);
 		exec.setMailingService(mailingService);
 		exec.setPersonService(personService);
-		int errCode = exec.execute();
+		exec.setDataSource(dataSource);
+		exec.setDefaultDatabaseUrl("defaultUrl");
+		int errCode = exec.execute(null);
 		out.close();
 		err.close();
 
@@ -133,7 +218,8 @@ public class CliAppTest {
 	@Test
 	public void importNative() throws Exception {
 		CommandExecutor exec = new CommandExecutor(new String[] { "-i",
-				"test.csv", "--style=native" }, new PrintStream(out),
+				"test.csv", "--style=native", "--user=unneededuser",
+				"--password=unneededpass", }, new PrintStream(out),
 				new PrintStream(err));
 		exec.setActionService(actionService);
 		exec.setDonationService(donationService);
@@ -141,7 +227,9 @@ public class CliAppTest {
 		exec.setImportService(importService);
 		exec.setMailingService(mailingService);
 		exec.setPersonService(personService);
-		int errCode = exec.execute();
+		exec.setDataSource(dataSource);
+		exec.setDefaultDatabaseUrl("defaultUrl");
+		int errCode = exec.execute(null);
 		out.close();
 		err.close();
 
@@ -158,7 +246,8 @@ public class CliAppTest {
 	@Test
 	public void importHypo() throws Exception {
 		CommandExecutor exec = new CommandExecutor(new String[] { "-i",
-				"test.csv", "--style=hypo" }, new PrintStream(out),
+				"test.csv", "--style=hypo", "--user=unneededuser",
+				"--password=unneededpass", }, new PrintStream(out),
 				new PrintStream(err));
 		exec.setActionService(actionService);
 		exec.setDonationService(donationService);
@@ -166,7 +255,9 @@ public class CliAppTest {
 		exec.setImportService(importService);
 		exec.setMailingService(mailingService);
 		exec.setPersonService(personService);
-		int errCode = exec.execute();
+		exec.setDataSource(dataSource);
+		exec.setDefaultDatabaseUrl("defaultUrl");
+		int errCode = exec.execute(null);
 		out.close();
 		err.close();
 
@@ -183,7 +274,8 @@ public class CliAppTest {
 	@Test
 	public void importSms() throws Exception {
 		CommandExecutor exec = new CommandExecutor(new String[] { "-i",
-				"sms.csv", "--style=sms" }, new PrintStream(out),
+				"sms.csv", "--style=sms", "--user=unneededuser",
+				"--password=unneededpass", }, new PrintStream(out),
 				new PrintStream(err));
 		exec.setActionService(actionService);
 		exec.setDonationService(donationService);
@@ -191,7 +283,9 @@ public class CliAppTest {
 		exec.setImportService(importService);
 		exec.setMailingService(mailingService);
 		exec.setPersonService(personService);
-		int errCode = exec.execute();
+		exec.setDataSource(dataSource);
+		exec.setDefaultDatabaseUrl("defaultUrl");
+		int errCode = exec.execute(null);
 		out.close();
 		err.close();
 
@@ -208,14 +302,18 @@ public class CliAppTest {
 	@Test
 	public void importWithoutFile_fails() throws Exception {
 		CommandExecutor exec = new CommandExecutor(new String[] { "-i",
-				"--style=native" }, new PrintStream(out), new PrintStream(err));
+				"--style=native", "--user=unneededuser",
+				"--password=unneededpass", }, new PrintStream(out),
+				new PrintStream(err));
 		exec.setActionService(actionService);
 		exec.setDonationService(donationService);
 		exec.setFilterService(filterService);
 		exec.setImportService(importService);
 		exec.setMailingService(mailingService);
 		exec.setPersonService(personService);
-		int errCode = exec.execute();
+		exec.setDataSource(dataSource);
+		exec.setDefaultDatabaseUrl("defaultUrl");
+		int errCode = exec.execute(null);
 		out.close();
 		err.close();
 
@@ -230,15 +328,19 @@ public class CliAppTest {
 
 	@Test
 	public void importDefaultStyle_isNative() throws Exception {
-		CommandExecutor exec = new CommandExecutor(new String[] { "-i",
-				"test.csv" }, new PrintStream(out), new PrintStream(err));
+		CommandExecutor exec = new CommandExecutor(
+				new String[] { "-i", "test.csv", "--user=unneededuser",
+						"--password=unneededpass", }, new PrintStream(out),
+				new PrintStream(err));
 		exec.setActionService(actionService);
 		exec.setDonationService(donationService);
 		exec.setFilterService(filterService);
 		exec.setImportService(importService);
 		exec.setMailingService(mailingService);
 		exec.setPersonService(personService);
-		int errCode = exec.execute();
+		exec.setDataSource(dataSource);
+		exec.setDefaultDatabaseUrl("defaultUrl");
+		int errCode = exec.execute(null);
 		out.close();
 		err.close();
 
@@ -257,15 +359,19 @@ public class CliAppTest {
 		String excMsg = "testBlaBlu";
 		doThrow(new ServiceException(excMsg)).when(importService).nativeImport(
 				any(File.class));
-		CommandExecutor exec = new CommandExecutor(new String[] { "-i",
-				"test.csv" }, new PrintStream(out), new PrintStream(err));
+		CommandExecutor exec = new CommandExecutor(
+				new String[] { "-i", "test.csv", "--user=unneededuser",
+						"--password=unneededpass", }, new PrintStream(out),
+				new PrintStream(err));
 		exec.setActionService(actionService);
 		exec.setDonationService(donationService);
 		exec.setFilterService(filterService);
 		exec.setImportService(importService);
 		exec.setMailingService(mailingService);
 		exec.setPersonService(personService);
-		int errCode = exec.execute();
+		exec.setDataSource(dataSource);
+		exec.setDefaultDatabaseUrl("defaultUrl");
+		int errCode = exec.execute(null);
 		out.close();
 		err.close();
 
@@ -283,7 +389,8 @@ public class CliAppTest {
 	public void optionF() throws Exception {
 		doReturn("bla").when(filterService).convertResultsToCSVById(13);
 
-		CommandExecutor exec = new CommandExecutor(new String[] { "-f", "13" },
+		CommandExecutor exec = new CommandExecutor(new String[] { "-f", "13",
+				"--user=unneededuser", "--password=unneededpass", },
 				new PrintStream(out), new PrintStream(err));
 		exec.setActionService(actionService);
 		exec.setDonationService(donationService);
@@ -291,8 +398,10 @@ public class CliAppTest {
 		exec.setImportService(importService);
 		exec.setMailingService(mailingService);
 		exec.setPersonService(personService);
+		exec.setDataSource(dataSource);
+		exec.setDefaultDatabaseUrl("defaultUrl");
 
-		int errCode = exec.execute();
+		int errCode = exec.execute(null);
 		out.close();
 		err.close();
 

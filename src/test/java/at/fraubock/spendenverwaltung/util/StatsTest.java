@@ -11,9 +11,9 @@ import at.fraubock.spendenverwaltung.interfaces.dao.IDonationDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IFilterDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 
-public class StatsTest extends AbstractStatsTest{
-private static ApplicationContext context;
-	
+public class StatsTest extends AbstractStatsTest {
+	private static ApplicationContext context;
+
 	/**
 	 * obtain personDao bean, initializing ApplicationContext
 	 */
@@ -26,15 +26,15 @@ private static ApplicationContext context;
 		setPersonDao(context.getBean("personDao", IPersonDAO.class));
 		setFilterDao(context.getBean("filterDao", IFilterDAO.class));
 	}
-	
+
 	/**
 	 * manually close ApplicationContext and associated resources
 	 */
-	@AfterClass 
+	@AfterClass
 	public static void shutdown() {
-		if(context != null) {
+		if (context != null) {
 			((AbstractApplicationContext) context).close();
 		}
 	}
-}
 
+}

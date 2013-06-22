@@ -1,5 +1,7 @@
 package at.fraubock.spendenverwaltung.util;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,6 +26,7 @@ import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.util.filter.FilterProperty;
 import at.fraubock.spendenverwaltung.util.filter.FilterType;
 import at.fraubock.spendenverwaltung.util.filter.RelationalOperator;
+import at.fraubock.spendenverwaltung.util.statistics.Province;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/testspring.xml")
@@ -131,4 +134,98 @@ public abstract class AbstractStatsTest {
 
 	}
 
+	@Test
+	public void validateProvinceMapping1() {
+		Address a = new Address();
+		a.setCity("Wien");
+		a.setCountry("Österreich");
+		a.setPostalCode("1070");
+		a.setStreet("Neustiftgasse 68");
+		Person p = new Person();
+		p.setMainAddress(a);
+		Donation d = new Donation();
+		d.setAmount(1000L);
+		d.setDate(new Date());
+		d.setDonator(p);
+		assertEquals(Province.VIENNA, Province.getFromDonation(d));
+	}
+
+	@Test
+	public void validateProvinceMapping2() {
+		Address a = new Address();
+		a.setCity("Ternberg");
+		a.setCountry("Österreich");
+		a.setPostalCode("4452");
+		a.setStreet("Heldenstr. 27");
+		Person p = new Person();
+		p.setMainAddress(a);
+		Donation d = new Donation();
+		d.setAmount(1000L);
+		d.setDate(new Date());
+		d.setDonator(p);
+		assertEquals(Province.UPPER_AUSTRIA, Province.getFromDonation(d));
+	}
+
+	@Test
+	public void validateProvinceMapping3() {
+		Address a = new Address();
+		a.setCity("Bürs");
+		a.setCountry("Österreich");
+		a.setPostalCode("6706");
+		Person p = new Person();
+		p.setMainAddress(a);
+		Donation d = new Donation();
+		d.setAmount(1000L);
+		d.setDate(new Date());
+		d.setDonator(p);
+		assertEquals(Province.VORARLBERG, Province.getFromDonation(d));
+	}
+
+	@Test
+	public void validateProvinceMapping7() {
+		Address a = new Address();
+		a.setCity("Gallizien");
+		a.setCountry("Österreich");
+		a.setPostalCode("9132");
+		Person p = new Person();
+		p.setMainAddress(a);
+		Donation d = new Donation();
+		d.setAmount(1000L);
+		d.setDate(new Date());
+		d.setDonator(p);
+		assertEquals(Province.CARINTHIA, Province.getFromDonation(d));
+	}
+
+	@Test
+	public void validateProvinceMapping4() {
+		Address a = new Address();
+		a.setCity("Berlin");
+		a.setCountry("Derutschland");
+		a.setPostalCode("Diwas");
+		Person p = new Person();
+		p.setMainAddress(a);
+		Donation d = new Donation();
+		d.setAmount(1000L);
+		d.setDate(new Date());
+		d.setDonator(p);
+		assertEquals(Province.OTHER, Province.getFromDonation(d));
+	}
+
+	@Test
+	public void validateProvinceMapping5() {
+		Person p = new Person();
+		Donation d = new Donation();
+		d.setAmount(1000L);
+		d.setDate(new Date());
+		d.setDonator(p);
+		assertEquals(Province.OTHER, Province.getFromDonation(d));
+	}
+
+	@Test
+	public void validateProvinceMapping6() {
+		Donation d = new Donation();
+		d.setAmount(1000L);
+		d.setDate(new Date());
+		assertEquals(Province.OTHER, Province.getFromDonation(d));
+	}
 }

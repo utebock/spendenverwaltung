@@ -1,11 +1,14 @@
 package at.fraubock.spendenverwaltung.util.statistics;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.Month;
 import org.jfree.data.time.Quarter;
@@ -19,17 +22,13 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.util.Pair;
 
 /**
- * A statistic for {@link Donation}s based on a fixed time period that produces
- * a {@link TimeSeriesCollection} to be used e.g. for feeding charts.
+ * A collection of static methods assisting in creating statistical dataset for
+ * {@link Donation}s to be used e.g. for feeding charts.
  * 
  * @author manuel-bichler
  * 
- * @param <T>
- *            the type of the regular time period used for creating the buckets,
- *            e.g. {@link Year}, {@link Quarter}, {@link Month}, {@link Week},
- *            {@link Day}.
  */
-public class DonationTimeStatisticDatasetGenerator {
+public class DonationDatasetGenerator {
 
 	/**
 	 * Creates a new dataset.
@@ -45,6 +44,10 @@ public class DonationTimeStatisticDatasetGenerator {
 	 *            the "buckets" the donations will be thrown into. e.g.
 	 *            {@link Year}, {@link Quarter}, {@link Month}, {@link Week},
 	 *            {@link Day}.
+	 * @param <T>
+	 *            the type of the regular time period used for creating the
+	 *            buckets, e.g. {@link Year}, {@link Quarter}, {@link Month},
+	 *            {@link Week}, {@link Day}.
 	 * 
 	 * @return the generated dataset, e.g. for use with charts
 	 */
@@ -79,4 +82,40 @@ public class DonationTimeStatisticDatasetGenerator {
 		}
 		return tsColl;
 	}
+
+	/**
+	 * Creates a new category dataset. Each of the ten categories represents one
+	 * Austrian province or the "other" province (other country or no
+	 * donator/address info).
+	 * 
+	 * @param dataSets
+	 *            a list of rows the statistic shall be calculated from. Each
+	 *            row consists of a list of donations and a name.
+	 * @param operation
+	 *            the statistic operation that shall be used to calculate the
+	 *            statistic value for each bucket in each row.
+	 * 
+	 * @return the generated dataset, e.g. for use with charts.
+	 */
+	public static CategoryDataset createDatasetProvinciallyCategorized(
+			List<Pair<List<Donation>, String>> dataSets, Operation operation) {
+		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+		for (Pair<List<Donation>, String> row : dataSets) {
+			// for each province create a statistic
+			Map<Province, DescriptiveStatistics> statMap = new EnumMap<Province, DescriptiveStatistics>(
+					Province.class);
+			for (Province p : Province.values())
+				statMap.put(p, new DescriptiveStatistics());
+			for (Donation d : row.a)
+				statMap.get(Province.getFromDonation(d)).addValue(
+						d.getAmount().doubleValue() / 100 /* in EUR */);
+			for (Map.Entry<Province, DescriptiveStatistics> entry : statMap
+					.entrySet())
+				// now add each calculated statistical value to the dataset
+				dataset.addValue(operation.getStatisticValue(entry.getValue()),
+						row.b, entry.getKey());
+		}
+		return dataset;
+	}
+
 }

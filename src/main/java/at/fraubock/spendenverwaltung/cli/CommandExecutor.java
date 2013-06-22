@@ -1,9 +1,11 @@
 package at.fraubock.spendenverwaltung.cli;
 
+import java.io.Console;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.util.Arrays;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -14,6 +16,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.log4j.Logger;
 
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
@@ -41,6 +44,9 @@ public class CommandExecutor {
 	private IImportService importService;
 	private IMailingService mailingService;
 	private IPersonService personService;
+
+	private BasicDataSource dataSource;
+	private String defaultDatabaseUrl;
 
 	private String[] args;
 	private PrintStream out, err;
@@ -172,16 +178,56 @@ public class CommandExecutor {
 	}
 
 	/**
+	 * @return the data source whose username, password and URL will be set
+	 */
+	public BasicDataSource getDataSource() {
+		return dataSource;
+	}
+
+	/**
+	 * @param dataSource
+	 *            the data source whose username, password and URL is to be set
+	 */
+	public void setDataSource(BasicDataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+
+	/**
+	 * @return the default database URL. May be the empty string or null. Driver
+	 *         name and database name omitted. Example:
+	 *         "localhost:3306/ubspenderverwaltung"
+	 */
+	public String getDefaultDatabaseUrl() {
+		return defaultDatabaseUrl;
+	}
+
+	/**
+	 * @param defaultDatabaseUrl
+	 *            the default database URL. May be the empty string or null.
+	 *            Driver name and database name omitted. Example:
+	 *            "localhost:3306/ubspenderverwaltung"
+	 */
+	public void setDefaultDatabaseUrl(String defaultDatabaseUrl) {
+		this.defaultDatabaseUrl = defaultDatabaseUrl;
+	}
+
+	/**
 	 * executes the command and writes normal and error output.
 	 * 
-	 * Prior to calling this method, the servicesm ust have been set using the
-	 * setters.
+	 * If password is not specified as an option, it will prompt for the
+	 * password from the console given.
 	 * 
+	 * Prior to calling this method, the services and the dataSource must have
+	 * been set using the setters.
+	 * 
+	 * @param console
+	 *            the console to read the password from if <code>password</code>
+	 *            is not specified as an option
 	 * 
 	 * @return 0 if the execution finished successfully or an error code if it
 	 *         has not
 	 */
-	public int execute() {
+	public int execute(Console console) {
 
 		// create options:
 		Options options = new Options();
@@ -260,11 +306,47 @@ public class CommandExecutor {
 		OptionBuilder.hasArg();
 		OptionBuilder.withArgName("ID");
 		options.addOption(OptionBuilder.create());
+		OptionBuilder.withLongOpt("user");
+		OptionBuilder.withDescription("use UNAME as your MySQL user name");
+		OptionBuilder.hasArg();
+		OptionBuilder.withArgName("UNAME");
+		OptionBuilder.isRequired();
+		options.addOption(OptionBuilder.create());
+		OptionBuilder.isRequired(false);
+		OptionBuilder.withLongOpt("password");
+		OptionBuilder
+				.withDescription("use PASSWD as your MySQL password. If not specified, it will be promted");
+		OptionBuilder.hasArg();
+		OptionBuilder.withArgName("PASSWD");
+		options.addOption(OptionBuilder.create());
+		OptionBuilder.withLongOpt("url");
+		OptionBuilder
+				.withDescription("use URL as the MySQL database location. Defaults to \""
+						+ defaultDatabaseUrl + "\"");
+		OptionBuilder.hasArg();
+		OptionBuilder.withArgName("URL");
+		options.addOption(OptionBuilder.create());
 
 		// parse:
 		CommandLineParser parser = new GnuParser();
 		try {
 			CommandLine cmd = parser.parse(options, args);
+
+			// establish database connection:
+			dataSource.setUsername(cmd.getOptionValue("user"));
+			if (cmd.hasOption("url"))
+				dataSource.setUrl("jdbc:mysql://" + cmd.getOptionValue("url"));
+			else
+				dataSource.setUrl("jdbc:mysql://" + defaultDatabaseUrl);
+			if (cmd.hasOption("password"))
+				dataSource.setPassword(cmd.getOptionValue("password"));
+			else {
+				// prompt for password
+				char[] pwd = console.readPassword("[%s]", "Password:");
+				dataSource.setPassword(String.valueOf(pwd));
+				Arrays.fill(pwd, ' '); // security purpose
+			}
+
 			// see which option has been chosen and execute:
 			if (cmd.hasOption("h")) {
 				PrintWriter pw = new PrintWriter(out);
