@@ -131,7 +131,7 @@ public class HistoryView extends InitializableView {
 		historyTable.getColumnModel().getColumn(3).setMaxWidth(150);
 
 		scrollPane = new JScrollPane(historyTable);
-		scrollPane.setPreferredSize(new Dimension(750,
+		scrollPane.setPreferredSize(new Dimension(710,
 				MAX_TABLE_SIZE * 18 - 17));
 		panel.add(scrollPane, "wrap");
 
