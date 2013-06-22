@@ -15,8 +15,11 @@ import java.util.List;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -111,18 +114,16 @@ public class HistorySearchPanel extends JPanel {
 		add(dateLabel, "split 2");
 		add(dateFrom = new JXDatePicker(new java.util.Date()), "gap 160, wrap, growx");
 		dateFrom.setDate(null);
-		dateFrom.getEditor().addFocusListener(new FocusListener() {
-
+		dateFrom.getEditor().addActionListener(new ActionListener() {
+			
 			@Override
-			public void focusGained(FocusEvent arg0) {
-			}
-
-			@Override
-			public void focusLost(FocusEvent arg0) {
+			public void actionPerformed(ActionEvent e) {
 				try {
-					dateFrom.commitEdit();
-					search();
-				} catch (ParseException e) {
+					if(dateFrom.isEditValid()) {
+						dateFrom.commitEdit();
+						search();
+					}
+				} catch (ParseException ex) {
 					// nothing
 				}
 			}
@@ -132,18 +133,16 @@ public class HistorySearchPanel extends JPanel {
 		add((endLabel = new JLabel("Ende:")), "split2");
 		add((dateTo = new JXDatePicker(new java.util.Date())), "gap 175, wrap, growx");
 		dateTo.setDate(null);
-		dateTo.getEditor().addFocusListener(new FocusListener() {
-
+		dateTo.getEditor().addActionListener(new ActionListener() {
+			
 			@Override
-			public void focusGained(FocusEvent arg0) {
-			}
-
-			@Override
-			public void focusLost(FocusEvent arg0) {
+			public void actionPerformed(ActionEvent e) {
 				try {
-					dateTo.commitEdit();
-					search();
-				} catch (ParseException e) {
+					if(dateTo.isEditValid()) {
+						dateTo.commitEdit();
+						search();
+					}
+				} catch (ParseException ex) {
 					// nothing
 				}
 			}

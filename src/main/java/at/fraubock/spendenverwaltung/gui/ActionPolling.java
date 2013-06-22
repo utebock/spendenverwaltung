@@ -163,8 +163,8 @@ public class ActionPolling extends Thread {
 			}
 			setVisible(true);
 
-			for (int i = 0; i < 100 + size * 30; i++) {
-				setBounds(1040, 700 - i, 300, 110 + size * 30);
+			for (int i = 0; i < 100 + size * 50; i++) {
+				setBounds(rootLayeredPane.getWidth()-320, 770 - i, 300, 30 + size * 50);
 				rootLayeredPane.repaint();
 				rootLayeredPane.revalidate();
 				try {
@@ -190,9 +190,9 @@ public class ActionPolling extends Thread {
 				return; // already invisible
 
 			int size = this.getComponents().length;
-			for (int i = 0; i < 100 + size * 30; i++) {
-				setBounds(1040, (700 - (100 + size * 30)) + i, 300,
-						110 + size * 30);
+			for (int i = 0; i < 100 + size * 50; i++) {
+				setBounds(rootLayeredPane.getWidth()-320, (770 - (100 + size * 50)) + i, 300,
+						30 + size * 50);
 				rootLayeredPane.repaint();
 				rootLayeredPane.revalidate();
 				try {

@@ -70,7 +70,6 @@ public class GuiStarter {
 
 		ActionPolling polling = new ActionPolling(viewDisplayer, actionService,
 				viewActionFactory);
-		polling.start();
 
 		// need to call mainMenu.init() after all views are set in the
 		// viewActionFactory
@@ -94,7 +93,7 @@ public class GuiStarter {
 		// switch to login view
 		LoginView login = new LoginView(databaseDataSource, componentFactory,
 				viewActionFactory, viewDisplayer, "", "", context.getBean(
-						"defaultDatabaseUrl", String.class));
+						"defaultDatabaseUrl", String.class),polling);
 		login.init();
 		viewDisplayer.changeView(login);
 	}

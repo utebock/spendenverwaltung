@@ -17,6 +17,7 @@ import net.miginfocom.swing.MigLayout;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.log4j.Logger;
 
+import at.fraubock.spendenverwaltung.gui.ActionPolling;
 import at.fraubock.spendenverwaltung.gui.MainFrame;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
@@ -48,6 +49,7 @@ public class LoginView extends InitializableView {
 	private ViewDisplayer viewDisplayer;
 	private BasicDataSource databaseDataSource;
 	private String defaultUser = "", defaultPassword = "", defaultUrl = "";
+	private ActionPolling polling;
 
 	/**
 	 * Creates a new instance.
@@ -74,11 +76,12 @@ public class LoginView extends InitializableView {
 	public LoginView(BasicDataSource databaseDataSource,
 			ComponentFactory componentFactory, ViewActionFactory actionFactory,
 			ViewDisplayer viewDisplayer, String defaultUser,
-			String defaultPassword, String defaultUrl) {
+			String defaultPassword, String defaultUrl, ActionPolling polling) {
 		this.databaseDataSource = databaseDataSource;
 		this.componentFactory = componentFactory;
 		this.actionFactory = actionFactory;
 		this.viewDisplayer = viewDisplayer;
+		this.polling = polling;
 		if (defaultPassword != null)
 			this.defaultPassword = defaultPassword;
 		if (defaultUrl != null)
@@ -101,9 +104,9 @@ public class LoginView extends InitializableView {
 	 */
 	public LoginView(BasicDataSource databaseDataSource,
 			ComponentFactory componentFactory, ViewActionFactory actionFactory,
-			ViewDisplayer viewDisplayer) {
+			ViewDisplayer viewDisplayer, ActionPolling polling) {
 		this(databaseDataSource, componentFactory, actionFactory,
-				viewDisplayer, null, null, null);
+				viewDisplayer, null, null, null, polling);
 	}
 
 	private void login() {
@@ -135,6 +138,7 @@ public class LoginView extends InitializableView {
 				componentFactory);
 		mainMenu.init();
 		viewDisplayer.changeView(mainMenu);
+		polling.start();
 	}
 
 	@Override

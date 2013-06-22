@@ -150,20 +150,8 @@ public class MainFilterView extends InitializableView {
 				}
 				Filter filter = filterModel.getFilterRow(showTable
 						.getSelectedRow());
-
-				if (filter.getOwner().equals(userName)
-						|| filter.getPrivacyStatus() == FilterPrivacyStatus.READ_UPDATE
-						|| filter.getPrivacyStatus() == FilterPrivacyStatus.READ_UPDATE_DELETE) {
-
-					createFilter(filter.getType(), filter);
-
-				} else {
-					JOptionPane.showMessageDialog(MainFilterView.this,
-							"Sie sind nicht berechtigt diesen Filter zu bearbeiten. Er geh\u00f6rt "
-									+ filter.getOwner());
-					return;
-				}
-
+				
+				createFilter(filter.getType(), filter);
 			}
 
 		});
@@ -205,13 +193,13 @@ public class MainFilterView extends InitializableView {
 			JOptionPane
 					.showMessageDialog(
 							this,
-							"An error occured. Please see console for further information",
+							"Ein unerwarteter Fehler ist aufgetreten.",
 							"Error", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 			return;
 		}
 		if (filterList == null) {
-			JOptionPane.showMessageDialog(this, "GetAll() returns null.",
+			JOptionPane.showMessageDialog(this, "Ein unerwarteter Fehler ist aufgetreten.",
 					"Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -221,7 +209,7 @@ public class MainFilterView extends InitializableView {
 	}
 
 	public void createFilter(FilterType type, Filter filter) {
-		CreateFilter cf = new CreateFilter(type, filterService, this, filter,
+		CreateFilter cf = new CreateFilter(type, filterService, this, filter, userName,
 				viewActionFactory);
 		removeAll();
 		revalidate();

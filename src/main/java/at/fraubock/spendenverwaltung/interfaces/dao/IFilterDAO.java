@@ -4,6 +4,7 @@ import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter.FilterPrivacyStatus;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 
 /**
@@ -25,6 +26,18 @@ public interface IFilterDAO {
 	 *             if communication to the underlying persistence system failed
 	 */
 	public void insert(Filter f) throws PersistenceException;
+
+	/**
+	 * updates a filter and deletes it's former criterion if given.
+	 * 
+	 * @param f
+	 *            - the filter to be updated
+	 * @param oldCrit
+	 *            - the criterion to be deleted
+	 * @throws PersistenceException
+	 *             if communication to the underlying persistence system failed
+	 */
+	public void update(Filter f, Criterion oldCrit) throws PersistenceException;
 
 	/**
 	 * Deletes a filter from the underlying persistence layer.

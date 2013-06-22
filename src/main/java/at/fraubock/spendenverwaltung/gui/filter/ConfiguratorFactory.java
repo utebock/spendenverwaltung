@@ -148,6 +148,8 @@ public class ConfiguratorFactory {
 					FilterProperty.DONATION_TYPE, "Art der Spende"));
 			configurators.add(new StringComparator(
 					FilterProperty.DONATION_NOTE, "Notiz"));
+			configurators.add(new BooleanComparator(
+					FilterProperty.DONATION_IS_ANON, "Anonyme Spende"));
 
 			if (!personFilters.isEmpty()) {
 				configurators.add(new SimpleFilterMountConfig("Spender",

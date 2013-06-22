@@ -23,7 +23,7 @@ import at.fraubock.spendenverwaltung.util.filter.FilterType;
 
 /**
  * implements {@link ICriterionConfigurator} for {@link MountedFilterCriterion}s
- * that mount Mailing filters and are added to person filters.
+ * that mount person filters and are added to mailing filters.
  * 
  * @author philipp muhoray
  * 

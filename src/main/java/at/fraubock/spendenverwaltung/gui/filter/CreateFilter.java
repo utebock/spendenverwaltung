@@ -16,7 +16,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
-import at.fraubock.spendenverwaltung.gui.ComponentBuilder;
 import at.fraubock.spendenverwaltung.gui.CustomTextField;
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.MainFilterView;
@@ -64,20 +63,23 @@ public class CreateFilter extends JPanel {
 
 	private JPanel namePanel;
 
+	@SuppressWarnings("unused")
 	private JLabel privacyLabel;
+	private String currentUser;
 
 
 	public CreateFilter(FilterType type, IFilterService filterService,
 			MainFilterView overview, ViewActionFactory viewActionFactory) {
-		this(type, filterService, overview, null, viewActionFactory);
+		this(type, filterService, overview, null, null, viewActionFactory);
 	}
 
 	public CreateFilter(FilterType type, IFilterService filterService,
-			MainFilterView filterOverview, Filter editFilter,
+			MainFilterView filterOverview, Filter editFilter, String currentUser,
 			ViewActionFactory viewActionFactory) {
 		super(new MigLayout());
 
 		// set attributes
+		this.currentUser = currentUser;
 		this.viewActionFactory = viewActionFactory;
 		this.editFilter = editFilter;
 		this.filterService = filterService;
@@ -120,6 +122,15 @@ public class CreateFilter extends JPanel {
 			}
 
 		});
+		
+		if(editFilter!=null) {
+			if (!editFilter.getOwner().equals(this.currentUser)
+					&& editFilter.getPrivacyStatus() == FilterPrivacyStatus.READ) {
+				saveButton.setEnabled(false);
+				saveButton.setToolTipText("Keine Berechtigung. Geh\u00F6rt " + editFilter.getOwner());
+				
+			}
+		}
 
 		JButton cancelButton = new JButton();
 		Action cancelAction = this.viewActionFactory.getMainFilterViewAction();
@@ -243,7 +254,7 @@ public class CreateFilter extends JPanel {
 		minusButton.setAction(minusAct);
 
 		minusButtons.add(minusButton);
-		criterionSelectorPanel.add(selectorComp, "w 700");
+		criterionSelectorPanel.add(selectorComp, "w 700!");
 		criterionSelectorPanel.add(minusButton, "wrap");
 
 		if (plusButton != null) {

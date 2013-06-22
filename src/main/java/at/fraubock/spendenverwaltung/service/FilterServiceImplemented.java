@@ -136,12 +136,11 @@ public class FilterServiceImplemented implements IFilterService {
 	@Transactional(rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public Filter update(Filter f, FilterTO to) throws ServiceException {
 		try {
-			Filter filter = create(to);
-			mountedCritDAO.replaceMountId(f.getId(), filter.getId());
-			delete(f);
+			Filter filter = createFilterFromTransferObject(to);
+			filter.setOwner(f.getOwner());
+			filter.setId(f.getId());
+			filterDAO.update(filter, f.getCriterion());
 			return filter;
-		} catch (FilterInUseException e) {
-			throw new ServiceException();
 		} catch (PersistenceException e) {
 			throw new ServiceException();
 		}
