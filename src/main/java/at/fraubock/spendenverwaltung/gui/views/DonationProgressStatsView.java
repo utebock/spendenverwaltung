@@ -219,7 +219,7 @@ public class DonationProgressStatsView extends InitializableView {
 		Action cancelAction = viewActionFactory.getMainMenuViewAction();
 		cancelAction.putValue(Action.NAME, "Abbrechen");
 		cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass()
-				.getResource("/images/backButton.jpg")));
+				.getResource("/images/backInButton.png")));
 		cancel.setAction(cancelAction);
 		cancel.setFont(new Font("bigger", Font.PLAIN, 13));
 
