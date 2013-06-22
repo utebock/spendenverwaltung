@@ -24,7 +24,6 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.Month;
@@ -304,14 +303,15 @@ public class DonationProgressStatsView extends InitializableView {
 	}
 
 	private JFreeChart createTimeSeriesChart(XYDataset dataset) {
-		final JFreeChart chart = ChartFactory.createXYLineChart(null, "Datum",
-				"Betrag", dataset, PlotOrientation.VERTICAL, true, true, false);
+		final JFreeChart chart = ChartFactory.createTimeSeriesChart(null,
+				"Datum", "Betrag", dataset, true, true, false);
 		final XYItemRenderer renderer = chart.getXYPlot().getRenderer();
 		final StandardXYToolTipGenerator g = new StandardXYToolTipGenerator(
 				StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
 				DateFormat.getDateInstance(DateFormat.LONG),
 				DecimalFormat.getCurrencyInstance(Locale.GERMANY));
 		renderer.setBaseToolTipGenerator(g);
+
 		return chart;
 
 	}
