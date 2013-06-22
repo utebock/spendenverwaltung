@@ -428,7 +428,7 @@ public class CreatePersonView extends InitializableView {
 							log.info("Creating donation");
 							donationService.create(donation);
 						}
-						
+						JOptionPane.showMessageDialog(overviewPanel, "Person erfolgreich angelegt.", "Information", JOptionPane.INFORMATION_MESSAGE);
 						Action switchToMenu = viewActionFactory.getMainMenuViewAction();
 						switchToMenu.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
 

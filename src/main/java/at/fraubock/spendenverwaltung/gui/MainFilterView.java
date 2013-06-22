@@ -97,7 +97,7 @@ public class MainFilterView extends InitializableView {
 		backButton = new JButton();
 		Action getBack = viewActionFactory.getMainMenuViewAction();
 		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass()
-				.getResource("/images/backButton.jpg")));
+				.getResource("/images/backButton.png")));
 		backButton.setAction(getBack);
 
 		personFilter = new JButton();
@@ -241,7 +241,7 @@ public class MainFilterView extends InitializableView {
 		if (!filter.getOwner().equals(userName)
 				&& filter.getPrivacyStatus() != FilterPrivacyStatus.READ_UPDATE_DELETE) {
 			JOptionPane.showMessageDialog(MainFilterView.this,
-					"Sie sind nicht berechtigt diesen Filter zu löschen");
+					"Sie sind nicht berechtigt, diesen Filter zu l\u00F6schen.");
 			return;
 		}
 
