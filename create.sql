@@ -1,4 +1,5 @@
 SET SESSION innodb_strict_mode=on;
+SET NAMES 'utf8' COLLATE 'utf8_unicode_ci';
 
 USE ubspenderverwaltung;
 
@@ -88,9 +89,9 @@ DROP TABLE IF EXISTS addresses;
 CREATE TABLE addresses ( -- for querying, you may want to use validated_addresses
 	id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 	street VARCHAR(1024) NOT NULL, -- including all address lines, e.g. 'Karlsplatz 14/5'
-	postcode VARCHAR(20) NOT NULL, -- must be 4-digit if country = 'Österreich'. Some countries may use characters as well.
+	postcode VARCHAR(20) NOT NULL, -- must be 4-digit if country = 'Ã–sterreich'. Some countries may use characters as well.
 	city VARCHAR(1024) NOT NULL,
-	country VARCHAR(120) NOT NULL DEFAULT 'Österreich' -- German name of country (must be the same for same country)
+	country VARCHAR(120) NOT NULL DEFAULT 'Ã–sterreich' -- German name of country (must be the same for same country)
 );
 
 CREATE TABLE persons ( -- for querying, you may want to use validated_persons
@@ -146,7 +147,7 @@ CREATE TABLE filter ( -- defines a filter for a specific entity
 	type ENUM('validated_persons','validated_donations','confirmed_mailings','validated_addresses') NOT NULL, -- the entity this filter is applicable to
 	name VARCHAR(120), -- a name for this filter. can be null when anonymous
 	anonymous BOOLEAN NOT NULL DEFAULT FALSE, -- anonymous filters are created inside other filters and only exist there
-	privacy_status ENUM('privat', 'anzeigen', 'anzeigen, bearbeiten', 'anzeigen, bearbeiten, löschen') NOT NULL DEFAULT 'privat', -- have all users access to this filter?!
+	privacy_status ENUM('privat', 'anzeigen', 'anzeigen, bearbeiten', 'anzeigen, bearbeiten, lÃ¶schen') NOT NULL DEFAULT 'privat', -- have all users access to this filter?!
 	owner VARCHAR(30) NOT NULL -- name of the user who created this filter
 );
 

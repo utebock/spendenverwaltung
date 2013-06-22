@@ -18,6 +18,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -180,13 +181,11 @@ public class DonationProgressStatsView extends InitializableView {
 		operationBox = new JComboBox<Operation>(Operation.values());
 		operationsPanel.add(operationBox, "gap 10, growx, wrap 10px");
 
-		printResult = componentFactory
-				.createLabel("Ergebnis: ");
+		printResult = componentFactory.createLabel("Ergebnis: ");
 		operationsPanel.add(printResult, "split 2");
-		resultLabel = componentFactory
-				.createLabel("");
+		resultLabel = componentFactory.createLabel("");
 		operationsPanel.add(resultLabel, "wrap 30px");
-		
+
 		submit = new JButton();
 		cancel = new JButton();
 		operationsPanel.add(submit, "split 2");
@@ -231,9 +230,19 @@ public class DonationProgressStatsView extends InitializableView {
 		private String name;
 		Pair<List<Donation>, String> pair;
 		private double result;
-		
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			// first check if any filters are selected
+			if (firstFilter.getSelectedIndex() == 0
+					&& secondFilter.getSelectedIndex() == 0
+					&& thirdFilter.getSelectedIndex() == 0) {
+				JOptionPane.showMessageDialog(operationsPanel,
+						"Bitte Auswahl an Einstellungen treffen.");
+				return;
+			}
+
+			// now, create the datasets
 			List<Pair<List<Donation>, String>> pairList = new ArrayList<Pair<List<Donation>, String>>();
 			Operation operation = (Operation) operationBox.getSelectedItem();
 			Class<? extends RegularTimePeriod> periodClass;
@@ -257,191 +266,40 @@ public class DonationProgressStatsView extends InitializableView {
 				periodClass = Year.class;
 				break;
 			}
-// 			everything is selected
-			if(firstFilter.getSelectedIndex() != 0
-					&& secondFilter.getSelectedIndex() != 0
-					&& thirdFilter.getSelectedIndex() != 0) {
-				
+
+			if (firstFilter.getSelectedIndex() != 0) {
 				donationList = getDonations((Filter) firstFilter
 						.getSelectedItem());
 				name = ((Filter) firstFilter.getSelectedItem()).getName();
 				pair = new Pair<List<Donation>, String>(donationList, name);
 				pairList.add(pair);
-
+			}
+			if (secondFilter.getSelectedIndex() != 0) {
 				donationList = getDonations((Filter) secondFilter
 						.getSelectedItem());
 				name = ((Filter) secondFilter.getSelectedItem()).getName();
 				pair = new Pair<List<Donation>, String>(donationList, name);
 				pairList.add(pair);
-
+			}
+			if (thirdFilter.getSelectedIndex() != 0) {
 				donationList = getDonations((Filter) thirdFilter
 						.getSelectedItem());
 				name = ((Filter) thirdFilter.getSelectedItem()).getName();
 				pair = new Pair<List<Donation>, String>(donationList, name);
 				pairList.add(pair);
-
-				TimeSeriesCollection dataSets = DonationTimeStatisticDatasetGenerator
-						.createDataset(pairList, operation, periodClass);
-
-				chart = createTimeSeriesChart(dataSets);
-				chartPanel = new ChartPanel(chart);
-				chartPanel.setPreferredSize(new Dimension(700, 270));
-				plotPanel.removeAll();
-				plotPanel.repaint();
-				plotPanel.add(chartPanel);
-				plotPanel.validate();
 			}
-//			first filter selected			
-			if(firstFilter.getSelectedIndex() != 0
-					&& secondFilter.getSelectedIndex() == 0
-					&& thirdFilter.getSelectedIndex() == 0){
-				donationList = getDonations((Filter) firstFilter
-						.getSelectedItem());
-				name = ((Filter) firstFilter.getSelectedItem()).getName();
-				
-				pair = new Pair<List<Donation>, String>(donationList, name);
-				pairList.add(pair);
-				TimeSeriesCollection dataSets = DonationTimeStatisticDatasetGenerator
-						.createDataset(pairList, operation, periodClass);
 
-				chart = createTimeSeriesChart(dataSets);
-				chartPanel = new ChartPanel(chart);
-				chartPanel.setPreferredSize(new Dimension(700, 270));
-				plotPanel.removeAll();
-				plotPanel.repaint();
-				plotPanel.add(chartPanel);
-				plotPanel.validate();
-			}
-//			second filter selected			
-			if(secondFilter.getSelectedIndex() != 0
-					&& firstFilter.getSelectedIndex() == 0
-					&& thirdFilter.getSelectedIndex() == 0){
-				donationList = getDonations((Filter) secondFilter
-						.getSelectedItem());
-				name = ((Filter) secondFilter.getSelectedItem()).getName();
-				
-				pair = new Pair<List<Donation>, String>(donationList, name);
-				pairList.add(pair);
-				TimeSeriesCollection dataSets = DonationTimeStatisticDatasetGenerator
-						.createDataset(pairList, operation, periodClass);
+			TimeSeriesCollection dataSets = DonationTimeStatisticDatasetGenerator
+					.createDataset(pairList, operation, periodClass);
 
-				chart = createTimeSeriesChart(dataSets);
-				chartPanel = new ChartPanel(chart);
-				chartPanel.setPreferredSize(new Dimension(700, 270));
-				plotPanel.removeAll();
-				plotPanel.repaint();
-				plotPanel.add(chartPanel);
-				plotPanel.validate();
-			}
-//			third filter selected			
-			if(thirdFilter.getSelectedIndex() != 0
-					&& firstFilter.getSelectedIndex() == 0
-					&& secondFilter.getSelectedIndex() == 0){
-				donationList = getDonations((Filter) thirdFilter
-						.getSelectedItem());
-				name = ((Filter) thirdFilter.getSelectedItem()).getName();
-				
-				pair = new Pair<List<Donation>, String>(donationList, name);
-				pairList.add(pair);
-				TimeSeriesCollection dataSets = DonationTimeStatisticDatasetGenerator
-						.createDataset(pairList, operation, periodClass);
+			chart = createTimeSeriesChart(dataSets);
+			chartPanel = new ChartPanel(chart);
+			chartPanel.setPreferredSize(new Dimension(700, 270));
+			plotPanel.removeAll();
+			plotPanel.repaint();
+			plotPanel.add(chartPanel);
+			plotPanel.validate();
 
-				chart = createTimeSeriesChart(dataSets);
-				chartPanel = new ChartPanel(chart);
-				chartPanel.setPreferredSize(new Dimension(700, 270));
-				plotPanel.removeAll();
-				plotPanel.repaint();
-				plotPanel.add(chartPanel);
-				plotPanel.validate();
-			}
-			
-// 			first filter & second filter selected
-			if (firstFilter.getSelectedIndex() != 0
-					&& secondFilter.getSelectedIndex() != 0) {
-				donationList = getDonations((Filter) firstFilter
-						.getSelectedItem());
-				name = ((Filter) firstFilter.getSelectedItem()).getName();
-				pair = new Pair<List<Donation>, String>(donationList, name);
-				pairList.add(pair);
-
-				donationList = getDonations((Filter) secondFilter
-						.getSelectedItem());
-				name = ((Filter) secondFilter.getSelectedItem()).getName();
-				pair = new Pair<List<Donation>, String>(donationList, name);
-				pairList.add(pair);
-
-				TimeSeriesCollection dataSets = DonationTimeStatisticDatasetGenerator
-						.createDataset(pairList, operation, periodClass);
-
-				chart = createTimeSeriesChart(dataSets);
-				chartPanel = new ChartPanel(chart);
-				chartPanel.setPreferredSize(new Dimension(700, 270));
-				plotPanel.removeAll();
-				plotPanel.repaint();
-				plotPanel.add(chartPanel);
-				plotPanel.validate();
-			}
-// 			second filter & third filter selected
-			if (secondFilter.getSelectedIndex() != 0
-					&& thirdFilter.getSelectedIndex() != 0) {
-				donationList = getDonations((Filter) secondFilter
-						.getSelectedItem());
-				name = ((Filter) secondFilter.getSelectedItem()).getName();
-				pair = new Pair<List<Donation>, String>(donationList, name);
-				pairList.add(pair);
-
-				donationList = getDonations((Filter) thirdFilter
-						.getSelectedItem());
-				name = ((Filter) thirdFilter.getSelectedItem()).getName();
-				pair = new Pair<List<Donation>, String>(donationList, name);
-				pairList.add(pair);
-
-				TimeSeriesCollection dataSets = DonationTimeStatisticDatasetGenerator
-						.createDataset(pairList, operation, periodClass);
-
-				chart = createTimeSeriesChart(dataSets);
-				chartPanel = new ChartPanel(chart);
-				chartPanel.setPreferredSize(new Dimension(700, 270));
-				plotPanel.removeAll();
-				plotPanel.repaint();
-				plotPanel.add(chartPanel);
-				plotPanel.validate();
-			}
-			
-// 			first filter & third filter selected
-			if (firstFilter.getSelectedIndex() != 0
-					&& thirdFilter.getSelectedIndex() != 0) {
-				donationList = getDonations((Filter) firstFilter
-						.getSelectedItem());
-				name = ((Filter) firstFilter.getSelectedItem()).getName();
-				pair = new Pair<List<Donation>, String>(donationList, name);
-				pairList.add(pair);
-
-				donationList = getDonations((Filter) thirdFilter
-						.getSelectedItem());
-				name = ((Filter) thirdFilter.getSelectedItem()).getName();
-				pair = new Pair<List<Donation>, String>(donationList, name);
-				pairList.add(pair);
-
-				TimeSeriesCollection dataSets = DonationTimeStatisticDatasetGenerator
-						.createDataset(pairList, operation, periodClass);
-
-				chart = createTimeSeriesChart(dataSets);
-				chartPanel = new ChartPanel(chart);
-				chartPanel.setPreferredSize(new Dimension(700, 270));
-				plotPanel.removeAll();
-				plotPanel.repaint();
-				plotPanel.add(chartPanel);
-				plotPanel.validate();
-			}
-// 			nothing is selected
-			if(firstFilter.getSelectedIndex() == 0
-					&& secondFilter.getSelectedIndex() == 0
-					&& thirdFilter.getSelectedIndex() == 0){
-				JOptionPane.showMessageDialog(operationsPanel,
-						"Bitte Auswahl an Einstellungen treffen.");
-				return;
-			}
 		}
 	}
 
