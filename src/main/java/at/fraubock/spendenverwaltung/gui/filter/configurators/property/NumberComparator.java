@@ -75,7 +75,7 @@ public class NumberComparator extends JPanel implements ICriterionConfigurator {
 						RelationalOperatorGuiWrapper.getForOperator(prop
 								.getRelationalOperator()));
 
-				this.textField.setNumericValue(prop.getNumValue()/100);
+				this.textField.setNumericValue(prop.getNumValue()/100D);
 
 				return true;
 			}

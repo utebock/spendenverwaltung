@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,7 +19,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -43,16 +43,12 @@ import at.fraubock.spendenverwaltung.gui.components.StringTextField;
 import at.fraubock.spendenverwaltung.interfaces.domain.Confirmation;
 import at.fraubock.spendenverwaltung.interfaces.domain.ConfirmationTemplate;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
-import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
-import at.fraubock.spendenverwaltung.interfaces.domain.Mailing.Medium;
-import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IConfirmationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.util.ConfirmationTemplateUtil;
-import at.fraubock.spendenverwaltung.util.MailingTemplateUtil;
 
 public class PersonDonationsView extends InitializableView {
 
@@ -141,6 +137,12 @@ public class PersonDonationsView extends InitializableView {
 		scrollPane.setPreferredSize(new Dimension(750, 450));
 		
 		contentPanel.add(scrollPane, "wrap");
+		
+		JButton exportButton = new JButton("Liste exportieren");
+		exportButton.setFont(new Font("Bigger", Font.PLAIN, 13));
+		final JFileChooser fileChooser = new JFileChooser();
+		exportButton.addActionListener(new exportActionListener(fileChooser));
+		contentPanel.add(exportButton, "wrap");
 		
 		feedbackLabel = componentFactory.createLabel("");
 		feedbackLabel.setFont(new Font("Headline", Font.PLAIN, 13));
@@ -959,5 +961,53 @@ public class PersonDonationsView extends InitializableView {
 		}	
 	}
 	
+	private final class exportActionListener implements ActionListener {
+		private final JFileChooser fileChooser;
+
+		private exportActionListener(JFileChooser fileChooser) {
+			this.fileChooser = fileChooser;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			List<Donation> donations = ((DonationTableModel) donationsTable.getModel())
+					.getDonations();
+
+			String csv = donationService.convertToCSV(donations);
+
+			fileChooser.setSelectedFile(new File("spenden.csv"));
+			fileChooser.setFileFilter(new FileFilter() {
+
+				@Override
+				public boolean accept(File f) {
+					return f.getName().toLowerCase().endsWith(".csv")
+							|| f.isDirectory();
+				}
+
+				@Override
+				public String getDescription() {
+					return "CSV Dateien(*.csv)";
+				}
+
+			});
+
+			if (fileChooser.showSaveDialog(PersonDonationsView.this) == JFileChooser.APPROVE_OPTION) {
+				File file = fileChooser.getSelectedFile();
+				FileWriter writer = null;
+				try {
+					writer = new FileWriter(file);
+					writer.write(csv);
+					writer.flush();
+					writer.close();
+				} catch (IOException e) {
+					JOptionPane.showMessageDialog(PersonDonationsView.this,
+							"Die Datei konnte nicht beschrieben werden.",
+							"Error", JOptionPane.ERROR_MESSAGE);
+					log.error("File could not be written to. path='"
+							+ file.getAbsolutePath() + "', text='" + csv + "'");
+				}
+			}
+		}
+	}
 	
 }
