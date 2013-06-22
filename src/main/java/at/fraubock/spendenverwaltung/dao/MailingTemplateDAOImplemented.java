@@ -28,6 +28,12 @@ import at.fraubock.spendenverwaltung.interfaces.domain.MailingTemplate;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
 
+/**
+ * implementation of {@link IMailingTemplateDAO}
+ * 
+ * @author philipp muhoray
+ * 
+ */
 public class MailingTemplateDAOImplemented implements IMailingTemplateDAO {
 	private static final Logger log = Logger
 			.getLogger(MailingTemplateDAOImplemented.class);
@@ -65,7 +71,7 @@ public class MailingTemplateDAOImplemented implements IMailingTemplateDAO {
 	public void delete(final MailingTemplate mt) throws PersistenceException {
 		try {
 			log.info("Deleting MailingTemplate...");
-				
+
 			validate(mt);
 			jdbcTemplate.update(new PreparedStatementCreator() {
 
@@ -148,7 +154,7 @@ public class MailingTemplateDAOImplemented implements IMailingTemplateDAO {
 			} catch (IOException e1) {
 				throw new SQLException(e1);
 			}
-			
+
 			InputStream is = rs.getBinaryStream("data");
 			OutputStream os = null;
 			try {
@@ -213,8 +219,8 @@ public class MailingTemplateDAOImplemented implements IMailingTemplateDAO {
 			ps.setString(1, mt.getFileName());
 			try {
 				FileInputStream stream = new FileInputStream(mt.getFile());
-				ps.setBinaryStream(2, stream, (int)mt.getFile().length());
-				log.debug("File length in PSC: "+(int)mt.getFile().length());
+				ps.setBinaryStream(2, stream, (int) mt.getFile().length());
+				log.debug("File length in PSC: " + (int) mt.getFile().length());
 			} catch (FileNotFoundException e) {
 				log.error("The file with path='"
 						+ mt.getFile().getAbsolutePath()

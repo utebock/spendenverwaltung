@@ -11,6 +11,7 @@ import at.fraubock.spendenverwaltung.gui.views.LoginView;
 import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
 import at.fraubock.spendenverwaltung.interfaces.service.IActionService;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
+import at.fraubock.spendenverwaltung.interfaces.service.IConfirmationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
@@ -29,6 +30,7 @@ public class GuiStarter {
 		@SuppressWarnings("resource")
 		ApplicationContext context = new ClassPathXmlApplicationContext(
 				"/spring.xml");
+		
 		/**
 		 * when the GUI is closed, SYSTEM_EXIT is called. this shutdown hook
 		 * ensures the graceful shutdown of the context.
@@ -45,6 +47,8 @@ public class GuiStarter {
 				IAddressService.class);
 		IMailingService mailingService = context.getBean("mailingService",
 				IMailingService.class);
+		IConfirmationService confirmationService = context.getBean("confirmationService",
+				IConfirmationService.class);
 		IImportService importService = context.getBean("importService",
 				IImportService.class);
 		IActionService actionService = context.getBean("actionService",
@@ -56,12 +60,17 @@ public class GuiStarter {
 				BasicDataSource.class);
 
 		ViewDisplayer viewDisplayer = new ViewDisplayer();
+
 		ComponentFactory componentFactory = new ComponentFactory();
 
 		ViewActionFactory viewActionFactory = new ViewActionFactory(
 				viewDisplayer, personService, donationService, filterService,
-				addressService, mailingService, importService, actionService,
+				addressService, mailingService, confirmationService, importService, actionService,
 				mailChimpService);
+
+		ActionPolling polling = new ActionPolling(viewDisplayer, actionService,
+				viewActionFactory);
+		polling.start();
 
 		// need to call mainMenu.init() after all views are set in the
 		// viewActionFactory

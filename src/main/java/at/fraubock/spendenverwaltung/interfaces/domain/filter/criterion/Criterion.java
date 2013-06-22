@@ -1,23 +1,20 @@
 package at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion;
 
-import at.fraubock.spendenverwaltung.util.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.FilterBuilder;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
 
 /**
  * a criterion represents a condition for a specific entity that can be
- * fulfilled or not. conceptually, a criterion composes of 
- * 1) input of an entity of a specific type (defined by the {@link FilterType}) 
- * 2) evaluation function which evaluates this criterion's condition based on the input
- * (defined in a concrete sub type of this abstract class)
- * 3) output that determines the result of the evaluation function (boolean)
+ * fulfilled or not. conceptually, a criterion composes of 1) input of an entity
+ * of a specific type (defined by the {@link FilterType}) 2) evaluation function
+ * which evaluates this criterion's condition based on the input (defined in a
+ * concrete sub type of this abstract class) 3) output that determines the
+ * result of the evaluation function (boolean)
  * 
- * @NOTE since we are using SQL statements for filtering rather than lists of
- *       entity instances, the evaluation function is NOT given programmatically
- *       but rather per definition. that means that there is no need for a method
- *       like <code>abstract boolean validate(Entity)</code> (which would go
- *       along with the idea behind this concept). instead, criterions are
- *       solely data structures that have to be interpreted into corresponding
- *       SQL statements fulfilling the definition. this is done by the
- *       {@link FilterToSqlBuilder}.
+ * @NOTE criterions are solely data structures that hold information about how
+ *       an object should be filtered. they first have to be interpreted into
+ *       corresponding query statements fulfilling the definition. this is done
+ *       by the {@link FilterBuilder}.
  * 
  * @author philipp muhoray
  * 
@@ -41,5 +38,33 @@ public abstract class Criterion {
 
 	public void setType(FilterType type) {
 		this.type = type;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Criterion other = (Criterion) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (type != other.type)
+			return false;
+		return true;
 	}
 }

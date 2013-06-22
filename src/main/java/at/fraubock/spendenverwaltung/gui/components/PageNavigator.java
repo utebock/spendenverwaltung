@@ -81,7 +81,7 @@ public class PageNavigator extends JPanel {
 
 		} catch (ServiceException e1) {
 			JOptionPane.showMessageDialog(PageNavigator.this,
-					"Ein unerwarteter Fehler ist aufgetreten.", "Error",
+					"Ein unerwarteter Fehler ist aufgetreten.", "Fehler",
 					JOptionPane.ERROR_MESSAGE);
 			log.error("Error when reading page count: " + e1.getMessage());
 		}

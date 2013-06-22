@@ -19,7 +19,7 @@ import at.fraubock.spendenverwaltung.gui.filter.configurators.ICriterionConfigur
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
-import at.fraubock.spendenverwaltung.util.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
 
 /**
  * implements {@link ICriterionConfigurator} for {@link MountedFilterCriterion}s

@@ -42,10 +42,10 @@ import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
-import at.fraubock.spendenverwaltung.util.FilterProperty;
-import at.fraubock.spendenverwaltung.util.FilterType;
-import at.fraubock.spendenverwaltung.util.LogicalOperator;
-import at.fraubock.spendenverwaltung.util.RelationalOperator;
+import at.fraubock.spendenverwaltung.util.filter.FilterProperty;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.LogicalOperator;
+import at.fraubock.spendenverwaltung.util.filter.RelationalOperator;
 
 public class FindPersonsView extends InitializableView {
 
@@ -103,12 +103,12 @@ public class FindPersonsView extends InitializableView {
 		initTable();
 		overviewPanel.add(filterCombo, "growx, wrap");
 
-		quickSearchLabel = componentFactory.createLabel("Schnellsuche");
+		quickSearchLabel = componentFactory.createLabel("Schnellsuche: ");
 		quickSearchField = new JTextField(30);
 		quickSearchField.addActionListener(new QuickSearchAction());
 
 		overviewPanel.add(quickSearchLabel, "split 2");
-		overviewPanel.add(quickSearchField, "wrap");
+		overviewPanel.add(quickSearchField, "gap 25, wrap 20px, growx");
 
 		overviewPanel.add(scrollPane, "wrap");
 
@@ -145,7 +145,7 @@ public class FindPersonsView extends InitializableView {
 		} catch (ServiceException e) {
 			log.warn(e.getLocalizedMessage());
 			JOptionPane.showMessageDialog(this,
-					"Ein unerwarteter Fehler ist aufgetreten.", "Error",
+					"Ein unerwarteter Fehler ist aufgetreten.", "Fehler",
 					JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -165,19 +165,19 @@ public class FindPersonsView extends InitializableView {
 		backButton = new JButton();
 		Action getBack = viewActionFactory.getMainMenuViewAction();
 		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass()
-				.getResource("/images/backButton.jpg")));
+				.getResource("/images/backButton.png")));
 		backButton.setAction(getBack);
 
 		viewAddressesButton = new JButton();
 		viewAddressesButton.setFont(new Font("Bigger", Font.PLAIN, 13));
 		ViewAddressesAction viewAddressesAction = new ViewAddressesAction();
-		viewAddressesAction.putValue(Action.NAME, "Adressen anzeigen");
+		viewAddressesAction.putValue(Action.NAME, "<html>&nbsp;Adressen anzeigen</html>");
 		viewAddressesButton.setAction(viewAddressesAction);
 
 		viewDonationsButton = new JButton();
 		viewDonationsButton.setFont(new Font("Bigger", Font.PLAIN, 13));
 		ViewDonationsAction viewDonationsAction = new ViewDonationsAction();
-		viewDonationsAction.putValue(Action.NAME, "Spenden anzeigen");
+		viewDonationsAction.putValue(Action.NAME, "<html>&nbsp;Spenden anzeigen</html>");
 		viewDonationsButton.setAction(viewDonationsAction);
 
 		editButton = new JButton();
@@ -195,10 +195,11 @@ public class FindPersonsView extends InitializableView {
 		deleteButton.setAction(deleteAction);
 
 		toolbar.add(backButton, "split 4, growx");
-		toolbar.add(viewAddressesButton);
-		toolbar.add(viewDonationsButton);
 		toolbar.add(editButton);
 		toolbar.add(deleteButton);
+		toolbar.add(viewAddressesButton);
+		toolbar.add(viewDonationsButton);
+		
 
 	}
 
@@ -275,8 +276,9 @@ public class FindPersonsView extends InitializableView {
 					personModel.addAll(results);
 				} catch (ServiceException e1) {
 					log.warn(e1.getLocalizedMessage());
-					feedbackLabel
-							.setText("Ein Fehler passierte während der Schnellsuche.");
+					//feedbackLabel
+					//		.setText("Ein Fehler passierte waehrend der Schnellsuche.");
+					JOptionPane.showMessageDialog(overviewPanel, "Ein Fehler ist w\u00E4hrend der Schnellsuche aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}
@@ -376,8 +378,9 @@ public class FindPersonsView extends InitializableView {
 			Person p;
 			int row = showTable.getSelectedRow();
 			if (row == -1) {
-				feedbackLabel
-						.setText("Bitte Person zum L\u00F6schen ausw\u00E4hlen.");
+				//feedbackLabel
+				//		.setText("Bitte Person zum L\u00F6schen ausw\u00E4hlen.");
+				JOptionPane.showMessageDialog(overviewPanel, "Bitte Person zum L\u00F6schen ausw\u00E4hlen.", "Information", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
 
@@ -385,7 +388,7 @@ public class FindPersonsView extends InitializableView {
 
 			Object[] options = { "Abbrechen", "L\u00F6schen" };
 			int ok = JOptionPane.showOptionDialog(overviewPanel,
-					"Diese Person sicher l\u00F6schen?", "Loeschen",
+					"Diese Person sicher l\u00F6schen?", "L\u00F6schen",
 					JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
 					null, options, options[1]);
 
@@ -395,9 +398,10 @@ public class FindPersonsView extends InitializableView {
 					personModel.removePerson(row);
 					feedbackLabel.setText("Person wurde gel\u00F6scht.");
 				} catch (ServiceException ex) {
-					feedbackLabel
-							.setText("Ein unerwarter Fehler ist während der Löschoperation aufgetreten.");
+					//feedbackLabel
+					//		.setText("Ein unerwarter Fehler ist waehrend der Loeschoperation aufgetreten.");
 					log.warn(ex.getLocalizedMessage());
+					JOptionPane.showMessageDialog(overviewPanel, "Ein Fehler ist w\u00E4hrend des L\u00F6schens aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}
@@ -416,8 +420,9 @@ public class FindPersonsView extends InitializableView {
 			Person p;
 			int row = showTable.getSelectedRow();
 			if (row == -1) {
-				feedbackLabel
-						.setText("Es muss eine Person ausgewählt werden bevor die Addressen angezeigt werden können.");
+			//	feedbackLabel
+			//			.setText("Es muss eine Person ausgewaehlt werden bevor die Addressen angezeigt werden koennen.");
+				JOptionPane.showMessageDialog(overviewPanel, "Bitte Person ausw\u00E4hlen.", "Information", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
 
@@ -449,8 +454,9 @@ public class FindPersonsView extends InitializableView {
 			Person p;
 			int row = showTable.getSelectedRow();
 			if (row == -1) {
-				feedbackLabel
-						.setText("Es muss eine Person ausgewählt werden bevor die Spenden angezeigt werden können.");
+			//	feedbackLabel
+			//			.setText("Es muss eine Person ausgewaehlt werden bevor die Spenden angezeigt werden koennen.");
+				JOptionPane.showMessageDialog(overviewPanel, "Bitte Person ausw\u00E4hlen.", "Information", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
 

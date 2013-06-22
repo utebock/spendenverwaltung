@@ -1,5 +1,11 @@
 package at.fraubock.spendenverwaltung.interfaces.exceptions;
 
+/**
+ * exception thrown by the services. occurs whenever the service layer
+ * encounters an error.
+ * 
+ * @author manuel-bichler
+ */
 public class ServiceException extends Exception {
 
 	private static final long serialVersionUID = 1L;

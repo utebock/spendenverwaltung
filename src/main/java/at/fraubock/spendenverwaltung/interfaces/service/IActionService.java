@@ -1,5 +1,8 @@
 package at.fraubock.spendenverwaltung.interfaces.service;
 
+import java.util.Date;
+import java.util.List;
+
 import at.fraubock.spendenverwaltung.interfaces.domain.Action;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.util.ActionSearchVO;
@@ -27,4 +30,16 @@ public interface IActionService {
 	 */
 	public Pager<Action> searchActions(final ActionSearchVO searchVOParam,
 			final int pageSizeParam) throws ServiceException;
+
+	/**
+	 * returns the first <code>amount</code> of actions that occurred since the
+	 * specified <code>date</code>.
+	 * 
+	 * @param date
+	 * @param amount
+	 * @return
+	 * @throws ServiceException
+	 */
+	public List<Action> pollForActionSince(Date date, int amount)
+			throws ServiceException;
 }

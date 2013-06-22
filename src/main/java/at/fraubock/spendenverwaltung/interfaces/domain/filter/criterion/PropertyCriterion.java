@@ -2,8 +2,8 @@ package at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion;
 
 import java.util.Date;
 
-import at.fraubock.spendenverwaltung.util.FilterProperty;
-import at.fraubock.spendenverwaltung.util.RelationalOperator;
+import at.fraubock.spendenverwaltung.util.filter.FilterProperty;
+import at.fraubock.spendenverwaltung.util.filter.RelationalOperator;
 
 /**
  * this class represents a {@link Criterion} that evaluates an entity based on

@@ -26,19 +26,19 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
-import at.fraubock.spendenverwaltung.util.FilterToSqlBuilder;
+import at.fraubock.spendenverwaltung.util.filter.FilterBuilder;
 
 public class PersonDAOImplemented implements IPersonDAO {
 
 	private IAddressDAO addressDAO;
 	private JdbcTemplate jdbcTemplate;
-	private FilterToSqlBuilder filterToSqlBuilder;
+	private FilterBuilder filterBuilder;
 
 	private static final Logger log = Logger
 			.getLogger(PersonDAOImplemented.class);
 
-	public void setFilterToSqlBuilder(FilterToSqlBuilder filterToSqlBuilder) {
-		this.filterToSqlBuilder = filterToSqlBuilder;
+	public void setFilterBuilder(FilterBuilder filterBuilder) {
+		this.filterBuilder = filterBuilder;
 	}
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
@@ -484,7 +484,7 @@ public class PersonDAOImplemented implements IPersonDAO {
 	@Override
 	public List<Person> getByFilter(Filter filter) throws PersistenceException {
 		try {
-			String select = filterToSqlBuilder.createSqlStatement(filter);
+			String select = filterBuilder.createStatement(filter);
 			try {
 
 				List<Person> personList = jdbcTemplate.query(select,

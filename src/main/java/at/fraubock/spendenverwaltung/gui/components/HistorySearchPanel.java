@@ -9,6 +9,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -36,17 +38,39 @@ public class HistorySearchPanel extends JPanel {
 	private JXDatePicker dateTo;
 	private JTextField dataSearch;
 	private HistoryView view;
+	private ComponentFactory componentFactory;
+
+	private JLabel nameLabel;
+
+	private JLabel entityLabel;
+
+	private JLabel dateLabel;
+
+	private JLabel dataLabel;
+
+	private JLabel didLabel;
+
+	private JLabel endLabel;
 
 	public HistorySearchPanel(HistoryView viewParam) {
 		this.view = viewParam;
 		setLayout(new MigLayout());
-
-		add(actorSearch = new JTextField(17));
+		componentFactory = new ComponentFactory();
+	
+		// WHO
+		nameLabel = componentFactory.createLabel("Benutzer: ");
+		add(nameLabel, "split 2");
+		actorSearch = new JTextField(17);
+		add(actorSearch, "gap 70, wrap, growx");
+		
 		actorSearch.addKeyListener(new SearchKeyListener());
 
-		add(actionSearch = new JComboBox<ActionTypeMapper>(
+		// DID
+		add((didLabel = new JLabel("Get\u00E4tigte Aktion: ")), "split 2");
+		add((actionSearch = new JComboBox<ActionTypeMapper>(
 				new SimpleComboBoxModel<ActionTypeMapper>(
-						ActionTypeMapper.values())));
+						ActionTypeMapper.values()))), "gap 20, wrap, growx");
+		
 		actionSearch.setPreferredSize(new Dimension(147, JComboBox.HEIGHT));
 		actionSearch.addActionListener(new ActionListener() {
 
@@ -55,14 +79,19 @@ public class HistorySearchPanel extends JPanel {
 				search();
 			}
 		});
-
+		// WHAT
 		List<ActionEntityMapper> mappers = new ArrayList<ActionEntityMapper>();
 		mappers.add(new ActionEntityMapper(null));
 		for (Action.Entity ent : Action.Entity.values()) {
 			mappers.add(new ActionEntityMapper(ent));
 		}
-		add(entitySearch = new JComboBox<ActionEntityMapper>(
-				new SimpleComboBoxModel<ActionEntityMapper>(mappers)));
+		
+		entityLabel = componentFactory.createLabel("Subjekt: ");
+		add(entityLabel, "split 2");
+		
+		entitySearch = new JComboBox<ActionEntityMapper>(
+				new SimpleComboBoxModel<ActionEntityMapper>(mappers));
+		
 		entitySearch.setPreferredSize(new Dimension(205, JComboBox.HEIGHT));
 		entitySearch.addActionListener(new ActionListener() {
 
@@ -71,13 +100,16 @@ public class HistorySearchPanel extends JPanel {
 				search();
 			}
 		});
+		add(entitySearch, "gap 75, wrap, growx");
 
 		JPanel datePanel = new JPanel();
 		datePanel.setLayout(new MigLayout());
-		add(datePanel);
-		datePanel.add(new JLabel("von "));
-		datePanel
-				.add(dateFrom = new JXDatePicker(new java.util.Date()), "wrap");
+		//add(datePanel);
+		
+		// WHEN
+		dateLabel = componentFactory.createLabel("Beginn: ");
+		add(dateLabel, "split 2");
+		add(dateFrom = new JXDatePicker(new java.util.Date()), "gap 80, wrap, growx");
 		dateFrom.setDate(null);
 		dateFrom.getEditor().addFocusListener(new FocusListener() {
 
@@ -96,8 +128,9 @@ public class HistorySearchPanel extends JPanel {
 			}
 		});
 
-		datePanel.add(new JLabel("bis "));
-		datePanel.add(dateTo = new JXDatePicker(new java.util.Date()));
+		//datePanel.add(new JLabel("bis "));
+		add((endLabel = new JLabel("Ende:")), "split2");
+		add((dateTo = new JXDatePicker(new java.util.Date())), "gap 95, wrap, growx");
 		dateTo.setDate(null);
 		dateTo.getEditor().addFocusListener(new FocusListener() {
 
@@ -116,7 +149,8 @@ public class HistorySearchPanel extends JPanel {
 			}
 		});
 
-		add(dataSearch = new JTextField(42));
+		add((dataLabel = new JLabel("Daten: ")), "split2");
+		add((dataSearch = new JTextField(42)), "gap 83, wrap, growx");
 		dataSearch.addKeyListener(new SearchKeyListener());
 
 	}
@@ -151,7 +185,16 @@ public class HistorySearchPanel extends JPanel {
 
 		searchVO.setFrom(dateFrom.getDate());
 
-		searchVO.setTo(dateTo.getDate());
+		if(dateTo.getDate()!=null) {
+			Calendar cal = new GregorianCalendar();
+			cal.setTime(dateTo.getDate());
+			cal.set(Calendar.HOUR_OF_DAY, 23);
+			cal.set(Calendar.MINUTE, 59);
+			cal.set(Calendar.SECOND, 59);
+			cal.set(Calendar.MILLISECOND, 999);
+			searchVO.setTo(cal.getTime());
+		}
+		
 
 		searchVO.setPayload(StringUtils.isEmpty(dataSearch.getText()) ? null
 				: dataSearch.getText());

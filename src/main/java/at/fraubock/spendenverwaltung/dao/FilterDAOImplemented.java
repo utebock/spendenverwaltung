@@ -25,8 +25,14 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter.FilterPrivacyStatus;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.service.FilterValidator;
-import at.fraubock.spendenverwaltung.util.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
 
+/**
+ * implementation of {@link IFilterDAO}
+ * 
+ * @author philipp muhoray
+ * 
+ */
 public class FilterDAOImplemented implements IFilterDAO {
 
 	private static final Logger log = Logger
@@ -63,14 +69,13 @@ public class FilterDAOImplemented implements IFilterDAO {
 		try {
 			validator.validate(f);
 
-			boolean rightsOk = jdbcTemplate
-					.queryForObject(
-							"SELECT (privacy_status = ? OR owner = SUBSTRING_INDEX(USER(),'@',1)) FROM filter WHERE id = ?",
-							new Object[] {
-									Filter.FilterPrivacyStatus.READ_UPDATE_DELETE
-											.toString(), f.getId() },
-							new int[] { Types.VARCHAR, Types.INTEGER },
-							Boolean.class);
+			boolean rightsOk = jdbcTemplate.queryForObject(
+					"SELECT (privacy_status = ? OR owner = SUBSTRING_INDEX(USER(),'@',1)) "
+							+ "FROM filter WHERE id = ?",
+					new Object[] {
+							Filter.FilterPrivacyStatus.READ_UPDATE_DELETE
+									.toString(), f.getId() }, new int[] {
+							Types.VARCHAR, Types.INTEGER }, Boolean.class);
 			if (!rightsOk) {
 				throw new PersistenceException("You have no right to delete "
 						+ f);
@@ -100,9 +105,9 @@ public class FilterDAOImplemented implements IFilterDAO {
 	@Override
 	public List<Filter> getAll() throws PersistenceException {
 		try {
-			// FIXME order alphabetically by name?
 			FilterMapper mapper = new FilterMapper();
-			String select = "SELECT * FROM filter WHERE owner = SUBSTRING_INDEX(USER(),'@',1) OR privacy_status != ? ORDER BY id DESC";
+			String select = "SELECT * FROM filter WHERE owner = SUBSTRING_INDEX(USER(),'@',1) "
+					+ "OR privacy_status != ? ORDER BY id DESC";
 			List<Filter> filterList = jdbcTemplate.query(select,
 					new Object[] { FilterPrivacyStatus.PRIVATE.toString() },
 					new int[] { Types.VARCHAR }, mapper);
@@ -127,7 +132,8 @@ public class FilterDAOImplemented implements IFilterDAO {
 				throw new IllegalArgumentException("Id must not be less than 0");
 			}
 
-			String select = "select * from filter where id = ? AND (owner = SUBSTRING_INDEX(USER(),'@',1) OR privacy_status != ? )";
+			String select = "select * from filter where id = ? AND (owner = SUBSTRING_INDEX(USER(),'@',1)"
+					+ " OR privacy_status != ? )";
 			Filter result = null;
 			try {
 				FilterMapper mapper = new FilterMapper();
@@ -171,7 +177,8 @@ public class FilterDAOImplemented implements IFilterDAO {
 			this.filter = filter;
 		}
 
-		private String createFilter = "insert into filter (type,name,anonymous,criterion,privacy_status,owner) values (?, ?, ?, ?, ?, SUBSTRING_INDEX(USER(),'@',1))";
+		private String createFilter = "insert into filter (type,name,anonymous,criterion,privacy_status,owner) "
+				+ "values (?, ?, ?, ?, ?, SUBSTRING_INDEX(USER(),'@',1))";
 
 		@Override
 		public PreparedStatement createPreparedStatement(Connection connection)
@@ -187,7 +194,8 @@ public class FilterDAOImplemented implements IFilterDAO {
 				ps.setInt(4, filter.getCriterion().getId());
 			}
 			ps.setString(5, filter.getPrivacyStatus().getName());
-			filter.setOwner(connection.getMetaData().getUserName());
+			String owner = connection.getMetaData().getUserName();
+			filter.setOwner(owner.substring(0,owner.indexOf("@")));
 			return ps;
 		}
 	}

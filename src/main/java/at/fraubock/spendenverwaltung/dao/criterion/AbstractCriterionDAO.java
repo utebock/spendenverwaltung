@@ -18,6 +18,13 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedF
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 
+/**
+ * DAO for the criterion table. each implementation of {@link Criterion} gets a
+ * corresponding entry in this table when persisted.
+ * 
+ * @author philipp muhoray
+ * 
+ */
 public class AbstractCriterionDAO {
 
 	private static final Logger log = Logger
@@ -81,8 +88,7 @@ public class AbstractCriterionDAO {
 
 		// delete the criterion
 		jdbcTemplate.update("delete from criterion where id = ?",
-				new Object[] { f.getId() },
-				new int[] { Types.INTEGER });
+				new Object[] { f.getId() }, new int[] { Types.INTEGER });
 	}
 
 	/* mappers for inserting and reading this entity */
@@ -136,7 +142,8 @@ public class AbstractCriterionDAO {
 		return mountedCritDAO;
 	}
 
-	public void setMountedCritDAO(MountedFilterCriterionDAOImplemented mountedCritDAO) {
+	public void setMountedCritDAO(
+			MountedFilterCriterionDAOImplemented mountedCritDAO) {
 		this.mountedCritDAO = mountedCritDAO;
 	}
 

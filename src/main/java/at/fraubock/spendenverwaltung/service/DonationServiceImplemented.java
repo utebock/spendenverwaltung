@@ -199,6 +199,7 @@ public class DonationServiceImplemented implements IDonationService {
 			log.warn(
 					"CSV data could not be written to "
 							+ csvFile.getAbsolutePath(), e);
+			throw e;
 		} finally {
 			if (writer != null)
 				writer.close();

@@ -21,10 +21,10 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Connecte
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
-import at.fraubock.spendenverwaltung.util.FilterProperty;
-import at.fraubock.spendenverwaltung.util.FilterType;
-import at.fraubock.spendenverwaltung.util.LogicalOperator;
-import at.fraubock.spendenverwaltung.util.RelationalOperator;
+import at.fraubock.spendenverwaltung.util.filter.FilterProperty;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.LogicalOperator;
+import at.fraubock.spendenverwaltung.util.filter.RelationalOperator;
 
 /**
  * implements {@link ICriterionConfigurator} for {@link MountedFilterCriterion}s

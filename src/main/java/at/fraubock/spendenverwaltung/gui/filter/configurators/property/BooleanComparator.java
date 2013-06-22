@@ -8,8 +8,8 @@ import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.filter.configurators.ICriterionConfigurator;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
-import at.fraubock.spendenverwaltung.util.FilterProperty;
-import at.fraubock.spendenverwaltung.util.RelationalOperator;
+import at.fraubock.spendenverwaltung.util.filter.FilterProperty;
+import at.fraubock.spendenverwaltung.util.filter.RelationalOperator;
 
 /**
  * implements {@link ICriterionConfigurator} for {@link PropertyCriterion}s of

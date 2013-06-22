@@ -121,6 +121,8 @@ public class CreatePersonView extends InitializableView {
 
 	private StringTextField titleField;
 
+	private JLabel amountLabel;
+
 	public CreatePersonView(ComponentFactory componentFactory, ViewActionFactory viewActionFactory, 
 			IPersonService personService, IAddressService addressService,
 			IDonationService donationService, PersonTableModel personModel) {
@@ -268,16 +270,19 @@ public class CreatePersonView extends InitializableView {
 		
 		donationCombo = new JComboBox<String>(donationService.getDonationTypes());
 		donationLabel = componentFactory.createLabel("Spende durch: ");
-		donationPanel.add(donationLabel);
-		donationPanel.add(donationCombo, "split 2");
+		donationPanel.add(donationLabel, "split2");
+		donationPanel.add(donationCombo, "gap 75, wrap, growx");
+		
+		amountLabel = componentFactory.createLabel("Betrag: ");
 		amount = new NumericTextField(ComponentConstants.SHORT_TEXT);
-		donationPanel.add(amount, "wrap, growx");
+		donationPanel.add(amountLabel, "split2");
+		donationPanel.add(amount, "gap 125, wrap, growx");
 		validateableDonationComponents.add(amount);
 		
 		dateLabel = componentFactory.createLabel("Spendendatum: ");
 		datePicker = new JXDatePicker(new java.util.Date());
-		donationPanel.add(dateLabel);
-		donationPanel.add(datePicker, "wrap, growx");
+		donationPanel.add(dateLabel, "split2");
+		donationPanel.add(datePicker, "gap 70, wrap, growx");
 		
 		dedicationLabel = componentFactory.createLabel("Widmung: ");
 		dedicationField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
@@ -286,10 +291,10 @@ public class CreatePersonView extends InitializableView {
 		dedicationNoteField = new StringTextField(ComponentConstants.LONG_TEXT);
 		validateableDonationComponents.add(dedicationNoteField);
 
-		donationPanel.add(dedicationLabel);
-		donationPanel.add(dedicationField, "wrap, growx");
-		donationPanel.add(dedicationNoteLabel);
-		donationPanel.add(dedicationNoteField, "wrap, growx");
+		donationPanel.add(dedicationLabel, "split2");
+		donationPanel.add(dedicationField, "gap 105, wrap, growx");
+		donationPanel.add(dedicationNoteLabel, "split2");
+		donationPanel.add(dedicationNoteField, "gap 129, wrap, growx");
 		
 		donationPanel.add(empty, "wrap");
 		
@@ -308,7 +313,7 @@ public class CreatePersonView extends InitializableView {
 		
 		Action cancelAction = viewActionFactory.getMainMenuViewAction();
 		cancelAction.putValue(Action.NAME, "Abbrechen");
-		cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
+		cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backInButton.png")));
 		cancel.setAction(cancelAction);
 		cancel.setFont(new Font("bigger", Font.PLAIN, 13));
 	}
@@ -359,11 +364,17 @@ public class CreatePersonView extends InitializableView {
 					person.setMainAddress(address);
 				}
 				
-				if(notifyMail.isSelected()){
+				if(notifyMail.isSelected()==true){
 					person.setEmailNotification(true);
 				}
-				if(notifyPost.isSelected()){
+				else{
+					person.setEmailNotification(false);
+				}
+				if(notifyPost.isSelected()==true){
 					person.setPostalNotification(true);
+				}
+				else{
+					person.setPostalNotification(false);
 				}
 				
 				String note = noteText.getText();
@@ -417,12 +428,12 @@ public class CreatePersonView extends InitializableView {
 							log.info("Creating donation");
 							donationService.create(donation);
 						}
-						
+						JOptionPane.showMessageDialog(overviewPanel, "Person erfolgreich angelegt.", "Information", JOptionPane.INFORMATION_MESSAGE);
 						Action switchToMenu = viewActionFactory.getMainMenuViewAction();
 						switchToMenu.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
 
 					} catch (ServiceException e1) {
-						JOptionPane.showConfirmDialog(null, "Ein fehler ist beim erstellen der Person aufgetreten");
+						JOptionPane.showConfirmDialog(null, "Ein Fehler ist beim Erstellen der Person aufgetreten.");
 					}
 				}
 			}

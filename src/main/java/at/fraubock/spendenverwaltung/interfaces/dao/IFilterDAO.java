@@ -6,15 +6,21 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter.FilterPrivacyStatus;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 
+/**
+ * interface to the data source for {@link Filter} entities.
+ * 
+ * @author philipp muhoray
+ * 
+ */
 public interface IFilterDAO {
 
 	/**
 	 * Inserts a new filter to the persistence layer (if its id is null or not
-	 * yet existent) Its id will be set and its owner will be set to the current
-	 * database user.
+	 * yet existent). Its id will be set and its owner will be set to the
+	 * current database user.
 	 * 
 	 * @param f
-	 *            Filter to be inserted or updates
+	 *            Filter to be inserted
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */
@@ -62,7 +68,7 @@ public interface IFilterDAO {
 	 * 
 	 * @return name of the user currently connected to the underlying
 	 *         persistence system. Must be equal to {@link Filter#getOwner()}
-	 *         for filters that are owned by the ivoking user
+	 *         for filters that are owned by the invoking user
 	 * @throws PersistenceException
 	 *             if communication to the underlying persistence system failed
 	 */

@@ -27,7 +27,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
-import at.fraubock.spendenverwaltung.util.FilterToSqlBuilder;
+import at.fraubock.spendenverwaltung.util.filter.FilterBuilder;
 
 /**
  * 
@@ -39,7 +39,7 @@ public class DonationDAOImplemented implements IDonationDAO {
 	private JdbcTemplate jdbcTemplate;
 	private IPersonDAO personDAO;
 	private IImportDAO importDAO;
-	private FilterToSqlBuilder filterToSqlBuilder;
+	private FilterBuilder filterBuilder;
 
 	private static final Logger log = Logger
 			.getLogger(DonationDAOImplemented.class);
@@ -241,12 +241,12 @@ public class DonationDAOImplemented implements IDonationDAO {
 		}
 	}
 
-	public FilterToSqlBuilder getFilterToSqlBuilder() {
-		return filterToSqlBuilder;
+	public FilterBuilder getFilterBuilder() {
+		return filterBuilder;
 	}
 
-	public void setFilterToSqlBuilder(FilterToSqlBuilder filterToSqlBuilder) {
-		this.filterToSqlBuilder = filterToSqlBuilder;
+	public void setFilterBuilder(FilterBuilder filterBuilder) {
+		this.filterBuilder = filterBuilder;
 	}
 
 	private class DonationMapper implements RowMapper<Donation> {
@@ -307,7 +307,7 @@ public class DonationDAOImplemented implements IDonationDAO {
 	public List<Donation> getByFilter(Filter filter)
 			throws PersistenceException {
 		try {
-			String select = filterToSqlBuilder.createSqlStatement(filter);
+			String select = filterBuilder.createStatement(filter);
 			List<Donation> DonationList = jdbcTemplate.query(select,
 					new DonationMapper());
 			log.info(DonationList.size() + " list size");

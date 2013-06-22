@@ -1,9 +1,10 @@
 package at.fraubock.spendenverwaltung.gui.container;
 
-import java.awt.Component;
-
 import javax.swing.JFrame;
+import javax.swing.JLayeredPane;
 import javax.swing.JScrollPane;
+
+import at.fraubock.spendenverwaltung.gui.views.InitializableView;
 
 //import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 //import at.fraubock.spendenverwaltung.gui.views.CreatePersonView;
@@ -39,10 +40,14 @@ public class ViewDisplayer {
 	 * changes the content of the frame's JScrollPane and displays it
 	 * @param newView
 	 */
-	public void changeView(Component newView) {
+	public void changeView(InitializableView newView) {
 		scrollPane.getViewport().removeAll();
 		scrollPane.repaint();
 		scrollPane.getViewport().add(newView);
+	}
+	
+	public JLayeredPane getLayeredPane() {
+		return frame.getLayeredPane();
 	}
 	
 	public void closeView(){

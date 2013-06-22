@@ -18,14 +18,21 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import at.fraubock.spendenverwaltung.dao.FilterDAOImplemented;
+import at.fraubock.spendenverwaltung.interfaces.dao.IMountedFilterCriterionDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.service.FilterValidator;
-import at.fraubock.spendenverwaltung.util.FilterProperty;
-import at.fraubock.spendenverwaltung.util.FilterType;
-import at.fraubock.spendenverwaltung.util.RelationalOperator;
+import at.fraubock.spendenverwaltung.util.filter.FilterProperty;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.RelationalOperator;
 
+/**
+ * implementation of {@link IMountedFilterCriterionDAO}
+ * 
+ * @author philipp muhoray
+ * 
+ */
 public class MountedFilterCriterionDAOImplemented implements
 		IMountedFilterCriterionDAO {
 
@@ -37,14 +44,12 @@ public class MountedFilterCriterionDAOImplemented implements
 	@Override
 	public void insert(MountedFilterCriterion f) throws PersistenceException {
 
-		// if (f.getId() == null) {
 		MountedFilterCriterion mount = (MountedFilterCriterion) f;
 		validator.validate(mount);
 		KeyHolder mountedKeyHolder = new GeneratedKeyHolder();
 
 		jdbcTemplate.update(new CreateMountedFilterStatementCreator(mount),
 				mountedKeyHolder);
-		// }
 	}
 
 	@Override

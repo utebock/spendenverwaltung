@@ -5,16 +5,13 @@ import java.util.List;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter.FilterPrivacyStatus;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
-import at.fraubock.spendenverwaltung.util.FilterType;
-import at.fraubock.spendenverwaltung.util.LogicalOperator;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.LogicalOperator;
 
 /**
  * a transfer object for {@link Filter} entities. it takes a list of
- * {@link Criterion}s and {@link LogicalOperator}s that defines the structure of
- * the resulting filter. the first operator connects the first and second
- * criterion, the following operator connects the first operator with the third
- * criterion, and so on
- * 
+ * {@link Criterion}s and a {@link LogicalOperator} that defines how the
+ * criterions will be connected.
  * 
  * @author philipp muhoray
  * 
@@ -67,11 +64,11 @@ public class FilterTO {
 	public void setOperator(LogicalOperator operator) {
 		this.operator = operator;
 	}
-	
+
 	public FilterPrivacyStatus getPrivacyStatus() {
 		return privacyStatus;
 	}
-	
+
 	public void setPrivacyStatus(FilterPrivacyStatus privacyStatus) {
 		this.privacyStatus = privacyStatus;
 	}

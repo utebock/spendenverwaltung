@@ -1,7 +1,7 @@
 package at.fraubock.spendenverwaltung.service;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
-import at.fraubock.spendenverwaltung.util.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
 
 /**
  * 

@@ -1,4 +1,4 @@
-package at.fraubock.spendenverwaltung.util;
+package at.fraubock.spendenverwaltung.util.filter;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;

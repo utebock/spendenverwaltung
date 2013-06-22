@@ -1,8 +1,8 @@
 package at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.InapplicableFilterTypeException;
-import at.fraubock.spendenverwaltung.util.FilterType;
-import at.fraubock.spendenverwaltung.util.LogicalOperator;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.LogicalOperator;
 
 /**
  * this class represents a {@link Criterion} that evaluates an entity based on

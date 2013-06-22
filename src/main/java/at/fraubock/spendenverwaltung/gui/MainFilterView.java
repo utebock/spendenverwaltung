@@ -31,8 +31,8 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter.FilterPriva
 import at.fraubock.spendenverwaltung.interfaces.exceptions.FilterInUseException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
-import at.fraubock.spendenverwaltung.util.FilterType;
 import at.fraubock.spendenverwaltung.util.Pair;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
 
 public class MainFilterView extends InitializableView {
 
@@ -97,7 +97,7 @@ public class MainFilterView extends InitializableView {
 		backButton = new JButton();
 		Action getBack = viewActionFactory.getMainMenuViewAction();
 		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass()
-				.getResource("/images/backButton.jpg")));
+				.getResource("/images/backButton.png")));
 		backButton.setAction(getBack);
 
 		personFilter = new JButton();
@@ -241,7 +241,7 @@ public class MainFilterView extends InitializableView {
 		if (!filter.getOwner().equals(userName)
 				&& filter.getPrivacyStatus() != FilterPrivacyStatus.READ_UPDATE_DELETE) {
 			JOptionPane.showMessageDialog(MainFilterView.this,
-					"Sie sind nicht berechtigt diesen Filter zu löschen. Er geh\u00f6rt "
+					"Sie sind nicht berechtigt diesen Filter zu l\u00F6schen. Er geh\u00f6rt "
 							+ filter.getOwner());
 			return;
 		}

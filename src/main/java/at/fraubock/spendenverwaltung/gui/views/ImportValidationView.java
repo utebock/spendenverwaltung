@@ -13,7 +13,6 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -31,7 +30,6 @@ import at.fraubock.spendenverwaltung.gui.ComponentBuilder;
 import at.fraubock.spendenverwaltung.gui.ConflictValidationTableModel;
 import at.fraubock.spendenverwaltung.gui.MatchValidationTableModel;
 import at.fraubock.spendenverwaltung.gui.NewValidationTableModel;
-import at.fraubock.spendenverwaltung.gui.Overview;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Import;
@@ -46,12 +44,11 @@ import at.fraubock.spendenverwaltung.util.ValidatedData;
 
 public class ImportValidationView extends InitializableView {
 	private static final long serialVersionUID = 1L;
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(FindPersonsView.class);
 	private IPersonService personService;
-	private IAddressService addressService;
 	private IDonationService donationService;
 	private IImportService importService;
-	private Overview overview;
 	private ConflictValidationTableModel conflictModel;
 	private NewValidationTableModel newModel;
 	private MatchValidationTableModel matchModel;
@@ -67,7 +64,6 @@ public class ImportValidationView extends InitializableView {
 	private ComponentBuilder builder;
 	private JButton backBtn;
 	private JButton saveBtn;
-	private List<Donation> donationList;
 	private List<Person> personList;
 	List<Import> imports;
 	private ImportValidator importValidator;
@@ -75,21 +71,21 @@ public class ImportValidationView extends InitializableView {
 	private JLabel newLabel;
 	private JLabel conflictLabel;
 	private JLabel matchLabel;
+	@SuppressWarnings("rawtypes")
 	private JComboBox conflictComboBox;
+	@SuppressWarnings("rawtypes")
 	private JComboBox importComboBox;
-	private ComponentFactory componentFactory;
 	private JLabel infoLabel;
 	private ViewActionFactory actionFactory;
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ImportValidationView(IPersonService personService, IAddressService addressService, IDonationService donationService, IImportService importService, ComponentFactory componentFactory, ViewActionFactory actionFactory){
 		setLayout(new MigLayout());
 		
 		this.builder = new ComponentBuilder();
-		this.componentFactory = componentFactory;
 		this.importValidator = new ImportValidator(personService, donationService);
 		this.validatedData = new ValidatedData();
 		this.personService = personService;
-		this.addressService = addressService;
 		this.donationService = donationService;
 		this.importService = importService;
 		this.actionFactory = actionFactory;
@@ -102,6 +98,7 @@ public class ImportValidationView extends InitializableView {
 		
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void init(){
 		
 		conflictPanel = builder.createPanel(1200,250);
@@ -173,7 +170,7 @@ public class ImportValidationView extends InitializableView {
 	
 			CancelButtonListener cancelAction = new CancelButtonListener();
 			cancelAction.putValue(Action.NAME, "Abbrechen");
-			cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
+			cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backInButton.png")));
 			backBtn = new JButton();
 			backBtn.setAction(cancelAction);
 			matchPanel.add(backBtn, "");
@@ -193,14 +190,15 @@ public class ImportValidationView extends InitializableView {
 			}
 		} else{
 			infoLabel = new JLabel("Keine Importe zu validieren");
-			infoLabel.setFont(new Font("Arial", 0, 16));
-			this.add(infoLabel, "wrap, gap 40");
+			infoLabel.setFont(new Font("bigger", Font.PLAIN, 14));
+			this.add(infoLabel, "wrap 30px, gap 40");
 			
 			CancelButtonListener cancelAction = new CancelButtonListener();
-			cancelAction.putValue(Action.NAME, "zurück");
-			cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
+			cancelAction.putValue(Action.NAME, "Zur\u00FCck");
+			cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backInButton.png")));
 			backBtn = new JButton();
 			backBtn.setAction(cancelAction);
+			backBtn.setFont(new Font("bigger", Font.PLAIN, 13));
 			this.add(backBtn, "gap 40");
 		}
 	}
@@ -244,7 +242,6 @@ public class ImportValidationView extends InitializableView {
 		List<Donation> newModelDonations = newModel.getDonationList();
 		List<Donation> matchModelDonations = matchModel.getDonationList();
 		List<Donation> conflictModelDonations = conflictModel.getDonationList();
-		List<Person> matchModelDelete;
 		List<Person> newModelDelete;
 		
 		try {
@@ -406,7 +403,7 @@ public class ImportValidationView extends InitializableView {
 	}
 	
 	public void openPersonDialog(Donation donationToAssign, AbstractValidationTableModel deleteFromModel){
-		JDialog assignPerson = new AssignPerson(personService, donationService, donationToAssign, matchModel, deleteFromModel);
+		new AssignPerson(personService, donationService, donationToAssign, matchModel, deleteFromModel);
 	}
 	
 	public void returnTo() {
@@ -460,6 +457,11 @@ public class ImportValidationView extends InitializableView {
 	}
 	
 	private class SaveButtonListener extends AbstractAction{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			saveValidation();
@@ -467,6 +469,11 @@ public class ImportValidationView extends InitializableView {
 	}
 	
 	private class CancelButtonListener extends AbstractAction{
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 
 		@Override
 		public void actionPerformed(ActionEvent e) {

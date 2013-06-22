@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
@@ -128,6 +129,16 @@ public class AddressServiceImplemented implements IAddressService {
 		} finally {
 			if (writer != null)
 				writer.close();
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
+	public List<Address> getByFilter(Filter filter) throws ServiceException {
+		try {
+			return addressDAO.getByFilter(filter);
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
 		}
 	}
 }

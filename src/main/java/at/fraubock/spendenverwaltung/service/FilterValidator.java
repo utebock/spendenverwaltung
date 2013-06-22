@@ -7,6 +7,12 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Connecte
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 
+/**
+ * validates a {@link Filter} instance
+ * 
+ * @author philipp muhoray
+ * 
+ */
 public class FilterValidator {
 
 	private static final Logger log = Logger.getLogger(FilterValidator.class);
@@ -61,7 +67,8 @@ public class FilterValidator {
 					"Operand1 must have same type as this criterion");
 		}
 
-		if (criterion.getOperand2()!=null && criterion.getOperand2().getType() != criterion.getType()) {
+		if (criterion.getOperand2() != null
+				&& criterion.getOperand2().getType() != criterion.getType()) {
 			log.error("Operand2 had a different type than this criterion");
 			throw new IllegalArgumentException(
 					"Operand2 must have same type as this criterion");
@@ -90,17 +97,6 @@ public class FilterValidator {
 			log.error("Property was null");
 			throw new IllegalArgumentException("Property must not be null");
 		}
-
-		// TODO zero or one value must be set
-		// if (!(criterion.getNumValue() != null ^ criterion.getStrValue() !=
-		// null
-		// ^ criterion.getDateValue() != null
-		// ^ criterion.getDaysBack() != null
-		// ^ criterion.getBoolValue() != null)) {
-		// log.error("More or less than one value was set for this PropertyCriterion");
-		// throw new IllegalArgumentException(
-		// "Exactly one value must be set for a PropertyCriterion");
-		// }
 	}
 
 	public void validate(MountedFilterCriterion criterion) {
@@ -120,17 +116,19 @@ public class FilterValidator {
 			throw new IllegalArgumentException(
 					"RelationalOperator must not be null");
 		}
-		
-		
-		if(criterion.getCount() != null && (criterion.getProperty() != null
-				|| criterion.getSum()!= null || criterion.getAvg()!= null)) {
+
+		if (criterion.getCount() != null
+				&& (criterion.getProperty() != null
+						|| criterion.getSum() != null || criterion.getAvg() != null)) {
 			log.error("Count value was set for mounted filter but also other values.");
 			throw new IllegalArgumentException(
 					"Either the count value or property and (avg or sum) value"
 							+ " must be set for a MountedFilterCriterion");
 		}
-		
-		if(criterion.getProperty() != null && (criterion.getCount()!=null || !(criterion.getAvg()!=null ^ criterion.getSum()!=null))) {
+
+		if (criterion.getProperty() != null
+				&& (criterion.getCount() != null || !(criterion.getAvg() != null ^ criterion
+						.getSum() != null))) {
 			log.error("Property was set for mounted filter but also either count value or both avg and sum value.");
 			throw new IllegalArgumentException(
 					"Either the count value or property and [avg or sum] value"

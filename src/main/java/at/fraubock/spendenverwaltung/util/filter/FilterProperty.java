@@ -1,11 +1,10 @@
-package at.fraubock.spendenverwaltung.util;
+package at.fraubock.spendenverwaltung.util.filter;
 
 import org.apache.log4j.Logger;
 
 /**
  * properties to be used for filtering.
  * 
- * @NOTE don't use any table name twice
  * @author philipp muhoray
  * 
  */
@@ -47,7 +46,7 @@ public enum FilterProperty {
 
 	public static FilterProperty getPropertyForString(String value,
 			FilterType filterType) {
-		// put exceptions to constraint here
+		// put properties that exist twice here
 		if("note".equals(value)) {
 			if(filterType==FilterType.PERSON) {
 				return PERSON_NOTE;

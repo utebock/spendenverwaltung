@@ -2,7 +2,6 @@ package at.fraubock.spendenverwaltung.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +28,7 @@ public class ActionDAOImplemented implements IActionDAO {
 			.getLogger(ActionDAOImplemented.class);
 
 	private JdbcTemplate jdbcTemplate;
-	private List<String> values;
+	private List<Object> values;
 	private String where;
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
@@ -37,20 +36,19 @@ public class ActionDAOImplemented implements IActionDAO {
 	}
 
 	@Override
-	public List<Action> getLimitedResultByAttributes(
-			ActionSearchVO searchVO, int offset, int count)
-			throws PersistenceException {
+	public List<Action> getLimitedResultByAttributes(ActionSearchVO searchVO,
+			int offset, int count) throws PersistenceException {
 
 		if (searchVO == null) {
 			log.error("Error executing getLimitedResultByAttributes: "
 					+ "searchVO was null");
 			throw new IllegalArgumentException("searchVO must not be null");
 		}
-		
+
 		log.info("Reading Actions for searchVO:" + searchVO);
-		
+
 		setWhereAndValues(searchVO);
-		
+
 		try {
 			return jdbcTemplate.query("select * from actions" + this.where
 					+ " ORDER BY time DESC LIMIT " + offset + ", " + count,
@@ -60,34 +58,33 @@ public class ActionDAOImplemented implements IActionDAO {
 			throw new PersistenceException(e);
 		}
 	}
-	
+
 	@Override
 	public long getNumberOfResultsByAttributes(ActionSearchVO searchVO)
 			throws PersistenceException {
-		
+
 		if (searchVO == null) {
 			log.error("Error getNumberOfResultsByAttributes: "
 					+ "searchVO was null");
 			throw new IllegalArgumentException("searchVO must not be null");
 		}
-		
+
 		log.info("Counting Actions for searchVO:" + searchVO);
 
 		setWhereAndValues(searchVO);
-		
+
 		try {
-			return jdbcTemplate.queryForObject("select count(*) from actions" + this.where
-					+ " ORDER BY time DESC ",
+			return jdbcTemplate.queryForObject("select count(*) from actions"
+					+ this.where + " ORDER BY time DESC ",
 					this.values.toArray(), Integer.class);
 		} catch (DataAccessException e) {
 			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
 		}
 	}
-	
-	
+
 	private void setWhereAndValues(ActionSearchVO searchVO) {
-		List<String> values = new ArrayList<String>();
+		List<Object> values = new ArrayList<Object>();
 		String where = "";
 		if (searchVO.getActor() != null) {
 			where += "actor LIKE ? and ";
@@ -109,21 +106,20 @@ public class ActionDAOImplemented implements IActionDAO {
 			values.add("%" + searchVO.getPayload() + "%");
 		}
 
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		if (searchVO.getFrom() != null) {
-			where += "DATE(time) >= DATE(?) and ";
-			values.add(sdf.format(searchVO.getFrom()));
+			where += "time >= ? and ";
+			values.add(searchVO.getFrom());
 		}
 
 		if (searchVO.getTo() != null) {
-			where += "DATE(time) <= DATE(?) and ";
-			values.add(sdf.format(searchVO.getTo()));
+			where += "time <= ? and ";
+			values.add(searchVO.getTo());
 		}
-		
-		if(!StringUtils.isEmpty(where)) {
-			where = " where " +  where.substring(0, where.lastIndexOf(" and "));
+
+		if (!StringUtils.isEmpty(where)) {
+			where = " where " + where.substring(0, where.lastIndexOf(" and "));
 		}
-		
+
 		this.where = where;
 		this.values = values;
 	}

@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.dao;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -16,9 +17,9 @@ import at.fraubock.spendenverwaltung.interfaces.dao.IFilterDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
-import at.fraubock.spendenverwaltung.util.FilterProperty;
-import at.fraubock.spendenverwaltung.util.FilterType;
-import at.fraubock.spendenverwaltung.util.RelationalOperator;
+import at.fraubock.spendenverwaltung.util.filter.FilterProperty;
+import at.fraubock.spendenverwaltung.util.filter.FilterType;
+import at.fraubock.spendenverwaltung.util.filter.RelationalOperator;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/testspring.xml")
@@ -68,7 +69,7 @@ public abstract class AbstractFilterDAOTest {
 		Filter savedFilter = filterDAO.getById(testFilter.getId());
 
 		// check if filter was saved correctly
-		assertTrue(savedFilter.equals(testFilter));
+		assertEquals(savedFilter,testFilter);
 
 	}
 

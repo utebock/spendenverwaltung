@@ -6,7 +6,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class FilterToSqlBuilderTest extends AbstractFilterToSqlBuilderTest {
+import at.fraubock.spendenverwaltung.util.filter.FilterBuilder;
+
+public class FilterBuilderTest extends AbstractFilterBuilderTest {
 	private static ApplicationContext context;
 
 	/**
@@ -16,7 +18,7 @@ public class FilterToSqlBuilderTest extends AbstractFilterToSqlBuilderTest {
 	public static void setup() {
 		context = new ClassPathXmlApplicationContext("testspring.xml");
 
-		setBuilder(context.getBean("filterToSqlBuilder", FilterToSqlBuilder.class));
+		setBuilder(context.getBean("filterBuilder", FilterBuilder.class));
 	}
 
 	/**
