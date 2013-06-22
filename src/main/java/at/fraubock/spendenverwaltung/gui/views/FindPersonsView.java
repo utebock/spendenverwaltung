@@ -108,7 +108,7 @@ public class FindPersonsView extends InitializableView {
 		quickSearchField.addActionListener(new QuickSearchAction());
 
 		overviewPanel.add(quickSearchLabel, "split 2");
-		overviewPanel.add(quickSearchField, "gap 25, wrap, growx");
+		overviewPanel.add(quickSearchField, "gap 25, wrap 20px, growx");
 
 		overviewPanel.add(scrollPane, "wrap");
 
