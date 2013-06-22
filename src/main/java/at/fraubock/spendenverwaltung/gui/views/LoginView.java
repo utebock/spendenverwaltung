@@ -1,12 +1,11 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -138,33 +137,6 @@ public class LoginView extends InitializableView {
 		viewDisplayer.changeView(mainMenu);
 	}
 
-	// check is user is valid if login is pressed
-	private final class LoginAction extends AbstractAction {
-
-		private static final long serialVersionUID = -8303170214117697889L;
-		private LoginView dialog;
-
-		private LoginAction(LoginView dialog) {
-			this.dialog = dialog;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			dialog.login();
-		}
-	}
-
-	// close GUI if cancelButton is pressed
-	private final class CancelAction extends AbstractAction {
-
-		private static final long serialVersionUID = 6697635107905733270L;
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			viewDisplayer.closeView();
-		}
-	}
-
 	@Override
 	public void init() {
 		this.setLayout(new MigLayout());
@@ -187,8 +159,34 @@ public class LoginView extends InitializableView {
 		add(loginBtn, "gapleft 200, gaptop 10");
 		add(cancelBtn, "wrap, gapleft 30");
 
-		cancelBtn.addActionListener(new CancelAction());
-		loginBtn.addActionListener(new LoginAction(this));
+		cancelBtn.addActionListener(new AbstractAction() {
+			private static final long serialVersionUID = -7953434061209248267L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				viewDisplayer.closeView();
+			}
+		});
+		loginBtn.addActionListener(new AbstractAction() {
+			private static final long serialVersionUID = -7953434061209248267L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				login();
+			}
+		});
+
+		Action loginButtonPress = new AbstractAction() {
+			private static final long serialVersionUID = -2009858949645282327L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				loginBtn.doClick();
+			}
+		};
+		userField.addActionListener(loginButtonPress);
+		pwdField.addActionListener(loginButtonPress);
+		urlField.addActionListener(loginButtonPress);
 
 	}
 }

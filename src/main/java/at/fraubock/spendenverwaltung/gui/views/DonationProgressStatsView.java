@@ -24,7 +24,9 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
+import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.Month;
 import org.jfree.data.time.Quarter;
@@ -43,7 +45,7 @@ import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.util.Pair;
 import at.fraubock.spendenverwaltung.util.filter.FilterType;
-import at.fraubock.spendenverwaltung.util.statistics.DonationTimeStatisticDatasetGenerator;
+import at.fraubock.spendenverwaltung.util.statistics.DonationDatasetGenerator;
 import at.fraubock.spendenverwaltung.util.statistics.Operation;
 
 public class DonationProgressStatsView extends InitializableView {
@@ -75,8 +77,6 @@ public class DonationProgressStatsView extends InitializableView {
 	private List<Donation> donationList;
 
 	private JPanel plotPanel;
-	private JLabel resultLabel;
-	private JLabel printResult;
 
 	public DonationProgressStatsView(ComponentFactory componentFactory,
 			ViewActionFactory viewActionFactory,
@@ -169,8 +169,9 @@ public class DonationProgressStatsView extends InitializableView {
 		chooseClass = componentFactory.createLabel("Darstellung nach: ");
 		operationsPanel.add(chooseClass, "split 2");
 		String[] classification = new String[] { "Tag", "Woche", "Monat",
-				"Quartal", "Jahr" };
+				"Quartal", "Jahr", "Bundesland" };
 		classBox = new JComboBox<String>(classification);
+		classBox.setSelectedItem("Monat");
 		operationsPanel.add(classBox, "gap 35, wrap 10px, growx");
 
 		// choose operation then
@@ -178,12 +179,8 @@ public class DonationProgressStatsView extends InitializableView {
 				.createLabel("Operation ausw\u00E4hlen: ");
 		operationsPanel.add(chooseOperation, "split 2");
 		operationBox = new JComboBox<Operation>(Operation.values());
+		operationBox.setSelectedItem(Operation.SUM);
 		operationsPanel.add(operationBox, "gap 10, growx, wrap 10px");
-
-		printResult = componentFactory.createLabel("Ergebnis: ");
-		operationsPanel.add(printResult, "split 2");
-		resultLabel = componentFactory.createLabel("");
-		operationsPanel.add(resultLabel, "wrap 30px");
 
 		submit = new JButton();
 		cancel = new JButton();
@@ -261,6 +258,9 @@ public class DonationProgressStatsView extends InitializableView {
 			case "Quartal":
 				periodClass = Quarter.class;
 				break;
+			case "Bundesland":
+				periodClass = null; // flag to use provinces
+				break;
 			default:
 				periodClass = Year.class;
 				break;
@@ -288,10 +288,19 @@ public class DonationProgressStatsView extends InitializableView {
 				pairList.add(pair);
 			}
 
-			TimeSeriesCollection dataSets = DonationTimeStatisticDatasetGenerator
-					.createDataset(pairList, operation, periodClass);
+			if (periodClass != null) {
+				// time series chart
+				TimeSeriesCollection dataSets = DonationDatasetGenerator
+						.createDataset(pairList, operation, periodClass);
 
-			chart = createTimeSeriesChart(dataSets);
+				chart = createTimeSeriesChart(dataSets);
+			} else {
+				// "Bundesland" chosen
+				CategoryDataset dataSet = DonationDatasetGenerator
+						.createDatasetProvinciallyCategorized(pairList,
+								operation);
+				chart = createBarChart(dataSet);
+			}
 			chartPanel = new ChartPanel(chart);
 			chartPanel.setPreferredSize(new Dimension(700, 270));
 			plotPanel.removeAll();
@@ -302,9 +311,9 @@ public class DonationProgressStatsView extends InitializableView {
 		}
 	}
 
-	private JFreeChart createTimeSeriesChart(XYDataset dataset) {
+	private static JFreeChart createTimeSeriesChart(XYDataset dataset) {
 		final JFreeChart chart = ChartFactory.createTimeSeriesChart(null,
-				"Datum", "Betrag", dataset, true, true, false);
+				"Datum", "Betrag", dataset, true, true, true);
 		final XYItemRenderer renderer = chart.getXYPlot().getRenderer();
 		final StandardXYToolTipGenerator g = new StandardXYToolTipGenerator(
 				StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
@@ -313,6 +322,12 @@ public class DonationProgressStatsView extends InitializableView {
 		renderer.setBaseToolTipGenerator(g);
 
 		return chart;
+	}
 
+	private static JFreeChart createBarChart(CategoryDataset dataset) {
+		final JFreeChart chart = ChartFactory.createBarChart(null,
+				"Bundesland", "Betrag", dataset, PlotOrientation.VERTICAL,
+				true, true, false);
+		return chart;
 	}
 }

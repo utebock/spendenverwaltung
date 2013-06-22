@@ -66,7 +66,7 @@ import at.fraubock.spendenverwaltung.util.filter.FilterProperty;
 import at.fraubock.spendenverwaltung.util.filter.FilterType;
 import at.fraubock.spendenverwaltung.util.filter.LogicalOperator;
 import at.fraubock.spendenverwaltung.util.filter.RelationalOperator;
-import at.fraubock.spendenverwaltung.util.statistics.DonationTimeStatisticDatasetGenerator;
+import at.fraubock.spendenverwaltung.util.statistics.DonationDatasetGenerator;
 import at.fraubock.spendenverwaltung.util.statistics.Operation;
 
 public class MailingStatsView extends InitializableView {
