@@ -357,28 +357,28 @@ public class PersonDonationsView extends InitializableView {
 			donationTypeCombo = new JComboBox<Donation.DonationType>(new SimpleComboBoxModel<>(Donation.DonationType.values()));
 			
 			addDonationPanel.add(donationTypeLabel, "split 2");
-			addDonationPanel.add(donationTypeCombo, "wrap");
+			addDonationPanel.add(donationTypeCombo, "gap 32, wrap, growx");
 			
 			dateLabel = componentFactory.createLabel("Datum: ");
 			donationDatePicker = new JXDatePicker(new Date());
 			addDonationPanel.add(dateLabel, "split 2");
-			addDonationPanel.add(donationDatePicker, "wrap");
+			addDonationPanel.add(donationDatePicker, "gap 63, wrap, growx");
 			
 			//add amount field + label
 			donationAmountLabel = componentFactory.createLabel("Spendenbetrag: ");
 			donationAmountField = new NumericTextField(ComponentConstants.SHORT_TEXT, false);
 			addDonationPanel.add(donationAmountLabel, "split 2");
-			addDonationPanel.add(donationAmountField, "wrap");
+			addDonationPanel.add(donationAmountField, "gap 13, wrap, growx");
 			
 			dedicationLabel = componentFactory.createLabel("Widmung: ");
 			dedicationField = new StringTextField(ComponentConstants.LONG_TEXT);
 			addDonationPanel.add(dedicationLabel, "split 2");
-			addDonationPanel.add(dedicationField, "wrap");
+			addDonationPanel.add(dedicationField, "gap 47, wrap, growx");
 			
 			noteLabel = componentFactory.createLabel("Notiz: ");
 			noteField = new StringTextField(ComponentConstants.LONG_TEXT);
 			addDonationPanel.add(noteLabel, "split 2");
-			addDonationPanel.add(noteField, "wrap 20px");
+			addDonationPanel.add(noteField, "gap 72, wrap 20px, growx");
 			
 			submitButton = new JButton(new SubmitAddAction());
 			cancelButton = new JButton(new CancelAddAction());		
@@ -540,13 +540,13 @@ public class PersonDonationsView extends InitializableView {
 			donationTypeCombo.setSelectedItem(selectedDonation.getType());
 			
 			editDonationPanel.add(donationTypeLabel, "split 2");
-			editDonationPanel.add(donationTypeCombo, "wrap, growx");
+			editDonationPanel.add(donationTypeCombo, "gap 32, wrap, growx");
 			
 			dateLabel = componentFactory.createLabel("Datum: ");
 			donationDatePicker = new JXDatePicker();
 			donationDatePicker.setDate(selectedDonation.getDate());
 			editDonationPanel.add(dateLabel, "split 2");
-			editDonationPanel.add(donationDatePicker, "wrap, growx");
+			editDonationPanel.add(donationDatePicker, "gap 63, wrap, growx");
 			
 			//add amount field + label
 			donationAmountLabel = componentFactory.createLabel("Spendenbetrag: ");
@@ -554,7 +554,7 @@ public class PersonDonationsView extends InitializableView {
 			currentTotal -= selectedDonation.getAmount();
 			donationAmountField.setNumericValue(selectedDonation.getAmount());
 			editDonationPanel.add(donationAmountLabel, "split 2");
-			editDonationPanel.add(donationAmountField, "wrap, growx");
+			editDonationPanel.add(donationAmountField, "gap 13, wrap, growx");
 			
 			dedicationLabel = componentFactory.createLabel("Widmung: ");
 			dedicationField = new StringTextField(ComponentConstants.LONG_TEXT);
@@ -562,7 +562,7 @@ public class PersonDonationsView extends InitializableView {
 				dedicationField.setText(selectedDonation.getDedication());
 			}
 			editDonationPanel.add(dedicationLabel, "split 2");
-			editDonationPanel.add(dedicationField, "wrap, growx");
+			editDonationPanel.add(dedicationField, "gap 47, wrap, growx");
 			
 			noteLabel = componentFactory.createLabel("Notiz: ");
 			noteField = new StringTextField(ComponentConstants.LONG_TEXT);
@@ -570,7 +570,7 @@ public class PersonDonationsView extends InitializableView {
 				noteField.setText(selectedDonation.getNote());
 			}
 			editDonationPanel.add(noteLabel, "split 2");
-			editDonationPanel.add(noteField, "wrap, growx");
+			editDonationPanel.add(noteField, "gap 72, wrap 20px, growx");
 			
 			submitButton = new JButton(new SubmitEditAction());
 			cancelButton = new JButton(new CancelEditAction());		
@@ -750,29 +750,30 @@ public class PersonDonationsView extends InitializableView {
 			donationConfirmationDialog = new JDialog(SwingUtilities.getWindowAncestor(contentPanel), Dialog.ModalityType.APPLICATION_MODAL);
 			donationConfirmationDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-			donationConfirmationPanel = componentFactory.createPanel(300, 250);
+			donationConfirmationPanel = componentFactory.createPanel(350, 250);
 
 			//add headline
 			donationHeadLabel = componentFactory.createLabel("Spendenbest\u00E4tigung erstellen");
-			donationConfirmationPanel.add(donationHeadLabel, "wrap, span 2");
+			donationHeadLabel.setFont(new Font("Headline", Font.PLAIN, 14));
+			donationConfirmationPanel.add(donationHeadLabel, "wrap 20px, span 2");
 			
 			//add template
-			templateLabel = componentFactory.createLabel("Vorlage");
-			donationConfirmationPanel.add(templateLabel);
+			templateLabel = componentFactory.createLabel("Vorlage: ");
+			donationConfirmationPanel.add(templateLabel, "split2");
 			
 			templateButton = new JButton(new ChooseDonationConfirmationTemplate());
-			donationConfirmationPanel.add(templateButton, "wrap");
+			donationConfirmationPanel.add(templateButton, "gap 12, wrap, growx");
 			
 			//add date
-			confirmationLabel = componentFactory.createLabel("Datum");
-			donationConfirmationPanel.add(confirmationLabel);
+			confirmationLabel = componentFactory.createLabel("Datum: ");
+			donationConfirmationPanel.add(confirmationLabel, "split2");
 			
 			confirmationPicker = new JXDatePicker(new java.util.Date());
-			donationConfirmationPanel.add(confirmationPicker, "wrap");
+			donationConfirmationPanel.add(confirmationPicker, "gap 20, wrap 20px, growx");
 			
 			//add save + cancel
 			saveButton = new JButton(new CreateConfirmationAction(donation));
-			donationConfirmationPanel.add(saveButton, "wrap");
+			donationConfirmationPanel.add(saveButton, "split 2");
 			
 			cancelButton = new JButton(new CancelDonationConfirmation(donationConfirmationDialog));
 			donationConfirmationPanel.add(cancelButton, "wrap");
