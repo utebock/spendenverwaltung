@@ -143,6 +143,8 @@ public enum Province {
 	static {
 		Map<String, Province> ppM = null;
 		try {
+			log.info("Trying to read " + mappingFileName
+					+ " to generate postcode - province mapping");
 			CSVReader reader = new CSVReader(new InputStreamReader(
 					Province.class.getClassLoader().getResourceAsStream(
 							mappingFileName)), ';');
@@ -172,6 +174,9 @@ public enum Province {
 					throw new IOException("Postcode " + postcodeLine[0]
 							+ " is defined more than once in the CSV file");
 			}
+			log.info("postcode-province mapping file " + mappingFileName
+					+ " successfully read, " + ppM.size()
+					+ " postcodes mapped.");
 		} catch (Exception e) {
 			String msg = "Postcode province mapping reading failed";
 			log.error(msg, e);
