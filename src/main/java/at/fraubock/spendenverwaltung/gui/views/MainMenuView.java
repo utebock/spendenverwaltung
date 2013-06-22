@@ -109,7 +109,7 @@ public class MainMenuView extends InitializableView {
 		filterLabel = componentFactory.createLabel("Filter");
 		personsPanel.add(filterLabel, "gap 59");
 		
-		historyLabel = componentFactory.createLabel("History");
+		historyLabel = componentFactory.createLabel("Verlauf");
 		personsPanel.add(historyLabel, "gap 62, wrap 0px");
 		
 		//separator for next section
