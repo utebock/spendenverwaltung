@@ -74,7 +74,7 @@ public class Filter {
 				return READ_UPDATE_DELETE;
 			default:
 				throw new IllegalArgumentException(
-						"No donation type for name: " + name);
+						"No privacy status for name: " + name);
 			}
 		}
 

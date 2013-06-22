@@ -15,7 +15,7 @@ public class HistoryTableModel extends AbstractTableModel implements
 	private static final long serialVersionUID = 1L;
 
 	private String[] columnNames = new String[] { "Benutzer", "Aktion",
-			"Objekt", "Datum", "Daten" };
+			"Objekt", "Datum" };
 	private Vector<Action> actions = new Vector<Action>();
 	private Pager<Action> pager;
 
@@ -37,8 +37,6 @@ public class HistoryTableModel extends AbstractTableModel implements
 			return action.getEntity().toString();
 		case 3:
 			return action.getTime();
-		case 4:
-			return action.getPayload();
 		default:
 			return null;
 		}
@@ -56,8 +54,6 @@ public class HistoryTableModel extends AbstractTableModel implements
 			return String.class;
 		case 3:
 			return Date.class;
-		case 4:
-			return String.class;
 		}
 		return null;
 	}

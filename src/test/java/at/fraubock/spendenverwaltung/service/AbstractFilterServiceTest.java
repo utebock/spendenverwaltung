@@ -102,31 +102,40 @@ public abstract class AbstractFilterServiceTest {
 		f.setPrivacyStatus(filterTO.getPrivacyStatus());
 		PropertyCriterion propCrit = new PropertyCriterion();
 		propCrit.compare(FilterProperty.DONATION_NOTE, RelationalOperator.LIKE, "testnote");
+		propCrit.setId(0);
 		f.setCriterion(propCrit);
 		f.setId(0);
-		createdFilter.setId(1);
 		
-		doAnswer(new Answer<Filter>() {
-
-            public Filter answer(InvocationOnMock invocation)
-                    throws Throwable {
-                Object[] args = invocation.getArguments();
-                if (args[0] instanceof Filter) {
-                	Filter filter = (Filter) args[0];
-                    filter.setId(1);
-                    return filter;
-                }
-                return null;
-            }
-        }).when(this.filterDAO).insert(any(Filter.class));
+//		doAnswer(new Answer<Filter>() {
+//
+//            public Filter answer(InvocationOnMock invocation)
+//                    throws Throwable {
+//                Object[] args = invocation.getArguments();
+//                if (args[0] instanceof Filter) {
+//                	Filter filter = (Filter) args[0];
+//                    filter.setId(1);
+//                    
+//                    if (args[1] instanceof Criterion) {
+//                    	Criterion criterion = (Criterion) args[1];
+//                    	criterion.setId(1);
+//                    }
+//                    
+//                    return filter;
+//                }
+//
+//                return null;
+//            }
+//        }).when(this.filterDAO).update(any(Filter.class),eq(f.getCriterion()));
+		
 		
 		Filter returnedFilter = filterService.update(f, filterTO);
 		
+		
+		createdFilter.setId(returnedFilter.getId());
+		createdFilter.getCriterion().setId(returnedFilter.getCriterion().getId());
 		assertEquals(createdFilter, returnedFilter);
 
-		verify(filterDAO).insert(createdFilter);
-		verify(filterDAO).delete(f);
-		verify(mCriterionDAO).replaceMountId(f.getId(),createdFilter.getId());
+//		verify(filterDAO).update(any(Filter.class),f.getCriterion());
 	}
 
 	/*

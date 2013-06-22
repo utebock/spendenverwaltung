@@ -14,14 +14,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 
 import net.miginfocom.swing.MigLayout;
 
 import org.apache.log4j.Logger;
 
-import at.fraubock.spendenverwaltung.gui.ComponentBuilder;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.HistorySearchPanel;
 import at.fraubock.spendenverwaltung.gui.components.HistoryTableModel;
@@ -80,28 +78,16 @@ public class HistoryView extends InitializableView {
 		historyTable.addMouseListener(new MouseListener() {
 
 			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
+			public void mouseReleased(MouseEvent arg0) {}
 
 			@Override
-			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
+			public void mousePressed(MouseEvent arg0) {}
 
 			@Override
-			public void mouseExited(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
+			public void mouseExited(MouseEvent arg0) {}
 
 			@Override
-			public void mouseEntered(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
+			public void mouseEntered(MouseEvent arg0) {}
 
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -131,7 +117,7 @@ public class HistoryView extends InitializableView {
 		historyTable.getColumnModel().getColumn(3).setMaxWidth(150);
 
 		scrollPane = new JScrollPane(historyTable);
-		scrollPane.setPreferredSize(new Dimension(710,
+		scrollPane.setPreferredSize(new Dimension(700,
 				MAX_TABLE_SIZE * 18 - 17));
 		panel.add(scrollPane, "wrap");
 
