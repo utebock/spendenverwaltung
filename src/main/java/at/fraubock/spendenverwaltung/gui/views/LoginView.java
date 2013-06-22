@@ -1,8 +1,10 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.ParseException;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -175,8 +177,11 @@ public class LoginView extends InitializableView {
 		pwdLabel = componentFactory.createLabel("Passwort:");
 		urlLabel = componentFactory.createLabel("Datenbank-URL:");
 		userField = componentFactory.createTextField(defaultUser);
+		userField.addActionListener(new LoginAction(this));
 		pwdField = new JPasswordField(defaultPassword);
+		pwdField.addActionListener(new LoginAction(this));
 		urlField = componentFactory.createTextField(defaultUrl);
+		urlField.addActionListener(new LoginAction(this));
 		loginBtn = new JButton("Login");
 		cancelBtn = new JButton("Abbrechen");
 
