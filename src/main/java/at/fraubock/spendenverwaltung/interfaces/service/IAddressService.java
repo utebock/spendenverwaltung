@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 
 /**
@@ -80,5 +82,17 @@ public interface IAddressService {
 	 *             if writing the file failed
 	 */
 	public void saveAsCSV(List<Address> addresses, File csvFile)
-			throws IOException;
+			throws IOException;	
+
+	/**
+	 * Retrieves addresses matching the given filter
+	 * 
+	 * @param filter
+	 *            the filter to be used
+	 * @return a list of all those addresses matching the given
+	 *         filter, sorted by id descending
+	 * @throws PersistenceException
+	 *             if communication to the underlying persistence system failed
+	 */
+	public List<Address> getByFilter(Filter filter) throws ServiceException;
 }

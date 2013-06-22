@@ -194,7 +194,8 @@ public class FilterDAOImplemented implements IFilterDAO {
 				ps.setInt(4, filter.getCriterion().getId());
 			}
 			ps.setString(5, filter.getPrivacyStatus().getName());
-			filter.setOwner(connection.getMetaData().getUserName());
+			String owner = connection.getMetaData().getUserName();
+			filter.setOwner(owner.substring(0,owner.indexOf("@")));
 			return ps;
 		}
 	}

@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.dao;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -68,7 +69,7 @@ public abstract class AbstractFilterDAOTest {
 		Filter savedFilter = filterDAO.getById(testFilter.getId());
 
 		// check if filter was saved correctly
-		assertTrue(savedFilter.equals(testFilter));
+		assertEquals(savedFilter,testFilter);
 
 	}
 

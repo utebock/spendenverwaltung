@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +37,11 @@ import com.sun.xml.internal.txw2.IllegalSignatureException;
  * @author philipp muhoray
  * 
  */
+@SuppressWarnings("restriction")
 public class FilterServiceImplemented implements IFilterService {
+
+	private static final Logger log = Logger
+			.getLogger(FilterServiceImplemented.class);
 
 	private IFilterDAO filterDAO;
 	private IMountedFilterCriterionDAO mountedCritDAO;
@@ -145,6 +150,16 @@ public class FilterServiceImplemented implements IFilterService {
 	@Override
 	@Transactional(rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public void delete(Filter f) throws ServiceException, FilterInUseException {
+		if (f == null) {
+			log.error("Filter was null in delete.");
+			throw new ServiceException();
+		}
+
+		if (f.getId() == null) {
+			log.error("Filter had no ID in delete");
+			throw new ServiceException();
+		}
+
 		try {
 			for (Integer id : mountedCritDAO.getAllMountedFilterIds()) {
 				if (f.getId().equals(id)) {
@@ -177,6 +192,12 @@ public class FilterServiceImplemented implements IFilterService {
 	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
 	public Pair<List<Filter>, String> getAllByFilter(FilterType type)
 			throws ServiceException {
+
+		if (type == null) {
+			log.error("FilterType was null in getAllByFilter.");
+			throw new ServiceException();
+		}
+
 		List<Filter> list = new ArrayList<Filter>();
 		String uName;
 		try {
@@ -222,6 +243,20 @@ public class FilterServiceImplemented implements IFilterService {
 
 	private Filter createFilterFromTransferObject(FilterTO filterTO)
 			throws ServiceException {
+
+		if (filterTO == null) {
+			log.error("FilterTO was null in create");
+			throw new ServiceException();
+		}
+
+		if (filterTO.getOperator() == null
+				|| filterTO.getPrivacyStatus() == null
+				|| filterTO.getType() == null) {
+			log.error("FilterTO had invalid null values in create: "
+					+ filterTO.toString());
+			throw new ServiceException();
+		}
+
 		Filter filter = new Filter();
 		filter.setType(filterTO.getType());
 		filter.setName(filterTO.getName());
@@ -266,8 +301,7 @@ public class FilterServiceImplemented implements IFilterService {
 			return null;
 		switch (f.getType()) {
 		case ADDRESS:
-			// TODO
-			break;
+			return addressService.convertToCSV(addressService.getByFilter(f));
 		case DONATION:
 			return donationService.convertToCSV(donationService.getByFilter(f));
 		case MAILING:
@@ -290,8 +324,8 @@ public class FilterServiceImplemented implements IFilterService {
 			return false;
 		switch (f.getType()) {
 		case ADDRESS:
-			// TODO
-			break; // TODO switch to return true
+			addressService.saveAsCSV(addressService.getByFilter(f), csvFile);
+			return true;
 		case DONATION:
 			donationService.saveAsCSV(donationService.getByFilter(f), csvFile);
 			return true;

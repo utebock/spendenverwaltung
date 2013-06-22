@@ -33,6 +33,7 @@
 	<!-- BEANS FOR DAOS -->
 	<bean id="addressDao" class="at.fraubock.spendenverwaltung.dao.AddressDAOImplemented">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<property name="filterBuilder" ref="filterBuilder" />
 	</bean>
 	<bean id="actionDao" class="at.fraubock.spendenverwaltung.dao.ActionDAOImplemented">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
