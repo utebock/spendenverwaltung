@@ -61,7 +61,7 @@ public class HistorySearchPanel extends JPanel {
 		nameLabel = componentFactory.createLabel("Benutzer: ");
 		add(nameLabel, "split 2");
 		actorSearch = new JTextField(17);
-		add(actorSearch, "gap 70, wrap, growx");
+		add(actorSearch, "gap 150, wrap, growx");
 		
 		actorSearch.addKeyListener(new SearchKeyListener());
 
@@ -69,7 +69,7 @@ public class HistorySearchPanel extends JPanel {
 		add((didLabel = new JLabel("Get\u00E4tigte Aktion: ")), "split 2");
 		add((actionSearch = new JComboBox<ActionTypeMapper>(
 				new SimpleComboBoxModel<ActionTypeMapper>(
-						ActionTypeMapper.values()))), "gap 20, wrap, growx");
+						ActionTypeMapper.values()))), "gap 100, wrap, growx");
 		
 		actionSearch.setPreferredSize(new Dimension(147, JComboBox.HEIGHT));
 		actionSearch.addActionListener(new ActionListener() {
@@ -100,7 +100,7 @@ public class HistorySearchPanel extends JPanel {
 				search();
 			}
 		});
-		add(entitySearch, "gap 75, wrap, growx");
+		add(entitySearch, "gap 155, wrap, growx");
 
 		JPanel datePanel = new JPanel();
 		datePanel.setLayout(new MigLayout());
@@ -109,7 +109,7 @@ public class HistorySearchPanel extends JPanel {
 		// WHEN
 		dateLabel = componentFactory.createLabel("Beginn: ");
 		add(dateLabel, "split 2");
-		add(dateFrom = new JXDatePicker(new java.util.Date()), "gap 80, wrap, growx");
+		add(dateFrom = new JXDatePicker(new java.util.Date()), "gap 160, wrap, growx");
 		dateFrom.setDate(null);
 		dateFrom.getEditor().addFocusListener(new FocusListener() {
 
@@ -130,7 +130,7 @@ public class HistorySearchPanel extends JPanel {
 
 		//datePanel.add(new JLabel("bis "));
 		add((endLabel = new JLabel("Ende:")), "split2");
-		add((dateTo = new JXDatePicker(new java.util.Date())), "gap 95, wrap, growx");
+		add((dateTo = new JXDatePicker(new java.util.Date())), "gap 175, wrap, growx");
 		dateTo.setDate(null);
 		dateTo.getEditor().addFocusListener(new FocusListener() {
 
@@ -150,7 +150,7 @@ public class HistorySearchPanel extends JPanel {
 		});
 
 		add((dataLabel = new JLabel("Daten: ")), "split2");
-		add((dataSearch = new JTextField(42)), "gap 83, wrap, growx");
+		add((dataSearch = new JTextField(42)), "gap 163, wrap, growx");
 		dataSearch.addKeyListener(new SearchKeyListener());
 
 	}
