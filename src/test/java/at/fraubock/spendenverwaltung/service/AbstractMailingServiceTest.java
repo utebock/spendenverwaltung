@@ -234,18 +234,6 @@ public abstract class AbstractMailingServiceTest {
 		mailingService.reproduceDocument(null);
 	}
 
-	@Test
-	public void reproduceDocumentWithValidArgument_ProducesDocument()
-			throws Exception {
-
-		mailingService.reproduceDocument(validMailingTwo);
-
-		verify(personDAO).getPersonsByMailing(validMailingTwo);
-		// TODO how to mock a static method?
-		// (MailingTemplateUtil#createMailingWithDocxTemplate())
-
-	}
-
 	private String csvExpected = "Datum;Art;Medium;Vorlage\n12.06.2013;Dankesbrief;E-Mail;-\n13.06.2013;Infomaterial;Postalisch;examplemailing2.docx\n"
 			+ "14.06.2013;Einzelspenden Dankesbrief;E-Mail;-\n";
 
