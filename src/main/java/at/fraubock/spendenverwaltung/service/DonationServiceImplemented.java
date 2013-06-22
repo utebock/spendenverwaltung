@@ -141,7 +141,7 @@ public class DonationServiceImplemented implements IDonationService {
 			throw new IllegalArgumentException("Argument must not be null.");
 		}
 
-		String csv = "Betrag;Datum;Widmung;Art;Notiz;Vorname;Nachname;E-Mail;Unternehmen;Land;Stadt;PLZ;Strasse\n";
+		String csv = "Betrag in \u20AC;Datum;Widmung;Art;Notiz;Vorname;Nachname;E-Mail;Unternehmen;Land;Stadt;PLZ;Strasse\n";
 
 		for (Donation d : donations) {
 			NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);

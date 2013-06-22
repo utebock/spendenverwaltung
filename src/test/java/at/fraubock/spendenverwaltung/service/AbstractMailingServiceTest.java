@@ -231,7 +231,7 @@ public abstract class AbstractMailingServiceTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void reproduceDocumentWithNullArgument_ThrowsException()
 			throws ServiceException {
-		mailingService.reproduceDocument(null);
+		mailingService.reproduceDocument(null,null);
 	}
 
 	private String csvExpected = "Datum;Art;Medium;Vorlage\n12.06.2013;Dankesbrief;E-Mail;-\n13.06.2013;Infomaterial;Postalisch;examplemailing2.docx\n"

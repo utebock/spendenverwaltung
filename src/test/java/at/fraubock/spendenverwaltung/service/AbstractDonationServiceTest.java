@@ -279,13 +279,13 @@ public abstract class AbstractDonationServiceTest {
 		List<Donation> list = new ArrayList<Donation>();
 		String csv = donationService.convertToCSV(list);
 		assertTrue(csv
-				.equals("Betrag;Datum;Widmung;Art;Notiz;Vorname;Nachname;"
+				.equals("Betrag in \u20AC;Datum;Widmung;Art;Notiz;Vorname;Nachname;"
 						+ "E-Mail;Unternehmen;Land;Stadt;PLZ;Strasse\n"));
 	}
 
-	private String csvExpected = "Betrag;Datum;Widmung;Art;Notiz;Vorname;Nachname;E-Mail;Unternehmen;Land;Stadt;PLZ;Strasse\n"
-			+ "100;12.06.2013;test;bank transfer;test;Test;Test;test@test.at;IBM;n.v.;n.v.;n.v.;n.v.;\n"
-			+ "200;13.06.2013;test2;sms;test2;Test;Test;test@test.at;IBM;n.v.;n.v.;n.v.;n.v.;\n"
-			+ "300;14.06.2013;test3;merchandise;test3;dfdasd;ffff;test2@ff.at;asfd;n.v.;n.v.;n.v.;n.v.;\n";
+	private String csvExpected = "Betrag in \u20AC;Datum;Widmung;Art;Notiz;Vorname;Nachname;E-Mail;Unternehmen;Land;Stadt;PLZ;Strasse\n"
+			+ "1;12.06.2013;test;bank transfer;test;Test;Test;test@test.at;IBM;n.v.;n.v.;n.v.;n.v.;\n"
+			+ "2;13.06.2013;test2;sms;test2;Test;Test;test@test.at;IBM;n.v.;n.v.;n.v.;n.v.;\n"
+			+ "3;14.06.2013;test3;merchandise;test3;dfdasd;ffff;test2@ff.at;asfd;n.v.;n.v.;n.v.;n.v.;\n";
 
 }

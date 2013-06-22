@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -25,17 +24,17 @@ import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXDatePicker;
 
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
-import at.fraubock.spendenverwaltung.gui.components.ComponentConstants;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.StringTextField;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing.Medium;
+import at.fraubock.spendenverwaltung.interfaces.domain.MailingTemplate;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
-import at.fraubock.spendenverwaltung.interfaces.service.IMailChimpService.MailChimpListItem;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailChimpService;
+import at.fraubock.spendenverwaltung.interfaces.service.IMailChimpService.MailChimpListItem;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.MailingTemplateUtil;
@@ -418,15 +417,15 @@ public class CreateMailingsView extends InitializableView {
 			
 			if(fileName.equals(""))
 				return;
-//			if(templateFile != null) {
-//				log.debug("Template file size "+templateFile.length());
-//				MailingTemplate template = new MailingTemplate();
-//				template.setFile(templateFile);
-//				template.setFileName(templateFile.getName());
-//				mailing.setTemplate(template);
-//			} else {
-//				log.debug("Template file was null");
-//			}
+			if(templateFile != null) {
+				log.debug("Template file size "+templateFile.length());
+				MailingTemplate template = new MailingTemplate();
+				template.setFile(templateFile);
+				template.setFileName(templateFile.getName());
+				mailing.setTemplate(template);
+			} else {
+				log.debug("Template file was null");
+			}
 
 			try {
 				mailingService.insertOrUpdate(mailing);

@@ -296,6 +296,69 @@ public class FindMailingsView extends InitializableView {
 		}
 
 	}
+	
+	private String showSaveDialog() {
+
+        JFileChooser chooser; 
+        String path = System.getProperty("user.home");
+
+        chooser = new JFileChooser(path); 
+        chooser.setDialogType(JFileChooser.SAVE_DIALOG); 
+        
+        FileFilter filterPdf = new FileFilter() {
+            public boolean accept(File f) {
+                if (f.isDirectory())
+                    return true;
+                return f.getName().toLowerCase().endsWith(".pdf");
+            }
+
+            public String getDescription() {
+                return "pdf-File (*.pdf)";
+            }
+        };
+        
+        FileFilter filterDocx = new FileFilter() {
+            public boolean accept(File f) {
+                if (f.isDirectory())
+                    return false;
+                return f.getName().toLowerCase().endsWith(".docx");
+            }
+
+            public String getDescription() {
+                return "docx-File (*.docx)";
+            }
+        };
+        
+        chooser.addChoosableFileFilter(filterPdf);
+        chooser.addChoosableFileFilter(filterDocx);
+        
+        chooser.removeChoosableFileFilter(chooser.getAcceptAllFileFilter());
+        chooser.setDialogTitle("Speichern unter..."); 
+        chooser.setFileFilter(filterPdf);
+        chooser.setVisible(true); 
+
+        int result = chooser.showSaveDialog(this); 
+
+        if (result == JFileChooser.APPROVE_OPTION) { 
+
+        	path = chooser.getSelectedFile().toString();
+            
+            if(chooser.getFileFilter().getDescription().contains("docx")){
+            	if(path.endsWith(".docx"))
+            		return path;
+            	else
+            		return path + ".docx";
+            } else if(chooser.getFileFilter().getDescription().contains("pdf")){
+            	if(path.endsWith(".pdf"))
+            		return path;
+            	else
+            		return path + ".pdf";
+            }
+            chooser.setVisible(false);
+        } 
+        chooser.setVisible(false); 
+        return ""; 
+	}
 
 	private final class ReproduceAction extends AbstractAction {
 
@@ -307,6 +370,11 @@ public class FindMailingsView extends InitializableView {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			String fileName = showSaveDialog();
+			
+			if(fileName.equals(""))
+				return;
+			
 			int selectedRow;
 			if ((selectedRow = mailingsTable.getSelectedRow()) != -1) {
 				Mailing mailing = tableModel.getRow(selectedRow);
@@ -321,7 +389,7 @@ public class FindMailingsView extends InitializableView {
 					JOptionPane.showMessageDialog(contentPanel, "Aussendungen ohne Vorlage k\u00F6nnen nicht wiederhergestellt werden.", "Warnung", JOptionPane.WARNING_MESSAGE);
 				} else {
 					try {
-						mailingService.reproduceDocument(mailing);
+						mailingService.reproduceDocument(mailing,fileName);
 					} catch (ServiceException e1) {
 						log.warn(e1.getLocalizedMessage());
 						//feedbackLabel
