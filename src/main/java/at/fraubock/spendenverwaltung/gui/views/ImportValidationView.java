@@ -170,7 +170,7 @@ public class ImportValidationView extends InitializableView {
 	
 			CancelButtonListener cancelAction = new CancelButtonListener();
 			cancelAction.putValue(Action.NAME, "Abbrechen");
-			cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
+			cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backInButton.png")));
 			backBtn = new JButton();
 			backBtn.setAction(cancelAction);
 			matchPanel.add(backBtn, "");
@@ -190,7 +190,7 @@ public class ImportValidationView extends InitializableView {
 			}
 		} else{
 			infoLabel = new JLabel("Keine Importe zu validieren");
-			infoLabel.setFont(new Font("bigger", Font.PLAIN, 13));
+			infoLabel.setFont(new Font("bigger", Font.PLAIN, 14));
 			this.add(infoLabel, "wrap 30px, gap 40");
 			
 			CancelButtonListener cancelAction = new CancelButtonListener();

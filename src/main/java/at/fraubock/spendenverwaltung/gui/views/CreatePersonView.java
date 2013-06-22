@@ -428,12 +428,12 @@ public class CreatePersonView extends InitializableView {
 							log.info("Creating donation");
 							donationService.create(donation);
 						}
-						
+						JOptionPane.showMessageDialog(overviewPanel, "Person erfolgreich angelegt.", "Information", JOptionPane.INFORMATION_MESSAGE);
 						Action switchToMenu = viewActionFactory.getMainMenuViewAction();
 						switchToMenu.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
 
 					} catch (ServiceException e1) {
-						JOptionPane.showConfirmDialog(null, "Ein fehler ist beim erstellen der Person aufgetreten");
+						JOptionPane.showConfirmDialog(null, "Ein Fehler ist beim Erstellen der Person aufgetreten.");
 					}
 				}
 			}

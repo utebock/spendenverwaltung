@@ -57,7 +57,7 @@ public class ConfirmMailingsView extends InitializableView {
 	}
 	
 	public void setUpLayout() {
-		contentPanel = componentFactory.createPanel(800, 800);
+		contentPanel = componentFactory.createPanel(750, 800);
 		
 		this.add(contentPanel);
 		
@@ -70,7 +70,7 @@ public class ConfirmMailingsView extends InitializableView {
 		scrollPane.setPreferredSize(new Dimension(700, 550));
 		
 		toolbar = new JToolBar();
-		contentPanel.add(toolbar, "wrap, growx");
+		contentPanel.add(toolbar, "wrap 20px, growx");
 		contentPanel.add(scrollPane, "wrap, growx");
 		
 		unconfirmedTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -93,7 +93,7 @@ public class ConfirmMailingsView extends InitializableView {
 				unconfirmedTable.setAutoCreateRowSorter(true);
 			} catch (ServiceException e) {
 				log.warn(e.getLocalizedMessage());
-				JOptionPane.showMessageDialog(this, "Ein Fehler tritt während der Initialisierung der Tabelle auf");
+				JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
@@ -104,7 +104,7 @@ public class ConfirmMailingsView extends InitializableView {
 		
 		JButton backButton = new JButton();
 		Action getBack = viewActionFactory.getMainMenuViewAction();
-		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.jpg")));
+		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backButton.png")));
 		backButton.setAction(getBack);
 		
 		JButton confirmButton = new JButton();
@@ -130,8 +130,9 @@ public class ConfirmMailingsView extends InitializableView {
 		toolbar.add(backButton, "split 5, growx");
 		toolbar.add(confirmButton, "growx");
 		toolbar.add(confirmAllButton, "growx");
-		toolbar.add(removePersonsButton, "growx");
 		toolbar.add(deleteButton, "growx");
+		toolbar.add(removePersonsButton, "growx");
+		
 	}
 	
 	private final class DeleteAction extends AbstractAction {
@@ -139,7 +140,7 @@ public class ConfirmMailingsView extends InitializableView {
 		private static final long serialVersionUID = 1L;
 
 		public DeleteAction() {
-			super("Aussendung löschen");
+			super("Aussendung l\u00F6schen");
 		}
 		
 		@Override
@@ -150,10 +151,12 @@ public class ConfirmMailingsView extends InitializableView {
 				try {
 					mailingService.delete(mailing.getMailing());
 					tableModel.removeUnconfirmedMailing(mailing);
-					feedbackLabel.setText("Aussendung wurde gelöscht.");
+					//feedbackLabel.setText("Aussendung wurde geloescht.");
+					JOptionPane.showMessageDialog(contentPanel, "Aussendung wurde gel\u00F6scht.", "Information", JOptionPane.INFORMATION_MESSAGE);
 				} catch (ServiceException e1) {
 					log.warn(e1.getLocalizedMessage());
-					feedbackLabel.setText("Ein Fehler trat während des Löschens auf");
+					//feedbackLabel.setText("Ein Fehler trat waehrend des Loeschens auf");
+					JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}
@@ -165,7 +168,7 @@ public class ConfirmMailingsView extends InitializableView {
 		private static final long serialVersionUID = 1L;
 
 		public ConfirmAction() {
-			super("Aussendung bestätigen");
+			super("Aussendung best\u00E4tigen");
 		}
 		
 		@Override
@@ -176,10 +179,12 @@ public class ConfirmMailingsView extends InitializableView {
 				try {
 					mailingService.confirmMailing(mailing.getMailing());
 					tableModel.removeUnconfirmedMailing(mailing);
-					feedbackLabel.setText("Aussendung wurde bestätigt.");
+					//feedbackLabel.setText("Aussendung wurde best\u00E4tigt.");
+					JOptionPane.showMessageDialog(contentPanel, "Aussendung wurde best\u00E4tigt.", "Information", JOptionPane.INFORMATION_MESSAGE);
 				} catch (ServiceException e1) {
 					log.warn(e1.getLocalizedMessage());
-					feedbackLabel.setText("Ein Fehler trat während der Bestätigung auf");
+					//feedbackLabel.setText("Ein Fehler trat waehrend der Bestaetigung auf");
+					JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}	
@@ -190,7 +195,7 @@ public class ConfirmMailingsView extends InitializableView {
 		private static final long serialVersionUID = 1L;
 
 		public ConfirmAllAction() {
-			super("Alle Aussendungen bestätigen");
+			super("Alle Aussendungen best\u00E4tigen");
 		}
 		
 		@Override
@@ -202,10 +207,12 @@ public class ConfirmMailingsView extends InitializableView {
 					mailingService.confirmMailing(umailing.getMailing());
 				}
 				tableModel.clear();
-				feedbackLabel.setText("Alle Aussendungen wurden bestätigt.");
+				//feedbackLabel.setText("Alle Aussendungen wurden bestaetigt.");
+				JOptionPane.showMessageDialog(contentPanel, "Alle Aussendungen wurde best\u00E4tigt.", "Information", JOptionPane.INFORMATION_MESSAGE);
 			} catch (ServiceException e1) {
 				log.warn(e1.getLocalizedMessage());
-				feedbackLabel.setText("Ein Fehler trat während der Bestätigung auf");
+			//	feedbackLabel.setText("Ein Fehler trat waehrend der Bestaetigung auf");
+				JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
 			}
 		}	
 	}
@@ -217,7 +224,7 @@ public class ConfirmMailingsView extends InitializableView {
 		private static final long serialVersionUID = 1L;
 
 		public RemovePersonsAction() {
-			super("Personen Entfernen");
+			super("<html>&nbsp;Personen entfernen</html>");
 		}
 		
 		@Override

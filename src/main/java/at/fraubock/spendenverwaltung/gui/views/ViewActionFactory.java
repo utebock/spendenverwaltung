@@ -16,6 +16,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.service.IActionService;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
+import at.fraubock.spendenverwaltung.interfaces.service.IConfirmationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
@@ -45,6 +46,7 @@ public class ViewActionFactory {
 	IFilterService filterService;
 	IAddressService addressService;
 	IMailingService mailingService;
+	IConfirmationService confirmationService;
 	IImportService importService;
 	IActionService actionService;
 	IMailChimpService mailChimpService;
@@ -52,14 +54,15 @@ public class ViewActionFactory {
 	public ViewActionFactory(ViewDisplayer viewDisplayer,
 			IPersonService personService, IDonationService donationService,
 			IFilterService filterService, IAddressService addressService,
-			IMailingService mailingService, IImportService importService,
-			IActionService actionService, IMailChimpService mailChimpService) {
+			IMailingService mailingService, IConfirmationService confirmationService,
+			IImportService importService, IActionService actionService, IMailChimpService mailChimpService) {
 
 		this.viewDisplayer = viewDisplayer;
 		this.personService = personService;
 		this.addressService = addressService;
 		this.donationService = donationService;
 		this.mailingService = mailingService;
+		this.confirmationService = confirmationService;
 		this.filterService = filterService;
 		this.importService = importService;
 		this.actionService = actionService;
@@ -108,8 +111,8 @@ public class ViewActionFactory {
 	public Action getPersonDonationsViewAction(
 			PersonTableModel personTableModel, Person selectedPerson) {
 		return new DisplayViewAction(new PersonDonationsView(this,
-				new ComponentFactory(), donationService, addressService,
-				selectedPerson, personTableModel));
+				new ComponentFactory(), donationService, confirmationService,  
+				addressService, selectedPerson, personTableModel));
 	}
 
 	public Action getFindPersonsView() {
