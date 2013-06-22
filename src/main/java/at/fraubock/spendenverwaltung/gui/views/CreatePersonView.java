@@ -433,7 +433,7 @@ public class CreatePersonView extends InitializableView {
 						switchToMenu.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
 
 					} catch (ServiceException e1) {
-						JOptionPane.showConfirmDialog(null, "Ein fehler ist beim erstellen der Person aufgetreten");
+						JOptionPane.showConfirmDialog(null, "Ein Fehler ist beim Erstellen der Person aufgetreten.");
 					}
 				}
 			}
