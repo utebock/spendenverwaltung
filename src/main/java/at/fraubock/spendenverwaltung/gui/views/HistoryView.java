@@ -22,6 +22,7 @@ import net.miginfocom.swing.MigLayout;
 import org.apache.log4j.Logger;
 
 import at.fraubock.spendenverwaltung.gui.ComponentBuilder;
+import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.HistorySearchPanel;
 import at.fraubock.spendenverwaltung.gui.components.HistoryTableModel;
 import at.fraubock.spendenverwaltung.gui.components.PageNavigator;
@@ -38,8 +39,7 @@ public class HistoryView extends InitializableView {
 	private final int MAX_TABLE_SIZE = 20;
 
 	private ViewActionFactory viewActionFactory;
-	private ComponentBuilder builder;
-	private JToolBar toolbar;
+	private ComponentFactory componentFactory;
 	private JPanel panel;
 	private JTable historyTable;
 	private JScrollPane scrollPane;
@@ -56,26 +56,19 @@ public class HistoryView extends InitializableView {
 
 	@Override
 	public void init() {
-
-		builder = new ComponentBuilder();
-		panel = builder.createPanel(1200, 620);
+		componentFactory = new ComponentFactory();
+		panel = componentFactory.createPanel(750, 800);
 		this.add(panel);
-
-		toolbar = builder.createToolbar();
-		toolbar.setFloatable(false);
-		toolbar.setRollover(true);
 
 		JButton backButton = new JButton();
 		javax.swing.Action getBack = viewActionFactory.getMainMenuViewAction();
 		getBack.putValue(javax.swing.Action.SMALL_ICON, new ImageIcon(
-				getClass().getResource("/images/backButton.jpg")));
+				getClass().getResource("/images/backInButton.png")));
 		backButton.setAction(getBack);
 
-		toolbar.add(backButton);
+		//toolbar.add(backButton);
 
-		panel.add(toolbar, "wrap,gapbottom 20");
-
-		JLabel headline = builder.createLabel("Historie aller Aktionen");
+		JLabel headline = componentFactory.createLabel("Verlauf aller Aktionen");
 		headline.setFont(new Font("Headline", Font.PLAIN, 14));
 		panel.add(headline, "wrap, gapbottom 20");
 
@@ -138,7 +131,7 @@ public class HistoryView extends InitializableView {
 		historyTable.getColumnModel().getColumn(3).setMaxWidth(150);
 
 		scrollPane = new JScrollPane(historyTable);
-		scrollPane.setPreferredSize(new Dimension(1200,
+		scrollPane.setPreferredSize(new Dimension(750,
 				MAX_TABLE_SIZE * 18 - 17));
 		panel.add(scrollPane, "wrap");
 
@@ -156,7 +149,7 @@ public class HistoryView extends InitializableView {
 			navigator.modelRefreshed();
 		} catch (ServiceException e) {
 			JOptionPane.showMessageDialog(this,
-					"Ein unerwarteter Fehler ist aufgetreten.", "Error",
+					"Ein unerwarteter Fehler ist aufgetreten.", "Fehler",
 					JOptionPane.ERROR_MESSAGE);
 			log.error("Error when loading all actions as pager or refreshing page model: "
 					+ e.getMessage());
