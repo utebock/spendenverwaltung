@@ -254,7 +254,7 @@ public class CreateFilter extends JPanel {
 		minusButton.setAction(minusAct);
 
 		minusButtons.add(minusButton);
-		criterionSelectorPanel.add(selectorComp, "w 700");
+		criterionSelectorPanel.add(selectorComp, "w 700!");
 		criterionSelectorPanel.add(minusButton, "wrap");
 
 		if (plusButton != null) {
