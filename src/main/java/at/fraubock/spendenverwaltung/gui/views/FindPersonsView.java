@@ -445,15 +445,16 @@ public class FindPersonsView extends InitializableView {
 			noteField = new StringTextField(ComponentConstants.LONG_TEXT);
 			noteField.setText(person.getNote());
 			editPersonPanel.add(noteLable, "split2");
-			editPersonPanel.add(noteField, "gap 45, wrap, growx");
+			editPersonPanel.add(noteField, "gap 45, wrap 20px, growx");
 			
 			cancelButton = new JButton();
 			cancelButton.setAction(new CancelEditAction());
 			
 			submitButton = new JButton();
 			submitButton.setAction(new SubmitEditAction());
-			editPersonPanel.add(cancelButton, "split2");
-			editPersonPanel.add(submitButton, "wrap");
+			editPersonPanel.add(submitButton, "split2");
+			editPersonPanel.add(cancelButton, "wrap");
+			
 			
 			validationFeedbackLabel = componentFactory.createLabel("");
 			editPersonPanel.add(validationFeedbackLabel, "wrap");
@@ -500,7 +501,8 @@ public class FindPersonsView extends InitializableView {
 				if((givenNameField.getText().equals("") || surnameField.getText().equals(""))
 						&& companyField.getText().equals("")) {
 					validation = false;
-					validationFeedbackLabel.setText("Vorname und Nachname oder Firma müssen gesetzt sein.");
+				//	validationFeedbackLabel.setText("Bitte Vorname und Nachname oder Firma setzen.");
+					JOptionPane.showMessageDialog(editPersonPanel, "Bitte Vorname und Nachname oder Firma setzen.", "Information", JOptionPane.INFORMATION_MESSAGE);
 					return;
 				}
 				
@@ -562,15 +564,18 @@ public class FindPersonsView extends InitializableView {
 					
 					try {
 						personService.update(person);
-						feedbackLabel.setText("Person würde erfolgreich geändert.");
+						//feedbackLabel.setText("Person erfolgreich ge\u00E4ndert.");
 						editPersonDialog.dispose();
+						JOptionPane.showMessageDialog(editPersonPanel, "Person erfolgreich ge\u00E4ndert.", "Information", JOptionPane.INFORMATION_MESSAGE);
 					} catch (ServiceException e1) {
 						log.warn(e1.getLocalizedMessage());
-						validationFeedbackLabel.setText("Ein Fehler ist während der Speicherung der Änderungen aufgetreten");
+						//validationFeedbackLabel.setText("Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.");
+						JOptionPane.showMessageDialog(editPersonPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
 					}
 					
 				} else {
-					validationFeedbackLabel.setText("Es konnten nicht alle Eingabefelder validiert werden");
+					JOptionPane.showMessageDialog(editPersonPanel, "Es konnten nicht alle Eingabefelder validiert werden.", "Warnung", JOptionPane.WARNING_MESSAGE);
+					//validationFeedbackLabel.setText("Es konnten nicht alle Eingabefelder validiert werden");
 				}
 				
 			}

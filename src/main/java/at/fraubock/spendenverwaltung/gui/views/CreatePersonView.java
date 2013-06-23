@@ -356,7 +356,7 @@ public class CreatePersonView extends InitializableView {
 				
 				if(givenField.getText().equals("") && surnameField.getText().equals("")
 						&& companyField.getText().equals("")) {
-					JOptionPane.showMessageDialog(null, "Vorname, Nachname oder Firma müssen ausgefüllt werden.");
+					JOptionPane.showMessageDialog(null, "Bitte Vorname und Nachname oder Firma setzen.");
 					return;
 				}
 				
