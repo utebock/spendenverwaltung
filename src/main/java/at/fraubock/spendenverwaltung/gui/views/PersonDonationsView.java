@@ -8,9 +8,12 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -29,6 +32,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXDatePicker;
@@ -129,6 +133,7 @@ public class PersonDonationsView extends InitializableView {
 		
 		donationTableModel = new DonationTableModel();
 		donationsTable = new JTable(donationTableModel);
+		donationsTable.setDefaultRenderer(Long.class, new LongCellRenderer());
 		donationsTable.setAutoCreateRowSorter(true);
 		donationsTable.setFillsViewportHeight(true);
 		donationsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -156,8 +161,11 @@ public class PersonDonationsView extends InitializableView {
 	}
 	
 	private void setTotalLabel() {
-		double sum = currentTotal/100;
-		donationTotalLabel.setText("Spendensumme: "+sum+" \u20ac");
+		double sum = currentTotal;
+		sum = sum/100;
+		
+		NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
+		donationTotalLabel.setText("Spendensumme: "+nf.format(sum)+" \u20ac");
 	}
 	
 	public void initTable() {
@@ -1008,6 +1016,21 @@ public class PersonDonationsView extends InitializableView {
 				}
 			}
 		}
+	}
+	
+	private final class LongCellRenderer extends DefaultTableCellRenderer {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		
+		@Override
+		protected void setValue(Object value) {
+			NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
+			super.setValue(nf.format((Double)value));
+		}
+		
 	}
 	
 }

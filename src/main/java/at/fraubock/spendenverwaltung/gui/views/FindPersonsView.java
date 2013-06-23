@@ -59,8 +59,6 @@ public class FindPersonsView extends InitializableView {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = Logger.getLogger(FindPersonsView.class);
 	private IPersonService personService;
-	private IAddressService addressService;
-	private IDonationService donationService;
 	private IFilterService filterService;
 	private PersonTableModel personModel;
 	private JTable showTable;
@@ -73,7 +71,6 @@ public class FindPersonsView extends InitializableView {
 	private JButton backButton;
 	private JPanel overviewPanel;
 	private JLabel label;
-	private JLabel empty;
 	private JLabel feedbackLabel;
 	private JLabel quickSearchLabel;
 	private JTextField quickSearchField;
@@ -89,8 +86,6 @@ public class FindPersonsView extends InitializableView {
 		this.componentFactory = componentFactory;
 		this.viewActionFactory = viewActionFactory;
 		this.personService = personService;
-		this.addressService = addressService;
-		this.donationService = donationService;
 		this.filterService = filterService;
 		this.personModel = personModel;
 	}
