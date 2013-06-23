@@ -17,6 +17,7 @@ import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.filter.configurators.ICriterionConfigurator;
 import at.fraubock.spendenverwaltung.gui.filter.configurators.property.StringComparator;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter.FilterPrivacyStatus;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.ConnectedCriterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
@@ -89,6 +90,7 @@ public class AddressConfigurator extends JPanel implements
 
 		Filter filter = new Filter(FilterType.ADDRESS, crit);
 		filter.setAnonymous(true);
+		filter.setPrivacyStatus(FilterPrivacyStatus.READ_UPDATE_DELETE);
 
 		MountedFilterCriterion mCrit = new MountedFilterCriterion();
 		mCrit.setMount(filter);

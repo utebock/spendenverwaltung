@@ -113,12 +113,12 @@ public abstract class AbstractActionServiceTest {
 		list1.add(newActionCreated);
 		ActionSearchVO searchVO = new ActionSearchVO();
 		searchVO.setFrom(new Date());
-		when(actionDAO.getLimitedResultByAttributes(searchVO, 0, 3))
+		when(actionDAO.getByAttributesFromOthers(searchVO, 0, 3))
 				.thenReturn(list1);
 		
 		List<Action> result = actionService.pollForActionSince(searchVO.getFrom(), 3);
 		
 		assertEquals(result,list1);
-		verify(actionDAO).getLimitedResultByAttributes(searchVO, 0, 3);
+		verify(actionDAO).getByAttributesFromOthers(searchVO, 0, 3);
 	}
 }
