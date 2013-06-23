@@ -38,8 +38,7 @@ public class MainFilterView extends InitializableView {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = Logger.getLogger(MainFilterView.class);
-	private IFilterService filterService;
-	private ComponentBuilder builder;
+	private IFilterService filterService;;
 	private ViewActionFactory viewActionFactory;
 	private FilterTableModel filterModel;
 	private JTable showTable;
@@ -77,16 +76,17 @@ public class MainFilterView extends InitializableView {
 	}
 
 	public void init() {
-		builder = new ComponentBuilder();
-		panel = builder.createPanel(700, 800);
+		panel = new JPanel();
+		panel.setLayout(new MigLayout());
+		panel.setPreferredSize(new Dimension(700, 800));
 		this.add(panel);
 
-		toolbar = builder.createToolbar();
+		toolbar = new JToolBar();
 		toolbar.setFloatable(false);
 		toolbar.setRollover(true);
 		addComponentsToToolbar(toolbar);
 		panel.add(toolbar, "wrap");
-		empty = builder.createLabel("		 ");
+		empty = new JLabel("		 ");
 		panel.add(empty, "wrap");
 		initTable();
 		panel.add(scrollPane);
@@ -150,7 +150,7 @@ public class MainFilterView extends InitializableView {
 				}
 				Filter filter = filterModel.getFilterRow(showTable
 						.getSelectedRow());
-				
+
 				createFilter(filter.getType(), filter);
 			}
 
@@ -190,17 +190,16 @@ public class MainFilterView extends InitializableView {
 			userName = filterPair.b;
 			log.info("List " + filterList.size() + " filter");
 		} catch (ServiceException e) {
-			JOptionPane
-					.showMessageDialog(
-							this,
-							"Ein unerwarteter Fehler ist aufgetreten.",
-							"Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this,
+					"Ein unerwarteter Fehler ist aufgetreten.", "Error",
+					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 			return;
 		}
 		if (filterList == null) {
-			JOptionPane.showMessageDialog(this, "Ein unerwarteter Fehler ist aufgetreten.",
-					"Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this,
+					"Ein unerwarteter Fehler ist aufgetreten.", "Error",
+					JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		for (Filter f : filterList) {
@@ -209,8 +208,8 @@ public class MainFilterView extends InitializableView {
 	}
 
 	public void createFilter(FilterType type, Filter filter) {
-		CreateFilter cf = new CreateFilter(type, filterService, this, filter, userName,
-				viewActionFactory);
+		CreateFilter cf = new CreateFilter(type, filterService, this, filter,
+				userName, viewActionFactory);
 		removeAll();
 		revalidate();
 		repaint();
