@@ -118,7 +118,7 @@ public enum Province {
 	 *         is not in Austria.
 	 */
 	public static Province getFromAddress(Address a) {
-		if (!"Österreich".equals(a.getCountry()))
+		if (!"\u00D6sterreich".equals(a.getCountry()))
 			return OTHER;
 		Province p = postcodeProvinceMapping.get(a.getPostalCode());
 		if (p == null) {
