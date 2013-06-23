@@ -342,17 +342,17 @@ END;//
 
 CREATE TRIGGER donations_log_insert AFTER INSERT ON donations FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'donations', CAST(NEW.id AS CHAR(30)), CONCAT('person: ', NEW.personid, ', ', NEW.amount, ' EUR-cents', ', ', NEW.donationdate, ', ', 'dedication: ', IFNULL(NEW.dedication, 'none'), ', ', NEW.type, ', ', 'note: ', IFNULL(NEW.note, 'none')));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'donations', CAST(NEW.id AS CHAR(30)), CONCAT('person: ', IFNULL(NEW.personid, 'anonym'), ', ', NEW.amount, ' EUR-cents', ', ', NEW.donationdate, ', ', 'dedication: ', IFNULL(NEW.dedication, 'none'), ', ', NEW.type, ', ', 'note: ', IFNULL(NEW.note, 'none')));
 END;//
 
 CREATE TRIGGER donations_log_update AFTER UPDATE ON donations FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donations', CAST(NEW.id AS CHAR(30)), CONCAT('person: ', NEW.personid, ', ', NEW.amount, ' EUR-cents', ', ', NEW.donationdate, ', ', 'dedication: ', IFNULL(NEW.dedication, 'none'), ', ', NEW.type, ', ', 'note: ', IFNULL(NEW.note, 'none')));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donations', CAST(NEW.id AS CHAR(30)), CONCAT('person: ', IFNULL(NEW.personid, 'anonym'), ', ', NEW.amount, ' EUR-cents', ', ', NEW.donationdate, ', ', 'dedication: ', IFNULL(NEW.dedication, 'none'), ', ', NEW.type, ', ', 'note: ', IFNULL(NEW.note, 'none')));
 END;//
 
 CREATE TRIGGER donations_log_delete AFTER DELETE ON donations FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'donations', CAST(OLD.id AS CHAR(30)), CONCAT('person: ', OLD.personid, ', ', OLD.amount, ' EUR-cents', ', ', OLD.donationdate, ', ', 'dedication: ', IFNULL(OLD.dedication, 'none'), ', ', OLD.type, ', ', 'note: ', IFNULL(OLD.note, 'none')));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'donations', CAST(OLD.id AS CHAR(30)), CONCAT('person: ', IFNULL(OLD.personid, 'anonym'), ', ', OLD.amount, ' EUR-cents', ', ', OLD.donationdate, ', ', 'dedication: ', IFNULL(OLD.dedication, 'none'), ', ', OLD.type, ', ', 'note: ', IFNULL(OLD.note, 'none')));
 END;//
 
 
