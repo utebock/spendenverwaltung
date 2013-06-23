@@ -13,6 +13,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -28,9 +29,11 @@ import at.fraubock.spendenverwaltung.gui.AbstractValidationTableModel;
 import at.fraubock.spendenverwaltung.gui.AssignPerson;
 import at.fraubock.spendenverwaltung.gui.ComponentBuilder;
 import at.fraubock.spendenverwaltung.gui.ConflictValidationTableModel;
+import at.fraubock.spendenverwaltung.gui.MainFrame;
 import at.fraubock.spendenverwaltung.gui.MatchValidationTableModel;
 import at.fraubock.spendenverwaltung.gui.NewValidationTableModel;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
+import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Import;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
@@ -78,9 +81,10 @@ public class ImportValidationView extends InitializableView {
 	private JLabel infoLabel;
 	private ViewActionFactory actionFactory;
 	private JScrollPane scrollPane;
+	private ViewDisplayer viewDisplayer;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ImportValidationView(IPersonService personService, IAddressService addressService, IDonationService donationService, IImportService importService, ComponentFactory componentFactory, ViewActionFactory actionFactory){
+	public ImportValidationView(IPersonService personService, IAddressService addressService, IDonationService donationService, IImportService importService, ComponentFactory componentFactory, ViewActionFactory actionFactory, ViewDisplayer viewDisplayer){
 		setLayout(new MigLayout());
 		
 		this.builder = new ComponentBuilder();
@@ -90,6 +94,7 @@ public class ImportValidationView extends InitializableView {
 		this.donationService = donationService;
 		this.importService = importService;
 		this.actionFactory = actionFactory;
+		this.viewDisplayer = viewDisplayer;
 
 		conflictComboBox = new JComboBox(ImportValidator.ValidationType.toArray());
 		
@@ -105,6 +110,8 @@ public class ImportValidationView extends InitializableView {
 		conflictPanel = builder.createPanel(1200,250);
 		newPanel = builder.createPanel(1200,250);
 		matchPanel = builder.createPanel(1200,250);
+		
+		viewDisplayer.getFrame().setSize(new Dimension(1250, 800));
 		
 		conflictTable = new JTable(conflictModel);
 		newTable = new JTable(newModel);
@@ -483,6 +490,7 @@ public class ImportValidationView extends InitializableView {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			viewDisplayer.getFrame().setSize(new Dimension(800, 800));
 			returnToMain();
 		}
 	}

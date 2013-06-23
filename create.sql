@@ -586,7 +586,7 @@ INSERT INTO `mountedfilter_criterion` (`id`,`mount`,`relational_operator`,`count
 INSERT INTO `mountedfilter_criterion` (`id`,`mount`,`relational_operator`,`count`,`property`,`sum`,`avg`) VALUES (8,4,'GREATER_EQ',1,NULL,NULL,NULL);
 INSERT INTO `mountedfilter_criterion` (`id`,`mount`,`relational_operator`,`count`,`property`,`sum`,`avg`) VALUES (24,3,'GREATER_EQ',NULL,'amount',50000,NULL);
 INSERT INTO `mountedfilter_criterion` (`id`,`mount`,`relational_operator`,`count`,`property`,`sum`,`avg`) VALUES (25,5,'GREATER_EQ',NULL,'amount',200000,NULL);
-INSERT INTO `mountedfilter_criterion` (`id`,`mount`,`relational_operator`,`count`,`property`,`sum`,`avg`) VALUES (26,7,'EQUALS',1,NULL,NULL,NULL);
+INSERT INTO `mountedfilter_criterion` (`id`,`mount`,`relational_operator`,`count`,`property`,`sum`,`avg`) VALUES (26,6,'EQUALS',1,NULL,NULL,NULL);
 
 INSERT INTO `connected_criterion` (`id`,`operand1`,`operand2`,`logical_operator`) VALUES (5,6,7,'AND');
 INSERT INTO `connected_criterion` (`id`,`operand1`,`operand2`,`logical_operator`) VALUES (22,23,26,'AND');
