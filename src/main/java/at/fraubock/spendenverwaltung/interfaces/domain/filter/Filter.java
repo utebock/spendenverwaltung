@@ -45,7 +45,7 @@ public class Filter {
 
 	public static enum FilterPrivacyStatus {
 		PRIVATE("privat"), READ("anzeigen"), READ_UPDATE("anzeigen, bearbeiten"), READ_UPDATE_DELETE(
-				"anzeigen, bearbeiten, löschen");
+				"anzeigen, bearbeiten, loeschen");
 
 		private final String name;
 
@@ -61,6 +61,13 @@ public class Filter {
 		public String toString() {
 			return name;
 		}
+		
+		public String toGUIString() {
+			if(name.contains("loeschen")) {
+				return name.replace("loeschen", "l\u00F6schen");
+			}
+			return name;
+		}
 
 		public static FilterPrivacyStatus getByName(String name) {
 			switch (name) {
@@ -70,7 +77,9 @@ public class Filter {
 				return READ;
 			case "anzeigen, bearbeiten":
 				return READ_UPDATE;
-			case "anzeigen, bearbeiten, löschen":
+			case "anzeigen, bearbeiten, loeschen":
+				return READ_UPDATE_DELETE;
+			case "anzeigen, bearbeiten, l\u00F6schen":
 				return READ_UPDATE_DELETE;
 			default:
 				throw new IllegalArgumentException(
@@ -80,7 +89,7 @@ public class Filter {
 
 		public static String[] toStringArray() {
 			return new String[] { "privat", "anzeigen", "anzeigen, bearbeiten",
-					"anzeigen, bearbeiten, löschen" };
+					"anzeigen, bearbeiten, l\u00F6schen" };
 		}
 	};
 
