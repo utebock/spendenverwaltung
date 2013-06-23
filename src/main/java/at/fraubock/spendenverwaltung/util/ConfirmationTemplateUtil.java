@@ -153,11 +153,11 @@ public class ConfirmationTemplateUtil {
 			}
 			
 			//Merge into one docx and delete temp files
-			mergeDocx(files, outputName);
+			mergeDocx(files, new File(outputName));
 		}
 	}
 	
-	private static void mergeDocx(List<File> files, String outputName){
+	private static void mergeDocx(List<File> files, File outputFile){
         DocxService docxService = new DocxService();
 
         // Create a list of streams to merge
@@ -172,8 +172,8 @@ public class ConfirmationTemplateUtil {
         }
         // Merge streams
         try {
-            FileOutputStream fos = new FileOutputStream(outputName);
-            fos.write(IOUtils.toByteArray(docxService.mergeDocx(streams, outputName)));
+            FileOutputStream fos = new FileOutputStream(outputFile);
+            fos.write(IOUtils.toByteArray(docxService.mergeDocx(streams, outputFile)));
             fos.close();
         } catch (Docx4JException d4je) {
             d4je.printStackTrace();

@@ -24,10 +24,9 @@ import org.docx4j.wml.CTAltChunk;
 
 public class DocxService {
 
-    public InputStream mergeDocx(final List<InputStream> streams, String output) throws Docx4JException, IOException {
+    public InputStream mergeDocx(final List<InputStream> streams, File outputFile) throws Docx4JException, IOException {
 
         WordprocessingMLPackage target = null;
-        final File generated = new File(output);
 
         int chunkId = 0;
         Iterator<InputStream> it = streams.iterator();
@@ -36,11 +35,11 @@ public class DocxService {
             if (is != null) {
                 if (target == null) {
                     // Copy first document
-                    OutputStream os = new FileOutputStream(generated);
+                    OutputStream os = new FileOutputStream(outputFile);
                     os.write(IOUtils.toByteArray(is));
                     os.close();
 
-                    target = WordprocessingMLPackage.load(generated);
+                    target = WordprocessingMLPackage.load(outputFile);
                 } else {
                     // Attach the others (Alternative input parts)
                     insertDocx(target.getMainDocumentPart(), IOUtils.toByteArray(is), chunkId++);
@@ -53,8 +52,8 @@ public class DocxService {
     		DocumentSettingsPart settingsPart = target.getMainDocumentPart().getDocumentSettingsPart();
     		settingsPart.getJaxbElement().setMailMerge(null);
     		
-            target.save(generated);
-            return new FileInputStream(generated);
+            target.save(outputFile);
+            return new FileInputStream(outputFile);
         } else {
             return null;
         }

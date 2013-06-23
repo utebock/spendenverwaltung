@@ -66,11 +66,13 @@ public class MailingTemplateUtil {
 	 * 			List of person to merge with the template file
 	 * @param outputName
 	 * 			Name of final pdf file
+	 * @return the created File
 	 * @throws IOException
 	 * @throws ServiceException
 	 */
-	public static void createMailingWithDocxTemplate(File templateFile, List<Person> personList, String outputName) throws IOException, ServiceException{
+	public static File createMailingWithDocxTemplate(File templateFile, List<Person> personList, String outputName) throws IOException, ServiceException{
 		List<File> files = new ArrayList<File>();
+		File f = null;
 		IXDocReport report;
 		File tempFile;
 		IContext context;
@@ -118,7 +120,8 @@ public class MailingTemplateUtil {
 			}
 			
 			//Merge into one pdf and delete temp files
-			mergePdfs(files, new File(outputName));
+			f = new File(outputName);
+			mergePdfs(files, f);
 		} else if(outputName.endsWith(".docx")){
 			
 			log.info("Create docx mailing with template "+templateFile.getName());
@@ -152,11 +155,14 @@ public class MailingTemplateUtil {
 			}
 			
 			//Merge into one docx and delete temp files
-			mergeDocx(files, outputName);
+			f = new File(outputName);
+			mergeDocx(files, f);
+			
 		}
+		return f;
 	}
 	
-	private static void mergeDocx(List<File> files, String outputName){
+	private static void mergeDocx(List<File> files, File outputFile){
         DocxService docxService = new DocxService();
 
         // Create a list of streams to merge
@@ -171,14 +177,15 @@ public class MailingTemplateUtil {
         }
         // Merge streams
         try {
-            FileOutputStream fos = new FileOutputStream(outputName);
-            fos.write(IOUtils.toByteArray(docxService.mergeDocx(streams, outputName)));
+            FileOutputStream fos = new FileOutputStream(outputFile);
+            fos.write(IOUtils.toByteArray(docxService.mergeDocx(streams, outputFile)));
             fos.close();
         } catch (Docx4JException d4je) {
             d4je.printStackTrace();
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
+       
 	}
 	
 	/**
