@@ -92,7 +92,7 @@ public class HistorySearchPanel extends JPanel {
 				search();
 			}
 		});
-		add(entitySearch, "gap 155, wrap, growx");
+		add(entitySearch, "gap 162, wrap, growx");
 
 		JPanel datePanel = new JPanel();
 		datePanel.setLayout(new MigLayout());
@@ -101,7 +101,7 @@ public class HistorySearchPanel extends JPanel {
 		// WHEN
 		dateLabel = componentFactory.createLabel("Beginn: ");
 		add(dateLabel, "split 2");
-		add(dateFrom = new JXDatePicker(new java.util.Date()), "gap 160, wrap, growx");
+		add(dateFrom = new JXDatePicker(new java.util.Date()), "gap 164, wrap, growx");
 		dateFrom.setDate(null);
 		dateFrom.getEditor().addActionListener(new ActionListener() {
 			
@@ -119,7 +119,7 @@ public class HistorySearchPanel extends JPanel {
 		});
 		
 		add((new JLabel("Ende:")), "split2");
-		add((dateTo = new JXDatePicker(new java.util.Date())), "gap 175, wrap, growx");
+		add((dateTo = new JXDatePicker(new java.util.Date())), "gap 179, wrap, growx");
 		dateTo.setDate(null);
 		dateTo.getEditor().addActionListener(new ActionListener() {
 			
@@ -137,7 +137,7 @@ public class HistorySearchPanel extends JPanel {
 		});
 
 		add((new JLabel("Daten: ")), "split2");
-		add((dataSearch = new JTextField(42)), "gap 163, wrap, growx");
+		add((dataSearch = new JTextField(42)), "gap 167, wrap, growx");
 		dataSearch.addKeyListener(new SearchKeyListener());
 
 	}
