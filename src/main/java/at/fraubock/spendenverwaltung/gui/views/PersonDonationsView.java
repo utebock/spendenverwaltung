@@ -94,8 +94,9 @@ public class PersonDonationsView extends InitializableView {
 	private DonationTableModel donationTableModel;
 	
 	private File confirmationTemplateFile;
-	JXDatePicker confirmationPicker;
+	private JXDatePicker confirmationPicker;
 	private JLabel dateLabel;
+	private JDialog donationConfirmationDialog;
 	
 	public PersonDonationsView (ViewActionFactory viewActionFactory, ComponentFactory componentFactory,
 			IDonationService donationService, IConfirmationService confirmationService, IAddressService addressService, Person selectedPerson, PersonTableModel personTableModel) {
@@ -731,7 +732,6 @@ public class PersonDonationsView extends InitializableView {
 		
 		private static final long serialVersionUID = 1L;
 
-		JDialog donationConfirmationDialog;
 		JPanel donationConfirmationPanel;
 		JLabel donationHeadLabel;
 		JLabel templateLabel;
@@ -793,7 +793,6 @@ public class PersonDonationsView extends InitializableView {
 		
 		private static final long serialVersionUID = 1L;
 
-		JDialog donationConfirmationDialog;
 		JPanel donationConfirmationPanel;
 		JLabel donationHeadLabel;
 		JLabel templateLabel;
@@ -938,8 +937,21 @@ public class PersonDonationsView extends InitializableView {
 			int counter = 1;
 			String fileName = showSaveDialog();
 			
+			ConfirmationTemplate confirmationTemplate = new ConfirmationTemplate();
+			confirmationTemplate.setFile(confirmationTemplateFile);
+			confirmationTemplate.setName(confirmationTemplateFile.getName());
+			
+			
 			if(fileName.equals(""))
 				return;
+			
+			try {
+					confirmationTemplate = confirmationService.insertOrUpdateConfirmationTemplate(confirmationTemplate);
+			} catch (ServiceException e1) {
+				log.error(e1 + " occured in CreateConfirmationsView");
+			//	feedbackLabel.setText("Ein Fehler ist waehrend der Erstellung dieser Aussendung aufgetreten.");
+				JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
+			}
 			
 			for(Donation donation : donations){
 				Confirmation confirmation = new Confirmation();
@@ -948,30 +960,16 @@ public class PersonDonationsView extends InitializableView {
 				confirmation.setDate(confirmationPicker.getDate());
 				confirmation.setPerson(donation.getDonator());
 				
-	
 				try {
+					confirmation.setTemplate(confirmationTemplate);
+
+					confirmationService.insertOrUpdate(confirmation);
+					//feedbackLabel.setText("Best\u00E4tigung wurde erstellt.");
 					
-					if(confirmationTemplateFile != null) {
-						ConfirmationTemplate confirmationTemplate = new ConfirmationTemplate();
-						confirmationTemplate.setFile(confirmationTemplateFile);
-						if(donations.size() > 1){
-							confirmationTemplate.setName(confirmationTemplateFile.getName()+"_"+counter);
-						} else{
-							confirmationTemplate.setName(confirmationTemplateFile.getName());
-						}
-						
-						confirmationTemplate = confirmationService.insertOrUpdateConfirmationTemplate(confirmationTemplate);
-						
-						confirmation.setTemplate(confirmationTemplate);
-	
-						confirmationService.insertOrUpdate(confirmation);
-						//feedbackLabel.setText("Best\u00E4tigung wurde erstellt.");
-						
-						if(counter == donations.size())
-							JOptionPane.showMessageDialog(contentPanel, "Spendenbest\u00E4tigung erfolgreich erstellt.", "Information", JOptionPane.INFORMATION_MESSAGE);
-						
-						counter ++;
-					}
+					if(counter == donations.size())
+						JOptionPane.showMessageDialog(contentPanel, "Spendenbest\u00E4tigung erfolgreich erstellt.", "Information", JOptionPane.INFORMATION_MESSAGE);
+					
+					counter ++;
 				} catch (ServiceException e1) {
 					log.error(e1 + " occured in CreateConfirmationsView");
 				//	feedbackLabel.setText("Ein Fehler ist waehrend der Erstellung dieser Aussendung aufgetreten.");
@@ -991,6 +989,8 @@ public class PersonDonationsView extends InitializableView {
 				//feedbackLabel.setText("Ein Fehler ist waehrend der Erstellung des PDFs aufgetreten.");
 				JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
 			}
+			
+			donationConfirmationDialog.dispose();
 		}
 
 	}

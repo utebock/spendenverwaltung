@@ -490,6 +490,7 @@ public class ImportValidationView extends InitializableView {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			viewDisplayer.getFrame().setSize(new Dimension(800, 800));
 			returnToMain();
 		}
 	}
