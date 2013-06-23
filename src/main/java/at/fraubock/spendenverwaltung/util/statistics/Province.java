@@ -88,8 +88,12 @@ public enum Province {
 	 * @return the province the donator's main address is in, or {@link #OTHER}
 	 *         if the donation is anonymous, the donator has no address
 	 *         specified or does not live in Austria.
+	 * @throws IllegalStateException
+	 *             when the country is Austria, but the postcode could not be
+	 *             mapped
 	 */
-	public static Province getFromDonation(Donation d) {
+	public static Province getFromDonation(Donation d)
+			throws IllegalStateException {
 		if (d.getDonator() == null)
 			return OTHER;
 		return getFromPerson(d.getDonator());
@@ -102,8 +106,12 @@ public enum Province {
 	 * @return the province the person's main address is in, or {@link #OTHER}
 	 *         if the person has no address specified or does not live in
 	 *         Austria.
+	 * @throws IllegalStateException
+	 *             when the country is Austria, but the postcode could not be
+	 *             mapped
 	 */
-	public static Province getFromPerson(Person pers) {
+	public static Province getFromPerson(Person pers)
+			throws IllegalStateException {
 		Address a = pers.getMainAddress();
 		if (a == null)
 			return OTHER;
@@ -116,8 +124,12 @@ public enum Province {
 	 *            any address (not null)
 	 * @return the province the address is in, or {@link #OTHER} if the address
 	 *         is not in Austria.
+	 * @throws IllegalStateException
+	 *             when the country is Austria, but the postcode could not be
+	 *             mapped
 	 */
-	public static Province getFromAddress(Address a) {
+	public static Province getFromAddress(Address a)
+			throws IllegalStateException {
 		if (!"Österreich".equals(a.getCountry()))
 			return OTHER;
 		Province p = postcodeProvinceMapping.get(a.getPostalCode());

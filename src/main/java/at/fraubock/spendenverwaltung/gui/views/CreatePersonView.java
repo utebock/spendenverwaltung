@@ -37,10 +37,10 @@ import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 /**
  * 
  * @author Cornelia Hasil, Chris Steele
- *
+ * 
  */
 public class CreatePersonView extends InitializableView {
-	
+
 	private static final Logger log = Logger.getLogger(CreatePersonView.class);
 
 	private static final long serialVersionUID = 1L;
@@ -52,7 +52,7 @@ public class CreatePersonView extends InitializableView {
 	private ComponentFactory componentFactory;
 	private PersonTableModel personModel;
 	private JPanel panel;
-	
+
 	private List<ValidateableComponent> validateablePersonComponents = new ArrayList<ValidateableComponent>();
 	private List<ValidateableComponent> validateableDonationComponents = new ArrayList<ValidateableComponent>();
 
@@ -60,55 +60,55 @@ public class CreatePersonView extends InitializableView {
 	private JLabel addPerson;
 	private JComboBox<String> salutation;
 	private JLabel salutLabel;
-	
+
 	private JLabel title;
 
 	private JLabel company;
 	private StringTextField companyField;
-	
+
 	private JLabel given_name;
 	private StringTextField givenField;
-	
+
 	private JLabel surname;
 	private StringTextField surnameField;
-	
+
 	private JLabel telephone;
 	private NumericTextField telephoneField;
-	
+
 	private JLabel mail;
 	private EmailTextField emailField;
-	
+
 	private JLabel street;
 	private StringTextField streetField;
-	
+
 	private JLabel postal;
 	private StringTextField postalField;
-	
+
 	private JLabel city;
 	private StringTextField cityField;
-	
+
 	private JLabel country;
 	private StringTextField countryField;
-	
+
 	private JLabel notifyType;
 	private JCheckBox notifyMail;
 	private JCheckBox notifyPost;
-	
+
 	private JLabel note;
-	
-	private StringTextField noteText; 
-	
+
+	private StringTextField noteText;
+
 	private JLabel donationLabel;
 	private JComboBox<String> donationCombo;
 	private NumericTextField amount;
-	
+
 	private JButton submit;
 	private JButton cancel;
-	
+
 	private Person person;
 	private Address address;
 	private Donation donation;
-	
+
 	private JSeparator separator;
 	private JPanel donationPanel;
 	private JLabel dedicationLabel;
@@ -123,19 +123,20 @@ public class CreatePersonView extends InitializableView {
 
 	private JLabel amountLabel;
 
-	public CreatePersonView(ComponentFactory componentFactory, ViewActionFactory viewActionFactory, 
-			IPersonService personService, IAddressService addressService,
-			IDonationService donationService, PersonTableModel personModel) {
+	public CreatePersonView(ComponentFactory componentFactory,
+			ViewActionFactory viewActionFactory, IPersonService personService,
+			IAddressService addressService, IDonationService donationService,
+			PersonTableModel personModel) {
 		this.componentFactory = componentFactory;
 		this.viewActionFactory = viewActionFactory;
 		this.personService = personService;
 		this.addressService = addressService;
 		this.donationService = donationService;
 		this.personModel = personModel;
-		
+
 		setUpCreate();
 	}
-	
+
 	public void setPersonService(IPersonService personService) {
 		this.personService = personService;
 	}
@@ -151,7 +152,7 @@ public class CreatePersonView extends InitializableView {
 	public void setComponentFactory(ComponentFactory componentFactory) {
 		this.componentFactory = componentFactory;
 	}
-	
+
 	public void setViewActionFactory(ViewActionFactory viewActionFactory) {
 		this.viewActionFactory = viewActionFactory;
 	}
@@ -159,45 +160,47 @@ public class CreatePersonView extends InitializableView {
 	public void setPersonModel(PersonTableModel personModel) {
 		this.personModel = personModel;
 	}
-	
+
 	private void setUpCreate() {
 		overviewPanel = componentFactory.createPanel(700, 850);
-		//JScrollPane pane = new JScrollPane(overviewPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		// JScrollPane pane = new JScrollPane(overviewPanel,
+		// JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+		// JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		this.add(overviewPanel);
 
-		panel = componentFactory.createPanel(700,500);
+		panel = componentFactory.createPanel(700, 500);
 		overviewPanel.add(panel);
-		
+
 		addPerson = componentFactory.createLabel("Personendaten eintragen");
 		addPerson.setFont(new Font("Headline", Font.PLAIN, 14));
 		panel.add(addPerson, "wrap");
 		JLabel empty = componentFactory.createLabel("		");
 		panel.add(empty, "wrap");
-		
-		String[] salutCombo = new String[]{"Herr", "Frau", "Fam.", "Firma"};
+
+		String[] salutCombo = new String[] { "Herr", "Frau", "Fam.", "Firma" };
 		salutation = new JComboBox<String>(salutCombo);
-		
+
 		salutLabel = componentFactory.createLabel("Anrede: ");
 		panel.add(salutLabel);
 		panel.add(salutation, "wrap");
-		
+
 		title = componentFactory.createLabel("Titel: ");
 		titleField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
 		panel.add(title);
 		panel.add(titleField, "wrap");
-		
+
 		company = componentFactory.createLabel("Firma: ");
 		companyField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
 		panel.add(company);
 		panel.add(companyField, "wrap, growx");
 		validateablePersonComponents.add(companyField);
-		
+
 		given_name = componentFactory.createLabel("Vorname: ");
 		givenField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
 		panel.add(given_name);
 		panel.add(givenField, "wrap, growx");
 		validateablePersonComponents.add(givenField);
-		
+
 		surname = componentFactory.createLabel("Nachname: ");
 		surnameField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
 		panel.add(surname);
@@ -209,7 +212,7 @@ public class CreatePersonView extends InitializableView {
 		panel.add(telephone);
 		panel.add(telephoneField, "wrap, growx");
 		validateablePersonComponents.add(telephoneField);
-		
+
 		mail = componentFactory.createLabel("E-Mail: ");
 		emailField = new EmailTextField(ComponentConstants.MEDIUM_TEXT);
 		panel.add(mail);
@@ -227,15 +230,16 @@ public class CreatePersonView extends InitializableView {
 		panel.add(postal);
 		panel.add(postalField, "wrap, growx");
 		validateablePersonComponents.add(postalField);
-		
+
 		city = componentFactory.createLabel("Ort: ");
 		cityField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
 		panel.add(city);
 		panel.add(cityField, "wrap, growx");
 		validateablePersonComponents.add(cityField);
-		
+
 		country = componentFactory.createLabel("Land: ");
 		countryField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
+		countryField.setText("\u00D6sterreich");
 		panel.add(country);
 		panel.add(countryField, "wrap, growx");
 		validateablePersonComponents.add(countryField);
@@ -246,7 +250,7 @@ public class CreatePersonView extends InitializableView {
 		panel.add(notifyType);
 		panel.add(notifyMail, "split 2");
 		panel.add(notifyPost, "wrap");
-		
+
 		note = componentFactory.createLabel("Notiz: ");
 		noteText = new StringTextField(ComponentConstants.LONG_TEXT);
 		panel.add(note);
@@ -254,36 +258,37 @@ public class CreatePersonView extends InitializableView {
 		panel.add(empty, "wrap");
 		validateablePersonComponents.add(noteText);
 
-/**
-* Next section
-*/
-		
+		/**
+		 * Next section
+		 */
+
 		separator = componentFactory.createSeparator();
 		overviewPanel.add(separator, "wrap, growx");
-		
+
 		donationPanel = componentFactory.createPanel(800, 450);
 		overviewPanel.add(donationPanel);
-		
+
 		addDonation = componentFactory.createLabel("Neue Spende anlegen");
 		addDonation.setFont(new Font("Headline", Font.PLAIN, 14));
 		donationPanel.add(addDonation, "wrap");
-		
-		donationCombo = new JComboBox<String>(donationService.getDonationTypes());
+
+		donationCombo = new JComboBox<String>(
+				donationService.getDonationTypes());
 		donationLabel = componentFactory.createLabel("Spende durch: ");
 		donationPanel.add(donationLabel, "split2");
 		donationPanel.add(donationCombo, "gap 75, wrap, growx");
-		
+
 		amountLabel = componentFactory.createLabel("Betrag: ");
 		amount = new NumericTextField(ComponentConstants.SHORT_TEXT);
 		donationPanel.add(amountLabel, "split2");
 		donationPanel.add(amount, "gap 125, wrap, growx");
 		validateableDonationComponents.add(amount);
-		
+
 		dateLabel = componentFactory.createLabel("Spendendatum: ");
 		datePicker = new JXDatePicker(new java.util.Date());
 		donationPanel.add(dateLabel, "split2");
 		donationPanel.add(datePicker, "gap 70, wrap, growx");
-		
+
 		dedicationLabel = componentFactory.createLabel("Widmung: ");
 		dedicationField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
 		validateableDonationComponents.add(dedicationField);
@@ -295,57 +300,61 @@ public class CreatePersonView extends InitializableView {
 		donationPanel.add(dedicationField, "gap 105, wrap, growx");
 		donationPanel.add(dedicationNoteLabel, "split2");
 		donationPanel.add(dedicationNoteField, "gap 129, wrap, growx");
-		
+
 		donationPanel.add(empty, "wrap");
-		
+
 		submit = new JButton();
 		cancel = new JButton();
-		
+
 		donationPanel.add(submit, "split 2");
 		donationPanel.add(cancel, "wrap");
 		init();
 	}
-	
+
 	public void init() {
 		SubmitAction submitAction = new SubmitAction();
 		submitAction.putValue(Action.NAME, "Anlegen");
 		submit.setAction(submitAction);
-		
+
 		Action cancelAction = viewActionFactory.getMainMenuViewAction();
 		cancelAction.putValue(Action.NAME, "Abbrechen");
-		cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backInButton.png")));
+		cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass()
+				.getResource("/images/backInButton.png")));
 		cancel.setAction(cancelAction);
 		cancel.setFont(new Font("bigger", Font.PLAIN, 13));
 	}
-	
+
 	private final class SubmitAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
+
 			boolean personValidated = true;
 			boolean donationValidated = true;
-			
-			for(ValidateableComponent comp : validateablePersonComponents) {
-				if(!comp.validateContents())
+
+			for (ValidateableComponent comp : validateablePersonComponents) {
+				if (!comp.validateContents())
 					personValidated = false;
 			}
-			
-			if(!personValidated) {
-				JOptionPane.showMessageDialog(null, "Personenfelder konnten nicht validiert werden");
+
+			if (!personValidated) {
+				JOptionPane.showMessageDialog(null,
+						"Personenfelder konnten nicht validiert werden");
 				return;
 			} else {
-				
-				if(givenField.getText().equals("") && surnameField.getText().equals("")
+
+				if (givenField.getText().equals("")
+						&& surnameField.getText().equals("")
 						&& companyField.getText().equals("")) {
-					JOptionPane.showMessageDialog(null, "Bitte Vorname und Nachname oder Firma setzen.");
+					JOptionPane.showMessageDialog(null,
+							"Bitte Vorname und Nachname oder Firma setzen.");
 					return;
 				}
-				
+
 				person = new Person();
-				
+
 				person.setSex(Person.Sex.values()[salutation.getSelectedIndex()]);
 				person.setTitle(titleField.getText());
 				person.setCompany(companyField.getText());
@@ -353,31 +362,35 @@ public class CreatePersonView extends InitializableView {
 				person.setSurname(surnameField.getText());
 				person.setTelephone(telephoneField.getText());
 				person.setEmail(emailField.getText());
-				
-				if(notifyMail.isSelected()){
+
+				if (notifyMail.isSelected()) {
 					person.setEmailNotification(true);
-				}
-				else{
+				} else {
 					person.setEmailNotification(false);
 				}
-				if(notifyPost.isSelected()){
+				if (notifyPost.isSelected()) {
 					person.setPostalNotification(true);
-				}
-				else{
+				} else {
 					person.setPostalNotification(false);
 				}
-				
+
 				String note = noteText.getText();
 				person.setNote(note);
-				
+
 				address = new Address();
-				
-				if(streetField.getText().equals("") && postalField.getText().equals("")
-						&& cityField.getText().equals("") && countryField.getText().equals("")) {
+
+				if (streetField.getText().equals("")
+						&& postalField.getText().equals("")
+						&& cityField.getText().equals("")
+						&& countryField.getText().equals("")) {
 					address = null;
-				} else if(streetField.getText().equals("") || postalField.getText().equals("")
-						|| cityField.getText().equals("") || countryField.getText().equals("")) {
-					JOptionPane.showMessageDialog(null, "Eine Adresse darf entweder ganz oder garnicht gesetzt sein.");
+				} else if (streetField.getText().equals("")
+						|| postalField.getText().equals("")
+						|| cityField.getText().equals("")
+						|| countryField.getText().equals("")) {
+					JOptionPane
+							.showMessageDialog(null,
+									"Eine Adresse darf entweder ganz oder garnicht gesetzt sein.");
 					return;
 				} else {
 					address.setStreet(streetField.getText());
@@ -388,58 +401,68 @@ public class CreatePersonView extends InitializableView {
 				}
 			}
 
-			
-			for(ValidateableComponent comp : validateableDonationComponents) {
-				if(!comp.validateContents()) {
+			for (ValidateableComponent comp : validateableDonationComponents) {
+				if (!comp.validateContents()) {
 					donationValidated = false;
-					JOptionPane.showMessageDialog(null, "Konnte Spendenh\u00F6he nicht feststellen");
+					JOptionPane.showMessageDialog(null,
+							"Konnte Spendenh\u00F6he nicht feststellen");
 					return;
 				}
-					
+
 			}
-			
-			if(donationValidated) {
+
+			if (donationValidated) {
 				donation = new Donation();
-				
-				donation.setType(Donation.DonationType.values()[donationCombo.getSelectedIndex()]);
-				
+
+				donation.setType(Donation.DonationType.values()[donationCombo
+						.getSelectedIndex()]);
+
 				Long d_amount = null;
-				
-				if(!amount.getText().isEmpty()) { 
+
+				if (!amount.getText().isEmpty()) {
 					d_amount = amount.getHundredths();
 					donation.setAmount(d_amount);
 					donation.setDate(datePicker.getDate());
-					donation.setDedication(dedicationField.getText());	
+					donation.setDedication(dedicationField.getText());
 					donation.setNote(dedicationNoteField.getText());
 				} else {
 					donation = null;
 				}
 			}
-			
-			if(personValidated) {
-				if(person != null) {
+
+			if (personValidated) {
+				if (person != null) {
 					try {
-						if(address != null) {
-							Address createdAddress = addressService.create(address); // will now be created when person is created - p
+						if (address != null) {
+							Address createdAddress = addressService
+									.create(address); // will now be created
+														// when person is
+														// created - p
 							List<Address> addresses = new ArrayList<Address>();
 							addresses.add(createdAddress);
 							person.setAddresses(addresses);
 						}
-					
+
 						personService.create(person);
 						personModel.addPerson(person);
-					
-						if(donation != null) {
+
+						if (donation != null) {
 							donation.setDonator(person);
 							log.info("Creating donation");
 							donationService.create(donation);
 						}
-						JOptionPane.showMessageDialog(overviewPanel, "Person erfolgreich angelegt.", "Information", JOptionPane.INFORMATION_MESSAGE);
-						Action switchToMenu = viewActionFactory.getMainMenuViewAction();
-						switchToMenu.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+						JOptionPane.showMessageDialog(overviewPanel,
+								"Person erfolgreich angelegt.", "Information",
+								JOptionPane.INFORMATION_MESSAGE);
+						Action switchToMenu = viewActionFactory
+								.getMainMenuViewAction();
+						switchToMenu.actionPerformed(new ActionEvent(this,
+								ActionEvent.ACTION_PERFORMED, null));
 
 					} catch (ServiceException e1) {
-						JOptionPane.showMessageDialog(null, "Ein Fehler ist beim Erstellen der Person aufgetreten.");
+						JOptionPane.showMessageDialog(null,
+								"Ein Fehler ist beim Erstellen der Person aufgetreten.\nDetails: "
+										+ e1.getLocalizedMessage());
 					}
 				}
 			}
