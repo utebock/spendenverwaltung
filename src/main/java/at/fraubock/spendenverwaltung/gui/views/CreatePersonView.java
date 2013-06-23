@@ -246,7 +246,7 @@ public class CreatePersonView extends InitializableView {
 
 		notifyType = componentFactory.createLabel("Benachrichtigungstyp: ");
 		notifyMail = new JCheckBox("Email");
-		notifyPost = new JCheckBox("Postal Service");
+		notifyPost = new JCheckBox("Post");
 		panel.add(notifyType);
 		panel.add(notifyMail, "split 2");
 		panel.add(notifyPost, "wrap");
@@ -382,12 +382,12 @@ public class CreatePersonView extends InitializableView {
 				if (streetField.getText().equals("")
 						&& postalField.getText().equals("")
 						&& cityField.getText().equals("")
-						&& countryField.getText().equals("")) {
+						|| countryField.getText().equals("")) {
 					address = null;
 				} else if (streetField.getText().equals("")
 						|| postalField.getText().equals("")
 						|| cityField.getText().equals("")
-						|| countryField.getText().equals("")) {
+						) {
 					JOptionPane
 							.showMessageDialog(null,
 									"Eine Adresse darf entweder ganz oder garnicht gesetzt sein.");
@@ -431,6 +431,20 @@ public class CreatePersonView extends InitializableView {
 			}
 
 			if (personValidated) {
+				
+//				try {
+//					if(!personService.getByAttributes(person).isEmpty()) {
+//						JOptionPane.showMessageDialog(overviewPanel,
+//								"Es existiert bereits eine Person mit diesen Attributen.", "Information",
+//								JOptionPane.INFORMATION_MESSAGE);
+//						return;
+//					}
+//				} catch (ServiceException e2) {
+//					log.warn(e2.getLocalizedMessage());
+//					JOptionPane.showMessageDialog(null,
+//							"Ein Fehler ist beim Duplikats-check der Person aufgetreten.");	
+//					return;
+//				}
 				if (person != null) {
 					try {
 						if (address != null) {
@@ -460,9 +474,9 @@ public class CreatePersonView extends InitializableView {
 								ActionEvent.ACTION_PERFORMED, null));
 
 					} catch (ServiceException e1) {
+						log.warn(e1.getLocalizedMessage());
 						JOptionPane.showMessageDialog(null,
-								"Ein Fehler ist beim Erstellen der Person aufgetreten.\nDetails: "
-										+ e1.getLocalizedMessage());
+								"Ein Fehler ist beim Erstellen der Person aufgetreten.");
 					}
 				}
 			}

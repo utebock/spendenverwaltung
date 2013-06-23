@@ -95,7 +95,7 @@ public class ActionServiceImplemented implements IActionService {
 		ActionSearchVO searchVO = new ActionSearchVO();
 		searchVO.setFrom(date);
 		try {
-			return actionDAO.getLimitedResultByAttributes(searchVO, 0, amount);
+			return actionDAO.getByAttributesFromOthers(searchVO, 0, amount);
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}

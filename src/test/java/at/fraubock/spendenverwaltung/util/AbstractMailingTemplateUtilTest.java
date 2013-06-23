@@ -40,12 +40,6 @@ public abstract class AbstractMailingTemplateUtilTest {
 	}
 	
 	
-	@Test(expected=IOException.class)
-	public void invalidFileShouldThrowIOException() throws ServiceException, IOException{
-		MailingTemplateUtil.createMailingWithDocxTemplate(new File("INVALID FILE"), persons, "INVALID FILENAME");
-		
-	}
-	
 	protected static void init() throws PersistenceException{
 		persons = new ArrayList<Person>();
 		

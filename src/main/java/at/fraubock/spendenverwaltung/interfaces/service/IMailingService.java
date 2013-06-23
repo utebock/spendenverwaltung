@@ -129,14 +129,18 @@ public interface IMailingService {
 			throws IOException, ServiceException;
 
 	/**
-	 * reproduces the document that was created by the given mailing. the
-	 * resulting file will be identical to the one that was produced when the
-	 * given mailing was initially created.
+	 * reproduces the document that was created by the given mailing and returns
+	 * it. the resulting file will be identical to the one that was produced
+	 * when the given mailing was initially created. file will be created at the
+	 * given path or in the system's temp folder if path is null.
 	 * 
-	 * @param destination
 	 * @param mailing
+	 * @param savePath
+	 * @return file that was reproduced or null if given mailing has no template
+	 * @throws ServiceException
 	 */
-	public void reproduceDocument(Mailing mailing, String savePath) throws ServiceException;
+	public File reproduceDocument(Mailing mailing, String savePath)
+			throws ServiceException;
 
 	/**
 	 * returns all mailings that have been confirmed by a user

@@ -147,24 +147,28 @@ public class PersonServiceImplemented implements IPersonService {
 		String csv = "Vorname;Nachname;E-Mail;Geschlecht;Titel;Unternehmen;Telephon;Empf\u00E4ngt E-Mail;Empf\u00E4ngt Post;Notiz;Land;Stadt;PLZ;Strasse\n";
 
 		for (Person p : persons) {
-			csv += p.getGivenName() + ";";
-			csv += p.getSurname() + ";";
-			csv += p.getEmail() + ";";
+			csv += nullSafeToString(p.getGivenName()) + ";";
+			csv += nullSafeToString(p.getSurname()) + ";";
+			csv += nullSafeToString(p.getEmail()) + ";";
 			csv += Person.Sex.getDisplayableName(p.getSex()) + ";";
-			csv += p.getTitle() + ";";
-			csv += p.getCompany() + ";";
-			csv += p.getTelephone() + ";";
+			csv += nullSafeToString(p.getTitle()) + ";";
+			csv += nullSafeToString(p.getCompany()) + ";";
+			csv += nullSafeToString(p.getTelephone()) + ";";
 			csv += (p.isEmailNotification() ? "ja" : "nein") + ";";
 			csv += (p.isPostalNotification() ? "ja" : "nein") + ";";
-			csv += p.getNote() + ";";
+			csv += nullSafeToString(p.getNote()) + ";";
 			Address a = p.getMainAddress();
 			String nA = "n.v.;";
-			csv += a == null ? nA : (a.getCountry() + ";");
-			csv += a == null ? nA : (a.getCity() + ";");
-			csv += a == null ? nA : (a.getPostalCode() + ";");
-			csv += (a == null ? nA : (a.getStreet() + ";")) + "\n";
+			csv += a == null ? nA : (nullSafeToString(a.getCountry()) + ";");
+			csv += a == null ? nA : (nullSafeToString(a.getCity()) + ";");
+			csv += a == null ? nA : (nullSafeToString(a.getPostalCode()) + ";");
+			csv += (a == null ? nA : (nullSafeToString(a.getStreet()) + ";")) + "\n";
 		}
 		return csv;
+	}
+	
+	private String nullSafeToString(Object obj) {
+		return obj==null?"n.v.":obj.toString();
 	}
 
 	@Override

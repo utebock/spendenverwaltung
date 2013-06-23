@@ -3,6 +3,8 @@ SET NAMES 'utf8' COLLATE 'utf8_unicode_ci';
 
 USE ubspenderverwaltung;
 
+START TRANSACTION;
+
 DROP TRIGGER IF EXISTS addresses_log_insert;
 DROP TRIGGER IF EXISTS addresses_log_update;
 DROP TRIGGER IF EXISTS addresses_log_delete;
@@ -299,12 +301,12 @@ END;//
 
 CREATE TRIGGER persons_log_update AFTER UPDATE ON persons FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'persons', CAST(NEW.id AS CHAR(30)), CONCAT(IFNULL(NEW.title, 'no title'), ', ', IFNULL(NEW.givenname, 'kein Vorname'), ', ', IFNULL(NEW.surname, 'kein Nachname'), ', ', IFNULL(NEW.company, 'keine Firma'), ', ', IFNULL(NEW.email, 'keine Email'), ', ', NEW.sex, ', ', IFNULL(NEW.telephone, 'keine Telefonnummer'), ', ', 'will ', IF(NEW.emailnotification, '', 'keine '), 'Emailaussendungen', ', ', 'will ', IF(NEW.postalnotification, '', 'keine '), 'Briefaussendungen', ', ', 'Notiz: ', IFNULL(NEW.note, 'keine')));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'persons', CAST(NEW.id AS CHAR(30)), CONCAT(IFNULL(NEW.title, 'kein titel'), ', ', IFNULL(NEW.givenname, 'kein Vorname'), ', ', IFNULL(NEW.surname, 'kein Nachname'), ', ', IFNULL(NEW.company, 'keine Firma'), ', ', IFNULL(NEW.email, 'keine Email'), ', ', NEW.sex, ', ', IFNULL(NEW.telephone, 'keine Telefonnummer'), ', ', 'will ', IF(NEW.emailnotification, '', 'keine '), 'Emailaussendungen', ', ', 'will ', IF(NEW.postalnotification, '', 'keine '), 'Briefaussendungen', ', ', 'Notiz: ', IFNULL(NEW.note, 'keine')));
 END;//
 
 CREATE TRIGGER persons_log_delete AFTER DELETE ON persons FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'persons', CAST(OLD.id AS CHAR(30)), CONCAT(IFNULL(OLD.title, 'no title'), ', ', IFNULL(OLD.givenname, 'kein Vorname'), ', ', IFNULL(OLD.surname, 'kein Nachname'), ', ', IFNULL(OLD.company, 'keine Firma'), ', ', IFNULL(OLD.email, 'keine Email'), ', ', OLD.sex, ', ', IFNULL(OLD.telephone, 'keine Telefonnummer'), ', ', 'will ', IF(OLD.emailnotification, '', 'keine '), 'Emailaussendungen', ', ', 'will ', IF(OLD.postalnotification, '', 'keine '), 'Briefaussendungen', ', ', 'Notiz: ', IFNULL(OLD.note, 'keine')));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'persons', CAST(OLD.id AS CHAR(30)), CONCAT(IFNULL(OLD.title, 'kein titel'), ', ', IFNULL(OLD.givenname, 'kein Vorname'), ', ', IFNULL(OLD.surname, 'kein Nachname'), ', ', IFNULL(OLD.company, 'keine Firma'), ', ', IFNULL(OLD.email, 'keine Email'), ', ', OLD.sex, ', ', IFNULL(OLD.telephone, 'keine Telefonnummer'), ', ', 'will ', IF(OLD.emailnotification, '', 'keine '), 'Emailaussendungen', ', ', 'will ', IF(OLD.postalnotification, '', 'keine '), 'Briefaussendungen', ', ', 'Notiz: ', IFNULL(OLD.note, 'keine')));
 END;//
 
 
@@ -406,17 +408,17 @@ END;//
 
 CREATE TRIGGER filter_log_insert AFTER INSERT ON filter FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'filter', CAST(NEW.id AS CHAR(30)), CONCAT('criterion #', NEW.criterion, ', Typ ', NEW.type, IF(NEW.name IS NULL, '', CONCAT('Name: "', NEW.name, '", ')), IF(NEW.anonymous, 'anonym, ', ''), 'andere duerfen: ', NEW.privacy_status, ', Besitzer: ', NEW.owner));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'filter', CAST(NEW.id AS CHAR(30)), CONCAT('criterion #', NEW.criterion, ', Typ ', NEW.type, IF(NEW.name IS NULL, '', CONCAT('Name: "', NEW.name, '", ')), IF(NEW.anonymous, 'filter ist anonym, ', ''), 'andere duerfen: ', NEW.privacy_status, ', Besitzer: ', NEW.owner));
 END;//
 
 CREATE TRIGGER filter_log_update AFTER UPDATE ON filter FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'filter', CAST(NEW.id AS CHAR(30)), CONCAT('criterion #', NEW.criterion, ', Typ ', NEW.type, IF(NEW.name IS NULL, '', CONCAT('Name: "', NEW.name, '", ')), IF(NEW.anonymous, 'anonym, ', ''), 'andere duerfen: ', NEW.privacy_status, ', Besitzer: ', NEW.owner));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'filter', CAST(NEW.id AS CHAR(30)), CONCAT('criterion #', NEW.criterion, ', Typ ', NEW.type, IF(NEW.name IS NULL, '', CONCAT('Name: "', NEW.name, '", ')), IF(NEW.anonymous, 'filter ist anonym, ', ''), 'andere duerfen: ', NEW.privacy_status, ', Besitzer: ', NEW.owner));
 END;//
 
 CREATE TRIGGER filter_log_delete AFTER DELETE ON filter FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'filter', CAST(OLD.id AS CHAR(30)), CONCAT('criterion #', OLD.criterion, ', Typ ', OLD.type, IF(OLD.name IS NULL, '', CONCAT('Name: "', OLD.name, '", ')), IF(OLD.anonymous, 'anonym, ', ''), 'andere duerfen: ', OLD.privacy_status, ', Besitzer: ', OLD.owner));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'filter', CAST(OLD.id AS CHAR(30)), CONCAT('criterion #', OLD.criterion, ', Typ ', OLD.type, IF(OLD.name IS NULL, '', CONCAT('Name: "', OLD.name, '", ')), IF(OLD.anonymous, 'filter ist anonym, ', ''), 'andere duerfen: ', OLD.privacy_status, ', Besitzer: ', OLD.owner));
 END;//
 
 
@@ -549,5 +551,45 @@ END;//
 
 DELIMITER ;
 
+-- insert default filters
 
+INSERT INTO `criterion` (`id`,`type`) VALUES (1,'validated_donations');
+INSERT INTO `criterion` (`id`,`type`) VALUES (2,'validated_donations');
+INSERT INTO `criterion` (`id`,`type`) VALUES (3,'validated_donations');
+INSERT INTO `criterion` (`id`,`type`) VALUES (4,'validated_donations');
+INSERT INTO `criterion` (`id`,`type`) VALUES (5,'validated_persons');
+INSERT INTO `criterion` (`id`,`type`) VALUES (6,'validated_persons');
+INSERT INTO `criterion` (`id`,`type`) VALUES (7,'validated_persons');
+INSERT INTO `criterion` (`id`,`type`) VALUES (8,'validated_persons');
+INSERT INTO `criterion` (`id`,`type`) VALUES (22,'validated_persons');
+INSERT INTO `criterion` (`id`,`type`) VALUES (23,'validated_persons');
+INSERT INTO `criterion` (`id`,`type`) VALUES (24,'validated_persons');
+INSERT INTO `criterion` (`id`,`type`) VALUES (25,'validated_persons');
+INSERT INTO `criterion` (`id`,`type`) VALUES (26,'validated_persons');
 
+INSERT INTO `filter` (`id`,`criterion`,`type`,`name`,`anonymous`,`privacy_status`,`owner`) VALUES (1,1,'validated_donations','2 Jahre zurueck',1,'anzeigen','default_filter_owner');
+INSERT INTO `filter` (`id`,`criterion`,`type`,`name`,`anonymous`,`privacy_status`,`owner`) VALUES (2,2,'validated_donations','4 Jahre zurueck',1,'anzeigen','default_filter_owner');
+INSERT INTO `filter` (`id`,`criterion`,`type`,`name`,`anonymous`,`privacy_status`,`owner`) VALUES (3,3,'validated_donations','3 Jahre zurueck',1,'anzeigen','default_filter_owner');
+INSERT INTO `filter` (`id`,`criterion`,`type`,`name`,`anonymous`,`privacy_status`,`owner`) VALUES (4,4,'validated_donations','Betrag >= 100',1,'anzeigen','default_filter_owner');
+INSERT INTO `filter` (`id`,`criterion`,`type`,`name`,`anonymous`,`privacy_status`,`owner`) VALUES (5,NULL,'validated_donations','Alle Spenden',0,'anzeigen','default_filter_owner');
+INSERT INTO `filter` (`id`,`criterion`,`type`,`name`,`anonymous`,`privacy_status`,`owner`) VALUES (6,5,'validated_persons','Dauerspender',0,'anzeigen','default_filter_owner');
+INSERT INTO `filter` (`id`,`criterion`,`type`,`name`,`anonymous`,`privacy_status`,`owner`) VALUES (7,8,'validated_persons','Großspender',0,'anzeigen','default_filter_owner');
+INSERT INTO `filter` (`id`,`criterion`,`type`,`name`,`anonymous`,`privacy_status`,`owner`) VALUES (8,22,'validated_persons','GroßFettDauerspender',0,'anzeigen','default_filter_owner');
+
+INSERT INTO `property_criterion` (`id`,`property`,`relational_operator`,`numValue`,`strValue`,`dateValue`,`daysBack`,`boolValue`) VALUES (1,'donationdate','LESS_EQ',NULL,NULL,NULL,730,NULL);
+INSERT INTO `property_criterion` (`id`,`property`,`relational_operator`,`numValue`,`strValue`,`dateValue`,`daysBack`,`boolValue`) VALUES (2,'donationdate','LESS_EQ',NULL,NULL,NULL,1460,NULL);
+INSERT INTO `property_criterion` (`id`,`property`,`relational_operator`,`numValue`,`strValue`,`dateValue`,`daysBack`,`boolValue`) VALUES (3,'donationdate','LESS_EQ',NULL,NULL,NULL,1095,NULL);
+INSERT INTO `property_criterion` (`id`,`property`,`relational_operator`,`numValue`,`strValue`,`dateValue`,`daysBack`,`boolValue`) VALUES (4,'amount','GREATER_EQ',10000,NULL,NULL,NULL,NULL);
+
+INSERT INTO `mountedfilter_criterion` (`id`,`mount`,`relational_operator`,`count`,`property`,`sum`,`avg`) VALUES (6,1,'GREATER_EQ',5,NULL,NULL,NULL);
+INSERT INTO `mountedfilter_criterion` (`id`,`mount`,`relational_operator`,`count`,`property`,`sum`,`avg`) VALUES (7,2,'GREATER_EQ',8,NULL,NULL,NULL);
+INSERT INTO `mountedfilter_criterion` (`id`,`mount`,`relational_operator`,`count`,`property`,`sum`,`avg`) VALUES (8,4,'GREATER_EQ',1,NULL,NULL,NULL);
+INSERT INTO `mountedfilter_criterion` (`id`,`mount`,`relational_operator`,`count`,`property`,`sum`,`avg`) VALUES (24,3,'GREATER_EQ',NULL,'amount',50000,NULL);
+INSERT INTO `mountedfilter_criterion` (`id`,`mount`,`relational_operator`,`count`,`property`,`sum`,`avg`) VALUES (25,5,'GREATER_EQ',NULL,'amount',200000,NULL);
+INSERT INTO `mountedfilter_criterion` (`id`,`mount`,`relational_operator`,`count`,`property`,`sum`,`avg`) VALUES (26,6,'EQUALS',1,NULL,NULL,NULL);
+
+INSERT INTO `connected_criterion` (`id`,`operand1`,`operand2`,`logical_operator`) VALUES (5,6,7,'AND');
+INSERT INTO `connected_criterion` (`id`,`operand1`,`operand2`,`logical_operator`) VALUES (22,23,26,'AND');
+INSERT INTO `connected_criterion` (`id`,`operand1`,`operand2`,`logical_operator`) VALUES (23,24,25,'AND');
+
+COMMIT;

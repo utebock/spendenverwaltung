@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -94,12 +95,12 @@ public class FindMailingsView extends InitializableView {
 
 		toolbar = new JToolBar();
 		contentPanel.add(toolbar, "span, growx, wrap");
-		
+
 		filterLabel = componentFactory.createLabel("Aussendungsfilter");
 		contentPanel.add(filterLabel, "split 2");
 		filterCombo = new JComboBox<Filter>();
 		contentPanel.add(filterCombo, "wrap, growx");
-	
+
 		afterDateLabel = componentFactory.createLabel("Datum ausw\u00E4hlen: ");
 		contentPanel.add(afterDateLabel, "split 3");
 		afterDate = new JXDatePicker();
@@ -108,10 +109,10 @@ public class FindMailingsView extends InitializableView {
 		beforeDate = new JXDatePicker();
 		beforeDate.addActionListener(new BeforeDatePickedListener());
 		contentPanel.add(beforeDate, "growx, wrap 20px");
-		
+
 		contentPanel.add(scrollPane, "wrap, growx");
 		contentPanel.add(createExportButton(), "wrap");
-		
+
 		mailingsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		feedbackLabel = componentFactory.createLabel("");
@@ -135,8 +136,12 @@ public class FindMailingsView extends InitializableView {
 			filterCombo.addActionListener(new FilterSelectedAction());
 		} catch (ServiceException e) {
 			log.warn(e.getLocalizedMessage());
-			JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
-			
+			JOptionPane
+					.showMessageDialog(
+							contentPanel,
+							"Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.",
+							"Fehler", JOptionPane.ERROR_MESSAGE);
+
 		}
 
 	}
@@ -149,8 +154,12 @@ public class FindMailingsView extends InitializableView {
 				mailingsTable.setAutoCreateRowSorter(true);
 			} catch (ServiceException e) {
 				log.warn(e.getLocalizedMessage());
-				JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
-				
+				JOptionPane
+						.showMessageDialog(
+								contentPanel,
+								"Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.",
+								"Fehler", JOptionPane.ERROR_MESSAGE);
+
 			}
 		}
 	}
@@ -167,8 +176,8 @@ public class FindMailingsView extends InitializableView {
 
 		JButton reproduceButton = new JButton();
 		reproduceButton.setFont(new Font("Bigger", Font.PLAIN, 13));
-		ReproduceAction confirmAction = new ReproduceAction();
-		reproduceButton.setAction(confirmAction);
+		ReproduceAction repAction = new ReproduceAction();
+		reproduceButton.setAction(repAction);
 
 		JButton viewPersonsButton = new JButton();
 		viewPersonsButton.setFont(new Font("Bigger", Font.PLAIN, 13));
@@ -184,7 +193,7 @@ public class FindMailingsView extends InitializableView {
 		toolbar.add(viewPersonsButton, "growx");
 		toolbar.add(deleteButton, "growx");
 		toolbar.add(reproduceButton, "growx");
-		
+
 	}
 
 	private final class AfterDatePickedListener implements ActionListener {
@@ -195,8 +204,10 @@ public class FindMailingsView extends InitializableView {
 
 			if (aDate != null && bDate != null) {
 				if (aDate.after(bDate)) {
-				//	feedbackLabel.setText("Ungueltiger Datumsbereich");
-					JOptionPane.showMessageDialog(contentPanel, "Ung\u00FCltiger Datumsbereich.", "Warnung", JOptionPane.WARNING_MESSAGE);
+					// feedbackLabel.setText("Ungueltiger Datumsbereich");
+					JOptionPane.showMessageDialog(contentPanel,
+							"Ung\u00FCltiger Datumsbereich.", "Warnung",
+							JOptionPane.WARNING_MESSAGE);
 				} else {
 					try {
 						tableModel.clear();
@@ -204,10 +215,14 @@ public class FindMailingsView extends InitializableView {
 								aDate, bDate));
 					} catch (ServiceException e1) {
 						log.warn(e1.getLocalizedMessage());
-						//feedbackLabel
-						//.setText("Es passierte ein Fehler beim Auswerten der Abfrage");
-						JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
-						
+						// feedbackLabel
+						// .setText("Es passierte ein Fehler beim Auswerten der Abfrage");
+						JOptionPane
+								.showMessageDialog(
+										contentPanel,
+										"Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.",
+										"Fehler", JOptionPane.ERROR_MESSAGE);
+
 					}
 				}
 			} else if (aDate != null) {
@@ -216,10 +231,14 @@ public class FindMailingsView extends InitializableView {
 					tableModel.addMailings(mailingService.getAfterDate(aDate));
 				} catch (ServiceException e1) {
 					log.warn(e1.getLocalizedMessage());
-					//feedbackLabel
-						//	.setText("Es passierte ein Fehler beim Auswerten der Abfrage");
-					JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
-					
+					// feedbackLabel
+					// .setText("Es passierte ein Fehler beim Auswerten der Abfrage");
+					JOptionPane
+							.showMessageDialog(
+									contentPanel,
+									"Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.",
+									"Fehler", JOptionPane.ERROR_MESSAGE);
+
 				}
 			}
 		}
@@ -233,8 +252,10 @@ public class FindMailingsView extends InitializableView {
 
 			if (aDate != null && bDate != null) {
 				if (aDate.after(bDate)) {
-					//feedbackLabel.setText("Ungueltiger Datumsbereich");
-					JOptionPane.showMessageDialog(contentPanel, "Ung\u00FCltiger Datumsbereich.", "Warnung", JOptionPane.WARNING_MESSAGE);
+					// feedbackLabel.setText("Ungueltiger Datumsbereich");
+					JOptionPane.showMessageDialog(contentPanel,
+							"Ung\u00FCltiger Datumsbereich.", "Warnung",
+							JOptionPane.WARNING_MESSAGE);
 				} else {
 					try {
 						tableModel.clear();
@@ -242,9 +263,11 @@ public class FindMailingsView extends InitializableView {
 								aDate, bDate));
 					} catch (ServiceException e1) {
 						log.warn(e1.getLocalizedMessage());
-					//	feedbackLabel
-						//		.setText("Es passierte ein Fehler beim Auswerten der Abfrage");JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
-						
+						// feedbackLabel
+						// .setText("Es passierte ein Fehler beim Auswerten der Abfrage");JOptionPane.showMessageDialog(contentPanel,
+						// "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.",
+						// "Fehler", JOptionPane.ERROR_MESSAGE);
+
 					}
 				}
 			} else if (bDate != null) {
@@ -253,10 +276,14 @@ public class FindMailingsView extends InitializableView {
 					tableModel.addMailings(mailingService.getBeforeDate(bDate));
 				} catch (ServiceException e1) {
 					log.warn(e1.getLocalizedMessage());
-				//	feedbackLabel
-					//		.setText("Es passierte ein Fehler beim Auswerten der Abfrage");
-					JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
-					
+					// feedbackLabel
+					// .setText("Es passierte ein Fehler beim Auswerten der Abfrage");
+					JOptionPane
+							.showMessageDialog(
+									contentPanel,
+									"Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.",
+									"Fehler", JOptionPane.ERROR_MESSAGE);
+
 				}
 			}
 		}
@@ -276,88 +303,31 @@ public class FindMailingsView extends InitializableView {
 			if ((selectedRow = mailingsTable.getSelectedRow()) != -1) {
 				Mailing mailing = tableModel.getRow(selectedRow);
 				try {
-					int dialogResult = JOptionPane.showConfirmDialog(
-							contentPanel,
-							"Wollen Sie diese Aussendung wirklich l\u00F6schen?",
-							"L\u00F6schen", JOptionPane.YES_NO_OPTION);
+					int dialogResult = JOptionPane
+							.showConfirmDialog(
+									contentPanel,
+									"Wollen Sie diese Aussendung wirklich l\u00F6schen?",
+									"L\u00F6schen", JOptionPane.YES_NO_OPTION);
 					if (dialogResult == JOptionPane.YES_OPTION) {
 						mailingService.delete(mailing);
 						tableModel.removeMailing(mailing);
-						feedbackLabel.setText("Aussendung wurde gel\u00F6scht.");
+						feedbackLabel
+								.setText("Aussendung wurde gel\u00F6scht.");
 					}
 				} catch (ServiceException e1) {
 					log.warn(e1.getLocalizedMessage());
-					//feedbackLabel
-						//	.setText("Ein Fehler trat waehrend des Loeschens auf");
-					JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
-					
+					// feedbackLabel
+					// .setText("Ein Fehler trat waehrend des Loeschens auf");
+					JOptionPane
+							.showMessageDialog(
+									contentPanel,
+									"Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.",
+									"Fehler", JOptionPane.ERROR_MESSAGE);
+
 				}
 			}
 		}
 
-	}
-	
-	private String showSaveDialog() {
-
-        JFileChooser chooser; 
-        String path = System.getProperty("user.home");
-
-        chooser = new JFileChooser(path); 
-        chooser.setDialogType(JFileChooser.SAVE_DIALOG); 
-        
-        FileFilter filterPdf = new FileFilter() {
-            public boolean accept(File f) {
-                if (f.isDirectory())
-                    return true;
-                return f.getName().toLowerCase().endsWith(".pdf");
-            }
-
-            public String getDescription() {
-                return "pdf-File (*.pdf)";
-            }
-        };
-        
-        FileFilter filterDocx = new FileFilter() {
-            public boolean accept(File f) {
-                if (f.isDirectory())
-                    return false;
-                return f.getName().toLowerCase().endsWith(".docx");
-            }
-
-            public String getDescription() {
-                return "docx-File (*.docx)";
-            }
-        };
-        
-        chooser.addChoosableFileFilter(filterPdf);
-        chooser.addChoosableFileFilter(filterDocx);
-        
-        chooser.removeChoosableFileFilter(chooser.getAcceptAllFileFilter());
-        chooser.setDialogTitle("Speichern unter..."); 
-        chooser.setFileFilter(filterPdf);
-        chooser.setVisible(true); 
-
-        int result = chooser.showSaveDialog(this); 
-
-        if (result == JFileChooser.APPROVE_OPTION) { 
-
-        	path = chooser.getSelectedFile().toString();
-            
-            if(chooser.getFileFilter().getDescription().contains("docx")){
-            	if(path.endsWith(".docx"))
-            		return path;
-            	else
-            		return path + ".docx";
-            } else if(chooser.getFileFilter().getDescription().contains("pdf")){
-            	if(path.endsWith(".pdf"))
-            		return path;
-            	else
-            		return path + ".pdf";
-            }
-            chooser.setVisible(false);
-        } 
-        chooser.setVisible(false); 
-        return ""; 
 	}
 
 	private final class ReproduceAction extends AbstractAction {
@@ -370,37 +340,68 @@ public class FindMailingsView extends InitializableView {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String fileName = showSaveDialog();
-			
-			if(fileName.equals(""))
+			int choice = JOptionPane.showOptionDialog(contentPanel, "Wiederherstellen als ...", "Aussendung wiederherstellen", JOptionPane.OK_OPTION, 1, null, new Object[] {"PDF","DOCX"}, "PDF");
+			if(choice==-1) {
 				return;
-			
+			}
 			int selectedRow;
 			if ((selectedRow = mailingsTable.getSelectedRow()) != -1) {
 				Mailing mailing = tableModel.getRow(selectedRow);
 
 				if (mailing.getMedium() == Mailing.Medium.EMAIL) {
-					//feedbackLabel
-						//	.setText("E-Mail-Aussendungen k\u00F6nnen nicht wiederhergestellt werden.");
-					JOptionPane.showMessageDialog(contentPanel, "E-Mail-Aussendungen k\u00F6nnen nicht wiederhergestellt werden.", "Warnung", JOptionPane.WARNING_MESSAGE);
+					// feedbackLabel
+					// .setText("E-Mail-Aussendungen k\u00F6nnen nicht wiederhergestellt werden.");
+					JOptionPane
+							.showMessageDialog(
+									contentPanel,
+									"E-Mail-Aussendungen k\u00F6nnen nicht wiederhergestellt werden.",
+									"Warnung", JOptionPane.WARNING_MESSAGE);
 				} else if (mailing.getTemplate() == null) {
-				//	feedbackLabel
-					//		.setText("Aussendungen ohne Vorlage k\u00F6nnen nicht wiederhergestellt werden.");
-					JOptionPane.showMessageDialog(contentPanel, "Aussendungen ohne Vorlage k\u00F6nnen nicht wiederhergestellt werden.", "Warnung", JOptionPane.WARNING_MESSAGE);
+					// feedbackLabel
+					// .setText("Aussendungen ohne Vorlage k\u00F6nnen nicht wiederhergestellt werden.");
+					JOptionPane
+							.showMessageDialog(
+									contentPanel,
+									"Aussendungen ohne Vorlage k\u00F6nnen nicht wiederhergestellt werden.",
+									"Warnung", JOptionPane.WARNING_MESSAGE);
 				} else {
 					try {
-						mailingService.reproduceDocument(mailing,fileName);
+						String fileName = mailing.getTemplate()!=null?mailing.getTemplate().getFileName():null;
+						if(choice==0 && fileName!=null) {
+							// wants pdf
+							int last = fileName.lastIndexOf(".");
+							fileName = fileName.substring(0,last);
+							fileName += ".pdf";
+						}
+						
+						File file = mailingService.reproduceDocument(mailing,fileName);
+						Desktop.getDesktop().open(file);
+
 					} catch (ServiceException e1) {
 						log.warn(e1.getLocalizedMessage());
-						//feedbackLabel
-							//	.setText("Die Aussendung konnte nicht wiederhergestellt werden.");
-						JOptionPane.showMessageDialog(contentPanel, "Die Aussendung konnte nicht wiederhergestellt werden.", "Fehler", JOptionPane.ERROR_MESSAGE);
+						// feedbackLabel
+						// .setText("Die Aussendung konnte nicht wiederhergestellt werden.");
+						JOptionPane
+								.showMessageDialog(
+										contentPanel,
+										"Die Aussendung konnte nicht wiederhergestellt werden.",
+										"Fehler", JOptionPane.ERROR_MESSAGE);
+					} catch (IOException e1) {
+						log.error("Error opening reproduced file: "
+								+ e1.getLocalizedMessage());
+						JOptionPane
+								.showMessageDialog(
+										contentPanel,
+										"Die Datei konnte nicht ge\u00F6ffnet werden.",
+										"Fehler", JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			} else {
-			//	feedbackLabel
-				//		.setText("Zum Wiederherstellen muss zuerst eine Aussendung mit Vorlage ausgewaehlt werden.");
-				JOptionPane.showMessageDialog(contentPanel, "Bitte Aussendung ausw\u00E4hlen.", "Information", JOptionPane.INFORMATION_MESSAGE);
+				// feedbackLabel
+				// .setText("Zum Wiederherstellen muss zuerst eine Aussendung mit Vorlage ausgewaehlt werden.");
+				JOptionPane.showMessageDialog(contentPanel,
+						"Bitte Aussendung ausw\u00E4hlen.", "Information",
+						JOptionPane.INFORMATION_MESSAGE);
 			}
 
 		}
@@ -497,10 +498,14 @@ public class FindMailingsView extends InitializableView {
 							.getByFilter(selectedFilter));
 				} catch (ServiceException e1) {
 					log.warn(e1.getLocalizedMessage());
-					//feedbackLabel
-						//	.setText("Es passierte ein Fehler waehrend der Auswertung des Filters.");
-					JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
-					
+					// feedbackLabel
+					// .setText("Es passierte ein Fehler waehrend der Auswertung des Filters.");
+					JOptionPane
+							.showMessageDialog(
+									contentPanel,
+									"Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.",
+									"Fehler", JOptionPane.ERROR_MESSAGE);
+
 				}
 
 			}

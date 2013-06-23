@@ -228,8 +228,8 @@ public class MainFilterView extends InitializableView {
 		if (!filter.getOwner().equals(userName)
 				&& filter.getPrivacyStatus() != FilterPrivacyStatus.READ_UPDATE_DELETE) {
 			JOptionPane.showMessageDialog(MainFilterView.this,
-					"Sie sind nicht berechtigt diesen Filter zu l\u00F6schen. Er geh\u00f6rt "
-							+ filter.getOwner());
+					"Sie sind nicht berechtigt diesen Filter zu l\u00F6schen."
+							+ (filter.getOwner().equals("default_filter_owner")?"":(" Er geh\u00f6rt "+filter.getOwner())));
 			return;
 		}
 

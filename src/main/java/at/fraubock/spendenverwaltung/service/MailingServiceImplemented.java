@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import at.fraubock.spendenverwaltung.gui.views.CreateMailingsView.SupportedFileFormat;
 import at.fraubock.spendenverwaltung.interfaces.dao.IMailingDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
@@ -188,18 +187,25 @@ public class MailingServiceImplemented implements IMailingService {
 		for (Mailing m : mailings) {
 			csv += m.getDate() == null ? "n.v." : (new SimpleDateFormat(
 					"dd.MM.yyyy").format(m.getDate())) + ";";
-			csv += m.getType().getName() + ";";
-			csv += (m.getMedium() == Mailing.Medium.POSTAL ? ("Postalisch;") : "E-Mail;");
-			csv += (m.getTemplate()==null?"-":m.getTemplate().getFileName());
+			csv += nullSafeToString(m.getType().getName()) + ";";
+			csv += (m.getMedium() == Mailing.Medium.POSTAL ? ("Postalisch;")
+					: "E-Mail;");
+			csv += (m.getTemplate() == null ? "n.v." : nullSafeToString(m
+					.getTemplate().getFileName()));
 			csv += "\n";
 		}
 		return csv;
 	}
 
+	private String nullSafeToString(Object obj) {
+		return obj == null ? "n.v." : obj.toString();
+	}
+
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
-	public void reproduceDocument(Mailing mailing, String savePath) throws ServiceException {
-		if (mailing == null || savePath==null) {
+	public File reproduceDocument(Mailing mailing, String savePath)
+			throws ServiceException {
+		if (mailing == null) {
 			throw new IllegalArgumentException("Argument must not be null.");
 		}
 
@@ -210,8 +216,9 @@ public class MailingServiceImplemented implements IMailingService {
 
 			try {
 				personList = personDAO.getPersonsByMailing(mailing);
-				MailingTemplateUtil.createMailingWithDocxTemplate(mt.getFile(),
-						personList, savePath);
+				return MailingTemplateUtil.createMailingWithDocxTemplate(
+						mt.getFile(), personList,
+						savePath == null ? mt.getFileName() : savePath);
 			} catch (PersistenceException e) {
 				throw new ServiceException(e);
 			} catch (IOException e) {
@@ -220,6 +227,7 @@ public class MailingServiceImplemented implements IMailingService {
 				throw new ServiceException(e);
 			}
 		}
+		return null;
 	}
 
 	@Override

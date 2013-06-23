@@ -29,8 +29,8 @@ public interface IFilterService {
 	public Filter create(FilterTO f) throws ServiceException;
 
 	/**
-	 * Updates an existing filter by deleting the given filter's Criterion and creating a
-	 * new one from the given FilterTO.
+	 * Updates an existing filter by deleting the given filter's Criterion and
+	 * creating a new one from the given FilterTO.
 	 * 
 	 * @param d
 	 *            Filter to be updated
@@ -69,6 +69,17 @@ public interface IFilterService {
 	 */
 	public Pair<List<Filter>, String> getAllByFilter(FilterType type)
 			throws ServiceException;
+
+	/**
+	 * Retrieves all {@link Filter} of the given {@link FilterType} and the
+	 * current user name ignoring the filter's anonymity. Using the user name,
+	 * possession of a filter may be determined.
+	 * 
+	 * @return A pair consisting of a list of all filters of given type and the
+	 *         current user's user name.
+	 */
+	public Pair<List<Filter>, String> getAllByFilterIgnoreAnonymous(
+			FilterType type) throws ServiceException;
 
 	/**
 	 * Retrieves all {@link Filter} depending on their anonymous state, and the

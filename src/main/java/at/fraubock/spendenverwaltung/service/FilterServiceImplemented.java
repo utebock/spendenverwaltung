@@ -186,6 +186,32 @@ public class FilterServiceImplemented implements IFilterService {
 		}
 		return new Pair<List<Filter>, String>(list, uName);
 	}
+	
+	@Override
+	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
+	public Pair<List<Filter>, String> getAllByFilterIgnoreAnonymous(FilterType type)
+			throws ServiceException {
+
+		if (type == null) {
+			log.error("FilterType was null in getAllByFilter.");
+			throw new ServiceException();
+		}
+
+		List<Filter> list = new ArrayList<Filter>();
+		String uName;
+		try {
+			for (Filter filter : filterDAO.getAll()) {
+				if (filter.getType() == type) {
+					list.add(filter);
+				}
+			}
+			uName = filterDAO.getCurrentUserName();
+		} catch (PersistenceException e) {
+			throw new ServiceException(e);
+		}
+
+		return new Pair<List<Filter>, String>(list, uName);
+	}
 
 	@Override
 	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)

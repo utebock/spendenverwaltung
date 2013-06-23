@@ -147,9 +147,9 @@ public class DonationServiceImplemented implements IDonationService {
 			NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
 			csv += nf.format((d.getAmount()/100D)) + ";";
 			csv += new SimpleDateFormat("dd.MM.yyyy").format(d.getDate()) + ";";
-			csv += d.getDedication() + ";";
-			csv += d.getType() + ";";
-			csv += d.getNote() + ";";
+			csv += nullSafeToString(d.getDedication()) + ";";
+			csv += nullSafeToString(d.getType()) + ";";
+			csv += nullSafeToString(d.getNote()) + ";";
 
 			String nA = "n.v.";
 			Person p = d.getDonator();
@@ -159,17 +159,21 @@ public class DonationServiceImplemented implements IDonationService {
 			}
 			Address a = p.getMainAddress();
 
-			csv += (p == null ? nA : p.getGivenName()) + ";";
-			csv += (p == null ? nA : p.getSurname()) + ";";
-			csv += (p == null ? nA : p.getEmail()) + ";";
-			csv += (p == null ? nA : p.getCompany()) + ";";
+			csv += (p == null ? nA : nullSafeToString(p.getGivenName())) + ";";
+			csv += (p == null ? nA : nullSafeToString(p.getSurname())) + ";";
+			csv += (p == null ? nA : nullSafeToString(p.getEmail())) + ";";
+			csv += (p == null ? nA : nullSafeToString(p.getCompany())) + ";";
 
-			csv += (a == null ? nA : a.getCountry()) + ";";
-			csv += (a == null ? nA : a.getCity()) + ";";
-			csv += (a == null ? nA : a.getPostalCode()) + ";";
-			csv += (a == null ? nA : a.getStreet()) + ";\n";
+			csv += (a == null ? nA : nullSafeToString(a.getCountry())) + ";";
+			csv += (a == null ? nA : nullSafeToString(a.getCity())) + ";";
+			csv += (a == null ? nA : nullSafeToString(a.getPostalCode())) + ";";
+			csv += (a == null ? nA : nullSafeToString(a.getStreet())) + ";\n";
 		}
 		return csv;
+	}
+	
+	private String nullSafeToString(Object obj) {
+		return obj==null?"n.v.":obj.toString();
 	}
 
 	@Override

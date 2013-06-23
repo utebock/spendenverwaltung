@@ -122,6 +122,26 @@ public abstract class AbstractActionDAOTest {
 		}
 
 	}
+	
+
+	@Test(expected = IllegalArgumentException.class)
+	@Transactional(readOnly = true)
+	public void getByAttributesFromOthersWithNullValue_ThrowsException()
+			throws PersistenceException {
+
+		actionDAO.getByAttributesFromOthers(null, 0, 0);
+
+	}
+	
+	@Transactional(readOnly = true)
+	public void getByAttributesFromOthers_ReturnsActions()
+			throws PersistenceException {
+
+		List<Action> allActions = actionDAO.getLimitedResultByAttributes(
+				searchVO, 0, 2);
+
+		assertEquals(0, allActions.size());
+	}
 
 	@Test(expected = IllegalArgumentException.class)
 	@Transactional(readOnly = true)

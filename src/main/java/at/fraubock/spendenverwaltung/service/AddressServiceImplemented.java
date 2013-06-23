@@ -194,8 +194,9 @@ public class AddressServiceImplemented implements IAddressService {
 				.writeNext(new String[] { "Stra\u00dfe", "PLZ", "Ort", "Land" });
 
 		for (Address a : addresses) {
-			csvWriter.writeNext(new String[] { a.getStreet(),
-					a.getPostalCode(), a.getCity(), a.getCountry() });
+			csvWriter.writeNext(new String[] { nullSafeToString(a.getStreet()),
+					nullSafeToString(a.getPostalCode()), nullSafeToString(a.getCity()), 
+					nullSafeToString(a.getCountry()) });
 		}
 		try {
 			csvWriter.close();
@@ -204,6 +205,10 @@ public class AddressServiceImplemented implements IAddressService {
 		}
 		stringWriter.flush();
 		return stringWriter.getBuffer().toString();
+	}
+	
+	private String nullSafeToString(Object obj) {
+		return obj==null?"n.v.":obj.toString();
 	}
 
 	@Override

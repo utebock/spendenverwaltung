@@ -67,15 +67,14 @@ public class CreateFilter extends JPanel {
 	private JLabel privacyLabel;
 	private String currentUser;
 
-
 	public CreateFilter(FilterType type, IFilterService filterService,
 			MainFilterView overview, ViewActionFactory viewActionFactory) {
 		this(type, filterService, overview, null, null, viewActionFactory);
 	}
 
 	public CreateFilter(FilterType type, IFilterService filterService,
-			MainFilterView filterOverview, Filter editFilter, String currentUser,
-			ViewActionFactory viewActionFactory) {
+			MainFilterView filterOverview, Filter editFilter,
+			String currentUser, ViewActionFactory viewActionFactory) {
 		super(new MigLayout());
 
 		// set attributes
@@ -86,7 +85,7 @@ public class CreateFilter extends JPanel {
 		this.filterOverview = filterOverview;
 		this.builder = new ComponentFactory();
 		this.type = type;
-		this.factory = new ConfiguratorFactory(type, editFilter,filterService);
+		this.factory = new ConfiguratorFactory(type, editFilter, filterService);
 		this.criterionSelectorPanel = builder.createPanel(700, 500);
 
 		this.plusButton = new JButton();
@@ -122,20 +121,26 @@ public class CreateFilter extends JPanel {
 			}
 
 		});
-		
-		if(editFilter!=null) {
+
+		if (editFilter != null) {
 			if (!editFilter.getOwner().equals(this.currentUser)
 					&& editFilter.getPrivacyStatus() == FilterPrivacyStatus.READ) {
 				saveButton.setEnabled(false);
-				saveButton.setToolTipText("Keine Berechtigung. Geh\u00F6rt " + editFilter.getOwner());
-				
+				saveButton
+						.setToolTipText("Keine Berechtigung."
+								+ (editFilter.getOwner().equals(
+										"default_filter_owner") ? ""
+										: (" Der Filter geh\u00f6rt " + editFilter
+												.getOwner())));
+
 			}
 		}
 
 		JButton cancelButton = new JButton();
 		Action cancelAction = this.viewActionFactory.getMainFilterViewAction();
 		cancelAction.putValue(Action.NAME, "Abbrechen");
-		cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backInButton.png")));
+		cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass()
+				.getResource("/images/backInButton.png")));
 		cancelButton.setAction(cancelAction);
 		cancelButton.setFont(new Font("", Font.PLAIN, 13));
 		this.controlButtonPanel = new JPanel();
@@ -162,13 +167,14 @@ public class CreateFilter extends JPanel {
 		if (editFilter != null) {
 			nameField.setText(editFilter.getName());
 		}
-		
+
 		namePanel = builder.createPanel(700, 100);
 		add(namePanel, "wrap 0px");
-		
+
 		namePanel.add(builder.createLabel("Filtername: "), "split 2");
 		namePanel.add(nameField, "gap 15, wrap, gapbottom 20");
-		namePanel.add((privacyLabel = builder.createLabel("Sichtbarkeit: ")), "split 2");
+		namePanel.add((privacyLabel = builder.createLabel("Sichtbarkeit: ")),
+				"split 2");
 
 		// Combobox for filter privacy setting
 		if ((editFilter != null) || editFilter == null) {
@@ -177,8 +183,7 @@ public class CreateFilter extends JPanel {
 			namePanel.add(privacyComboBox, "wrap, growx");
 
 			if (editFilter != null) {
-				String priv = editFilter.getPrivacyStatus()
-						.toGUIString();
+				String priv = editFilter.getPrivacyStatus().toGUIString();
 				privacyComboBox.setSelectedItem(priv);
 			}
 		}
