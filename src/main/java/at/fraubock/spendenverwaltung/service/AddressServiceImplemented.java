@@ -15,7 +15,9 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
+import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
+import at.fraubock.spendenverwaltung.util.statistics.Province;
 import au.com.bytecode.opencsv.CSVWriter;
 
 /**
@@ -37,13 +39,104 @@ public class AddressServiceImplemented implements IAddressService {
 		this.addressDAO = addressDAO;
 	}
 
+	/**
+	 * checks the integrity of an {@link Address} entity. Especially checks that
+	 * Austrian postcodes are 4-digit. Additionally checks that country is
+	 * 3-char minimum, starts with capital, and each word has capital only at
+	 * the beginning
+	 * 
+	 * @author manuel-bichler
+	 * @throws ValidationException
+	 * 
+	 */
+
+	private static void validate(Address address) throws ValidationException {
+		if (address == null) {
+			log.error("Argument was null");
+			throw new ValidationException("Address must not be null");
+		}
+		if (address.getStreet() == null) {
+			log.error("Street was null");
+			throw new ValidationException("Street must not be null");
+		}
+		if (address.getCity() == null) {
+			log.error("City was null");
+			throw new ValidationException("City must not be null");
+		}
+		if (address.getCountry() == null) {
+			log.error("Country was null");
+			throw new ValidationException("Country must not be null");
+		}
+		if (address.getCity().length() == 0) {
+			log.warn("Address city was empty string");
+			throw new ValidationException(
+					"A city of an address must not be the empty string.");
+		}
+		if (address.getCountry().length() == 0) {
+			log.warn("Address country was empty string");
+			throw new ValidationException(
+					"A country of an address must not be the empty string.");
+		}
+		if (address.getPostalCode().length() == 0) {
+			log.warn("Address postcode was empty string");
+			throw new ValidationException(
+					"A postcode of an address must not be the empty string.");
+		}
+		if (address.getStreet().length() == 0) {
+			log.warn("Address street was empty string");
+			throw new ValidationException(
+					"A street of an address must not be the empty string.");
+		}
+		// check for postcode - Austria matching:
+		try {
+			Province.getFromAddress(address);
+			// if p is OTHER it means we are not in Austria. okay then.
+		} catch (IllegalStateException e) {
+			log.warn("Address's postcode " + address.getPostalCode()
+					+ " is not applicable for country " + address.getCountry());
+			throw new ValidationException("When the address's country is "
+					+ address.getCountry() + ", a postcode of "
+					+ address.getPostalCode() + " is illegal.", e);
+		}
+
+		// profile country name:
+		if (address.getCountry().length() < 3) {
+			String msg = "Address's country "
+					+ address.getCountry()
+					+ " is shorter than 3 characters. Obviously, this is not a country name.";
+			log.warn(msg);
+			throw new ValidationException(msg);
+		}
+		if (!Character.isUpperCase(address.getCountry().codePointAt(0))) {
+			String msg = "Address's country "
+					+ address.getCountry()
+					+ " does not start with an upper case character. Obviously, this is not a country name.";
+			log.warn(msg);
+			throw new ValidationException(msg);
+		}
+		for (String s : address.getCountry().split("\\ ")) {
+			for (char c : s.substring(1, s.length() - 1).toCharArray()) {
+				if (Character.isUpperCase(c)) {
+					String msg = "Address's country "
+							+ address.getCountry()
+							+ " includes the upper case character \'"
+							+ c
+							+ "\' in the middle of a word. Obviously, this is not a country name.";
+					log.warn(msg);
+					throw new ValidationException(msg);
+				}
+			}
+		}
+	}
+
 	@Override
 	@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public Address create(Address a) throws ServiceException {
 		try {
+			validate(a);
 			addressDAO.insertOrUpdate(a);
 			return a;
-		} catch (PersistenceException e) {
+		} catch (ValidationException | PersistenceException e) {
 			throw new ServiceException(e);
 		}
 	}
@@ -52,9 +145,10 @@ public class AddressServiceImplemented implements IAddressService {
 	@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public Address update(Address a) throws ServiceException {
 		try {
+			validate(a);
 			addressDAO.insertOrUpdate(a);
 			return a;
-		} catch (PersistenceException e) {
+		} catch (ValidationException | PersistenceException e) {
 			throw new ServiceException(e);
 		}
 	}

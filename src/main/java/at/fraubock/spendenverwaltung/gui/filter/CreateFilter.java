@@ -176,9 +176,11 @@ public class CreateFilter extends JPanel {
 					FilterPrivacyStatus.toStringArray());
 			namePanel.add(privacyComboBox, "wrap, growx");
 
-			if (editFilter != null)
-				privacyComboBox.setSelectedItem(editFilter.getPrivacyStatus()
-						.toString());
+			if (editFilter != null) {
+				String priv = editFilter.getPrivacyStatus()
+						.toGUIString();
+				privacyComboBox.setSelectedItem(priv);
+			}
 		}
 
 		// create operator picker panel
