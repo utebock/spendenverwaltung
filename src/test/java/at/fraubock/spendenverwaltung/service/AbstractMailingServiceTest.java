@@ -234,7 +234,7 @@ public abstract class AbstractMailingServiceTest {
 		mailingService.reproduceDocument(null,null);
 	}
 
-	private String csvExpected = "Datum;Art;Medium;Vorlage\n12.06.2013;Dankesbrief;E-Mail;-\n13.06.2013;Infomaterial;Postalisch;examplemailing2.docx\n"
-			+ "14.06.2013;Einzelspenden Dankesbrief;E-Mail;-\n";
+	private String csvExpected = "Datum;Art;Medium;Vorlage\n12.06.2013;Dankesbrief;E-Mail;n.v.\n13.06.2013;Infomaterial;Postalisch;examplemailing2.docx\n"
+			+ "14.06.2013;Einzelspenden Dankesbrief;E-Mail;n.v.\n";
 
 }
