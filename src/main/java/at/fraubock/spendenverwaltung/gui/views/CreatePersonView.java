@@ -431,6 +431,20 @@ public class CreatePersonView extends InitializableView {
 			}
 
 			if (personValidated) {
+				
+				try {
+					if(!personService.getByAttributes(person).isEmpty()) {
+						JOptionPane.showMessageDialog(overviewPanel,
+								"Es existiert bereits eine Person mit diesen Attributen.", "Information",
+								JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+				} catch (ServiceException e2) {
+					log.warn(e2.getLocalizedMessage());
+					JOptionPane.showMessageDialog(null,
+							"Ein Fehler ist beim Duplikats-check der Person aufgetreten.");	
+					return;
+				}
 				if (person != null) {
 					try {
 						if (address != null) {
@@ -460,9 +474,9 @@ public class CreatePersonView extends InitializableView {
 								ActionEvent.ACTION_PERFORMED, null));
 
 					} catch (ServiceException e1) {
+						log.warn(e1.getLocalizedMessage());
 						JOptionPane.showMessageDialog(null,
-								"Ein Fehler ist beim Erstellen der Person aufgetreten.\nDetails: "
-										+ e1.getLocalizedMessage());
+								"Ein Fehler ist beim Erstellen der Person aufgetreten.");
 					}
 				}
 			}
