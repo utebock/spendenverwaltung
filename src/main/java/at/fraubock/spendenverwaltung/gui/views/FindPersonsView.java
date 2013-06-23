@@ -173,13 +173,15 @@ public class FindPersonsView extends InitializableView {
 		viewAddressesButton = new JButton();
 		viewAddressesButton.setFont(new Font("Bigger", Font.PLAIN, 13));
 		ViewAddressesAction viewAddressesAction = new ViewAddressesAction();
-		viewAddressesAction.putValue(Action.NAME, "<html>&nbsp;Adressen anzeigen</html>");
+		viewAddressesAction.putValue(Action.NAME,
+				"<html>&nbsp;Adressen anzeigen</html>");
 		viewAddressesButton.setAction(viewAddressesAction);
 
 		viewDonationsButton = new JButton();
 		viewDonationsButton.setFont(new Font("Bigger", Font.PLAIN, 13));
 		ViewDonationsAction viewDonationsAction = new ViewDonationsAction();
-		viewDonationsAction.putValue(Action.NAME, "<html>&nbsp;Spenden anzeigen</html>");
+		viewDonationsAction.putValue(Action.NAME,
+				"<html>&nbsp;Spenden anzeigen</html>");
 		viewDonationsButton.setAction(viewDonationsAction);
 
 		editButton = new JButton();
@@ -201,7 +203,6 @@ public class FindPersonsView extends InitializableView {
 		toolbar.add(deleteButton);
 		toolbar.add(viewAddressesButton);
 		toolbar.add(viewDonationsButton);
-		
 
 	}
 
@@ -214,7 +215,7 @@ public class FindPersonsView extends InitializableView {
 
 		try {
 			if (filter == null) {
-				personList = personService.getAll();
+				personList = personService.getConfirmed();
 			} else {
 				personList = personService.getByFilter(filter);
 			}
@@ -278,9 +279,13 @@ public class FindPersonsView extends InitializableView {
 					personModel.addAll(results);
 				} catch (ServiceException e1) {
 					log.warn(e1.getLocalizedMessage());
-					//feedbackLabel
-					//		.setText("Ein Fehler passierte waehrend der Schnellsuche.");
-					JOptionPane.showMessageDialog(overviewPanel, "Ein Fehler ist w\u00E4hrend der Schnellsuche aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
+					// feedbackLabel
+					// .setText("Ein Fehler passierte waehrend der Schnellsuche.");
+					JOptionPane
+							.showMessageDialog(
+									overviewPanel,
+									"Ein Fehler ist w\u00E4hrend der Schnellsuche aufgetreten. Bitte kontaktieren Sie Ihren Administrator.",
+									"Fehler", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}
@@ -337,66 +342,71 @@ public class FindPersonsView extends InitializableView {
 
 	private final class EditAction extends AbstractAction {
 
-		private static final long serialVersionUID = 1L;				
-				
+		private static final long serialVersionUID = 1L;
+
 		private JDialog editPersonDialog;
 		private JPanel editPersonPanel;
-		
-		String[] salutCombo = new String[]{"Herr", "Frau", "Fam.", "Firma"};
+
+		String[] salutCombo = new String[] { "Herr", "Frau", "Fam.", "Firma" };
 		JComboBox<String> salutation = new JComboBox<String>(salutCombo);
-		
+
 		private JLabel titleLabel;
 		private StringTextField titleField;
-		
+
 		private JLabel companyLable;
 		private StringTextField companyField;
 
 		private JLabel givenNameLable;
 		private StringTextField givenNameField;
-		
+
 		private JLabel surnameLable;
 		private StringTextField surnameField;
-		
+
 		private JLabel telephoneLable;
 		private StringTextField telephoneField;
-		
+
 		private JLabel emailLable;
 		private EmailTextField emailField;
-	
+
 		private JLabel noteLable;
 		private StringTextField noteField;
-		
+
 		private JLabel validationFeedbackLabel;
 		private JButton submitButton;
 		private JButton cancelButton;
-		
+
 		Person person;
 
 		public EditAction() {
 			super("<html>&nbsp;Adresse bearbeiten</html>");
 		}
-		
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			int row = showTable.getSelectedRow();
-			
-			//avoid costs of initializing the frame if no address has been selected
-			if(row == -1){
-			//	feedbackLabel.setText("Bitte die Adresse zum bearbeiten ausw\u00E4hlen.");
-				JOptionPane.showMessageDialog(overviewPanel, "Bitte Person ausw\u00E4hlen.", "Information", JOptionPane.INFORMATION_MESSAGE);
+
+			// avoid costs of initializing the frame if no address has been
+			// selected
+			if (row == -1) {
+				// feedbackLabel.setText("Bitte die Adresse zum bearbeiten ausw\u00E4hlen.");
+				JOptionPane.showMessageDialog(overviewPanel,
+						"Bitte Person ausw\u00E4hlen.", "Information",
+						JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
-			
+
 			person = personModel.getPersonRow(row);
-			
-			editPersonDialog = new JDialog(SwingUtilities.getWindowAncestor(overviewPanel), Dialog.ModalityType.APPLICATION_MODAL);
+
+			editPersonDialog = new JDialog(
+					SwingUtilities.getWindowAncestor(overviewPanel),
+					Dialog.ModalityType.APPLICATION_MODAL);
 			editPersonPanel = componentFactory.createPanel(420, 360);
-			
+
 			JLabel salutLabel = componentFactory.createLabel("Anrede: ");
 			salutation.setSelectedIndex(-1);
 			editPersonPanel.add(salutLabel, "split2");
 			editPersonPanel.add(salutation, "gap 28, wrap");
-			
+
 			titleLabel = componentFactory.createLabel("Titel:");
 			titleField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
 			titleField.setText(person.getTitle());
@@ -420,47 +430,47 @@ public class FindPersonsView extends InitializableView {
 			surnameField.setText(person.getSurname());
 			editPersonPanel.add(surnameLable, "split2");
 			editPersonPanel.add(surnameField, "gap 12, wrap, growx");
-			
+
 			telephoneLable = componentFactory.createLabel("Telefon:");
 			telephoneField = new StringTextField(ComponentConstants.MEDIUM_TEXT);
 			telephoneField.setText(person.getTelephone());
 			editPersonPanel.add(telephoneLable, "split2");
 			editPersonPanel.add(telephoneField, "gap 32, wrap, growx");
-			
+
 			emailLable = componentFactory.createLabel("Email:");
 			emailField = new EmailTextField(ComponentConstants.MEDIUM_TEXT);
 			emailField.setText(person.getEmail());
 			editPersonPanel.add(emailLable, "split2");
 			editPersonPanel.add(emailField, "gap 45, wrap, growx");
-			
+
 			noteLable = componentFactory.createLabel("Notiz:");
 			noteField = new StringTextField(ComponentConstants.LONG_TEXT);
 			noteField.setText(person.getNote());
 			editPersonPanel.add(noteLable, "split2");
 			editPersonPanel.add(noteField, "gap 45, wrap 20px, growx");
-			
+
 			cancelButton = new JButton();
 			cancelButton.setAction(new CancelEditAction());
-			
+
 			submitButton = new JButton();
 			submitButton.setAction(new SubmitEditAction());
 			editPersonPanel.add(submitButton, "split2");
 			editPersonPanel.add(cancelButton, "wrap");
-			
-			
+
 			validationFeedbackLabel = componentFactory.createLabel("");
 			editPersonPanel.add(validationFeedbackLabel, "wrap");
-			
+
 			editPersonDialog.add(editPersonPanel);
 			editPersonDialog.pack();
-			editPersonDialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(overviewPanel));
+			editPersonDialog.setLocationRelativeTo(SwingUtilities
+					.getWindowAncestor(overviewPanel));
 			editPersonDialog.setVisible(true);
 		}
-		
+
 		private final class CancelEditAction extends AbstractAction {
 
 			private static final long serialVersionUID = 1L;
-			
+
 			public CancelEditAction() {
 				super("Abbrechen");
 			}
@@ -470,111 +480,126 @@ public class FindPersonsView extends InitializableView {
 				editPersonDialog.dispose();
 			}
 		}
-		
+
 		private final class SubmitEditAction extends AbstractAction {
-			
+
 			private static final long serialVersionUID = 1L;
 
 			public SubmitEditAction() {
 				super("Speichern");
 			}
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				/*
-				 * Criteria to edit a person:
-				 * GivenName, Surname, Company - one of these must be set
-				 * Components must validate
+				 * Criteria to edit a person: GivenName, Surname, Company - one
+				 * of these must be set Components must validate
 				 */
-				
+
 				validationFeedbackLabel.setText("");
 				boolean validation = true;
-				
-				if((givenNameField.getText().equals("") || surnameField.getText().equals(""))
+
+				if ((givenNameField.getText().equals("") || surnameField
+						.getText().equals(""))
 						&& companyField.getText().equals("")) {
 					validation = false;
-				//	validationFeedbackLabel.setText("Bitte Vorname und Nachname oder Firma setzen.");
-					JOptionPane.showMessageDialog(editPersonPanel, "Bitte Vorname und Nachname oder Firma setzen.", "Information", JOptionPane.INFORMATION_MESSAGE);
+					// validationFeedbackLabel.setText("Bitte Vorname und Nachname oder Firma setzen.");
+					JOptionPane.showMessageDialog(editPersonPanel,
+							"Bitte Vorname und Nachname oder Firma setzen.",
+							"Information", JOptionPane.INFORMATION_MESSAGE);
 					return;
 				}
-				
-				if(givenNameField.getText().equals("") && surnameField.getText().equals("")) {
+
+				if (givenNameField.getText().equals("")
+						&& surnameField.getText().equals("")) {
 					person.setSex(Sex.COMPANY);
 				} else {
-					if(salutation.getSelectedIndex() != -1) {
-						person.setSex(Person.Sex.values()[salutation.getSelectedIndex()]);
+					if (salutation.getSelectedIndex() != -1) {
+						person.setSex(Person.Sex.values()[salutation
+								.getSelectedIndex()]);
 					}
 				}
-				
-				if(validation && titleField.validateContents() && givenNameField.validateContents() &&
-						surnameField.validateContents() && companyField.validateContents()
-						&& telephoneField.validateContents() && emailField.validateContents()
+
+				if (validation && titleField.validateContents()
+						&& givenNameField.validateContents()
+						&& surnameField.validateContents()
+						&& companyField.validateContents()
+						&& telephoneField.validateContents()
+						&& emailField.validateContents()
 						&& noteField.validateContents()) {
-					
-					
-					if(givenNameField.getText().equals("")) {
+
+					if (givenNameField.getText().equals("")) {
 						person.setGivenName(null);
 					} else {
 						person.setGivenName(givenNameField.getText());
 					}
-						
-					if(surnameField.getText().equals("")) {
+
+					if (surnameField.getText().equals("")) {
 						person.setSurname(null);
 					} else {
 						person.setSurname(surnameField.getText());
 					}
-					
-					if(titleField.getText().equals("")) {
+
+					if (titleField.getText().equals("")) {
 						person.setTitle(null);
 					} else {
 						person.setTitle(titleField.getText());
 					}
-					
-					if(telephoneField.getText().equals("")) {
+
+					if (telephoneField.getText().equals("")) {
 						person.setTelephone(null);
 					} else {
 						person.setTelephone(telephoneField.getText());
 					}
-					
-					if(emailField.getText().equals("")) {
+
+					if (emailField.getText().equals("")) {
 						person.setEmail(null);
 					} else {
 						person.setEmail(emailField.getText());
 					}
-					
-					if(companyField.getText().equals("")) {
+
+					if (companyField.getText().equals("")) {
 						person.setCompany(null);
 					} else {
 						person.setCompany(companyField.getText());
 					}
-					
-					if(noteField.getText().equals("")) {
+
+					if (noteField.getText().equals("")) {
 						person.setNote(null);
 					} else {
 						person.setNote(noteField.getText());
-					}	
-					
+					}
+
 					try {
 						personService.update(person);
-						//feedbackLabel.setText("Person erfolgreich ge\u00E4ndert.");
+						// feedbackLabel.setText("Person erfolgreich ge\u00E4ndert.");
 						editPersonDialog.dispose();
-						JOptionPane.showMessageDialog(editPersonPanel, "Person erfolgreich ge\u00E4ndert.", "Information", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(editPersonPanel,
+								"Person erfolgreich ge\u00E4ndert.",
+								"Information", JOptionPane.INFORMATION_MESSAGE);
 					} catch (ServiceException e1) {
 						log.warn(e1.getLocalizedMessage());
-						//validationFeedbackLabel.setText("Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.");
-						JOptionPane.showMessageDialog(editPersonPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
+						// validationFeedbackLabel.setText("Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.");
+						JOptionPane
+								.showMessageDialog(
+										editPersonPanel,
+										"Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.",
+										"Fehler", JOptionPane.ERROR_MESSAGE);
 					}
-					
+
 				} else {
-					JOptionPane.showMessageDialog(editPersonPanel, "Es konnten nicht alle Eingabefelder validiert werden.", "Warnung", JOptionPane.WARNING_MESSAGE);
-					//validationFeedbackLabel.setText("Es konnten nicht alle Eingabefelder validiert werden");
+					JOptionPane
+							.showMessageDialog(
+									editPersonPanel,
+									"Es konnten nicht alle Eingabefelder validiert werden.",
+									"Warnung", JOptionPane.WARNING_MESSAGE);
+					// validationFeedbackLabel.setText("Es konnten nicht alle Eingabefelder validiert werden");
 				}
-				
+
 			}
-			
+
 		}
 	}
-	
 
 	private final class DeleteAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
@@ -584,9 +609,11 @@ public class FindPersonsView extends InitializableView {
 			Person p;
 			int row = showTable.getSelectedRow();
 			if (row == -1) {
-				//feedbackLabel
-				//		.setText("Bitte Person zum L\u00F6schen ausw\u00E4hlen.");
-				JOptionPane.showMessageDialog(overviewPanel, "Bitte Person zum L\u00F6schen ausw\u00E4hlen.", "Information", JOptionPane.INFORMATION_MESSAGE);
+				// feedbackLabel
+				// .setText("Bitte Person zum L\u00F6schen ausw\u00E4hlen.");
+				JOptionPane.showMessageDialog(overviewPanel,
+						"Bitte Person zum L\u00F6schen ausw\u00E4hlen.",
+						"Information", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
 
@@ -604,10 +631,14 @@ public class FindPersonsView extends InitializableView {
 					personModel.removePerson(row);
 					feedbackLabel.setText("Person wurde gel\u00F6scht.");
 				} catch (ServiceException ex) {
-					//feedbackLabel
-					//		.setText("Ein unerwarter Fehler ist waehrend der Loeschoperation aufgetreten.");
+					// feedbackLabel
+					// .setText("Ein unerwarter Fehler ist waehrend der Loeschoperation aufgetreten.");
 					log.warn(ex.getLocalizedMessage());
-					JOptionPane.showMessageDialog(overviewPanel, "Ein Fehler ist w\u00E4hrend des L\u00F6schens aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
+					JOptionPane
+							.showMessageDialog(
+									overviewPanel,
+									"Ein Fehler ist w\u00E4hrend des L\u00F6schens aufgetreten. Bitte kontaktieren Sie Ihren Administrator.",
+									"Fehler", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}
@@ -626,9 +657,11 @@ public class FindPersonsView extends InitializableView {
 			Person p;
 			int row = showTable.getSelectedRow();
 			if (row == -1) {
-			//	feedbackLabel
-			//			.setText("Es muss eine Person ausgewaehlt werden bevor die Addressen angezeigt werden koennen.");
-				JOptionPane.showMessageDialog(overviewPanel, "Bitte Person ausw\u00E4hlen.", "Information", JOptionPane.INFORMATION_MESSAGE);
+				// feedbackLabel
+				// .setText("Es muss eine Person ausgewaehlt werden bevor die Addressen angezeigt werden koennen.");
+				JOptionPane.showMessageDialog(overviewPanel,
+						"Bitte Person ausw\u00E4hlen.", "Information",
+						JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
 
@@ -660,9 +693,11 @@ public class FindPersonsView extends InitializableView {
 			Person p;
 			int row = showTable.getSelectedRow();
 			if (row == -1) {
-			//	feedbackLabel
-			//			.setText("Es muss eine Person ausgewaehlt werden bevor die Spenden angezeigt werden koennen.");
-				JOptionPane.showMessageDialog(overviewPanel, "Bitte Person ausw\u00E4hlen.", "Information", JOptionPane.INFORMATION_MESSAGE);
+				// feedbackLabel
+				// .setText("Es muss eine Person ausgewaehlt werden bevor die Spenden angezeigt werden koennen.");
+				JOptionPane.showMessageDialog(overviewPanel,
+						"Bitte Person ausw\u00E4hlen.", "Information",
+						JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
 
