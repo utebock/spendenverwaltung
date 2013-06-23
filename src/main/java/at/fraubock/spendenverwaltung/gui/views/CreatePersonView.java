@@ -382,12 +382,12 @@ public class CreatePersonView extends InitializableView {
 				if (streetField.getText().equals("")
 						&& postalField.getText().equals("")
 						&& cityField.getText().equals("")
-						&& countryField.getText().equals("")) {
+						|| countryField.getText().equals("")) {
 					address = null;
 				} else if (streetField.getText().equals("")
 						|| postalField.getText().equals("")
 						|| cityField.getText().equals("")
-						|| countryField.getText().equals("")) {
+						) {
 					JOptionPane
 							.showMessageDialog(null,
 									"Eine Adresse darf entweder ganz oder garnicht gesetzt sein.");

@@ -3,6 +3,8 @@ SET NAMES 'utf8' COLLATE 'utf8_unicode_ci';
 
 USE ubspenderverwaltung;
 
+START TRANSACTION;
+
 DROP TRIGGER IF EXISTS addresses_log_insert;
 DROP TRIGGER IF EXISTS addresses_log_update;
 DROP TRIGGER IF EXISTS addresses_log_delete;
@@ -590,4 +592,4 @@ INSERT INTO `connected_criterion` (`id`,`operand1`,`operand2`,`logical_operator`
 INSERT INTO `connected_criterion` (`id`,`operand1`,`operand2`,`logical_operator`) VALUES (22,23,26,'AND');
 INSERT INTO `connected_criterion` (`id`,`operand1`,`operand2`,`logical_operator`) VALUES (23,24,25,'AND');
 
-
+COMMIT;
