@@ -77,6 +77,7 @@ public class ImportValidationView extends InitializableView {
 	private JComboBox importComboBox;
 	private JLabel infoLabel;
 	private ViewActionFactory actionFactory;
+	private JScrollPane scrollPane;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ImportValidationView(IPersonService personService, IAddressService addressService, IDonationService donationService, IImportService importService, ComponentFactory componentFactory, ViewActionFactory actionFactory){
@@ -146,6 +147,10 @@ public class ImportValidationView extends InitializableView {
 				counter ++;
 			}
 	
+			infoLabel = new JLabel("Validierung von Importen: ");
+			infoLabel.setFont(new Font("bigger", Font.PLAIN, 14));
+			add(infoLabel, "wrap 30px, gap 40");
+			
 			importComboBox.addActionListener(new ImportComboBoxListener(this));
 			add(importComboBox, "wrap");
 			
@@ -173,6 +178,7 @@ public class ImportValidationView extends InitializableView {
 			cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backInButton.png")));
 			backBtn = new JButton();
 			backBtn.setAction(cancelAction);
+			backBtn.setFont(new Font("", Font.PLAIN, 13));
 			matchPanel.add(backBtn, "");
 	
 			this.add(conflictPanel, "wrap, growx");

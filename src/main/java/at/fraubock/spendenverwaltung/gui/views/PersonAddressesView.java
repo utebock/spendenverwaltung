@@ -296,13 +296,13 @@ public class PersonAddressesView extends InitializableView {
 							personService.update(selectedPerson);
 							
 							//feedbackLabel.setText("Adresse erfolgreich angelegt.");
-							JOptionPane.showMessageDialog(contentPanel, "Adresse erfolgreich angelegt.", "Information", JOptionPane.INFORMATION_MESSAGE);
 							
 							mainAddressLabel.setText("Hauptadresse: "+selectedPerson.getMainAddress().getStreet() + " " +
 									selectedPerson.getMainAddress().getPostalCode() + " " +
 									selectedPerson.getMainAddress().getCity() + " " +
 									selectedPerson.getMainAddress().getCountry());
 							addAddressDialog.dispose();
+							JOptionPane.showMessageDialog(contentPanel, "Adresse erfolgreich angelegt.", "Information", JOptionPane.INFORMATION_MESSAGE);
 						}
 						catch(ServiceException ex){
 							log.warn(ex.getLocalizedMessage()); 

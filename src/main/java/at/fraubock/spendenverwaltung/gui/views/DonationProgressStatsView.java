@@ -339,11 +339,9 @@ public class DonationProgressStatsView extends InitializableView {
 		}
 		
 		JComboBox<Filter> cb = new JComboBox<Filter>(new SimpleComboBoxModel<Filter>(selected));
-
+		panel.add(cb);
 		exportButton.addActionListener(new ExportActionListener(fileChooser,cb));
 		panel.add(exportButton);
-		
-		panel.add(cb);
 		
 		return panel;
 		
