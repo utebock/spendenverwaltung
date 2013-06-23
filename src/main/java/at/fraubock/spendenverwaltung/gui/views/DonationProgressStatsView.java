@@ -4,6 +4,9 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -15,9 +18,11 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
@@ -305,10 +310,43 @@ public class DonationProgressStatsView extends InitializableView {
 			chartPanel.setPreferredSize(new Dimension(700, 270));
 			plotPanel.removeAll();
 			plotPanel.repaint();
-			plotPanel.add(chartPanel);
+			plotPanel.add(chartPanel,"wrap");
+			plotPanel.add(createExportPanel());
 			plotPanel.validate();
 
 		}
+	}
+	
+	private JPanel createExportPanel() {
+		JPanel panel = new JPanel();
+		
+		JButton exportButton = new JButton("Statistik exportieren");
+		exportButton.setFont(new Font("Bigger", Font.PLAIN, 13));
+		final JFileChooser fileChooser = new JFileChooser();
+		
+		List<Filter> selected = new ArrayList<Filter>();
+		if (firstFilter.getSelectedIndex() != 0) {
+			selected.add((Filter) firstFilter
+					.getSelectedItem());
+		}
+		if (secondFilter.getSelectedIndex() != 0) {
+			selected.add((Filter) secondFilter
+					.getSelectedItem());
+		}
+		if (thirdFilter.getSelectedIndex() != 0) {
+			selected.add((Filter) thirdFilter
+					.getSelectedItem());
+		}
+		
+		JComboBox<Filter> cb = new JComboBox<Filter>(new SimpleComboBoxModel<Filter>(selected));
+
+		exportButton.addActionListener(new ExportActionListener(fileChooser,cb));
+		panel.add(exportButton);
+		
+		panel.add(cb);
+		
+		return panel;
+		
 	}
 
 	private static JFreeChart createTimeSeriesChart(XYDataset dataset) {
@@ -329,5 +367,63 @@ public class DonationProgressStatsView extends InitializableView {
 				"Bundesland", "Betrag", dataset, PlotOrientation.VERTICAL,
 				true, true, false);
 		return chart;
+	}	
+	
+	private final class ExportActionListener implements ActionListener {
+		
+		private final JFileChooser fileChooser;
+		private final JComboBox<Filter> cb;
+		
+		private ExportActionListener(JFileChooser fileChooser, JComboBox<Filter> cb) {
+			this.fileChooser = fileChooser;
+			this.cb = cb;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			Filter filter = (Filter)cb.getSelectedItem();
+			String csv = null;
+			try {
+				csv = filterService.convertResultsToCSVById(filter.getId());
+			} catch (ServiceException e1) {
+				JOptionPane.showMessageDialog(DonationProgressStatsView.this,
+						"Der Filter konnte nicht exportiert werden.",
+						"Error", JOptionPane.ERROR_MESSAGE);
+				log.error("convertResultsToCSVById failed. filter_id='" + filter.getId() + "'");
+			}
+
+			fileChooser.setSelectedFile(new File("spendenstatistik.csv"));
+			fileChooser.setFileFilter(new FileFilter() {
+
+				@Override
+				public boolean accept(File f) {
+					return f.getName().toLowerCase().endsWith(".csv")
+							|| f.isDirectory();
+				}
+
+				@Override
+				public String getDescription() {
+					return "CSV Dateien(*.csv)";
+				}
+
+			});
+
+			if (fileChooser.showSaveDialog(DonationProgressStatsView.this) == JFileChooser.APPROVE_OPTION) {
+				File file = fileChooser.getSelectedFile();
+				FileWriter writer = null;
+				try {
+					writer = new FileWriter(file);
+					writer.write(csv);
+					writer.flush();
+					writer.close();
+				} catch (IOException e) {
+					JOptionPane.showMessageDialog(DonationProgressStatsView.this,
+							"Die Datei konnte nicht beschrieben werden.",
+							"Error", JOptionPane.ERROR_MESSAGE);
+					log.error("File could not be written to. path='"
+							+ file.getAbsolutePath() + "', text='" + csv + "'");
+				}
+			}
+		}
 	}
 }

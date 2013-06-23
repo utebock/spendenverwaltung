@@ -153,6 +153,10 @@ public class DonationServiceImplemented implements IDonationService {
 
 			String nA = "n.v.";
 			Person p = d.getDonator();
+			if(p==null) {
+				csv+="\n";
+				continue;
+			}
 			Address a = p.getMainAddress();
 
 			csv += (p == null ? nA : p.getGivenName()) + ";";

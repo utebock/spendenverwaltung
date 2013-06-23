@@ -149,6 +149,10 @@
 		class="at.fraubock.spendenverwaltung.service.FilterServiceImplemented">
 		<property name="filterDAO" ref="filterDao" />
 		<property name="mountedCritDAO" ref="mountedCritDao" />
+		<property name="personService" ref="personService" />
+		<property name="addressService" ref="addressService" />
+		<property name="donationService" ref="donationService" />
+		<property name="mailingService" ref="mailingService" />
 	</bean>
 	<bean id="filterValidator" class="at.fraubock.spendenverwaltung.service.FilterValidator">
 	</bean>

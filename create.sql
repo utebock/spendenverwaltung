@@ -167,7 +167,7 @@ CREATE TABLE property_criterion ( -- a concrete criterion that compares an entit
 	'mailing_date','mailing_type','mailing_medium',
 	'street','postcode','city','ismain','country') NOT NULL, -- the property (column name) of the entity to be compared. Filters containing an 'ismain' criterion may solemnly be used as mounted into a person criterion, i.e. have no meaning on its own.
 	-- this criterion's type is specified by the property used.
-	relational_operator ENUM('EQUALS','GREATER','LESS','GREATER_EQ','LESS_EQ','LIKE','UNEQUAL','IS_NULL','IS_NOT_NULL') NOT NULL, -- must fit the property type, e.g. for ismain, you may only use 'EQUALS', 'UNEQUAL', 'IS_NULL', 'IS_NOT_NULL'
+	relational_operator ENUM('EQUALS','GREATER','LESS','GREATER_EQ','LESS_EQ','LIKE','UNEQUAL','IS_NULL','NOT_NULL') NOT NULL, -- must fit the property type, e.g. for ismain, you may only use 'EQUALS', 'UNEQUAL', 'IS_NULL', 'IS_NOT_NULL'
 	-- the value the property is compared to (exactly one of those 5 must be set, except for when relational_operator is IS_NULL or IS_NOT_NULL, in which case none must be set). Which one is set must be according to the type of the property specified in 'property'.
 	numValue DOUBLE, 
 	strValue VARCHAR(1024),
@@ -181,7 +181,7 @@ CREATE TABLE mountedfilter_criterion ( -- a criterion which applies another filt
 	mount INTEGER UNSIGNED NOT NULL REFERENCES filter(id), -- the filter that will be applied to a set of entities related to this entity
 	-- if the mounted filter is of type mailing, address or donation, this criterion is of type person.
 	-- if the mounted filter is of type mailing, this criterion is of type person.
-	relational_operator ENUM('EQUALS','GREATER','LESS','GREATER_EQ','LESS_EQ','LIKE','UNEQUAL','IS_NULL','IS_NOT_NULL') NOT NULL,
+	relational_operator ENUM('EQUALS','GREATER','LESS','GREATER_EQ','LESS_EQ','LIKE','UNEQUAL','IS_NULL','NOT_NULL') NOT NULL,
 	-- either count XOR property must be set. (i.e. not both)
 	count INT, -- if set, the number of the filter result will be compared with this value
 	property ENUM('givenname','surname','sex','email','company','emailnotification','postalnotification','title','note','telephone',
