@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
+import java.awt.Desktop;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -726,6 +727,68 @@ public class PersonDonationsView extends InitializableView {
 		}	
 	}
 	
+	private final class ConfirmAllAction extends AbstractAction {
+		
+		private static final long serialVersionUID = 1L;
+
+		JDialog donationConfirmationDialog;
+		JPanel donationConfirmationPanel;
+		JLabel donationHeadLabel;
+		JLabel templateLabel;
+		JButton templateButton;
+		JButton saveButton;
+		JButton cancelButton;
+		Donation donation;
+		JLabel confirmationLabel;
+				
+		public ConfirmAllAction() {
+			super("Spendenbest\u00E4tigung für alle");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			feedbackLabel.setText("");
+			
+			List<Donation> donations = donationTableModel.getDonations();
+			
+			donationConfirmationDialog = new JDialog(SwingUtilities.getWindowAncestor(contentPanel), Dialog.ModalityType.APPLICATION_MODAL);
+			donationConfirmationDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+			donationConfirmationPanel = componentFactory.createPanel(350, 250);
+
+			//add headline
+			donationHeadLabel = componentFactory.createLabel(donations.size() + " Spendenbest\u00E4tigungen erstellen");
+			donationHeadLabel.setFont(new Font("Headline", Font.PLAIN, 14));
+			donationConfirmationPanel.add(donationHeadLabel, "wrap 20px, span 2");
+			
+			//add template
+			templateLabel = componentFactory.createLabel("Vorlage: ");
+			donationConfirmationPanel.add(templateLabel, "split2");
+			
+			templateButton = new JButton(new ChooseDonationConfirmationTemplate());
+			donationConfirmationPanel.add(templateButton, "gap 12, wrap, growx");
+			
+			//add date
+			confirmationLabel = componentFactory.createLabel("Datum: ");
+			donationConfirmationPanel.add(confirmationLabel, "split2");
+			
+			confirmationPicker = new JXDatePicker(new java.util.Date());
+			donationConfirmationPanel.add(confirmationPicker, "gap 20, wrap 20px, growx");
+			
+			//add save + cancel
+			saveButton = new JButton(new CreateConfirmationAction(donations));
+			donationConfirmationPanel.add(saveButton, "split 2");
+			
+			cancelButton = new JButton(new CancelDonationConfirmation(donationConfirmationDialog));
+			donationConfirmationPanel.add(cancelButton, "wrap");
+			
+			donationConfirmationDialog.add(donationConfirmationPanel);
+			donationConfirmationDialog.pack();
+			donationConfirmationDialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(contentPanel));
+			donationConfirmationDialog.setVisible(true);
+		}	
+	}
+	
 	private final class ConfirmAction extends AbstractAction {
 		
 		private static final long serialVersionUID = 1L;
@@ -782,7 +845,9 @@ public class PersonDonationsView extends InitializableView {
 			donationConfirmationPanel.add(confirmationPicker, "gap 20, wrap 20px, growx");
 			
 			//add save + cancel
-			saveButton = new JButton(new CreateConfirmationAction(donation));
+			List<Donation> donationList = new ArrayList<Donation>();
+			donationList.add(donation);
+			saveButton = new JButton(new CreateConfirmationAction(donationList));
 			donationConfirmationPanel.add(saveButton, "split 2");
 			
 			cancelButton = new JButton(new CancelDonationConfirmation(donationConfirmationDialog));
@@ -861,51 +926,68 @@ public class PersonDonationsView extends InitializableView {
 	private final class CreateConfirmationAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
-		private Donation donation;
+		private List<Donation> donations;
 
-		public CreateConfirmationAction(Donation donation) {
+		public CreateConfirmationAction(List<Donation> donations) {
 			super("Speichern");
-			this.donation = donation;
+			this.donations = donations;
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			List<Donation> donationList = new ArrayList<Donation>();
-			donationList.add(donation);
-			Confirmation confirmation = new Confirmation();
-			
-			confirmation.setDonation(donation);
-			confirmation.setDate(confirmationPicker.getDate());
-			confirmation.setPerson(donation.getDonator());
-			
+			int counter = 1;
 			String fileName = showSaveDialog();
 			
 			if(fileName.equals(""))
 				return;
-
-			try {
+			
+			for(Donation donation : donations){
+				Confirmation confirmation = new Confirmation();
 				
-				if(confirmationTemplateFile != null) {
-					ConfirmationTemplate confirmationTemplate = new ConfirmationTemplate();
-					confirmationTemplate.setFile(confirmationTemplateFile);
-					confirmationTemplate.setName("abc");
+				confirmation.setDonation(donation);
+				confirmation.setDate(confirmationPicker.getDate());
+				confirmation.setPerson(donation.getDonator());
+				
+	
+				try {
 					
-					confirmationTemplate = confirmationService.insertOrUpdateConfirmationTemplate(confirmationTemplate);
-					
-					confirmation.setTemplate(confirmationTemplate);
-
-					confirmationService.insertOrUpdate(confirmation);
-					//feedbackLabel.setText("Best\u00E4tigung wurde erstellt.");
-					JOptionPane.showMessageDialog(contentPanel, "Spendenbest\u00E4tigung erfolgreich erstellt.", "Information", JOptionPane.INFORMATION_MESSAGE);
-					
-					ConfirmationTemplateUtil.createMailingWithDocxTemplate(confirmationTemplateFile,donationList, fileName);
+					if(confirmationTemplateFile != null) {
+						ConfirmationTemplate confirmationTemplate = new ConfirmationTemplate();
+						confirmationTemplate.setFile(confirmationTemplateFile);
+						if(donations.size() > 1){
+							confirmationTemplate.setName(confirmationTemplateFile.getName()+"_"+counter);
+						} else{
+							confirmationTemplate.setName(confirmationTemplateFile.getName());
+						}
+						
+						confirmationTemplate = confirmationService.insertOrUpdateConfirmationTemplate(confirmationTemplate);
+						
+						confirmation.setTemplate(confirmationTemplate);
+	
+						confirmationService.insertOrUpdate(confirmation);
+						//feedbackLabel.setText("Best\u00E4tigung wurde erstellt.");
+						
+						if(counter == donations.size())
+							JOptionPane.showMessageDialog(contentPanel, "Spendenbest\u00E4tigung erfolgreich erstellt.", "Information", JOptionPane.INFORMATION_MESSAGE);
+						
+						counter ++;
+					}
+				} catch (ServiceException e1) {
+					log.error(e1 + " occured in CreateConfirmationsView");
+				//	feedbackLabel.setText("Ein Fehler ist waehrend der Erstellung dieser Aussendung aufgetreten.");
+					JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
 				}
+				
+			}
+			
+			try {
+				ConfirmationTemplateUtil.createMailingWithDocxTemplate(confirmationTemplateFile,donations, fileName);
 			} catch (ServiceException e1) {
-				log.error(e1 + " occured in CreateMailingsView");
+				log.error(e1 + " occured in CreateConfirmationsView");
 			//	feedbackLabel.setText("Ein Fehler ist waehrend der Erstellung dieser Aussendung aufgetreten.");
 				JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
 			} catch (IOException e1) {
-				log.error(e1 + " occured in CreateMailingsView");
+				log.error(e1 + " occured in CreateConfirmationsView");
 				//feedbackLabel.setText("Ein Fehler ist waehrend der Erstellung des PDFs aufgetreten.");
 				JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
 			}
@@ -952,20 +1034,6 @@ public class PersonDonationsView extends InitializableView {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			parent.dispose();
-		}	
-	}
-	
-	private final class ConfirmAllAction extends AbstractAction {
-		
-		private static final long serialVersionUID = 1L;
-		
-		public ConfirmAllAction() {
-			super("Spendenbest\u00E4tigung f\u00FCr alle");
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			//TODO alldonationconfirmation logic
 		}	
 	}
 	

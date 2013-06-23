@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.util;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -122,7 +123,7 @@ public class ConfirmationTemplateUtil {
 			mergePdfs(files, new File(outputName));
 		} else if(outputName.endsWith(".docx")){
 			
-			log.info("Create docx mailing with template "+templateFile.getName());
+			log.info("Create docx confirmation with template "+templateFile.getName());
 			
 			try {
 				//Load Template file
@@ -155,6 +156,8 @@ public class ConfirmationTemplateUtil {
 			//Merge into one docx and delete temp files
 			mergeDocx(files, outputName);
 		}
+		
+		Desktop.getDesktop().open(new File(outputName));
 	}
 	
 	private static void mergeDocx(List<File> files, String outputName){
