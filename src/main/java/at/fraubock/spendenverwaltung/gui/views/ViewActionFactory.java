@@ -5,8 +5,10 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 
 import at.fraubock.spendenverwaltung.gui.MainFilterView;
+import at.fraubock.spendenverwaltung.gui.MainFrame;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.MailingTableModel;
 import at.fraubock.spendenverwaltung.gui.components.PersonTableModel;
@@ -154,7 +156,7 @@ public class ViewActionFactory {
 	public Action getImportValidationViewAction() {
 		return new DisplayViewAction(new ImportValidationView(personService,
 				addressService, donationService, importService,
-				new ComponentFactory(), this), "/images/importValidate.png");
+			new ComponentFactory(), this, viewDisplayer), "/images/importValidate.png");
 	}
 
 	// TODO richtige view returnen!
