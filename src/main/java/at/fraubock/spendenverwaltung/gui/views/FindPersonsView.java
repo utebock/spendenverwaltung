@@ -15,7 +15,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -38,10 +37,8 @@ import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.components.ComponentConstants;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.EmailTextField;
-import at.fraubock.spendenverwaltung.gui.components.NumericTextField;
 import at.fraubock.spendenverwaltung.gui.components.PersonTableModel;
 import at.fraubock.spendenverwaltung.gui.components.StringTextField;
-import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person.Sex;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
@@ -62,8 +59,6 @@ public class FindPersonsView extends InitializableView {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = Logger.getLogger(FindPersonsView.class);
 	private IPersonService personService;
-	private IAddressService addressService;
-	private IDonationService donationService;
 	private IFilterService filterService;
 	private PersonTableModel personModel;
 	private JTable showTable;
@@ -76,7 +71,6 @@ public class FindPersonsView extends InitializableView {
 	private JButton backButton;
 	private JPanel overviewPanel;
 	private JLabel label;
-	private JLabel empty;
 	private JLabel feedbackLabel;
 	private JLabel quickSearchLabel;
 	private JTextField quickSearchField;
@@ -92,8 +86,6 @@ public class FindPersonsView extends InitializableView {
 		this.componentFactory = componentFactory;
 		this.viewActionFactory = viewActionFactory;
 		this.personService = personService;
-		this.addressService = addressService;
-		this.donationService = donationService;
 		this.filterService = filterService;
 		this.personModel = personModel;
 	}
