@@ -51,13 +51,9 @@ public class Action {
 
 	public enum Entity {
 		PERSON("persons", "Person"), ADDRESSES("addresses", "Adresse"), LIVES_AT(
-				"livesat", "livesat"), IMPORT("imports", "Import"), DONATION(
-				"donations", "Spende"), CRITERION("criterion", "criterion"), FILTER(
-				"filter", "Filter"), MAILING("mailings", "Aussendung"), SENT_MAILING(
-				"sent_mailings", "sent_mailings"), MAILING_TEMPLATE(
-				"mailing_templates", "Aussendungsvorlage"), DONATION_CONFIRMATION_TEMPLATE(
-				"donation_confirmation_templates",
-				"Spendenbest\u00e4tigungsvorlage"), DONATION_CONFIRMATION(
+				"livesat", "Adresszuweisung"), IMPORT("imports", "Import"), DONATION(
+				"donations", "Spende"), FILTER(
+				"filter", "Filter"), MAILING("mailings", "Aussendung"), DONATION_CONFIRMATION(
 				"donation_confirmations", "Spendenbest\u00e4tigung");
 
 		private String name;
