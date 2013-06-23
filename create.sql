@@ -161,8 +161,8 @@ CREATE TABLE connected_criterion ( -- a concrete criterion that logically connec
 
 CREATE TABLE property_criterion ( -- a concrete criterion that compares an entities property with a given value
 	id INTEGER UNSIGNED PRIMARY KEY REFERENCES criterion(id),
-	property ENUM('givenname','surname','sex','email','company','emailnotification','postalnotification','title','person_note','telephone',
-	'amount','donationdate','dedication','donation_type','donation_note','personid',
+	property ENUM('givenname','surname','sex','email','company','emailnotification','postalnotification','title','note','telephone',
+	'amount','donationdate','dedication','type','personid',
 	'mailing_date','mailing_type','mailing_medium',
 	'street','postcode','city','ismain','country') NOT NULL, -- the property (column name) of the entity to be compared. Filters containing an 'ismain' criterion may solemnly be used as mounted into a person criterion, i.e. have no meaning on its own.
 	-- this criterion's type is specified by the property used.
@@ -183,8 +183,8 @@ CREATE TABLE mountedfilter_criterion ( -- a criterion which applies another filt
 	relational_operator ENUM('EQUALS','GREATER','LESS','GREATER_EQ','LESS_EQ','LIKE','UNEQUAL','IS_NULL','IS_NOT_NULL') NOT NULL,
 	-- either count XOR property must be set. (i.e. not both)
 	count INT, -- if set, the number of the filter result will be compared with this value
-	property ENUM('givenname','surname','sex','email','company','emailnotification','postalnotification','title','person_note','telephone',
-	'amount','donationdate','dedication','donation_type','donation_note','personid',
+	property ENUM('givenname','surname','sex','email','company','emailnotification','postalnotification','title','note','telephone',
+	'amount','donationdate','dedication','type','personid',
 	'mailing_date','mailing_type','mailing_medium',
 	'street','postcode','city','ismain','country'), -- if set, either sum XOR avg must be set. the property (column name) of the entity for the mount filter. Must be a column name of the table the mounted filter operates on (must match its type).
 	sum DOUBLE, -- must only be not-null if property is set. sum of the filter result's given property will be compared.
