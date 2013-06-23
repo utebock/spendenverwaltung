@@ -569,8 +569,8 @@ INSERT INTO `filter` (`id`,`criterion`,`type`,`name`,`anonymous`,`privacy_status
 INSERT INTO `filter` (`id`,`criterion`,`type`,`name`,`anonymous`,`privacy_status`,`owner`) VALUES (4,4,'validated_donations','Betrag >= 100',0,'anzeigen','default_filter_owner');
 INSERT INTO `filter` (`id`,`criterion`,`type`,`name`,`anonymous`,`privacy_status`,`owner`) VALUES (5,NULL,'validated_donations','Alle Spenden',0,'anzeigen','default_filter_owner');
 INSERT INTO `filter` (`id`,`criterion`,`type`,`name`,`anonymous`,`privacy_status`,`owner`) VALUES (6,5,'validated_persons','Dauerspender',0,'anzeigen','default_filter_owner');
-INSERT INTO `filter` (`id`,`criterion`,`type`,`name`,`anonymous`,`privacy_status`,`owner`) VALUES (7,8,'validated_persons','Groﬂspender',0,'anzeigen','default_filter_owner');
-INSERT INTO `filter` (`id`,`criterion`,`type`,`name`,`anonymous`,`privacy_status`,`owner`) VALUES (8,9,'validated_persons','GroﬂFettDauerspender',0,'anzeigen','default_filter_owner');
+INSERT INTO `filter` (`id`,`criterion`,`type`,`name`,`anonymous`,`privacy_status`,`owner`) VALUES (7,8,'validated_persons','Gro√üspender',0,'anzeigen','default_filter_owner');
+INSERT INTO `filter` (`id`,`criterion`,`type`,`name`,`anonymous`,`privacy_status`,`owner`) VALUES (8,9,'validated_persons','Gro√üFettDauerspender',0,'anzeigen','default_filter_owner');
 
 INSERT INTO `property_criterion` (`id`,`property`,`relational_operator`,`numValue`,`strValue`,`dateValue`,`daysBack`,`boolValue`) VALUES (1,'donationdate','LESS_EQ',NULL,NULL,NULL,730,NULL);
 INSERT INTO `property_criterion` (`id`,`property`,`relational_operator`,`numValue`,`strValue`,`dateValue`,`daysBack`,`boolValue`) VALUES (2,'donationdate','LESS_EQ',NULL,NULL,NULL,1460,NULL);
