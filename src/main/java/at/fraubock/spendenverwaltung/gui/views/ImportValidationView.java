@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -27,6 +28,7 @@ import org.apache.log4j.Logger;
 
 import at.fraubock.spendenverwaltung.gui.AbstractValidationTableModel;
 import at.fraubock.spendenverwaltung.gui.AssignPerson;
+import at.fraubock.spendenverwaltung.gui.CellRenderer;
 import at.fraubock.spendenverwaltung.gui.ComponentBuilder;
 import at.fraubock.spendenverwaltung.gui.ConflictValidationTableModel;
 import at.fraubock.spendenverwaltung.gui.MainFrame;
@@ -121,6 +123,17 @@ public class ImportValidationView extends InitializableView {
 		newTable.getColumnModel().getColumn(13).setCellEditor(new DefaultCellEditor(conflictComboBox));
 		matchTable.getColumnModel().getColumn(13).setCellEditor(new DefaultCellEditor(conflictComboBox));
 		
+		conflictTable.setDefaultRenderer(Object.class, new CellRenderer());
+		conflictTable.setDefaultRenderer(Long.class, new CellRenderer());
+		conflictTable.setDefaultRenderer(Date.class, new CellRenderer());
+		
+		newTable.setDefaultRenderer(Object.class, new CellRenderer());
+		newTable.setDefaultRenderer(Long.class, new CellRenderer());
+		newTable.setDefaultRenderer(Date.class, new CellRenderer());
+		
+		matchTable.setDefaultRenderer(Object.class, new CellRenderer());
+		matchTable.setDefaultRenderer(Long.class, new CellRenderer());
+		matchTable.setDefaultRenderer(Date.class, new CellRenderer());
 		
 		conflictTable.setFillsViewportHeight(true);
 		newTable.setFillsViewportHeight(true);

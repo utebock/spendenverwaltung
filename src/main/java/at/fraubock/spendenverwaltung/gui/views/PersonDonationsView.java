@@ -1,5 +1,7 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -38,6 +40,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXDatePicker;
 
+import at.fraubock.spendenverwaltung.gui.CellRenderer;
 import at.fraubock.spendenverwaltung.gui.DonationTableModel;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.components.ComponentConstants;
@@ -135,6 +138,8 @@ public class PersonDonationsView extends InitializableView {
 		
 		donationTableModel = new DonationTableModel();
 		donationsTable = new JTable(donationTableModel);
+		donationsTable.setDefaultRenderer(Object.class, new CellRenderer());
+		donationsTable.setDefaultRenderer(Date.class, new CellRenderer());
 		donationsTable.setDefaultRenderer(Long.class, new LongCellRenderer());
 		donationsTable.setAutoCreateRowSorter(true);
 		donationsTable.setFillsViewportHeight(true);
@@ -1088,6 +1093,8 @@ public class PersonDonationsView extends InitializableView {
 	
 	private final class LongCellRenderer extends DefaultTableCellRenderer {
 
+	    Color color = new Color(240,240,240);
+
 		/**
 		 * 
 		 */
@@ -1097,6 +1104,20 @@ public class PersonDonationsView extends InitializableView {
 		protected void setValue(Object value) {
 			NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
 			super.setValue(nf.format((Double)value));
+		}
+	    
+		@Override
+		public Component getTableCellRendererComponent(JTable table, Object obj, boolean isSelected, boolean hasFocus, int row, int column) {
+		    JLabel label = (JLabel)super.getTableCellRendererComponent(table, obj, isSelected,hasFocus, row, column);
+		    
+		    if((row % 2) == 1 && !isSelected){
+		        label.setBackground(color);
+		    }
+		    else if((row % 2) == 0 && !isSelected){
+		        label.setBackground(Color.WHITE);
+		    }
+		    
+		    return label;
 		}
 		
 	}

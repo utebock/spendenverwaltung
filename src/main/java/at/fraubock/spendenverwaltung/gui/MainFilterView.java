@@ -69,6 +69,7 @@ public class MainFilterView extends InitializableView {
 		showTable = new JTable(filterModel);
 		showTable.setFillsViewportHeight(true);
 		showTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		showTable.setDefaultRenderer(Object.class, new CellRenderer());
 		scrollPane = new JScrollPane(showTable);
 		scrollPane.setPreferredSize(new Dimension(748, 550));
 		this.add(scrollPane);
