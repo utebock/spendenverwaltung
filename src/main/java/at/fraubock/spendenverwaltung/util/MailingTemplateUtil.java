@@ -101,7 +101,7 @@ public class MailingTemplateUtil {
 				for(Person p : personList){
 
 					context.put("person", p);
-					tempFile = File.createTempFile("MailingTemp", ".docx");
+					tempFile = File.createTempFile("MailingTemp", ".pdf");
 					
 					files.add(tempFile);
 					out = new FileOutputStream(tempFile);

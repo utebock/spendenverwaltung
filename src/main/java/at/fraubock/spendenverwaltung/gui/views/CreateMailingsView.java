@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
+import java.awt.Desktop;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -430,7 +431,7 @@ public class CreateMailingsView extends InitializableView {
 			try {
 				mailingService.insertOrUpdate(mailing);
 				//feedbackLabel.setText("Aussendung wurde erstellt.");
-				JOptionPane.showMessageDialog(contentPanel, "Aussendung erfolgreich erstellt", "Information", JOptionPane.INFORMATION_MESSAGE);
+				//JOptionPane.showMessageDialog(contentPanel, "Aussendung erfolgreich erstellt", "Information", JOptionPane.INFORMATION_MESSAGE);
 				if(templateFile != null) {
 					String name = "";
 //					String fileName = outputNameField.getText();
@@ -462,7 +463,8 @@ public class CreateMailingsView extends InitializableView {
 						JOptionPane.showMessageDialog(contentPanel, "Der Personenfilter ent\u00E4lt keine adressierbaren Personen.", "Warnung", JOptionPane.WARNING_MESSAGE);
 						mailingService.delete(mailing);
 					} else {					
-						MailingTemplateUtil.createMailingWithDocxTemplate(templateFile, personService.getPersonsByMailing(mailing), fileName);
+						File f = MailingTemplateUtil.createMailingWithDocxTemplate(templateFile, personService.getPersonsByMailing(mailing), fileName);
+						Desktop.getDesktop().open(f);
 					}
 				}
 			} catch (ServiceException e1) {

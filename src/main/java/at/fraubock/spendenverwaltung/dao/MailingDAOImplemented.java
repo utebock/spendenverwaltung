@@ -26,6 +26,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.Person;
 import at.fraubock.spendenverwaltung.interfaces.domain.UnconfirmedMailing;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.ConnectedCriterion;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.MountedFilterCriterion;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
@@ -210,16 +211,24 @@ public class MailingDAOImplemented implements IMailingDAO {
 
 					PropertyCriterion hasEmail = new PropertyCriterion();
 					hasEmail.compare(FilterProperty.PERSON_EMAIL, RelationalOperator.UNEQUAL, "");
-
-					ConnectedCriterion andHasEmailCriterion = new ConnectedCriterion();
-					andHasEmailCriterion.connect(hasEmail, LogicalOperator.AND, mailing
-							.getFilter().getCriterion());
+					
+					Criterion hasEMailCriterion = null;
+					
+					if(mailing.getFilter().getCriterion()==null) {
+						hasEMailCriterion = hasEmail;
+					} else {
+						ConnectedCriterion andHasEmailCriterion = new ConnectedCriterion();
+						andHasEmailCriterion.connect(hasEmail, LogicalOperator.AND, mailing
+								.getFilter().getCriterion());
+						hasEMailCriterion = andHasEmailCriterion;
+					}
+					
 					
 					PropertyCriterion wantsEmail = new PropertyCriterion();
 					wantsEmail.compare(FilterProperty.PERSON_WANTS_EMAIL, true);
 					
 					ConnectedCriterion andWantsEmailsCriterion = new ConnectedCriterion();
-					andWantsEmailsCriterion.connect(andHasEmailCriterion, LogicalOperator.AND, wantsEmail);
+					andWantsEmailsCriterion.connect(hasEMailCriterion, LogicalOperator.AND, wantsEmail);
 					
 					andEmail.setCriterion(andWantsEmailsCriterion);
 					mailing.setFilter(andEmail);
@@ -241,9 +250,16 @@ public class MailingDAOImplemented implements IMailingDAO {
 					mountedCompositeFilter.mountAndCompareCount(addressFilter,
 							RelationalOperator.EQUALS, 1);
 
-					ConnectedCriterion andCriterion = new ConnectedCriterion();
-					andCriterion.connect(mailing.getFilter().getCriterion(),
-							LogicalOperator.AND, mountedCompositeFilter);
+					Criterion andCriterion = null;
+					
+					if(mailing.getFilter().getCriterion()==null) {
+						andCriterion = mountedCompositeFilter;
+					} else {
+						ConnectedCriterion conCriterion = new ConnectedCriterion();
+						conCriterion.connect(mailing.getFilter().getCriterion(),
+								LogicalOperator.AND, mountedCompositeFilter);
+						andCriterion = conCriterion;
+					}
 					
 					PropertyCriterion wantsMail = new PropertyCriterion();
 					wantsMail.compare(FilterProperty.PERSON_WANTS_MAIL, true);

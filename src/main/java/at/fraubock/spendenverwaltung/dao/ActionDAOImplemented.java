@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.util.StringUtils;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IActionDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Action;
@@ -51,12 +50,27 @@ public class ActionDAOImplemented implements IActionDAO {
 
 		try {
 			return jdbcTemplate.query("select * from actions" + this.where
-					+ " ORDER BY time DESC LIMIT " + offset + ", " + count,
+					+ "ORDER BY time DESC LIMIT " + offset + ", " + count,
 					this.values.toArray(), new ActionMapper());
 		} catch (DataAccessException e) {
 			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
 		}
+	}
+	
+	@Override
+	public List<Action> getByAttributesFromOthers(ActionSearchVO searchVO,
+			int offset, int count) throws PersistenceException {
+		
+		List<Action> actions = new ArrayList<Action>();
+		String currentActor = fetchCurrentUser();
+		
+		for(Action a: getLimitedResultByAttributes(searchVO,offset,count)) {
+			if(!currentActor.equals(a.getActor())) {
+				actions.add(a);
+			}
+		}
+		return actions;
 	}
 
 	@Override
@@ -75,8 +89,7 @@ public class ActionDAOImplemented implements IActionDAO {
 
 		try {
 			return jdbcTemplate.queryForObject("select count(*) from actions"
-					+ this.where + " ORDER BY time DESC ",
-					this.values.toArray(), Integer.class);
+					+ this.where, this.values.toArray(), Integer.class);
 		} catch (DataAccessException e) {
 			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
@@ -85,7 +98,7 @@ public class ActionDAOImplemented implements IActionDAO {
 
 	private void setWhereAndValues(ActionSearchVO searchVO) {
 		List<Object> values = new ArrayList<Object>();
-		String where = "";
+		String where = " where ";
 		if (searchVO.getActor() != null) {
 			where += "actor LIKE ? and ";
 			values.add("%" + searchVO.getActor() + "%");
@@ -116,12 +129,17 @@ public class ActionDAOImplemented implements IActionDAO {
 			values.add(searchVO.getTo());
 		}
 
-		if (!StringUtils.isEmpty(where)) {
-			where = " where " + where.substring(0, where.lastIndexOf(" and "));
-		}
-
-		this.where = where;
+		// we don't want to show these actions to the user:
+		this.where = where
+				+ " entity NOT LIKE '%criterion%' and entity NOT "
+				+ "LIKE '%templates%' and entity <> 'sent_mailings' and (payload "
+				+ "NOT LIKE '%andere duerfen: privat%' or actor = '"+fetchCurrentUser()+"') " +
+				"and payload NOT LIKE '%filter ist anonym%' ";
 		this.values = values;
+	}
+	
+	private String fetchCurrentUser() {
+		return jdbcTemplate.queryForObject("SELECT (SUBSTRING_INDEX(USER(),'@',1))", String.class);
 	}
 
 	private class ActionMapper implements RowMapper<Action> {

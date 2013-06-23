@@ -112,10 +112,14 @@ public class ImportServiceImplemented implements IImportService {
 				person.setTitle(row.getTitle());
 				person.setCompany(row.getCompany());
 				person.setTelephone(row.getTelephone());
-				person.setEmailNotification(Boolean.valueOf(row
-						.getEmailNotification()));
-				person.setPostalNotification(Boolean.valueOf(row
-						.getPostalNotification()));
+				if(row.getEmailNotification().equals("1"))
+					person.setEmailNotification(true);
+				else
+					person.setEmailNotification(false);
+				if(row.getPostalNotification().equals("1"))
+					person.setPostalNotification(true);
+				else
+					person.setPostalNotification(false);
 				person.setNote(row.getPersonNote());
 
 				// Donation

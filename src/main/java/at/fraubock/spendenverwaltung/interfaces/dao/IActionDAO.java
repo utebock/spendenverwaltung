@@ -29,8 +29,26 @@ public interface IActionDAO {
 	 *         where attributes match given values
 	 * @throws PersistenceException
 	 */
-
 	public List<Action> getLimitedResultByAttributes(ActionSearchVO searchVO,
+			int offset, int count) throws PersistenceException;
+
+	/**
+	 * Retrieves actions whose attributes match the values given in the
+	 * {@link ActionSearchVO} and whose actor attribute does not match the
+	 * current user's name. retrieves <code>count</code> actions starting from
+	 * <code>offset</code>
+	 * 
+	 * @param searchVO
+	 *            - a value object containing the values to be searched for
+	 * @param offset
+	 *            - starting from this result
+	 * @param count
+	 *            - retrieving this amount of results
+	 * @return List of actions from offset plus count, sorted by date descending
+	 *         where attributes match given values
+	 * @throws PersistenceException
+	 */
+	public List<Action> getByAttributesFromOthers(ActionSearchVO searchVO,
 			int offset, int count) throws PersistenceException;
 
 	/**
