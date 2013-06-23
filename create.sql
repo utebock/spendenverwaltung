@@ -86,6 +86,7 @@ DROP TABLE IF EXISTS persons;
 DROP TABLE IF EXISTS addresses;
 
 
+
 CREATE TABLE addresses ( -- for querying, you may want to use validated_addresses
 	id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 	street VARCHAR(1024) NOT NULL, -- including all address lines, e.g. 'Karlsplatz 14/5'

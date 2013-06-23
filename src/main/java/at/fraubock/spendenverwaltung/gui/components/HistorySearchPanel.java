@@ -3,8 +3,6 @@ package at.fraubock.spendenverwaltung.gui.components;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.ParseException;
@@ -15,11 +13,8 @@ import java.util.List;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -49,12 +44,6 @@ public class HistorySearchPanel extends JPanel {
 
 	private JLabel dateLabel;
 
-	private JLabel dataLabel;
-
-	private JLabel didLabel;
-
-	private JLabel endLabel;
-
 	public HistorySearchPanel(HistoryView viewParam) {
 		this.view = viewParam;
 		setLayout(new MigLayout());
@@ -69,7 +58,7 @@ public class HistorySearchPanel extends JPanel {
 		actorSearch.addKeyListener(new SearchKeyListener());
 
 		// DID
-		add((didLabel = new JLabel("Get\u00E4tigte Aktion: ")), "split 2");
+		add((new JLabel("Get\u00E4tigte Aktion: ")), "split 2");
 		add((actionSearch = new JComboBox<ActionTypeMapper>(
 				new SimpleComboBoxModel<ActionTypeMapper>(
 						ActionTypeMapper.values()))), "gap 100, wrap, growx");
@@ -89,7 +78,7 @@ public class HistorySearchPanel extends JPanel {
 			mappers.add(new ActionEntityMapper(ent));
 		}
 		
-		entityLabel = componentFactory.createLabel("Subjekt: ");
+		entityLabel = componentFactory.createLabel("Objekt: ");
 		add(entityLabel, "split 2");
 		
 		entitySearch = new JComboBox<ActionEntityMapper>(
@@ -128,9 +117,8 @@ public class HistorySearchPanel extends JPanel {
 				}
 			}
 		});
-
-		//datePanel.add(new JLabel("bis "));
-		add((endLabel = new JLabel("Ende:")), "split2");
+		
+		add((new JLabel("Ende:")), "split2");
 		add((dateTo = new JXDatePicker(new java.util.Date())), "gap 175, wrap, growx");
 		dateTo.setDate(null);
 		dateTo.getEditor().addActionListener(new ActionListener() {
@@ -148,7 +136,7 @@ public class HistorySearchPanel extends JPanel {
 			}
 		});
 
-		add((dataLabel = new JLabel("Daten: ")), "split2");
+		add((new JLabel("Daten: ")), "split2");
 		add((dataSearch = new JTextField(42)), "gap 163, wrap, growx");
 		dataSearch.addKeyListener(new SearchKeyListener());
 
