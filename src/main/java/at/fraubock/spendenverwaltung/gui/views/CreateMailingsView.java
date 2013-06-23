@@ -460,7 +460,7 @@ public class CreateMailingsView extends InitializableView {
 					
 					if(recipients.isEmpty()) {
 					//	feedbackLabel.setText("Der Personenfilter enthielt keine erreichbaren Personen.");
-						JOptionPane.showMessageDialog(contentPanel, "Der Personenfilter ent\u00E4lt keine adressierbaren Personen.", "Warnung", JOptionPane.WARNING_MESSAGE);
+						JOptionPane.showMessageDialog(contentPanel, "Der Personenfilter enth\u00E4lt keine adressierbaren Personen.", "Warnung", JOptionPane.WARNING_MESSAGE);
 						mailingService.delete(mailing);
 					} else {					
 						File f = MailingTemplateUtil.createMailingWithDocxTemplate(templateFile, personService.getPersonsByMailing(mailing), fileName);

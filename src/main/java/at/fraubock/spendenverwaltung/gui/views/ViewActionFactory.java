@@ -165,11 +165,9 @@ public class ViewActionFactory {
 				"/images/createDonationConfirmation.jpg");
 	}
 
-	// TODO richtige view returnen!
 	public Action getFindDonationConfirmationViewAction() {
-		return new DisplayViewAction(new CreatePersonView(
-				new ComponentFactory(), this, personService, addressService,
-				donationService, new PersonTableModel()),
+		return new DisplayViewAction(new FindDonationConfirmationsView(personService, addressService,
+				donationService, filterService, confirmationService, new ComponentFactory(), this),
 				"/images/obtainDonationConfirmation.jpg");
 	}
 
