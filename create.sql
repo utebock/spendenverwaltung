@@ -294,33 +294,33 @@ END;//
 
 CREATE TRIGGER persons_log_insert AFTER INSERT ON persons FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'persons', CAST(NEW.id AS CHAR(30)), CONCAT(IFNULL(NEW.title, 'no title'), ', ', IFNULL(NEW.givenname, 'no given name'), ', ', IFNULL(NEW.surname, 'no surname'), ', ', IFNULL(NEW.company, 'no company'), ', ', IFNULL(NEW.email, 'no email'), ', ', NEW.sex, ', ', IFNULL(NEW.telephone, 'no phone'), ', ', 'email: ', NEW.emailnotification, ', ', 'postal: ', NEW.postalnotification, ', ', 'note: ', IFNULL(NEW.note, 'none')));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'persons', CAST(NEW.id AS CHAR(30)), CONCAT(IFNULL(NEW.title, 'kein titel'), ', ', IFNULL(NEW.givenname, 'kein Vorname'), ', ', IFNULL(NEW.surname, 'kein Nachname'), ', ', IFNULL(NEW.company, 'keine Firma'), ', ', IFNULL(NEW.email, 'keine Email'), ', ', NEW.sex, ', ', IFNULL(NEW.telephone, 'keine Telefonnummer'), ', ', 'will ', IF(NEW.emailnotification, '', 'keine '), 'Emailaussendungen', ', ', 'will ', IF(NEW.postalnotification, '', 'keine '), 'Briefaussendungen', ', ', 'Notiz: ', IFNULL(NEW.note, 'keine')));
 END;//
 
 CREATE TRIGGER persons_log_update AFTER UPDATE ON persons FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'persons', CAST(NEW.id AS CHAR(30)), CONCAT(IFNULL(NEW.title, 'no title'), ', ', IFNULL(NEW.givenname, 'no given name'), ', ', IFNULL(NEW.surname, 'no surname'), ', ', IFNULL(NEW.company, 'no company'), ', ', IFNULL(NEW.email, 'no email'), ', ', NEW.sex, ', ', IFNULL(NEW.telephone, 'no phone'), ', ', 'email: ', NEW.emailnotification, ', ', 'postal: ', NEW.postalnotification, ', ', 'note: ', IFNULL(NEW.note, 'none')));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'persons', CAST(NEW.id AS CHAR(30)), CONCAT(IFNULL(NEW.title, 'no title'), ', ', IFNULL(NEW.givenname, 'kein Vorname'), ', ', IFNULL(NEW.surname, 'kein Nachname'), ', ', IFNULL(NEW.company, 'keine Firma'), ', ', IFNULL(NEW.email, 'keine Email'), ', ', NEW.sex, ', ', IFNULL(NEW.telephone, 'keine Telefonnummer'), ', ', 'will ', IF(NEW.emailnotification, '', 'keine '), 'Emailaussendungen', ', ', 'will ', IF(NEW.postalnotification, '', 'keine '), 'Briefaussendungen', ', ', 'Notiz: ', IFNULL(NEW.note, 'keine')));
 END;//
 
 CREATE TRIGGER persons_log_delete AFTER DELETE ON persons FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'persons', CAST(OLD.id AS CHAR(30)), CONCAT(IFNULL(OLD.title, 'no title'), ', ', IFNULL(OLD.givenname, 'no given name'), ', ', IFNULL(OLD.surname, 'no surname'), ', ', IFNULL(OLD.company, 'no company'), ', ', IFNULL(OLD.email, 'no email'), ', ', OLD.sex, ', ', IFNULL(OLD.telephone, 'no phone'), ', ', 'email: ', OLD.emailnotification, ', ', 'postal: ', OLD.postalnotification, ', ', 'note: ', IFNULL(OLD.note, 'none')));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'persons', CAST(OLD.id AS CHAR(30)), CONCAT(IFNULL(OLD.title, 'no title'), ', ', IFNULL(OLD.givenname, 'kein Vorname'), ', ', IFNULL(OLD.surname, 'kein Nachname'), ', ', IFNULL(OLD.company, 'keine Firma'), ', ', IFNULL(OLD.email, 'keine Email'), ', ', OLD.sex, ', ', IFNULL(OLD.telephone, 'keine Telefonnummer'), ', ', 'will ', IF(OLD.emailnotification, '', 'keine '), 'Emailaussendungen', ', ', 'will ', IF(OLD.postalnotification, '', 'keine '), 'Briefaussendungen', ', ', 'Notiz: ', IFNULL(OLD.note, 'keine')));
 END;//
 
 
 CREATE TRIGGER livesat_log_insert AFTER INSERT ON livesat FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'livesat', CONCAT(CAST(NEW.pid AS CHAR(14)), '/', CAST(NEW.aid AS CHAR(14))), IF(NEW.ismain, 'main', 'not main'));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'livesat', CONCAT(CAST(NEW.pid AS CHAR(14)), '/', CAST(NEW.aid AS CHAR(14))), IF(NEW.ismain, 'Hauptadresse', 'Nebenadresse'));
 END;//
 
 CREATE TRIGGER livesat_log_update AFTER UPDATE ON livesat FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'livesat', CONCAT(CAST(NEW.pid AS CHAR(14)), '/', CAST(NEW.aid AS CHAR(14))), IF(NEW.ismain, 'main', 'not main'));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'livesat', CONCAT(CAST(NEW.pid AS CHAR(14)), '/', CAST(NEW.aid AS CHAR(14))), IF(NEW.ismain, 'Hauptadresse', 'Nebenadresse'));
 END;//
 
 CREATE TRIGGER livesat_log_delete AFTER DELETE ON livesat FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'livesat', CONCAT(CAST(OLD.pid AS CHAR(14)), '/', CAST(OLD.aid AS CHAR(14))), IF(OLD.ismain, 'was main', 'was not main'));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'livesat', CONCAT(CAST(OLD.pid AS CHAR(14)), '/', CAST(OLD.aid AS CHAR(14))), IF(OLD.ismain, 'war Hauptadresse', 'war Nebenadresse'));
 END;//
 
 
@@ -342,17 +342,17 @@ END;//
 
 CREATE TRIGGER donations_log_insert AFTER INSERT ON donations FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'donations', CAST(NEW.id AS CHAR(30)), CONCAT('person: ', IFNULL(NEW.personid, 'anonym'), ', ', NEW.amount, ' EUR-cents', ', ', NEW.donationdate, ', ', 'dedication: ', IFNULL(NEW.dedication, 'none'), ', ', NEW.type, ', ', 'note: ', IFNULL(NEW.note, 'none')));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'donations', CAST(NEW.id AS CHAR(30)), CONCAT('person: ', IF(NEW.personid IS NULL, 'anonym', (SELECT CONCAT('#', id, ' ', IFNULL(givenname, 'kein Vorname'), ' ', IFNULL(surname, 'kein Nachname'), ' ', IFNULL(company, 'keine Firma')) FROM persons WHERE id = NEW.personid)), ', ', NEW.amount, ' EUR-cents', ', ', NEW.donationdate, ', ', 'Widmung: ', IFNULL(NEW.dedication, 'keine'), ', ', NEW.type, ', ', 'Notiz: ', IFNULL(NEW.note, 'keine')));
 END;//
 
 CREATE TRIGGER donations_log_update AFTER UPDATE ON donations FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donations', CAST(NEW.id AS CHAR(30)), CONCAT('person: ', IFNULL(NEW.personid, 'anonym'), ', ', NEW.amount, ' EUR-cents', ', ', NEW.donationdate, ', ', 'dedication: ', IFNULL(NEW.dedication, 'none'), ', ', NEW.type, ', ', 'note: ', IFNULL(NEW.note, 'none')));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donations', CAST(NEW.id AS CHAR(30)), CONCAT('person: ', IF(NEW.personid IS NULL, 'anonym', (SELECT CONCAT('#', id, ' ', IFNULL(givenname, 'kein Vorname'), ' ', IFNULL(surname, 'kein Nachname'), ' ', IFNULL(company, 'keine Firma')) FROM persons WHERE id = NEW.personid)), ', ', NEW.amount, ' EUR-cents', ', ', NEW.donationdate, ', ', 'Widmung: ', IFNULL(NEW.dedication, 'keine'), ', ', NEW.type, ', ', 'Notiz: ', IFNULL(NEW.note, 'keine')));
 END;//
 
 CREATE TRIGGER donations_log_delete AFTER DELETE ON donations FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'donations', CAST(OLD.id AS CHAR(30)), CONCAT('person: ', IFNULL(OLD.personid, 'anonym'), ', ', OLD.amount, ' EUR-cents', ', ', OLD.donationdate, ', ', 'dedication: ', IFNULL(OLD.dedication, 'none'), ', ', OLD.type, ', ', 'note: ', IFNULL(OLD.note, 'none')));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'donations', CAST(OLD.id AS CHAR(30)), CONCAT('person: ', IF(OLD.personid IS NULL, 'anonym', (SELECT CONCAT('#', id, ' ', IFNULL(givenname, 'kein Vorname'), ' ', IFNULL(surname, 'kein Nachname'), ' ', IFNULL(company, 'keine Firma')) FROM persons WHERE id = OLD.personid)), ', ', OLD.amount, ' EUR-cents', ', ', OLD.donationdate, ', ', 'Widmung: ', IFNULL(OLD.dedication, 'keine'), ', ', OLD.type, ', ', 'Notiz: ', IFNULL(OLD.note, 'keine')));
 END;//
 
 
@@ -406,48 +406,48 @@ END;//
 
 CREATE TRIGGER filter_log_insert AFTER INSERT ON filter FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'filter', CAST(NEW.id AS CHAR(30)), CONCAT('criterion #', NEW.criterion, ', type ', NEW.type, IF(NEW.name IS NULL, '', CONCAT('name: "', NEW.name, '", ')), IF(NEW.anonymous, 'anonymous, ', ''), 'privacy: ', NEW.privacy_status, ', owner: ', NEW.owner));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'filter', CAST(NEW.id AS CHAR(30)), CONCAT('criterion #', NEW.criterion, ', Typ ', NEW.type, IF(NEW.name IS NULL, '', CONCAT('Name: "', NEW.name, '", ')), IF(NEW.anonymous, 'anonym, ', ''), 'andere duerfen: ', NEW.privacy_status, ', Besitzer: ', NEW.owner));
 END;//
 
 CREATE TRIGGER filter_log_update AFTER UPDATE ON filter FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'filter', CAST(NEW.id AS CHAR(30)), CONCAT('criterion #', NEW.criterion, ', type ', NEW.type, IF(NEW.name IS NULL, '', CONCAT('name: "', NEW.name, '", ')), IF(NEW.anonymous, 'anonymous, ', ''), 'privacy: ', NEW.privacy_status, ', owner: ', NEW.owner));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'filter', CAST(NEW.id AS CHAR(30)), CONCAT('criterion #', NEW.criterion, ', Typ ', NEW.type, IF(NEW.name IS NULL, '', CONCAT('Name: "', NEW.name, '", ')), IF(NEW.anonymous, 'anonym, ', ''), 'andere duerfen: ', NEW.privacy_status, ', Besitzer: ', NEW.owner));
 END;//
 
 CREATE TRIGGER filter_log_delete AFTER DELETE ON filter FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'filter', CAST(OLD.id AS CHAR(30)), CONCAT('criterion #', OLD.criterion, ', type ', OLD.type, IF(OLD.name IS NULL, '', CONCAT('name: "', OLD.name, '", ')), IF(OLD.anonymous, 'anonymous, ', ''), 'privacy: ', OLD.privacy_status, ', owner: ', OLD.owner));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'filter', CAST(OLD.id AS CHAR(30)), CONCAT('criterion #', OLD.criterion, ', Typ ', OLD.type, IF(OLD.name IS NULL, '', CONCAT('Name: "', OLD.name, '", ')), IF(OLD.anonymous, 'anonym, ', ''), 'andere duerfen: ', OLD.privacy_status, ', Besitzer: ', OLD.owner));
 END;//
 
 
 CREATE TRIGGER mailings_log_insert AFTER INSERT ON mailings FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'mailings', CAST(NEW.id AS CHAR(30)), CONCAT(NEW.mailing_type, ', ', NEW.mailing_medium, ', ', NEW.mailing_date, IF(NEW.template IS NULL, '',CONCAT('template #', NEW.template))));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'mailings', CAST(NEW.id AS CHAR(30)), CONCAT(NEW.mailing_type, ', ', NEW.mailing_medium, ', ', NEW.mailing_date, IF(NEW.template IS NULL, '',CONCAT('Vorlage #', NEW.template))));
 END;//
 
 CREATE TRIGGER mailings_log_update AFTER UPDATE ON mailings FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'mailings', CAST(NEW.id AS CHAR(30)), CONCAT(NEW.mailing_type, ', ', NEW.mailing_medium, ', ', NEW.mailing_date, IF(NEW.template IS NULL, '',CONCAT('template #', NEW.template))));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'mailings', CAST(NEW.id AS CHAR(30)), CONCAT(NEW.mailing_type, ', ', NEW.mailing_medium, ', ', NEW.mailing_date, IF(NEW.template IS NULL, '',CONCAT('Vorlage #', NEW.template))));
 END;//
 
 CREATE TRIGGER mailings_log_delete AFTER DELETE ON mailings FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'mailings', CAST(OLD.id AS CHAR(30)), CONCAT(OLD.mailing_type, ', ', OLD.mailing_medium, ', ', OLD.mailing_date, IF(OLD.template IS NULL, '',CONCAT('template #', OLD.template))));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'mailings', CAST(OLD.id AS CHAR(30)), CONCAT(OLD.mailing_type, ', ', OLD.mailing_medium, ', ', OLD.mailing_date, IF(OLD.template IS NULL, '',CONCAT('Vorlage #', OLD.template))));
 END;//
 
 CREATE TRIGGER unconfirmed_mailings_log_insert AFTER INSERT ON unconfirmed_mailings FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'mailings', CAST(NEW.id AS CHAR(30)), CONCAT('now considered unconfirmed. Creator: ', NEW.creator));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'mailings', CAST(NEW.id AS CHAR(30)), CONCAT('ist nun unbestaetigt. Erstellt von: ', NEW.creator));
 END;//
 
 CREATE TRIGGER unconfirmed_mailings_log_update AFTER UPDATE ON unconfirmed_mailings FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'mailings', CAST(NEW.id AS CHAR(30)), CONCAT('now considered unconfirmed. Creator: ', NEW.creator));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'mailings', CAST(NEW.id AS CHAR(30)), CONCAT('ist nun unbestaetigt. Erstellt von: ', NEW.creator));
 END;//
 
 CREATE TRIGGER unconfirmed_mailings_log_delete AFTER DELETE ON unconfirmed_mailings FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'mailings', CAST(OLD.id AS CHAR(30)), 'now considered confirmed.');
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'mailings', CAST(OLD.id AS CHAR(30)), 'ist nun bestaetigt.');
 END;//
 
 
@@ -469,79 +469,79 @@ END;//
 
 CREATE TRIGGER mailing_templates_log_insert AFTER INSERT ON mailing_templates FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'mailing_templates', CAST(NEW.id AS CHAR(30)), CONCAT('name: "', NEW.name, '"'));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'mailing_templates', CAST(NEW.id AS CHAR(30)), CONCAT('Name: "', NEW.name, '"'));
 END;//
 
 CREATE TRIGGER mailing_templates_log_update AFTER UPDATE ON mailing_templates FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'mailing_templates', CAST(NEW.id AS CHAR(30)), CONCAT('name: "', NEW.name, '"'));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'mailing_templates', CAST(NEW.id AS CHAR(30)), CONCAT('Name: "', NEW.name, '"'));
 END;//
 
 CREATE TRIGGER mailing_templates_log_delete AFTER DELETE ON mailing_templates FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'mailing_templates', CAST(OLD.id AS CHAR(30)), CONCAT('name: "', OLD.name, '"'));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'mailing_templates', CAST(OLD.id AS CHAR(30)), CONCAT('Name: "', OLD.name, '"'));
 END;//
 
 
 CREATE TRIGGER donation_confirmation_templates_log_insert AFTER INSERT ON donation_confirmation_templates FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'donation_confirmation_templates', CAST(NEW.id AS CHAR(30)), CONCAT('name: "', NEW.name, '"'));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'donation_confirmation_templates', CAST(NEW.id AS CHAR(30)), CONCAT('Name: "', NEW.name, '"'));
 END;//
 
 CREATE TRIGGER donation_confirmation_templates_log_update AFTER UPDATE ON donation_confirmation_templates FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmation_templates', CAST(NEW.id AS CHAR(30)), CONCAT('name: "', NEW.name, '"'));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmation_templates', CAST(NEW.id AS CHAR(30)), CONCAT('Name: "', NEW.name, '"'));
 END;//
 
 CREATE TRIGGER donation_confirmation_templates_log_delete AFTER DELETE ON donation_confirmation_templates FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'donation_confirmation_templates', CAST(OLD.id AS CHAR(30)), CONCAT('name: "', OLD.name, '"'));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'donation_confirmation_templates', CAST(OLD.id AS CHAR(30)), CONCAT('Name: "', OLD.name, '"'));
 END;//
 
 
 CREATE TRIGGER donation_confirmations_log_insert AFTER INSERT ON donation_confirmations FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'donation_confirmations', CAST(NEW.id AS CHAR(30)), CONCAT('person #', NEW.personid, ', ', 'template #', NEW.template, ', date: ', NEW.confirmation_date));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'insert', 'donation_confirmations', CAST(NEW.id AS CHAR(30)), CONCAT('person: ', IF(NEW.personid IS NULL, 'anonym', (SELECT CONCAT('#', id, ' ', IFNULL(givenname, 'kein Vorname'), ' ', IFNULL(surname, 'kein Nachname'), ' ', IFNULL(company, 'keine Firma')) FROM persons WHERE id = NEW.personid)), ', ', 'Vorlage #', NEW.template, ', Datum: ', NEW.confirmation_date));
 END;//
 
 CREATE TRIGGER donation_confirmations_log_update AFTER UPDATE ON donation_confirmations FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(NEW.id AS CHAR(30)), CONCAT('person #', NEW.personid, ', ', 'template #', NEW.template, ', date: ', NEW.confirmation_date));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(NEW.id AS CHAR(30)), CONCAT('person: ', IF(NEW.personid IS NULL, 'anonym', (SELECT CONCAT('#', id, ' ', IFNULL(givenname, 'kein Vorname'), ' ', IFNULL(surname, 'kein Nachname'), ' ', IFNULL(company, 'keine Firma')) FROM persons WHERE id = NEW.personid)), ', ', 'Vorlage #', NEW.template, ', Datum: ', NEW.confirmation_date));
 END;//
 
 CREATE TRIGGER donation_confirmations_log_delete AFTER DELETE ON donation_confirmations FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'donation_confirmations', CAST(OLD.id AS CHAR(30)), CONCAT('person #', OLD.personid, ', ', 'template #', OLD.template, ', date: ', OLD.confirmation_date));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'delete', 'donation_confirmations', CAST(OLD.id AS CHAR(30)), CONCAT('person: ', IF(OLD.personid IS NULL, 'anonym', (SELECT CONCAT('#', id, ' ', IFNULL(givenname, 'kein Vorname'), ' ', IFNULL(surname, 'kein Nachname'), ' ', IFNULL(company, 'keine Firma')) FROM persons WHERE id = OLD.personid)), ', ', 'Vorlage #', OLD.template, ', Datum: ', OLD.confirmation_date));
 END;//
 
 CREATE TRIGGER single_donation_confirmation_log_insert AFTER INSERT ON single_donation_confirmation FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(NEW.id AS CHAR(30)), CONCAT('for single donation #', NEW.donationid));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(NEW.id AS CHAR(30)), CONCAT('fuer einzelne Spende #', NEW.donationid));
 END;//
 
 CREATE TRIGGER single_donation_confirmation_log_update AFTER UPDATE ON single_donation_confirmation FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(NEW.id AS CHAR(30)), CONCAT('for single donation #', NEW.donationid));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(NEW.id AS CHAR(30)), CONCAT('fuer einzelne Spende #', NEW.donationid));
 END;//
 
 CREATE TRIGGER single_donation_confirmation_log_delete AFTER DELETE ON single_donation_confirmation FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(OLD.id AS CHAR(30)), CONCAT('for single donation #', OLD.donationid));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(OLD.id AS CHAR(30)), CONCAT('fuer einzelne Spende #', OLD.donationid));
 END;//
 
 CREATE TRIGGER multiple_donations_confirmation_log_insert AFTER INSERT ON multiple_donations_confirmation FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(NEW.id AS CHAR(30)), CONCAT('for all donations between ', NEW.from_date, ' to ', NEW.to_date));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(NEW.id AS CHAR(30)), CONCAT('fuer alle Spenden zwischen ', NEW.from_date, ' und ', NEW.to_date));
 END;//
 
 CREATE TRIGGER multiple_donations_confirmation_log_update AFTER UPDATE ON multiple_donations_confirmation FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(NEW.id AS CHAR(30)), CONCAT('for all donations between ', NEW.from_date, ' to ', NEW.to_date));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(NEW.id AS CHAR(30)), CONCAT('fuer alle Spenden zwischen ', NEW.from_date, ' und ', NEW.to_date));
 END;//
 
 CREATE TRIGGER multiple_donations_confirmation_log_delete AFTER DELETE ON multiple_donations_confirmation FOR EACH ROW
 BEGIN
-	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(OLD.id AS CHAR(30)), CONCAT('for all donations between ', OLD.from_date, ' to ', OLD.to_date));
+	INSERT INTO actions(actor, time, type, entity, entityid, payload) VALUES (SUBSTRING_INDEX(USER(),'@',1), NOW(), 'update', 'donation_confirmations', CAST(OLD.id AS CHAR(30)), CONCAT('fuer alle Spenden zwischen ', OLD.from_date, ' und ', OLD.to_date));
 END;//
 
 

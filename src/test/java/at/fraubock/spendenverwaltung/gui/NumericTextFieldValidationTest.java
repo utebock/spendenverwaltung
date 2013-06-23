@@ -138,5 +138,14 @@ public class NumericTextFieldValidationTest {
 		assertEquals(14400, field.getHundredths());
 	}
 	
+	@Test
+	public void getNumericValueOkay() {
+		field.setNumericValue(100023);
+		assertTrue(field.validateContents());
+		Double expected = 1000.23;
+		Double reality = field.getNumericValue();
+		assertEquals(expected, reality);
+	}
+	
 	
 }
