@@ -337,22 +337,6 @@ public class CreatePersonView extends InitializableView {
 				JOptionPane.showMessageDialog(null, "Personenfelder konnten nicht validiert werden");
 				return;
 			} else {
-				address = new Address();
-				
-				if(streetField.getText().equals("") && postalField.getText().equals("")
-						&& cityField.getText().equals("") && countryField.getText().equals("")) {
-					address = null;
-				} else if(streetField.getText().equals("") || postalField.getText().equals("")
-						|| cityField.getText().equals("") || countryField.getText().equals("")) {
-					JOptionPane.showMessageDialog(null, "Eine Adresse darf entweder ganz oder garnicht gesetzt sein.");
-					return;
-				} else {
-					address.setStreet(streetField.getText());
-					address.setPostalCode(postalField.getText());
-					address.setCity(cityField.getText());
-					address.setCountry(countryField.getText());
-					person.setMainAddress(address);
-				}
 				
 				if(givenField.getText().equals("") && surnameField.getText().equals("")
 						&& companyField.getText().equals("")) {
@@ -385,6 +369,23 @@ public class CreatePersonView extends InitializableView {
 				
 				String note = noteText.getText();
 				person.setNote(note);
+				
+				address = new Address();
+				
+				if(streetField.getText().equals("") && postalField.getText().equals("")
+						&& cityField.getText().equals("") && countryField.getText().equals("")) {
+					address = null;
+				} else if(streetField.getText().equals("") || postalField.getText().equals("")
+						|| cityField.getText().equals("") || countryField.getText().equals("")) {
+					JOptionPane.showMessageDialog(null, "Eine Adresse darf entweder ganz oder garnicht gesetzt sein.");
+					return;
+				} else {
+					address.setStreet(streetField.getText());
+					address.setPostalCode(postalField.getText());
+					address.setCity(cityField.getText());
+					address.setCountry(countryField.getText());
+					person.setMainAddress(address);
+				}
 			}
 
 			
