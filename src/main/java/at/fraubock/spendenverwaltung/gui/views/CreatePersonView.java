@@ -246,7 +246,7 @@ public class CreatePersonView extends InitializableView {
 
 		notifyType = componentFactory.createLabel("Benachrichtigungstyp: ");
 		notifyMail = new JCheckBox("Email");
-		notifyPost = new JCheckBox("Postal Service");
+		notifyPost = new JCheckBox("Post");
 		panel.add(notifyType);
 		panel.add(notifyMail, "split 2");
 		panel.add(notifyPost, "wrap");
