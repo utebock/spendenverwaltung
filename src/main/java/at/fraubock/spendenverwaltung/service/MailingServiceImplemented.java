@@ -189,8 +189,8 @@ public class MailingServiceImplemented implements IMailingService {
 			csv += m.getDate() == null ? "n.v." : (new SimpleDateFormat(
 					"dd.MM.yyyy").format(m.getDate())) + ";";
 			csv += m.getType().getName() + ";";
-			csv += (m.getMedium() == Mailing.Medium.POSTAL ? ("Postalisch;" + m
-					.getTemplate().getFileName()) : "E-Mail;-");
+			csv += (m.getMedium() == Mailing.Medium.POSTAL ? ("Postalisch;") : "E-Mail;");
+			csv += (m.getTemplate()==null?"-":m.getTemplate().getFileName());
 			csv += "\n";
 		}
 		return csv;
@@ -198,8 +198,8 @@ public class MailingServiceImplemented implements IMailingService {
 
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
-	public void reproduceDocument(Mailing mailing) throws ServiceException {
-		if (mailing == null) {
+	public void reproduceDocument(Mailing mailing, String savePath) throws ServiceException {
+		if (mailing == null || savePath==null) {
 			throw new IllegalArgumentException("Argument must not be null.");
 		}
 
@@ -211,7 +211,7 @@ public class MailingServiceImplemented implements IMailingService {
 			try {
 				personList = personDAO.getPersonsByMailing(mailing);
 				MailingTemplateUtil.createMailingWithDocxTemplate(mt.getFile(),
-						personList, mt.getFileName());
+						personList, savePath);
 			} catch (PersistenceException e) {
 				throw new ServiceException(e);
 			} catch (IOException e) {

@@ -1,4 +1,5 @@
 SET SESSION innodb_strict_mode=on;
+SET NAMES 'utf8' COLLATE 'utf8_unicode_ci';
 
 USE ubspenderverwaltung;
 
@@ -85,6 +86,7 @@ DROP TABLE IF EXISTS persons;
 DROP TABLE IF EXISTS addresses;
 
 
+
 CREATE TABLE addresses ( -- for querying, you may want to use validated_addresses
 	id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 	street VARCHAR(1024) NOT NULL, -- including all address lines, e.g. 'Karlsplatz 14/5'
@@ -160,12 +162,12 @@ CREATE TABLE connected_criterion ( -- a concrete criterion that logically connec
 
 CREATE TABLE property_criterion ( -- a concrete criterion that compares an entities property with a given value
 	id INTEGER UNSIGNED PRIMARY KEY REFERENCES criterion(id),
-	property ENUM('givenname','surname','sex','email','company','emailnotification','postalnotification','title','person_note','telephone',
-	'amount','donationdate','dedication','donation_type','donation_note',
+	property ENUM('givenname','surname','sex','email','company','emailnotification','postalnotification','title','note','telephone',
+	'amount','donationdate','dedication','type','personid',
 	'mailing_date','mailing_type','mailing_medium',
 	'street','postcode','city','ismain','country') NOT NULL, -- the property (column name) of the entity to be compared. Filters containing an 'ismain' criterion may solemnly be used as mounted into a person criterion, i.e. have no meaning on its own.
 	-- this criterion's type is specified by the property used.
-	relational_operator ENUM('EQUALS','GREATER','LESS','GREATER_EQ','LESS_EQ','LIKE','UNEQUAL','IS_NULL','IS_NOT_NULL') NOT NULL, -- must fit the property type, e.g. for ismain, you may only use 'EQUALS', 'UNEQUAL', 'IS_NULL', 'IS_NOT_NULL'
+	relational_operator ENUM('EQUALS','GREATER','LESS','GREATER_EQ','LESS_EQ','LIKE','UNEQUAL','IS_NULL','NOT_NULL') NOT NULL, -- must fit the property type, e.g. for ismain, you may only use 'EQUALS', 'UNEQUAL', 'IS_NULL', 'IS_NOT_NULL'
 	-- the value the property is compared to (exactly one of those 5 must be set, except for when relational_operator is IS_NULL or IS_NOT_NULL, in which case none must be set). Which one is set must be according to the type of the property specified in 'property'.
 	numValue DOUBLE, 
 	strValue VARCHAR(1024),
@@ -179,11 +181,11 @@ CREATE TABLE mountedfilter_criterion ( -- a criterion which applies another filt
 	mount INTEGER UNSIGNED NOT NULL REFERENCES filter(id), -- the filter that will be applied to a set of entities related to this entity
 	-- if the mounted filter is of type mailing, address or donation, this criterion is of type person.
 	-- if the mounted filter is of type mailing, this criterion is of type person.
-	relational_operator ENUM('EQUALS','GREATER','LESS','GREATER_EQ','LESS_EQ','LIKE','UNEQUAL','IS_NULL','IS_NOT_NULL') NOT NULL,
+	relational_operator ENUM('EQUALS','GREATER','LESS','GREATER_EQ','LESS_EQ','LIKE','UNEQUAL','IS_NULL','NOT_NULL') NOT NULL,
 	-- either count XOR property must be set. (i.e. not both)
 	count INT, -- if set, the number of the filter result will be compared with this value
-	property ENUM('givenname','surname','sex','email','company','emailnotification','postalnotification','title','person_note','telephone',
-	'amount','donationdate','dedication','donation_type','donation_note',
+	property ENUM('givenname','surname','sex','email','company','emailnotification','postalnotification','title','note','telephone',
+	'amount','donationdate','dedication','type','personid',
 	'mailing_date','mailing_type','mailing_medium',
 	'street','postcode','city','ismain','country'), -- if set, either sum XOR avg must be set. the property (column name) of the entity for the mount filter. Must be a column name of the table the mounted filter operates on (must match its type).
 	sum DOUBLE, -- must only be not-null if property is set. sum of the filter result's given property will be compared.

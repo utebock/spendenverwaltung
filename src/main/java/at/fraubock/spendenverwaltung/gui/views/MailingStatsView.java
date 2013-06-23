@@ -66,7 +66,7 @@ import at.fraubock.spendenverwaltung.util.filter.FilterProperty;
 import at.fraubock.spendenverwaltung.util.filter.FilterType;
 import at.fraubock.spendenverwaltung.util.filter.LogicalOperator;
 import at.fraubock.spendenverwaltung.util.filter.RelationalOperator;
-import at.fraubock.spendenverwaltung.util.statistics.DonationTimeStatisticDatasetGenerator;
+import at.fraubock.spendenverwaltung.util.statistics.DonationDatasetGenerator;
 import at.fraubock.spendenverwaltung.util.statistics.Operation;
 
 public class MailingStatsView extends InitializableView {
@@ -128,25 +128,25 @@ public class MailingStatsView extends InitializableView {
 		mailingTypeLabel = componentFactory.createLabel("Aussendungstyp ausw\u00E4hlen:");
 		
 		mailingTypes = new JComboBox<String>(MailingType.toStringArray());
-		operationsPanel.add(mailingTypeLabel, "");
-		operationsPanel.add(mailingTypes, "wrap");
+		operationsPanel.add(mailingTypeLabel, "split2");
+		operationsPanel.add(mailingTypes, "gap 30, wrap, growx");
 		
 		fromLabel = componentFactory.createLabel("Datum von:");
 		fromDatePicker = new JXDatePicker(new java.util.Date());
-		operationsPanel.add(fromLabel);
-		operationsPanel.add(fromDatePicker, "wrap");
+		operationsPanel.add(fromLabel, "split2");
+		operationsPanel.add(fromDatePicker, "gap 140, wrap, growx");
 		
 		toLabel = componentFactory.createLabel("Datum bis:");
 		toDatePicker = new JXDatePicker(new java.util.Date());
-		operationsPanel.add(toLabel);
-		operationsPanel.add(toDatePicker, "wrap");
+		operationsPanel.add(toLabel, "split2");
+		operationsPanel.add(toDatePicker, "gap 143, wrap 30px, growx");
 		
 		submit = new JButton();
 		cancel = new JButton();
-		operationsPanel.add(submit, "");
+		operationsPanel.add(submit, "split2");
 		operationsPanel.add(cancel, "wrap 20px");
 		
-		infoLabel = componentFactory.createLabel("Für diesen Aussendungstyp existieren noch keine bestätigten Aussendungen.");
+		infoLabel = componentFactory.createLabel("F\u00FCr diesen Aussendungstyp existieren noch keine bestaetigten Aussendungen.");
 		infoLabel.setFont(new Font("Dialog", Font.PLAIN, 16));
 
 		operationsPanel.add(plotPanel, "span 2");
@@ -193,7 +193,7 @@ public class MailingStatsView extends InitializableView {
 		Action cancelAction = viewActionFactory.getMainMenuViewAction();
 		cancelAction.putValue(Action.NAME, "Abbrechen");
 		cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass()
-				.getResource("/images/backButton.jpg")));
+				.getResource("/images/backInButton.png")));
 		cancel.setAction(cancelAction);
 		cancel.setFont(new Font("bigger", Font.PLAIN, 13));
 
@@ -265,7 +265,8 @@ public class MailingStatsView extends InitializableView {
 			plotPanel.repaint();
 			
 			if(mailingList.isEmpty())
-				plotPanel.add(infoLabel);
+				//plotPanel.add(infoLabel);
+				JOptionPane.showMessageDialog(plotPanel, "F\u00FCr diesen Aussendungstyp existieren noch keine best\u00E4tigten Aussendungen.", "Warnung", JOptionPane.WARNING_MESSAGE);
 			else
 				plotPanel.add(chartPanel);
 			plotPanel.validate();

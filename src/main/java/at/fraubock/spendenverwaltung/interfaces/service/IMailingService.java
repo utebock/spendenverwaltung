@@ -136,7 +136,7 @@ public interface IMailingService {
 	 * @param destination
 	 * @param mailing
 	 */
-	public void reproduceDocument(Mailing mailing) throws ServiceException;
+	public void reproduceDocument(Mailing mailing, String savePath) throws ServiceException;
 
 	/**
 	 * returns all mailings that have been confirmed by a user

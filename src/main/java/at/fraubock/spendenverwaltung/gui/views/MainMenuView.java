@@ -109,7 +109,7 @@ public class MainMenuView extends InitializableView {
 		filterLabel = componentFactory.createLabel("Filter");
 		personsPanel.add(filterLabel, "gap 59");
 		
-		historyLabel = componentFactory.createLabel("History");
+		historyLabel = componentFactory.createLabel("Verlauf");
 		personsPanel.add(historyLabel, "gap 62, wrap 0px");
 		
 		//separator for next section
@@ -132,18 +132,18 @@ public class MainMenuView extends InitializableView {
 		validation = new JButton();
 		importPanel.add(validation, "gap 55");
 		createConfirm = new JButton();
-		importPanel.add(createConfirm, "gap 55");
+		//importPanel.add(createConfirm, "gap 55");
 		obtainConfirm = new JButton();
-		importPanel.add(obtainConfirm, "wrap 0px, gap 45");
+		importPanel.add(obtainConfirm, "wrap 0px, gap 55");
 		
 		importLabel = componentFactory.createLabel("Importe");
 		importPanel.add(importLabel, "gap 15, split3");
 		validationLabel = componentFactory.createLabel("Validierung");
 		importPanel.add(validationLabel, "gap 77");
 		createConfirmLabel = componentFactory.createLabel("<html><center>Best\u00E4tigung <br> erstellen</html>");
-		importPanel.add(createConfirmLabel, "gap 63");
+	//	importPanel.add(createConfirmLabel, "gap 63"); accessible through find persons
 		obtainConfirmLabel = componentFactory.createLabel("<html><center>Best\u00E4tigung <br>abrufen</html>");
-		importPanel.add(obtainConfirmLabel, "gap 48");
+		importPanel.add(obtainConfirmLabel, "gap 63");
 		
 		importSeparator = componentFactory.createSeparator();
 		overviewPanel.add(importSeparator, "wrap 0px, growx");
@@ -208,10 +208,10 @@ public class MainMenuView extends InitializableView {
 		history.setAction(viewActionFactory.getHistoryViewAction());
 		imports.setAction(viewActionFactory.getDonationImportViewAction());
 		validation.setAction(viewActionFactory.getImportValidationViewAction());
-		createConfirm.setAction(viewActionFactory.getCreateDonationConfirmationViewAction());
+		//createConfirm.setAction(viewActionFactory.getCreateDonationConfirmationViewAction()); accessible through find persons
 		obtainConfirm.setAction( viewActionFactory.getFindDonationConfirmationViewAction());
 		mailings.setAction(viewActionFactory.getCreateMailingsViewAction());
-		showSendings.setAction(viewActionFactory.getFindMailingsViewAction(null));
+		showSendings.setAction(viewActionFactory.getFindMailingsViewAction(null)); 
 		confirmSendings.setAction(viewActionFactory.getConfirmMailingsViewAction(null));
 		progress.setAction(viewActionFactory.getDonationProgressStatsViewAction());
 		statsSendings.setAction(viewActionFactory.getShowMailingStatsViewAction());

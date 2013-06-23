@@ -16,11 +16,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
-import at.fraubock.spendenverwaltung.gui.ComponentBuilder;
 import at.fraubock.spendenverwaltung.gui.CustomTextField;
 import at.fraubock.spendenverwaltung.gui.InvalidInputException;
 import at.fraubock.spendenverwaltung.gui.MainFilterView;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
+import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.views.ViewActionFactory;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter.FilterPrivacyStatus;
@@ -39,7 +39,7 @@ public class CreateFilter extends JPanel {
 	private int MAXIMUM_CRITERIONS = 4;
 
 	private MainFilterView filterOverview;
-	private ComponentBuilder builder;
+	private ComponentFactory builder;
 
 	private IFilterService filterService;
 	private FilterType type;
@@ -61,22 +61,30 @@ public class CreateFilter extends JPanel {
 
 	private JComboBox<String> privacyComboBox;
 
+	private JPanel namePanel;
+
+	@SuppressWarnings("unused")
+	private JLabel privacyLabel;
+	private String currentUser;
+
+
 	public CreateFilter(FilterType type, IFilterService filterService,
 			MainFilterView overview, ViewActionFactory viewActionFactory) {
-		this(type, filterService, overview, null, viewActionFactory);
+		this(type, filterService, overview, null, null, viewActionFactory);
 	}
 
 	public CreateFilter(FilterType type, IFilterService filterService,
-			MainFilterView filterOverview, Filter editFilter,
+			MainFilterView filterOverview, Filter editFilter, String currentUser,
 			ViewActionFactory viewActionFactory) {
 		super(new MigLayout());
 
 		// set attributes
+		this.currentUser = currentUser;
 		this.viewActionFactory = viewActionFactory;
 		this.editFilter = editFilter;
 		this.filterService = filterService;
 		this.filterOverview = filterOverview;
-		this.builder = new ComponentBuilder();
+		this.builder = new ComponentFactory();
 		this.type = type;
 		this.factory = new ConfiguratorFactory(type, editFilter,filterService);
 		this.criterionSelectorPanel = builder.createPanel(700, 500);
@@ -114,12 +122,22 @@ public class CreateFilter extends JPanel {
 			}
 
 		});
+		
+		if(editFilter!=null) {
+			if (!editFilter.getOwner().equals(this.currentUser)
+					&& editFilter.getPrivacyStatus() == FilterPrivacyStatus.READ) {
+				saveButton.setEnabled(false);
+				saveButton.setToolTipText("Keine Berechtigung. Geh\u00F6rt " + editFilter.getOwner());
+				
+			}
+		}
 
 		JButton cancelButton = new JButton();
 		Action cancelAction = this.viewActionFactory.getMainFilterViewAction();
-		cancelAction.putValue(Action.NAME, "<html>Abbrechen</html>");
-		cancelAction.putValue(Action.SMALL_ICON, null);
+		cancelAction.putValue(Action.NAME, "Abbrechen");
+		cancelAction.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/images/backInButton.png")));
 		cancelButton.setAction(cancelAction);
+		cancelButton.setFont(new Font("", Font.PLAIN, 13));
 		this.controlButtonPanel = new JPanel();
 		controlButtonPanel.add(saveButton);
 		controlButtonPanel.add(cancelButton);
@@ -144,15 +162,19 @@ public class CreateFilter extends JPanel {
 		if (editFilter != null) {
 			nameField.setText(editFilter.getName());
 		}
-		this.add(builder.createLabel("Filtername: "), "split 2");
-		this.add(nameField, "wrap, gapbottom 20");
-		// add(filterNamePanel, "wrap");
+		
+		namePanel = builder.createPanel(700, 100);
+		add(namePanel, "wrap 0px");
+		
+		namePanel.add(builder.createLabel("Filtername: "), "split 2");
+		namePanel.add(nameField, "gap 15, wrap, gapbottom 20");
+		namePanel.add((privacyLabel = builder.createLabel("Sichtbarkeit: ")), "split 2");
 
 		// Combobox for filter privacy setting
 		if ((editFilter != null) || editFilter == null) {
 			privacyComboBox = new JComboBox<String>(
 					FilterPrivacyStatus.toStringArray());
-			this.add(privacyComboBox, "wrap");
+			namePanel.add(privacyComboBox, "wrap, growx");
 
 			if (editFilter != null)
 				privacyComboBox.setSelectedItem(editFilter.getPrivacyStatus()
@@ -187,10 +209,10 @@ public class CreateFilter extends JPanel {
 						.getSelectedItem();
 				if ("alle".equals(operator)) {
 					andOperator = true;
-					operatorLabel.setText(" Kriterien erf\u00FCllt sind:");
+					operatorLabel.setText(" Kriterien erf\u00FCllt sind");
 				} else {
 					andOperator = false;
-					operatorLabel.setText(" Kriterium erf\u00FCllt ist:");
+					operatorLabel.setText(" Kriterium erf\u00FCllt ist");
 				}
 				operatorLabel.repaint();
 				operatorLabel.revalidate();
@@ -232,7 +254,7 @@ public class CreateFilter extends JPanel {
 		minusButton.setAction(minusAct);
 
 		minusButtons.add(minusButton);
-		criterionSelectorPanel.add(selectorComp, "w 700");
+		criterionSelectorPanel.add(selectorComp, "w 700!");
 		criterionSelectorPanel.add(minusButton, "wrap");
 
 		if (plusButton != null) {

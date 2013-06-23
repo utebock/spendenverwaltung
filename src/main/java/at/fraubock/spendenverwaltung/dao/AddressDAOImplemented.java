@@ -18,8 +18,10 @@ import org.springframework.jdbc.support.KeyHolder;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IAddressDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
+import at.fraubock.spendenverwaltung.util.filter.FilterBuilder;
 
 /**
  * implementation of {@link IAddressDAO}
@@ -34,6 +36,15 @@ public class AddressDAOImplemented implements IAddressDAO {
 			.getLogger(AddressDAOImplemented.class);
 
 	private JdbcTemplate jdbcTemplate;
+	private FilterBuilder filterBuilder;
+
+	public FilterBuilder getFilterBuilder() {
+		return filterBuilder;
+	}
+
+	public void setFilterBuilder(FilterBuilder filterBuilder) {
+		this.filterBuilder = filterBuilder;
+	}
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -237,6 +248,21 @@ public class AddressDAOImplemented implements IAddressDAO {
 			return jdbcTemplate.query(
 					"select * from validated_addresses ORDER BY id DESC",
 					new AddressMapper());
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
+	}
+
+	@Override
+	public List<Address> getByFilter(Filter filter) throws PersistenceException {
+		try {
+			String select = filterBuilder.createStatement(filter);
+			List<Address> AddressList = jdbcTemplate.query(select,
+					new AddressMapper());
+			log.info(AddressList.size() + " list size");
+
+			return AddressList;
 		} catch (DataAccessException e) {
 			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);

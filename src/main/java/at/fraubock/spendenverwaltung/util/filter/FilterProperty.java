@@ -18,7 +18,7 @@ public enum FilterProperty {
 
 	/* filter properties of a donation */
 	DONATION_AMOUNT("amount"), DONATION_DATE("donationdate"), DONATION_DEDICATION(
-			"dedication"), DONATION_TYPE("type"), DONATION_NOTE("note"),
+			"dedication"), DONATION_TYPE("type"), DONATION_NOTE("note"), DONATION_IS_ANON("personid"),
 
 	/* filter properties of a mailing */
 	MAILING_DATE("mailing_date"), MAILING_TYPE("mailing_type"), MAILING_MEDIUM(

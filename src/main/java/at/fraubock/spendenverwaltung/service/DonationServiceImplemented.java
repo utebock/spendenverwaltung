@@ -3,8 +3,10 @@ package at.fraubock.spendenverwaltung.service;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.springframework.transaction.annotation.Isolation;
@@ -139,10 +141,11 @@ public class DonationServiceImplemented implements IDonationService {
 			throw new IllegalArgumentException("Argument must not be null.");
 		}
 
-		String csv = "Betrag;Datum;Widmung;Art;Notiz;Vorname;Nachname;E-Mail;Unternehmen;Land;Stadt;PLZ;Strasse\n";
+		String csv = "Betrag in \u20AC;Datum;Widmung;Art;Notiz;Vorname;Nachname;E-Mail;Unternehmen;Land;Stadt;PLZ;Strasse\n";
 
 		for (Donation d : donations) {
-			csv += d.getAmount() + ";";
+			NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
+			csv += nf.format((d.getAmount()/100D)) + ";";
 			csv += new SimpleDateFormat("dd.MM.yyyy").format(d.getDate()) + ";";
 			csv += d.getDedication() + ";";
 			csv += d.getType() + ";";
@@ -150,6 +153,10 @@ public class DonationServiceImplemented implements IDonationService {
 
 			String nA = "n.v.";
 			Person p = d.getDonator();
+			if(p==null) {
+				csv+="\n";
+				continue;
+			}
 			Address a = p.getMainAddress();
 
 			csv += (p == null ? nA : p.getGivenName()) + ";";
@@ -199,6 +206,7 @@ public class DonationServiceImplemented implements IDonationService {
 			log.warn(
 					"CSV data could not be written to "
 							+ csvFile.getAbsolutePath(), e);
+			throw e;
 		} finally {
 			if (writer != null)
 				writer.close();

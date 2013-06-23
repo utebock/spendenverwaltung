@@ -3,8 +3,6 @@ package at.fraubock.spendenverwaltung.gui.components;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.ParseException;
@@ -38,17 +36,33 @@ public class HistorySearchPanel extends JPanel {
 	private JXDatePicker dateTo;
 	private JTextField dataSearch;
 	private HistoryView view;
+	private ComponentFactory componentFactory;
+
+	private JLabel nameLabel;
+
+	private JLabel entityLabel;
+
+	private JLabel dateLabel;
 
 	public HistorySearchPanel(HistoryView viewParam) {
 		this.view = viewParam;
 		setLayout(new MigLayout());
-
-		add(actorSearch = new JTextField(17));
+		componentFactory = new ComponentFactory();
+	
+		// WHO
+		nameLabel = componentFactory.createLabel("Benutzer: ");
+		add(nameLabel, "split 2");
+		actorSearch = new JTextField(17);
+		add(actorSearch, "gap 150, wrap, growx");
+		
 		actorSearch.addKeyListener(new SearchKeyListener());
 
-		add(actionSearch = new JComboBox<ActionTypeMapper>(
+		// DID
+		add((new JLabel("Get\u00E4tigte Aktion: ")), "split 2");
+		add((actionSearch = new JComboBox<ActionTypeMapper>(
 				new SimpleComboBoxModel<ActionTypeMapper>(
-						ActionTypeMapper.values())));
+						ActionTypeMapper.values()))), "gap 100, wrap, growx");
+		
 		actionSearch.setPreferredSize(new Dimension(147, JComboBox.HEIGHT));
 		actionSearch.addActionListener(new ActionListener() {
 
@@ -57,14 +71,19 @@ public class HistorySearchPanel extends JPanel {
 				search();
 			}
 		});
-
+		// WHAT
 		List<ActionEntityMapper> mappers = new ArrayList<ActionEntityMapper>();
 		mappers.add(new ActionEntityMapper(null));
 		for (Action.Entity ent : Action.Entity.values()) {
 			mappers.add(new ActionEntityMapper(ent));
 		}
-		add(entitySearch = new JComboBox<ActionEntityMapper>(
-				new SimpleComboBoxModel<ActionEntityMapper>(mappers)));
+		
+		entityLabel = componentFactory.createLabel("Objekt: ");
+		add(entityLabel, "split 2");
+		
+		entitySearch = new JComboBox<ActionEntityMapper>(
+				new SimpleComboBoxModel<ActionEntityMapper>(mappers));
+		
 		entitySearch.setPreferredSize(new Dimension(205, JComboBox.HEIGHT));
 		entitySearch.addActionListener(new ActionListener() {
 
@@ -73,52 +92,52 @@ public class HistorySearchPanel extends JPanel {
 				search();
 			}
 		});
+		add(entitySearch, "gap 162, wrap, growx");
 
 		JPanel datePanel = new JPanel();
 		datePanel.setLayout(new MigLayout());
-		add(datePanel);
-		datePanel.add(new JLabel("von "));
-		datePanel
-				.add(dateFrom = new JXDatePicker(new java.util.Date()), "wrap");
+		//add(datePanel);
+		
+		// WHEN
+		dateLabel = componentFactory.createLabel("Beginn: ");
+		add(dateLabel, "split 2");
+		add(dateFrom = new JXDatePicker(new java.util.Date()), "gap 164, wrap, growx");
 		dateFrom.setDate(null);
-		dateFrom.getEditor().addFocusListener(new FocusListener() {
-
+		dateFrom.getEditor().addActionListener(new ActionListener() {
+			
 			@Override
-			public void focusGained(FocusEvent arg0) {
-			}
-
-			@Override
-			public void focusLost(FocusEvent arg0) {
+			public void actionPerformed(ActionEvent e) {
 				try {
-					dateFrom.commitEdit();
-					search();
-				} catch (ParseException e) {
+					if(dateFrom.isEditValid()) {
+						dateFrom.commitEdit();
+						search();
+					}
+				} catch (ParseException ex) {
 					// nothing
 				}
 			}
 		});
-
-		datePanel.add(new JLabel("bis "));
-		datePanel.add(dateTo = new JXDatePicker(new java.util.Date()));
+		
+		add((new JLabel("Ende:")), "split2");
+		add((dateTo = new JXDatePicker(new java.util.Date())), "gap 179, wrap, growx");
 		dateTo.setDate(null);
-		dateTo.getEditor().addFocusListener(new FocusListener() {
-
+		dateTo.getEditor().addActionListener(new ActionListener() {
+			
 			@Override
-			public void focusGained(FocusEvent arg0) {
-			}
-
-			@Override
-			public void focusLost(FocusEvent arg0) {
+			public void actionPerformed(ActionEvent e) {
 				try {
-					dateTo.commitEdit();
-					search();
-				} catch (ParseException e) {
+					if(dateTo.isEditValid()) {
+						dateTo.commitEdit();
+						search();
+					}
+				} catch (ParseException ex) {
 					// nothing
 				}
 			}
 		});
 
-		add(dataSearch = new JTextField(42));
+		add((new JLabel("Daten: ")), "split2");
+		add((dataSearch = new JTextField(42)), "gap 167, wrap, growx");
 		dataSearch.addKeyListener(new SearchKeyListener());
 
 	}

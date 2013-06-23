@@ -35,8 +35,16 @@ public class BooleanComparator extends JPanel implements ICriterionConfigurator 
 	public Criterion createCriterion() throws InvalidInputException {
 		PropertyCriterion crit = new PropertyCriterion();
 		crit.setProperty(property);
-		crit.setRelationalOperator(RelationalOperator.EQUALS);
-		crit.setBoolValue(checkBox.isSelected());
+		if(property == FilterProperty.DONATION_IS_ANON) {
+			if(checkBox.isSelected()) {
+				crit.setRelationalOperator(RelationalOperator.IS_NULL);
+			} else {
+				crit.setRelationalOperator(RelationalOperator.NOT_NULL);
+			}
+		} else {
+			crit.setRelationalOperator(RelationalOperator.EQUALS);
+			crit.setBoolValue(checkBox.isSelected());
+		}
 		return crit;
 	}
 
@@ -55,7 +63,15 @@ public class BooleanComparator extends JPanel implements ICriterionConfigurator 
 		if(criterion instanceof PropertyCriterion) {
 			PropertyCriterion prop = (PropertyCriterion)criterion;
 			if(prop.getProperty() == this.property) {
-				this.checkBox.setSelected(prop.getBoolValue());
+				if(property == FilterProperty.DONATION_IS_ANON) {
+					if(prop.getRelationalOperator()==RelationalOperator.NOT_NULL) {
+						this.checkBox.setSelected(false);
+					} else {
+						this.checkBox.setSelected(true);
+					}
+				} else {
+					this.checkBox.setSelected(prop.getBoolValue());
+				}
 				return true;
 			}
 		}

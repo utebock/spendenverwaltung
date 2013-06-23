@@ -23,6 +23,7 @@ import at.fraubock.spendenverwaltung.dao.criterion.AbstractCriterionDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IFilterDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter.FilterPrivacyStatus;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Criterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.service.FilterValidator;
 import at.fraubock.spendenverwaltung.util.filter.FilterType;
@@ -61,6 +62,21 @@ public class FilterDAOImplemented implements IFilterDAO {
 			log.warn(e.getLocalizedMessage());
 			throw new PersistenceException(e);
 		}
+
+	}
+
+	@Override
+	public void update(Filter f, Criterion oldCrit) throws PersistenceException {
+		log.info("Updating Filter...");
+		validator.validate(f);
+		if (f.getCriterion() != null) {
+			abstractCritDAO.insert(f.getCriterion());
+		}
+		jdbcTemplate.update(new UpdateFilterStatementCreator(f));
+		if (oldCrit != null) {
+			abstractCritDAO.delete(oldCrit);
+		}
+		log.info("Filter entity successfully updated: " + f.toString());
 
 	}
 
@@ -194,7 +210,8 @@ public class FilterDAOImplemented implements IFilterDAO {
 				ps.setInt(4, filter.getCriterion().getId());
 			}
 			ps.setString(5, filter.getPrivacyStatus().getName());
-			filter.setOwner(connection.getMetaData().getUserName());
+			String owner = connection.getMetaData().getUserName();
+			filter.setOwner(owner.substring(0, owner.indexOf("@")));
 			return ps;
 		}
 	}
@@ -225,6 +242,39 @@ public class FilterDAOImplemented implements IFilterDAO {
 
 		public Map<Integer, Integer> getCriterionId() {
 			return criterionId;
+		}
+	}
+
+	private class UpdateFilterStatementCreator implements
+			PreparedStatementCreator {
+
+		private Filter filter;
+
+		UpdateFilterStatementCreator(Filter filter) {
+			this.filter = filter;
+		}
+
+		@Override
+		public PreparedStatement createPreparedStatement(Connection connection)
+				throws SQLException {
+			String updateFilter = "update filter set type=?, "
+					+ "name=?, anonymous=?, privacy_status=?, owner=?, criterion=? where id=?";
+
+			PreparedStatement ps = connection.prepareStatement(updateFilter);
+			ps.setString(1, filter.getType().toString());
+			ps.setString(2, filter.getName());
+			ps.setBoolean(3, filter.isAnonymous());
+			
+			
+			ps.setString(4, filter.getPrivacyStatus().getName());
+			ps.setString(5, filter.getOwner());
+			if(filter.getCriterion()!=null) {
+				ps.setInt(6, filter.getCriterion().getId());
+			} else {
+				ps.setNull(6, java.sql.Types.INTEGER);
+			}
+			ps.setInt(7, filter.getId());
+			return ps;
 		}
 	}
 

@@ -337,9 +337,14 @@ public class CreatePersonView extends InitializableView {
 				JOptionPane.showMessageDialog(null, "Personenfelder konnten nicht validiert werden");
 				return;
 			} else {
-				person = new Person();
 				
-				address = new Address();
+				if(givenField.getText().equals("") && surnameField.getText().equals("")
+						&& companyField.getText().equals("")) {
+					JOptionPane.showMessageDialog(null, "Bitte Vorname und Nachname oder Firma setzen.");
+					return;
+				}
+				
+				person = new Person();
 				
 				person.setSex(Person.Sex.values()[salutation.getSelectedIndex()]);
 				person.setTitle(titleField.getText());
@@ -348,6 +353,24 @@ public class CreatePersonView extends InitializableView {
 				person.setSurname(surnameField.getText());
 				person.setTelephone(telephoneField.getText());
 				person.setEmail(emailField.getText());
+				
+				if(notifyMail.isSelected()){
+					person.setEmailNotification(true);
+				}
+				else{
+					person.setEmailNotification(false);
+				}
+				if(notifyPost.isSelected()){
+					person.setPostalNotification(true);
+				}
+				else{
+					person.setPostalNotification(false);
+				}
+				
+				String note = noteText.getText();
+				person.setNote(note);
+				
+				address = new Address();
 				
 				if(streetField.getText().equals("") && postalField.getText().equals("")
 						&& cityField.getText().equals("") && countryField.getText().equals("")) {
@@ -363,27 +386,10 @@ public class CreatePersonView extends InitializableView {
 					address.setCountry(countryField.getText());
 					person.setMainAddress(address);
 				}
-				
-				if(notifyMail.isSelected()==true){
-					person.setEmailNotification(true);
-				}
-				else{
-					person.setEmailNotification(false);
-				}
-				if(notifyPost.isSelected()==true){
-					person.setPostalNotification(true);
-				}
-				else{
-					person.setPostalNotification(false);
-				}
-				
-				String note = noteText.getText();
-				person.setNote(note);
 			}
-						
+
+			
 			for(ValidateableComponent comp : validateableDonationComponents) {
-				
-				//this ONLY happens if something has been entered in the donation field
 				if(!comp.validateContents()) {
 					donationValidated = false;
 					JOptionPane.showMessageDialog(null, "Konnte Spendenh\u00F6he nicht feststellen");
@@ -428,12 +434,12 @@ public class CreatePersonView extends InitializableView {
 							log.info("Creating donation");
 							donationService.create(donation);
 						}
-						
+						JOptionPane.showMessageDialog(overviewPanel, "Person erfolgreich angelegt.", "Information", JOptionPane.INFORMATION_MESSAGE);
 						Action switchToMenu = viewActionFactory.getMainMenuViewAction();
 						switchToMenu.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
 
 					} catch (ServiceException e1) {
-						JOptionPane.showConfirmDialog(null, "Ein fehler ist beim erstellen der Person aufgetreten");
+						JOptionPane.showMessageDialog(null, "Ein Fehler ist beim Erstellen der Person aufgetreten.");
 					}
 				}
 			}

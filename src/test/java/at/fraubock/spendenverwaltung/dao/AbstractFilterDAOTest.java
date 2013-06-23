@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.dao;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IFilterDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter.FilterPrivacyStatus;
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.util.filter.FilterProperty;
@@ -68,7 +70,59 @@ public abstract class AbstractFilterDAOTest {
 		Filter savedFilter = filterDAO.getById(testFilter.getId());
 
 		// check if filter was saved correctly
-		assertTrue(savedFilter.equals(testFilter));
+		assertEquals(savedFilter,testFilter);
+
+	}
+	
+	/*
+	 * testing update
+	 */
+
+	@Test(expected = IllegalArgumentException.class)
+	@Transactional
+	public void updateWithNullParameter_ThrowsException()
+			throws PersistenceException {
+
+		filterDAO.update(null,null);
+
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	@Transactional
+	public void updateWithInvalidStateParameter_ThrowsException()
+			throws PersistenceException {
+
+		filterDAO.update(new Filter(),null);
+
+	}
+	
+	@Test
+	@Transactional
+	public void updateWithValidParameter_UpdatesFilter()
+			throws PersistenceException {
+		
+		PropertyCriterion upCrit = new PropertyCriterion();
+		upCrit.compare(FilterProperty.MAILING_TYPE, RelationalOperator.LIKE, "test");
+		
+		Filter updateFilter = new Filter();
+		updateFilter.setName("updatedName");
+		updateFilter.setType(FilterType.MAILING);
+		updateFilter.setAnonymous(true);
+		updateFilter.setOwner("updatedowner");
+		updateFilter.setPrivacyStatus(FilterPrivacyStatus.READ_UPDATE);
+		updateFilter.setCriterion(upCrit);
+		
+		filterDAO.insert(testFilter);
+		
+		updateFilter.setId(testFilter.getId());
+
+		filterDAO.update(updateFilter,testFilter.getCriterion());
+		
+		Filter savedFilter = filterDAO.getById(testFilter.getId());
+
+		// check if filter was updated correctly
+		assertEquals(savedFilter,updateFilter);
+		assertEquals(upCrit,updateFilter.getCriterion());
 
 	}
 

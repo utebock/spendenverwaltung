@@ -1,12 +1,11 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -18,6 +17,7 @@ import net.miginfocom.swing.MigLayout;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.log4j.Logger;
 
+import at.fraubock.spendenverwaltung.gui.ActionPolling;
 import at.fraubock.spendenverwaltung.gui.MainFrame;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
@@ -49,6 +49,7 @@ public class LoginView extends InitializableView {
 	private ViewDisplayer viewDisplayer;
 	private BasicDataSource databaseDataSource;
 	private String defaultUser = "", defaultPassword = "", defaultUrl = "";
+	private ActionPolling polling;
 
 	/**
 	 * Creates a new instance.
@@ -75,11 +76,12 @@ public class LoginView extends InitializableView {
 	public LoginView(BasicDataSource databaseDataSource,
 			ComponentFactory componentFactory, ViewActionFactory actionFactory,
 			ViewDisplayer viewDisplayer, String defaultUser,
-			String defaultPassword, String defaultUrl) {
+			String defaultPassword, String defaultUrl, ActionPolling polling) {
 		this.databaseDataSource = databaseDataSource;
 		this.componentFactory = componentFactory;
 		this.actionFactory = actionFactory;
 		this.viewDisplayer = viewDisplayer;
+		this.polling = polling;
 		if (defaultPassword != null)
 			this.defaultPassword = defaultPassword;
 		if (defaultUrl != null)
@@ -102,9 +104,9 @@ public class LoginView extends InitializableView {
 	 */
 	public LoginView(BasicDataSource databaseDataSource,
 			ComponentFactory componentFactory, ViewActionFactory actionFactory,
-			ViewDisplayer viewDisplayer) {
+			ViewDisplayer viewDisplayer, ActionPolling polling) {
 		this(databaseDataSource, componentFactory, actionFactory,
-				viewDisplayer, null, null, null);
+				viewDisplayer, null, null, null, polling);
 	}
 
 	private void login() {
@@ -136,33 +138,7 @@ public class LoginView extends InitializableView {
 				componentFactory);
 		mainMenu.init();
 		viewDisplayer.changeView(mainMenu);
-	}
-
-	// check is user is valid if login is pressed
-	private final class LoginAction extends AbstractAction {
-
-		private static final long serialVersionUID = -8303170214117697889L;
-		private LoginView dialog;
-
-		private LoginAction(LoginView dialog) {
-			this.dialog = dialog;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			dialog.login();
-		}
-	}
-
-	// close GUI if cancelButton is pressed
-	private final class CancelAction extends AbstractAction {
-
-		private static final long serialVersionUID = 6697635107905733270L;
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			viewDisplayer.closeView();
-		}
+		polling.start();
 	}
 
 	@Override
@@ -187,8 +163,34 @@ public class LoginView extends InitializableView {
 		add(loginBtn, "gapleft 200, gaptop 10");
 		add(cancelBtn, "wrap, gapleft 30");
 
-		cancelBtn.addActionListener(new CancelAction());
-		loginBtn.addActionListener(new LoginAction(this));
+		cancelBtn.addActionListener(new AbstractAction() {
+			private static final long serialVersionUID = -7953434061209248267L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				viewDisplayer.closeView();
+			}
+		});
+		loginBtn.addActionListener(new AbstractAction() {
+			private static final long serialVersionUID = -7953434061209248267L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				login();
+			}
+		});
+
+		Action loginButtonPress = new AbstractAction() {
+			private static final long serialVersionUID = -2009858949645282327L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				loginBtn.doClick();
+			}
+		};
+		userField.addActionListener(loginButtonPress);
+		pwdField.addActionListener(loginButtonPress);
+		urlField.addActionListener(loginButtonPress);
 
 	}
 }

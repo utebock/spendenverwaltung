@@ -93,7 +93,7 @@ public class NumericTextField extends CustomTextField implements
 	 */
 	public void setNumericValue(long value) {
 		NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
-		this.setText(nf.format((value/100)).replace(".", ""));
+		this.setText(nf.format((value/100D)).replace(".", ""));
 	}
 
 	/**

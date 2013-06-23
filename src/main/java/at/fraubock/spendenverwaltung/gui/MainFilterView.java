@@ -38,8 +38,7 @@ public class MainFilterView extends InitializableView {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = Logger.getLogger(MainFilterView.class);
-	private IFilterService filterService;
-	private ComponentBuilder builder;
+	private IFilterService filterService;;
 	private ViewActionFactory viewActionFactory;
 	private FilterTableModel filterModel;
 	private JTable showTable;
@@ -77,16 +76,17 @@ public class MainFilterView extends InitializableView {
 	}
 
 	public void init() {
-		builder = new ComponentBuilder();
-		panel = builder.createPanel(700, 800);
+		panel = new JPanel();
+		panel.setLayout(new MigLayout());
+		panel.setPreferredSize(new Dimension(700, 800));
 		this.add(panel);
 
-		toolbar = builder.createToolbar();
+		toolbar = new JToolBar();
 		toolbar.setFloatable(false);
 		toolbar.setRollover(true);
 		addComponentsToToolbar(toolbar);
 		panel.add(toolbar, "wrap");
-		empty = builder.createLabel("		 ");
+		empty = new JLabel("		 ");
 		panel.add(empty, "wrap");
 		initTable();
 		panel.add(scrollPane);
@@ -97,7 +97,7 @@ public class MainFilterView extends InitializableView {
 		backButton = new JButton();
 		Action getBack = viewActionFactory.getMainMenuViewAction();
 		getBack.putValue(Action.SMALL_ICON, new ImageIcon(getClass()
-				.getResource("/images/backButton.jpg")));
+				.getResource("/images/backButton.png")));
 		backButton.setAction(getBack);
 
 		personFilter = new JButton();
@@ -151,19 +151,7 @@ public class MainFilterView extends InitializableView {
 				Filter filter = filterModel.getFilterRow(showTable
 						.getSelectedRow());
 
-				if (filter.getOwner().equals(userName)
-						|| filter.getPrivacyStatus() == FilterPrivacyStatus.READ_UPDATE
-						|| filter.getPrivacyStatus() == FilterPrivacyStatus.READ_UPDATE_DELETE) {
-
-					createFilter(filter.getType(), filter);
-
-				} else {
-					JOptionPane
-							.showMessageDialog(MainFilterView.this,
-									"Sie sind nicht berechtigt diesen Filter zu bearbeiten");
-					return;
-				}
-
+				createFilter(filter.getType(), filter);
 			}
 
 		});
@@ -202,17 +190,16 @@ public class MainFilterView extends InitializableView {
 			userName = filterPair.b;
 			log.info("List " + filterList.size() + " filter");
 		} catch (ServiceException e) {
-			JOptionPane
-					.showMessageDialog(
-							this,
-							"An error occured. Please see console for further information",
-							"Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this,
+					"Ein unerwarteter Fehler ist aufgetreten.", "Error",
+					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 			return;
 		}
 		if (filterList == null) {
-			JOptionPane.showMessageDialog(this, "GetAll() returns null.",
-					"Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this,
+					"Ein unerwarteter Fehler ist aufgetreten.", "Error",
+					JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		for (Filter f : filterList) {
@@ -222,7 +209,7 @@ public class MainFilterView extends InitializableView {
 
 	public void createFilter(FilterType type, Filter filter) {
 		CreateFilter cf = new CreateFilter(type, filterService, this, filter,
-				viewActionFactory);
+				userName, viewActionFactory);
 		removeAll();
 		revalidate();
 		repaint();
@@ -241,7 +228,8 @@ public class MainFilterView extends InitializableView {
 		if (!filter.getOwner().equals(userName)
 				&& filter.getPrivacyStatus() != FilterPrivacyStatus.READ_UPDATE_DELETE) {
 			JOptionPane.showMessageDialog(MainFilterView.this,
-					"Sie sind nicht berechtigt diesen Filter zu löschen");
+					"Sie sind nicht berechtigt diesen Filter zu l\u00F6schen. Er geh\u00f6rt "
+							+ filter.getOwner());
 			return;
 		}
 
