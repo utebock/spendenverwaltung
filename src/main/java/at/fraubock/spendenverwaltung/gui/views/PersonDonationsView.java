@@ -453,11 +453,11 @@ public class PersonDonationsView extends InitializableView {
 						donationService.create(donation);
 						donationTableModel.addDonation(donation);
 						//feedbackLabel.setText("Spende wurde erstellt.");
-						JOptionPane.showMessageDialog(contentPanel, "Spende erfolgreich hinzugef\u00FCgt.", "Information", JOptionPane.INFORMATION_MESSAGE);
 						//update total label
 						currentTotal += donation.getAmount();
 						setTotalLabel();
-						addDonationDialog.dispose();						
+						addDonationDialog.dispose();	
+						JOptionPane.showMessageDialog(contentPanel, "Spende erfolgreich hinzugef\u00FCgt.", "Information", JOptionPane.INFORMATION_MESSAGE);
 					} catch (ServiceException e1) {
 						log.warn(e1.getLocalizedMessage());
 						//feedbackLabel.setText("Es passierte ein Fehler beim erstellen der Spende.");
@@ -646,11 +646,11 @@ public class PersonDonationsView extends InitializableView {
 						donationTableModel.removeDonation(selectedRow);
 						donationTableModel.addDonation(donation);
 						//feedbackLabel.setText("Spende wurde geaendert.");
-						JOptionPane.showMessageDialog(contentPanel, "Spende erfolgreich ge\u00E4ndert.", "Information", JOptionPane.INFORMATION_MESSAGE);
 						//update total label
 						currentTotal += donation.getAmount();
 						setTotalLabel();
-						editDonationDialog.dispose();						
+						editDonationDialog.dispose();		
+						JOptionPane.showMessageDialog(contentPanel, "Spende erfolgreich ge\u00E4ndert.", "Information", JOptionPane.INFORMATION_MESSAGE);
 					} catch (ServiceException e1) {
 						log.warn(e1.getLocalizedMessage());
 						//feedbackLabel.setText("Es passierte ein Fehler beim bearbeiten der Spende.");

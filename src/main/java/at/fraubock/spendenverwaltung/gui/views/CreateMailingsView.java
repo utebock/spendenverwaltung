@@ -133,7 +133,7 @@ public class CreateMailingsView extends InitializableView {
 				.createLabel("Personenfilter ausw\u00E4hlen: ");
 		eMailingPersonFilterChooser = new JComboBox<Filter>();
 		createEMailingPanel.add(emailFilterLabel, "split2");
-		createEMailingPanel.add(eMailingPersonFilterChooser, "gap 68, wrap, growx");
+		createEMailingPanel.add(eMailingPersonFilterChooser, "gap 108, wrap, growx");
 
 		// type combobox and label
 		emailTypeLabel = componentFactory
@@ -141,24 +141,24 @@ public class CreateMailingsView extends InitializableView {
 		eMailingTypeChooser = new JComboBox<Mailing.MailingType>(
 				Mailing.MailingType.values());
 		createEMailingPanel.add(emailTypeLabel, "split 2");
-		createEMailingPanel.add(eMailingTypeChooser, "gap 50, wrap, growx");
+		createEMailingPanel.add(eMailingTypeChooser, "gap 90, wrap, growx");
 
 		emailDateLabel = componentFactory.createLabel("Datum ausw\u00E4hlen: ");
-		eMailingPersonFilterChooser = new JComboBox<Filter>();
+		//eMailingPersonFilterChooser = new JComboBox<Filter>();
 		emailDatePicker = new JXDatePicker(new java.util.Date());
 		createEMailingPanel.add(emailDateLabel, "split2");
-		createEMailingPanel.add(emailDatePicker, "gap 170, wrap, growx");
+		createEMailingPanel.add(emailDatePicker, "gap 210, wrap, growx");
 		
 		//MailChimp listChooser
 		emailMailChimpLabel = componentFactory.createLabel("MailChimp-Liste ausw\u00E4hlen: ");
 		emailMailChimpListChooser = new JComboBox<MailChimpListItem>();
 		createEMailingPanel.add(emailMailChimpLabel, "split 2");
-		createEMailingPanel.add(emailMailChimpListChooser, "gap 50, wrap, growx");
+		createEMailingPanel.add(emailMailChimpListChooser, "gap 90, wrap, growx");
 		
 		apiKeyLabel = componentFactory.createLabel("MailChimp-API-Schl\u00FCssel \u00E4ndern: ");
 		createEMailingPanel.add(apiKeyLabel, "split2");
 		emailMailChimpApiButton = new JButton("MailChimp API Key");
-		createEMailingPanel.add(emailMailChimpApiButton, "gap 120, wrap 20px");
+		createEMailingPanel.add(emailMailChimpApiButton, "gap 160, wrap 20px, growx");
 		
 		// buttons
 		createEMailingButton = new JButton("Anlegen");
@@ -179,7 +179,7 @@ public class CreateMailingsView extends InitializableView {
 				.createLabel("Personenfilter ausw\u00E4hlen: ");
 		postalPersonFilterChooser = new JComboBox<Filter>();
 		createPostalMailingPanel.add(postalFilterLabel, "split2");
-		createPostalMailingPanel.add(postalPersonFilterChooser, "gap 68, wrap, growx");
+		createPostalMailingPanel.add(postalPersonFilterChooser, "gap 108, wrap, growx");
 
 		// type combobox and label
 		postalTypeLabel = componentFactory
@@ -187,17 +187,17 @@ public class CreateMailingsView extends InitializableView {
 		postalMailingTypeChooser = new JComboBox<Mailing.MailingType>(
 				Mailing.MailingType.values());
 		createPostalMailingPanel.add(postalTypeLabel, "split2");
-		createPostalMailingPanel.add(postalMailingTypeChooser, "gap 50, wrap, growx");
+		createPostalMailingPanel.add(postalMailingTypeChooser, "gap 90, wrap, growx");
 
 		postalDateLabel = componentFactory.createLabel("Datum ausw\u00E4hlen: ");
 		postalDatePicker = new JXDatePicker(new java.util.Date());
 		createPostalMailingPanel.add(postalDateLabel, "split2");
-		createPostalMailingPanel.add(postalDatePicker, "gap 170, wrap, growx");
+		createPostalMailingPanel.add(postalDatePicker, "gap 210, wrap, growx");
 		
 		fileChooserLabel = componentFactory.createLabel("Vorlage ausw\u00E4hlen: ");
 		fileChooserButton = new JButton("Auswaehlen");
 		createPostalMailingPanel.add(fileChooserLabel, "split2");
-		createPostalMailingPanel.add(fileChooserButton, "gap 210, wrap 20px");
+		createPostalMailingPanel.add(fileChooserButton, "gap 250, growx, wrap 20px");
 		
 		// buttons
 		createPostalMailingButton = new JButton("Anlegen");
