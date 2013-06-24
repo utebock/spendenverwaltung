@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import at.fraubock.spendenverwaltung.gui.filter.configurators.ICriterionConfigurator;
 import at.fraubock.spendenverwaltung.gui.filter.configurators.mounted.AddressConfigurator;
 import at.fraubock.spendenverwaltung.gui.filter.configurators.mounted.DonationToPersonFilterConfig;
@@ -36,6 +38,9 @@ import at.fraubock.spendenverwaltung.util.filter.FilterType;
  */
 public class ConfiguratorFactory {
 
+	private static final Logger log = Logger
+			.getLogger(ConfiguratorFactory.class);
+
 	private FilterType type;
 	@SuppressWarnings("unused")
 	private Filter editFilter;
@@ -54,12 +59,17 @@ public class ConfiguratorFactory {
 		this.editFilter = editFilter;
 		this.personFilters = new ArrayList<Filter>();
 		try {
-			personFilters = filterService.getAllByFilterIgnoreAnonymous(FilterType.PERSON).a;
-			mailingFilters = filterService.getAllByFilterIgnoreAnonymous(FilterType.MAILING).a;
-			donationFilters = filterService.getAllByFilterIgnoreAnonymous(FilterType.DONATION).a;
-			addressFilters = filterService.getAllByFilterIgnoreAnonymous(FilterType.ADDRESS).a;
+			personFilters = filterService
+					.getAllByFilterIgnoreAnonymous(FilterType.PERSON).a;
+			mailingFilters = filterService
+					.getAllByFilterIgnoreAnonymous(FilterType.MAILING).a;
+			donationFilters = filterService
+					.getAllByFilterIgnoreAnonymous(FilterType.DONATION).a;
+			addressFilters = filterService
+					.getAllByFilterIgnoreAnonymous(FilterType.ADDRESS).a;
 		} catch (ServiceException e) {
-			// TODO err msg + log
+			log.error("Configuration factory couldn't load filters. error was: "
+					+ e.getLocalizedMessage());
 		}
 
 		if (editFilter != null) {

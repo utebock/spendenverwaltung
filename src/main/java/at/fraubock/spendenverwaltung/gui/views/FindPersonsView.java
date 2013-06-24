@@ -375,12 +375,11 @@ public class FindPersonsView extends InitializableView {
 		private JLabel validationFeedbackLabel;
 		private JButton submitButton;
 		private JButton cancelButton;
-		
-		
+
 		private JLabel notificationTypeLabel;
 		private JLabel wantsEmail;
 		private JLabel wantsPostal;
-		
+
 		private JCheckBox wantsEmailNotification;
 		private JCheckBox wantsPostalNotification;
 
@@ -410,20 +409,20 @@ public class FindPersonsView extends InitializableView {
 					SwingUtilities.getWindowAncestor(overviewPanel),
 					Dialog.ModalityType.APPLICATION_MODAL);
 			editPersonPanel = componentFactory.createPanel(450, 400);
-			
+
 			JLabel salutLabel = componentFactory.createLabel("Anrede: ");
-			if(person.getSex().equals(Sex.MALE)) {
+			if (person.getSex().equals(Sex.MALE)) {
 				salutation.setSelectedIndex(0);
-			} else if(person.getSex().equals(Sex.FEMALE)) {
+			} else if (person.getSex().equals(Sex.FEMALE)) {
 				salutation.setSelectedIndex(1);
-			} else if(person.getSex().equals(Sex.FAMILY)) {
+			} else if (person.getSex().equals(Sex.FAMILY)) {
 				salutation.setSelectedIndex(2);
-			} else if(person.getSex().equals(Sex.COMPANY)) {
+			} else if (person.getSex().equals(Sex.COMPANY)) {
 				salutation.setSelectedIndex(3);
 			} else {
 				salutation.setSelectedIndex(-1);
 			}
-			
+
 			editPersonPanel.add(salutLabel, "split2");
 			editPersonPanel.add(salutation, "gap 28, wrap");
 
@@ -469,24 +468,25 @@ public class FindPersonsView extends InitializableView {
 			editPersonPanel.add(noteLable, "split2");
 			editPersonPanel.add(noteField, "gap 45, wrap, growx");
 
-			notificationTypeLabel = componentFactory.createLabel("Benachrichtigungstyp:");
+			notificationTypeLabel = componentFactory
+					.createLabel("Benachrichtigungstyp:");
 			wantsEmail = componentFactory.createLabel("Email");
 			wantsPostal = componentFactory.createLabel("Post");
 			wantsEmailNotification = new JCheckBox();
-			if(person.isEmailNotification()) {
+			if (person.isEmailNotification()) {
 				wantsEmailNotification.setSelected(true);
 			}
 			wantsPostalNotification = new JCheckBox();
-			if(person.isPostalNotification()) {
+			if (person.isPostalNotification()) {
 				wantsPostalNotification.setSelected(true);
 			}
-			
+
 			editPersonPanel.add(notificationTypeLabel, "split5");
 			editPersonPanel.add(wantsEmailNotification);
 			editPersonPanel.add(wantsEmail);
 			editPersonPanel.add(wantsPostalNotification);
 			editPersonPanel.add(wantsPostal, "wrap 20px");
-			
+
 			cancelButton = new JButton();
 			cancelButton.setAction(new CancelEditAction());
 			submitButton = new JButton();
@@ -581,6 +581,15 @@ public class FindPersonsView extends InitializableView {
 						person.setTitle(null);
 					} else {
 						person.setTitle(titleField.getText());
+						if (surnameField.getText().equals("")) {
+							JOptionPane
+									.showMessageDialog(
+											editPersonPanel,
+											"Eine Person mit Titel muss einen Namen haben.",
+											"Fehler", JOptionPane.ERROR_MESSAGE);
+						return;
+						}
+						
 					}
 
 					if (telephoneField.getText().equals("")) {
@@ -606,16 +615,16 @@ public class FindPersonsView extends InitializableView {
 					} else {
 						person.setNote(noteField.getText());
 					}
-					
-					if(wantsEmailNotification.isSelected()) {
+
+					if (wantsEmailNotification.isSelected()) {
 						person.setEmailNotification(true);
 					} else {
 						person.setEmailNotification(false);
 					}
-					
-					if(wantsPostalNotification.isSelected()) {
+
+					if (wantsPostalNotification.isSelected()) {
 						person.setPostalNotification(true);
-					} else{
+					} else {
 						person.setPostalNotification(false);
 					}
 

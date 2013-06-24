@@ -115,9 +115,10 @@ public abstract class AbstractActionDAOTest {
 
 			assertEquals(nowDate, actDate);
 			assertEquals(
-					"TestTitle, GNTest, SNTest, TestCompany - QWERTZ1234 - TestCompany, "
-							+ "test@test.at, male, 01234567889, email: 0, postal: 0, note: testnote"
-							+ (a.getType() == Action.Type.INSERT ? "" : "2"),
+					"TestTitle, GNTest, SNTest, TestCompany - QWERTZ1234 - TestCompany, " +
+					"test@test.at, male, 01234567889, will keine Emailaussendungen, " +
+					"will keine Briefaussendungen, Notiz: testnote"+
+					(a.getType() == Action.Type.INSERT ? "" : "2"),
 					a.getPayload());
 		}
 

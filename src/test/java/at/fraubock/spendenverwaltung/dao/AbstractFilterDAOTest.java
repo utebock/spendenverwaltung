@@ -162,7 +162,7 @@ public abstract class AbstractFilterDAOTest {
 		filterDAO.insert(testFilter2);
 
 		List<Filter> allFilters = filterDAO.getAll();
-		assertTrue(allFilters != null && allFilters.size() == 2);
+		assertTrue(allFilters != null && allFilters.size() == 10); // 2 + 8 default filters
 
 	}
 
