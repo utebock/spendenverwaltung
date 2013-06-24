@@ -168,8 +168,7 @@ public class ViewActionFactory {
 	}
 
 	public Action getFindDonationConfirmationViewAction() {
-		return new DisplayViewAction(new FindDonationConfirmationsView(personService, addressService,
-				donationService, filterService, confirmationService, new ComponentFactory(), this),
+		return new DisplayViewAction(new FindDonationConfirmationsView(confirmationService, new ComponentFactory(), this),
 				"/images/obtainDonationConfirmation.jpg");
 	}
 

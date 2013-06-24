@@ -1,5 +1,9 @@
 package at.fraubock.spendenverwaltung.service;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -8,11 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import at.fraubock.spendenverwaltung.interfaces.dao.IConfirmationDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IConfirmationTemplateDAO;
+import at.fraubock.spendenverwaltung.interfaces.dao.IDonationDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Confirmation;
 import at.fraubock.spendenverwaltung.interfaces.domain.ConfirmationTemplate;
+import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IConfirmationService;
+import at.fraubock.spendenverwaltung.util.ConfirmationTemplateUtil;
 
 public class ConfirmationServiceImplemented implements IConfirmationService {
 
@@ -21,6 +28,7 @@ public class ConfirmationServiceImplemented implements IConfirmationService {
 	
 	private IConfirmationDAO confirmationDAO;
 	private IConfirmationTemplateDAO confirmationTemplateDAO;
+	private IDonationDAO donationDAO;
 	
 	public void setConfirmationDAO(IConfirmationDAO confirmationDAO) {
 		this.confirmationDAO = confirmationDAO;
@@ -29,6 +37,10 @@ public class ConfirmationServiceImplemented implements IConfirmationService {
 	public void setConfirmationTemplateDAO(
 			IConfirmationTemplateDAO confirmationTemplateDAO) {
 		this.confirmationTemplateDAO = confirmationTemplateDAO;
+	}
+	
+	public void setDonationDAO(IDonationDAO donationDAO){
+		this.donationDAO = donationDAO;
 	}
 
 	@Override
@@ -100,12 +112,37 @@ public class ConfirmationServiceImplemented implements IConfirmationService {
 
 	@Override
 	@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
-	public void reproduceDocument(Confirmation confirmation)
+	public File reproduceDocument(Confirmation confirmation, String outputName)
 			throws ServiceException {
-		// TODO Auto-generated method stub
-
+		File file;
+		List<Donation> donations;
+		if(confirmation.getDonation()!=null){
+			donations = new ArrayList<Donation>();
+			donations.add(confirmation.getDonation());
+		}
+		else{
+			try {
+				donations = donationDAO.getByPerson(confirmation.getPerson());
+			} catch (PersistenceException e) {
+				throw new ServiceException(e);
+			}
+			for(int i = donations.size()-1; i>0; i--){
+				Donation d = donations.get(i);
+				if(d.getDate().before(confirmation.getFromDate())||d.getDate().after(confirmation.getToDate())){
+					donations.remove(d);
+				}
+			}
+			
+		}
+		
+		try {
+			ConfirmationTemplateUtil.createMailingWithDocxTemplate(confirmation.getTemplate().getFile(), donations, outputName);
+		} catch (IOException e) {
+			throw new ServiceException(e);
+		}
+		file = new File(outputName);
+		return file;
 	}
-
 	@Override
 	@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
 	public void delete(ConfirmationTemplate template) throws ServiceException {
@@ -121,6 +158,18 @@ public class ConfirmationServiceImplemented implements IConfirmationService {
 		}
 		
 	}
+	
+	@Override
+	@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Throwable.class)
+	public List<Confirmation> getByPersonNameLike(String searchString) throws ServiceException {
+		try{
+			return confirmationDAO.getByPersonNameLike(searchString);
+		}
+		catch(PersistenceException e){
+			throw new ServiceException(e);
+		}
+	}
+
 
 	
 

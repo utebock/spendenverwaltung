@@ -1,5 +1,6 @@
 package at.fraubock.spendenverwaltung.interfaces.service;
 
+import java.io.File;
 import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Confirmation;
@@ -74,7 +75,19 @@ public interface IConfirmationService {
 	 * Reproduces the created document by given confirmation
 	 * @param confirmation
 	 * 			Confirmation
+	 * @param outputName
+	 * 			Name of output file
+	 * @return 
 	 */
-	public void reproduceDocument(Confirmation confirmation) throws ServiceException;
+	public File reproduceDocument(Confirmation confirmation, String outputName) throws ServiceException;
+
+	/**
+	 * Returns a list where the givenname or surename of the donator matches the searchString
+	 * @param searchString
+	 * @return
+	 * @throws ServiceException
+	 */
+	List<Confirmation> getByPersonNameLike(String searchString)
+			throws ServiceException;
 	
 }

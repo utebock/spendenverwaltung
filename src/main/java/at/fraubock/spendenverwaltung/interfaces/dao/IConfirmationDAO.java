@@ -4,6 +4,7 @@ import java.util.List;
 
 import at.fraubock.spendenverwaltung.interfaces.domain.Confirmation;
 import at.fraubock.spendenverwaltung.interfaces.domain.ConfirmationTemplate;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 
 /**
@@ -54,10 +55,19 @@ public interface IConfirmationDAO {
 	public Confirmation getById(int id) throws PersistenceException;
 	
 	/**
-	 * Retrievs all confirmations with the given template stored in the underlying persistence layer 
+	 * Retrieves all confirmations with the given template stored in the underlying persistence layer 
 	 * @param template
 	 * 			ConfirmationTemplate with valid id
 	 * @return
 	 */
 	public List<Confirmation> getByConfirmationTemplate(ConfirmationTemplate template) throws PersistenceException;
+	
+	/**
+	 * Retrieves all confirmaitons where givenname or surname match the searchstring in an like query
+	 * @param searchString
+	 * @return
+	 * @throws PersistenceException
+	 */
+	List<Confirmation> getByPersonNameLike(String searchString)
+			throws PersistenceException;
 }

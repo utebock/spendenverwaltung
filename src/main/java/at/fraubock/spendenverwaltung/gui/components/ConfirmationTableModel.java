@@ -1,5 +1,7 @@
 package at.fraubock.spendenverwaltung.gui.components;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
@@ -46,6 +48,7 @@ public class ConfirmationTableModel extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
+		SimpleDateFormat f = new SimpleDateFormat("MM.dd.yyyy");
 		Confirmation confirmation = (Confirmation)confirmations.get(rowIndex);
 		switch(columnIndex){
 			case 0: return confirmation.getPerson().getGivenName();
@@ -55,17 +58,20 @@ public class ConfirmationTableModel extends AbstractTableModel {
 							return confirmation.getPerson().getCompany();
 						}
 					}
-					return "Keine Firma";
-			case 3: if(confirmation.getDonation()!=null)return confirmation.getDonation().getAmount();
+					return null;
+			case 3: if(confirmation.getDonation()!=null){
+						return confirmation.getDonation().getAmount()/(double)100;
+					}
 					else{
 						return "Mehrere Spenden";
 					}
-			case 4: if(confirmation.getDonation()!=null)return confirmation.getDonation().getDate();
+			case 4: if(confirmation.getDonation()!=null)return f.format(confirmation.getDonation().getDate());
 					else{
-						return confirmation.getFromDate()+" - "+confirmation.getToDate();
+						return f.format(confirmation.getFromDate())+" bis "+f.format(confirmation.getToDate());
 					}
-			case 5: return confirmation.getTemplate().getName();
-			case 6: confirmation.getDate();
+			case 5: if(confirmation.getTemplate()!=null)return confirmation.getTemplate().getName();
+					else return null;
+			case 6: return confirmation.getDate();
 			default: return null;
 		}
 	}
@@ -80,13 +86,13 @@ public class ConfirmationTableModel extends AbstractTableModel {
 		case 2:
 			return String.class;
 		case 3:
-			return Long.class;
+			return String.class;
 		case 4:
 			return String.class;
 		case 5:
 			return String.class;
 		case 6:
-			return Date.class;
+			return java.util.Date.class;
 		}
 		return null;
 	}
