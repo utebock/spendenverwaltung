@@ -132,7 +132,7 @@ public class AbstractValidationTableModel extends AbstractTableModel {
 			case 5: return (person == null || person.getAddresses().isEmpty()) ? "" : person.getMainAddress().getPostalCode();
 			case 6: return (person == null || person.getAddresses().isEmpty()) ? "" : person.getMainAddress().getCity();
 			case 7: return (person == null || person.getAddresses().isEmpty()) ? "" : person.getMainAddress().getCountry();
-			case 8: return donation.getAmount();
+			case 8: return (donation.getAmount()/100D);
 			case 9: return donation.getDate();
 			case 10: return donation.getDedication();
 			case 11: return donation.getType();

@@ -4,9 +4,11 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -21,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -116,8 +119,12 @@ public class ImportValidationView extends InitializableView {
 		viewDisplayer.getFrame().setSize(new Dimension(1250, 800));
 		
 		conflictTable = new JTable(conflictModel);
+		conflictTable.setDefaultRenderer(Long.class, new LongCellRenderer());
 		newTable = new JTable(newModel);
+		newTable.setDefaultRenderer(Long.class, new LongCellRenderer());
 		matchTable = new JTable(matchModel);
+		matchTable.setDefaultRenderer(Long.class, new LongCellRenderer());
+
 		
 		conflictTable.getColumnModel().getColumn(13).setCellEditor(new DefaultCellEditor(conflictComboBox));
 		newTable.getColumnModel().getColumn(13).setCellEditor(new DefaultCellEditor(conflictComboBox));
@@ -511,5 +518,20 @@ public class ImportValidationView extends InitializableView {
 			viewDisplayer.getFrame().setSize(new Dimension(800, 800));
 			returnToMain();
 		}
+	}
+	
+	private final class LongCellRenderer extends DefaultTableCellRenderer {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		
+		@Override
+		protected void setValue(Object value) {
+			NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
+			super.setValue(nf.format((Double)value));
+		}
+		
 	}
 }
