@@ -48,7 +48,7 @@ public class LoginView extends InitializableView {
 	private ViewActionFactory actionFactory;
 	private ViewDisplayer viewDisplayer;
 	private BasicDataSource databaseDataSource;
-	private String defaultUser = "ubadministrative", defaultPassword = "ubadmin", defaultUrl = "";
+	private String defaultUser = "", defaultPassword = "", defaultUrl = "";
 	private ActionPolling polling;
 
 	/**
@@ -149,9 +149,9 @@ public class LoginView extends InitializableView {
 		pwdLabel = componentFactory.createLabel("Passwort:");
 		urlLabel = componentFactory.createLabel("Datenbank-URL:");
 		userField = componentFactory.createTextField(defaultUser);
-		userField.setText("ubadministrative");
+		userField.setText(defaultUser);
 		pwdField = new JPasswordField(defaultPassword);
-		pwdField.setText("ubadmin");
+		pwdField.setText(defaultPassword);
 		urlField = componentFactory.createTextField(defaultUrl);
 		loginBtn = new JButton("Login");
 		cancelBtn = new JButton("Abbrechen");
