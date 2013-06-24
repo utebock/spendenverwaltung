@@ -22,7 +22,6 @@ import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.Connecte
 import at.fraubock.spendenverwaltung.interfaces.domain.filter.criterion.PropertyCriterion;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
-import at.fraubock.spendenverwaltung.interfaces.service.IMailChimpService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
 import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 import at.fraubock.spendenverwaltung.util.MailingTemplateUtil;
@@ -38,7 +37,6 @@ public class MailingServiceImplemented implements IMailingService {
 	private IMailingDAO mailingDAO;
 	private IPersonDAO personDAO;
 	private IPersonService personService;
-	private IMailChimpService mailChimpService;
 
 	/**
 	 * @return the personService
@@ -61,10 +59,6 @@ public class MailingServiceImplemented implements IMailingService {
 
 	public void setPersonDAO(IPersonDAO personDAO) {
 		this.personDAO = personDAO;
-	}
-
-	public void setMailChimpService(IMailChimpService mailChimpService) {
-		this.mailChimpService = mailChimpService;
 	}
 
 	@Override
@@ -361,5 +355,12 @@ public class MailingServiceImplemented implements IMailingService {
 		} catch (PersistenceException e) {
 			throw new ServiceException(e);
 		}
+	}
+
+	@Override
+	@Transactional(readOnly = true, rollbackFor = Throwable.class, isolation = Isolation.READ_COMMITTED)
+	public File reproduceDocumentById(int id, String savePath)
+			throws ServiceException, IOException {
+		return reproduceDocument(getById(id), savePath);
 	}
 }
