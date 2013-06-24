@@ -31,6 +31,7 @@ import net.miginfocom.swing.MigLayout;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXDatePicker;
 
+import at.fraubock.spendenverwaltung.gui.CellRenderer;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.MailingTableModel;
@@ -92,6 +93,8 @@ public class FindMailingsView extends InitializableView {
 		mailingsTable.setFillsViewportHeight(true);
 		JScrollPane scrollPane = new JScrollPane(mailingsTable);
 		scrollPane.setPreferredSize(new Dimension(700, 550));
+		mailingsTable.setDefaultRenderer(Object.class, new CellRenderer());
+		mailingsTable.setDefaultRenderer(Date.class, new CellRenderer());
 
 		toolbar = new JToolBar();
 		contentPanel.add(toolbar, "span, growx, wrap");

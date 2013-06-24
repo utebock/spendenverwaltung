@@ -3,6 +3,7 @@ package at.fraubock.spendenverwaltung.gui.views;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -19,6 +20,7 @@ import javax.swing.ListSelectionModel;
 
 import org.apache.log4j.Logger;
 
+import at.fraubock.spendenverwaltung.gui.CellRenderer;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.UnconfirmedMailingTableModel;
 import at.fraubock.spendenverwaltung.interfaces.domain.Mailing;
@@ -74,6 +76,8 @@ public class ConfirmMailingsView extends InitializableView {
 		contentPanel.add(scrollPane, "wrap, growx");
 		
 		unconfirmedTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		unconfirmedTable.setDefaultRenderer(Object.class, new CellRenderer());
+		unconfirmedTable.setDefaultRenderer(Date.class, new CellRenderer());
 		
 		feedbackLabel = componentFactory.createLabel("");
 		feedbackLabel.setFont(new Font("Headline", Font.PLAIN, 16));

@@ -24,6 +24,7 @@ import javax.swing.SwingUtilities;
 import org.apache.log4j.Logger;
 
 import at.fraubock.spendenverwaltung.gui.AddressTableModel;
+import at.fraubock.spendenverwaltung.gui.CellRenderer;
 import at.fraubock.spendenverwaltung.gui.components.ComponentConstants;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.NumericTextField;
@@ -84,6 +85,7 @@ public class PersonAddressesView extends InitializableView {
 		addressesTable.setAutoCreateRowSorter(true);
 		addressesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		addressesTable.setFillsViewportHeight(true);
+		addressesTable.setDefaultRenderer(Object.class, new CellRenderer());
 		
 		JScrollPane scrollPane = new JScrollPane(addressesTable);
 		scrollPane.setPreferredSize(new Dimension(700, 550));
