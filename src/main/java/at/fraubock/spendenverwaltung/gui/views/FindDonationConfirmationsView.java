@@ -28,6 +28,7 @@ import net.miginfocom.swing.MigLayout;
 
 import org.apache.log4j.Logger;
 
+import at.fraubock.spendenverwaltung.gui.CellRenderer;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
 import at.fraubock.spendenverwaltung.gui.components.ConfirmationTableModel;
 import at.fraubock.spendenverwaltung.interfaces.domain.Confirmation;
@@ -107,6 +108,7 @@ public class FindDonationConfirmationsView extends InitializableView {
 		showTable.setFillsViewportHeight(true);
 		showTable.setAutoCreateRowSorter(true);
 		showTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		showTable.setDefaultRenderer(Object.class, new CellRenderer());
 		scrollPane = new JScrollPane(showTable);
 		scrollPane.setPreferredSize(new Dimension(700, 550));
 	}
