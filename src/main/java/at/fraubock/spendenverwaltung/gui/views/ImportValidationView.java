@@ -335,6 +335,7 @@ public class ImportValidationView extends InitializableView {
 		
 		if(conflicts == 0){
 			if(imports.size() == 1){
+				viewDisplayer.getFrame().setSize(new Dimension(800, 800));
 				returnToMain();
 			} else if(imports.size() > 1) {
 				this.removeAll();
@@ -418,6 +419,8 @@ public class ImportValidationView extends InitializableView {
 					if(donationsFromPerson.size() == 0){
 						personService.delete(oldPerson);
 					}
+					donationService.delete(d);
+				} else {
 					donationService.delete(d);
 				}
 			} catch (ServiceException e) {

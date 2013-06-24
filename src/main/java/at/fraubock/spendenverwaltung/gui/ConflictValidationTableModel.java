@@ -11,6 +11,7 @@ import at.fraubock.spendenverwaltung.gui.views.ImportValidationView;
 import at.fraubock.spendenverwaltung.interfaces.domain.Address;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.Person.Sex;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
@@ -51,11 +52,15 @@ public class ConflictValidationTableModel extends AbstractValidationTableModel {
 
         
         if(columnIndex != 13){
-			oldDonator.setId(updatePerson.getId());
-			oldDonator.setAddresses(updatePerson.getAddresses());
-			oldDonator.setCompany(updatePerson.getCompany());
-			oldDonator.setSex(updatePerson.getSex());
-			oldDonator.setSurname(updatePerson.getSurname());
+        	if(updatePerson != null){
+				oldDonator.setId(updatePerson.getId());
+				oldDonator.setAddresses(updatePerson.getAddresses());
+				oldDonator.setCompany(updatePerson.getCompany());
+				oldDonator.setSex(updatePerson.getSex());
+				oldDonator.setSurname(updatePerson.getSurname());
+        	} else{
+        		updatePerson = new Person();
+        	}
 
 			updateAddress = updatePerson.getMainAddress();
 			
@@ -127,10 +132,12 @@ public class ConflictValidationTableModel extends AbstractValidationTableModel {
 				
 				if(matchedPersons.size() != 0)
 					updateDonation.setDonator(matchedPersons.get(0));
-				if(updateDonation.getDonator().getId() != null && donationService.donationExists(updateDonation)){
+				if(updateDonation.getDonator() != null && updateDonation.getDonator().getId() != null && donationService.donationExists(updateDonation)){
 					changedModel = false;
 				} else if (matchedPersons.size() == 0){
 					updatePerson.setId(null);
+					if(updatePerson.getSex() == null)
+						updatePerson.setSex(Sex.MALE);
 					updateDonation.setDonator(updatePerson);
 					removeDonation(rowIndex);
 					parent.addToNew(updateDonation);

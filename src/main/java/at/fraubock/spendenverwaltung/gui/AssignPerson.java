@@ -195,11 +195,13 @@ public class AssignPerson extends JDialog {
 		public void mouseClicked(MouseEvent e) {
 			if(e.getClickCount() == 2){
 				Person oldDonator = new Person();
-				oldDonator.setId(donationToAssign.getDonator().getId());
-				oldDonator.setAddresses(donationToAssign.getDonator().getAddresses());
-				oldDonator.setCompany(donationToAssign.getDonator().getCompany());
-				oldDonator.setSex(donationToAssign.getDonator().getSex());
-				oldDonator.setSurname(donationToAssign.getDonator().getSurname());
+				if(donationToAssign.getDonator() != null){
+					oldDonator.setId(donationToAssign.getDonator().getId());
+					oldDonator.setAddresses(donationToAssign.getDonator().getAddresses());
+					oldDonator.setCompany(donationToAssign.getDonator().getCompany());
+					oldDonator.setSex(donationToAssign.getDonator().getSex());
+					oldDonator.setSurname(donationToAssign.getDonator().getSurname());
+				}
 				
 				donationToAssign.setDonator(personModel.getPersonRow(showTable.getSelectedRow()));
 				
