@@ -259,9 +259,7 @@ public class CommandExecutor {
 		OptionBuilder.withDescription("use UNAME as your MySQL user name");
 		OptionBuilder.hasArg();
 		OptionBuilder.withArgName("UNAME");
-		OptionBuilder.isRequired();
 		options.addOption(OptionBuilder.create());
-		OptionBuilder.isRequired(false);
 		OptionBuilder.withLongOpt("password");
 		OptionBuilder
 				.withDescription("use PASSWD as your MySQL password. If not specified, it will be promted");
@@ -281,6 +279,14 @@ public class CommandExecutor {
 		try {
 			CommandLine cmd = parser.parse(options, args);
 
+			// see which option has been chosen and execute:
+			if (cmd.hasOption("h")) {
+				PrintWriter pw = new PrintWriter(out);
+				new HelpFormatter().printHelp(pw, CMD_WIDTH, APP_NAME,
+						APP_DESCR, options, HelpFormatter.DEFAULT_LEFT_PAD,
+						HelpFormatter.DEFAULT_DESC_PAD, APP_INFO, true);
+				pw.close();
+			}
 			// establish database connection:
 			dataSource.setUsername(cmd.getOptionValue("user"));
 			if (cmd.hasOption("url"))
@@ -296,14 +302,7 @@ public class CommandExecutor {
 				Arrays.fill(pwd, ' '); // security purpose
 			}
 
-			// see which option has been chosen and execute:
-			if (cmd.hasOption("h")) {
-				PrintWriter pw = new PrintWriter(out);
-				new HelpFormatter().printHelp(pw, CMD_WIDTH, APP_NAME,
-						APP_DESCR, options, HelpFormatter.DEFAULT_LEFT_PAD,
-						HelpFormatter.DEFAULT_DESC_PAD, APP_INFO, true);
-				pw.close();
-			} else if (cmd.hasOption("i")) {
+			if (cmd.hasOption("i")) {
 				File importFile = new File(cmd.getOptionValue("i"));
 				String importStyle = cmd.getOptionValue("style", "native");
 				log.info("User wishes to import " + importFile + " with "
