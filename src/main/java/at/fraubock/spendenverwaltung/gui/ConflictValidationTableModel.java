@@ -139,9 +139,12 @@ public class ConflictValidationTableModel extends AbstractValidationTableModel {
 					if(updatePerson.getSex() == null)
 						updatePerson.setSex(Sex.MALE);
 					updateDonation.setDonator(updatePerson);
-					removeDonation(rowIndex);
-					parent.addToNew(updateDonation);
-					changedModel = true;
+					if((updatePerson.getGivenName() != null && updatePerson.getSurname() != null) && (updatePerson.getEmail() != null || updatePerson.getTelephone() != null || updatePerson.getAddresses() != null)){
+
+						removeDonation(rowIndex);
+						parent.addToNew(updateDonation);
+						changedModel = true;
+					}					
 				} else if (matchedPersons.size() != 0){
 					//add to matchModel
 					removeDonation(rowIndex);
