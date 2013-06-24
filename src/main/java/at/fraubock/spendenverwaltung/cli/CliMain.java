@@ -6,14 +6,11 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import at.fraubock.spendenverwaltung.interfaces.service.IActionService;
-import at.fraubock.spendenverwaltung.interfaces.service.IAddressService;
 import at.fraubock.spendenverwaltung.interfaces.service.IConfirmationService;
-import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailChimpService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
-import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 /**
  * Class providing main method for starting the CLI application of
@@ -28,14 +25,8 @@ public class CliMain {
 		ApplicationContext context = new ClassPathXmlApplicationContext(
 				"/spring.xml");
 
-		IPersonService personService = context.getBean("personService",
-				IPersonService.class);
-		IDonationService donationService = context.getBean("donationService",
-				IDonationService.class);
 		IFilterService filterService = context.getBean("filterService",
 				IFilterService.class);
-		IAddressService addressService = context.getBean("addressService",
-				IAddressService.class);
 		IMailingService mailingService = context.getBean("mailingService",
 				IMailingService.class);
 		IConfirmationService confirmationService = context.getBean(
@@ -53,13 +44,13 @@ public class CliMain {
 
 		CommandExecutor ex = new CommandExecutor(args, System.out, System.err);
 		ex.setActionService(actionService);
+		ex.setConfirmationService(confirmationService);
 		ex.setDataSource(databaseDataSource);
 		ex.setDefaultDatabaseUrl(defaultDatabaseUrl);
-		ex.setDonationService(donationService);
 		ex.setFilterService(filterService);
 		ex.setImportService(importService);
 		ex.setMailingService(mailingService);
-		ex.setPersonService(personService);
+		ex.setMailChimpService(mailChimpService);
 
 		int err = (ex).execute(System.console());
 		if (err != 0)

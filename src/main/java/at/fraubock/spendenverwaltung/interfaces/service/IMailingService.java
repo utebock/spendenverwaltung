@@ -143,6 +143,21 @@ public interface IMailingService {
 			throws ServiceException;
 
 	/**
+	 * As {@link #reproduceDocument(Mailing, String)}, but with only the
+	 * mailing's ID given instead of the whole mailing object
+	 * 
+	 * @param id
+	 *            the id of the mailing to be reproduced
+	 * @param savePath
+	 *            the path the resulting PDF should be saved to
+	 * @return file that was reproduced or null if given mailing has no template
+	 * @throws ServiceException
+	 *             if something bad happens
+	 */
+	public File reproduceDocumentById(int id, String savePath)
+			throws ServiceException, IOException;
+
+	/**
 	 * returns all mailings that have been confirmed by a user
 	 * 
 	 * @return

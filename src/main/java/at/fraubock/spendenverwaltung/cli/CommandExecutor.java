@@ -5,7 +5,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.text.DateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -19,13 +21,14 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.log4j.Logger;
 
+import at.fraubock.spendenverwaltung.interfaces.domain.Action;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IActionService;
-import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
+import at.fraubock.spendenverwaltung.interfaces.service.IConfirmationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
+import at.fraubock.spendenverwaltung.interfaces.service.IMailChimpService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
-import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 /**
  * An instance of this class provides the functionality to parse arguments,
@@ -39,11 +42,11 @@ public class CommandExecutor {
 	private static final Logger log = Logger.getLogger(CommandExecutor.class);
 
 	private IActionService actionService;
-	private IDonationService donationService;
+	private IConfirmationService confirmationService;
 	private IFilterService filterService;
 	private IImportService importService;
 	private IMailingService mailingService;
-	private IPersonService personService;
+	private IMailChimpService mailChimpService;
 
 	private BasicDataSource dataSource;
 	private String defaultDatabaseUrl;
@@ -54,6 +57,8 @@ public class CommandExecutor {
 	public static final int PARSE_ERR = 1;
 	public static final int SERVICE_ERR = 2;
 	public static final int IO_ERR = 4; // continue with 8, 16 etc.
+
+	private static final int ACTIONS_TO_PRINT = 30;
 
 	/**
 	 * width of the command line for help/usage formatting
@@ -88,13 +93,6 @@ public class CommandExecutor {
 	}
 
 	/**
-	 * @return the actionService
-	 */
-	public IActionService getActionService() {
-		return actionService;
-	}
-
-	/**
 	 * @param actionService
 	 *            the actionService to set
 	 */
@@ -103,25 +101,11 @@ public class CommandExecutor {
 	}
 
 	/**
-	 * @return the donationService
+	 * @param confirmationService
+	 *            the confirmationService to set
 	 */
-	public IDonationService getDonationService() {
-		return donationService;
-	}
-
-	/**
-	 * @param donationService
-	 *            the donationService to set
-	 */
-	public void setDonationService(IDonationService donationService) {
-		this.donationService = donationService;
-	}
-
-	/**
-	 * @return the filterService
-	 */
-	public IFilterService getFilterService() {
-		return filterService;
+	public void setConfirmationService(IConfirmationService confirmationService) {
+		this.confirmationService = confirmationService;
 	}
 
 	/**
@@ -133,25 +117,11 @@ public class CommandExecutor {
 	}
 
 	/**
-	 * @return the importService
-	 */
-	public IImportService getImportService() {
-		return importService;
-	}
-
-	/**
 	 * @param importService
 	 *            the importService to set
 	 */
 	public void setImportService(IImportService importService) {
 		this.importService = importService;
-	}
-
-	/**
-	 * @return the mailingService
-	 */
-	public IMailingService getMailingService() {
-		return mailingService;
 	}
 
 	/**
@@ -163,25 +133,11 @@ public class CommandExecutor {
 	}
 
 	/**
-	 * @return the personService
+	 * @param mailChimpService
+	 *            the mailChimpService to set
 	 */
-	public IPersonService getPersonService() {
-		return personService;
-	}
-
-	/**
-	 * @param personService
-	 *            the personService to set
-	 */
-	public void setPersonService(IPersonService personService) {
-		this.personService = personService;
-	}
-
-	/**
-	 * @return the data source whose username, password and URL will be set
-	 */
-	public BasicDataSource getDataSource() {
-		return dataSource;
+	public void setMailChimpService(IMailChimpService mailChimpService) {
+		this.mailChimpService = mailChimpService;
 	}
 
 	/**
@@ -190,15 +146,6 @@ public class CommandExecutor {
 	 */
 	public void setDataSource(BasicDataSource dataSource) {
 		this.dataSource = dataSource;
-	}
-
-	/**
-	 * @return the default database URL. May be the empty string or null. Driver
-	 *         name and database name omitted. Example:
-	 *         "localhost:3306/ubspenderverwaltung"
-	 */
-	public String getDefaultDatabaseUrl() {
-		return defaultDatabaseUrl;
 	}
 
 	/**
@@ -279,8 +226,10 @@ public class CommandExecutor {
 				"a",
 				"actions",
 				true,
-				"Prints a history of actions. The history will go back only DAYS number of days. If DAYS is set to 0, the history will not be limited in time back.");
-		actionsOption.setArgName("DAYS");
+				"Prints the first "
+						+ ACTIONS_TO_PRINT
+						+ " actions of the history, beginning on the DATE specified.");
+		actionsOption.setArgName("DATE");
 		mutexActions.addOption(actionsOption);
 
 		options.addOptionGroup(mutexActions);
@@ -424,8 +373,8 @@ public class CommandExecutor {
 				if (outputFileName == null)
 					throw new ParseException(
 							"The output file name must be specified using the -o option.");
-				File file = new File(outputFileName);
-				throw new ServiceException("not yet implemented"); // TODO
+				confirmationService.reproduceById(confirmationId,
+						outputFileName);
 			} else if (cmd.hasOption("p")) {
 				int mailingId;
 				try {
@@ -437,8 +386,12 @@ public class CommandExecutor {
 				if (outputFileName == null)
 					throw new ParseException(
 							"The output file name must be specified using the -o option.");
-				File file = new File(outputFileName);
-				throw new ServiceException("not yet implemented"); // TODO
+				File f = mailingService.reproduceDocumentById(mailingId,
+						outputFileName);
+				if (f == null) {
+					throw new ParseException(
+							"The mailing with the given id has no template attached, sdo it could not be reproduced.");
+				}
 			} else if (cmd.hasOption("s")) {
 				if (!cmd.hasOption("api-key"))
 					throw new ParseException(
@@ -446,24 +399,34 @@ public class CommandExecutor {
 				if (!cmd.hasOption("listid"))
 					throw new ParseException(
 							"List ID must be specified using the --listid option.");
-				int mailingId, apiKey, listid;
+				int mailingId;
+				String apiKey = cmd.getOptionValue("api-key");
+				String listid = cmd.getOptionValue("listid");
 				try {
 					mailingId = Integer.parseInt(cmd.getOptionValue("p"));
-					apiKey = Integer.parseInt(cmd.getOptionValue("api-key"));
-					listid = Integer.parseInt(cmd.getOptionValue("listid"));
 				} catch (NumberFormatException e) {
 					throw new ParseException(e.getLocalizedMessage());
 				}
-				throw new ServiceException("not yet implemented"); // TODO
+				mailChimpService.setAPIKey(apiKey);
+				mailChimpService.addMailingByIdToList(listid, mailingId);
 			} else if (cmd.hasOption("a")) {
-				int daysBack;
+				DateFormat fmt = DateFormat.getDateInstance(DateFormat.SHORT);
+				Date beginning;
 				try {
-					daysBack = Integer.parseInt(cmd.getOptionValue("a"));
-				} catch (NumberFormatException e) {
-					throw new ParseException(e.getLocalizedMessage());
+					beginning = fmt.parse(cmd.getOptionValue("a"));
+				} catch (java.text.ParseException e) {
+					throw new ParseException(
+							"Could not parse the date \""
+									+ cmd.getOptionValue("a")
+									+ "\". It does not have the required format, e.g. \""
+									+ fmt.format(new Date())
+									+ "\".\nDetails:\n"
+									+ e.getLocalizedMessage());
 				}
-
-				throw new ServiceException("not yet implemented"); // TODO
+				for (Action a : actionService.pollForActionSince(beginning,
+						ACTIONS_TO_PRINT)) {
+					out.println(a);
+				}
 			} else {
 				throw new ParseException("No valid option passed.");
 			}

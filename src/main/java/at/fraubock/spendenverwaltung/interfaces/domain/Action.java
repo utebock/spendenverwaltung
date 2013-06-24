@@ -52,8 +52,8 @@ public class Action {
 	public enum Entity {
 		PERSON("persons", "Person"), ADDRESSES("addresses", "Adresse"), LIVES_AT(
 				"livesat", "Adresszuweisung"), IMPORT("imports", "Import"), DONATION(
-				"donations", "Spende"), FILTER(
-				"filter", "Filter"), MAILING("mailings", "Aussendung"), DONATION_CONFIRMATION(
+				"donations", "Spende"), FILTER("filter", "Filter"), MAILING(
+				"mailings", "Aussendung"), DONATION_CONFIRMATION(
 				"donation_confirmations", "Spendenbest\u00e4tigung");
 
 		private String name;
@@ -193,6 +193,13 @@ public class Action {
 		if (type != other.type)
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "id=" + id + ", actor=" + actor + ", time=" + time + ", type="
+				+ type + ", entity=" + entity + ", entityId=" + entityId
+				+ ", payload=" + payload;
 	}
 
 }
