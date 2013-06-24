@@ -338,10 +338,12 @@ public class ImportValidationView extends InitializableView {
 				viewDisplayer.getFrame().setSize(new Dimension(800, 800));
 				returnToMain();
 			} else if(imports.size() > 1) {
-				this.removeAll();
-				this.revalidate();
-				init();
-				return;
+//				this.removeAll();
+//				this.revalidate();
+//				init();
+//				return;
+				viewDisplayer.getFrame().setSize(new Dimension(800, 800));
+				returnToMain();
 			}
 					
 		} else{
