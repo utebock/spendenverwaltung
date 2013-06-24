@@ -148,7 +148,6 @@ public abstract class AbstractActionDAOTest {
 	@Transactional(readOnly = true)
 	public void getNumberOfWithNullValue_ThrowsException()
 			throws PersistenceException {
-		assert(1==2);
 		actionDAO.getNumberOfResultsByAttributes(null);
 
 	}

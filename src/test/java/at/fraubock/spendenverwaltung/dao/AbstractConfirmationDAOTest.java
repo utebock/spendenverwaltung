@@ -23,6 +23,7 @@ import at.fraubock.spendenverwaltung.interfaces.domain.ConfirmationTemplate;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation.DonationType;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
+import at.fraubock.spendenverwaltung.interfaces.domain.Person.Sex;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 
 
@@ -177,6 +178,23 @@ public abstract class AbstractConfirmationDAOTest {
 		assertEquals(confirmationDao.getByConfirmationTemplate(template).size(),1);
 		assertEquals(confirmationDao.getByConfirmationTemplate(template2).size(),1);
 		
+	}
+	
+	@Test
+	@Transactional
+	public void getByPersonNameLike_ShouldReturn() throws PersistenceException{
+		Person p = new Person();
+		p.setGivenName("Sebastian");
+		p.setSurname("Braun");
+		p.setSex(Sex.MALE);
+		personDao.insertOrUpdate(p);
+		c1.setPerson(p);
+		
+		confirmationDao.insertOrUpdate(c1);
+		confirmationDao.insertOrUpdate(c2);
+		
+		List<Confirmation> result = confirmationDao.getByPersonNameLike("Sebastia");
+		assertEquals(result.size(), 1);
 	}
 	
 	public static void initData() throws PersistenceException{

@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -13,6 +14,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -26,11 +28,14 @@ import org.apache.log4j.Logger;
 
 import at.fraubock.spendenverwaltung.gui.AbstractValidationTableModel;
 import at.fraubock.spendenverwaltung.gui.AssignPerson;
+import at.fraubock.spendenverwaltung.gui.CellRenderer;
 import at.fraubock.spendenverwaltung.gui.ComponentBuilder;
 import at.fraubock.spendenverwaltung.gui.ConflictValidationTableModel;
+import at.fraubock.spendenverwaltung.gui.MainFrame;
 import at.fraubock.spendenverwaltung.gui.MatchValidationTableModel;
 import at.fraubock.spendenverwaltung.gui.NewValidationTableModel;
 import at.fraubock.spendenverwaltung.gui.components.ComponentFactory;
+import at.fraubock.spendenverwaltung.gui.container.ViewDisplayer;
 import at.fraubock.spendenverwaltung.interfaces.domain.Donation;
 import at.fraubock.spendenverwaltung.interfaces.domain.Import;
 import at.fraubock.spendenverwaltung.interfaces.domain.Person;
@@ -78,9 +83,10 @@ public class ImportValidationView extends InitializableView {
 	private JLabel infoLabel;
 	private ViewActionFactory actionFactory;
 	private JScrollPane scrollPane;
+	private ViewDisplayer viewDisplayer;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ImportValidationView(IPersonService personService, IAddressService addressService, IDonationService donationService, IImportService importService, ComponentFactory componentFactory, ViewActionFactory actionFactory){
+	public ImportValidationView(IPersonService personService, IAddressService addressService, IDonationService donationService, IImportService importService, ComponentFactory componentFactory, ViewActionFactory actionFactory, ViewDisplayer viewDisplayer){
 		setLayout(new MigLayout());
 		
 		this.builder = new ComponentBuilder();
@@ -90,6 +96,7 @@ public class ImportValidationView extends InitializableView {
 		this.donationService = donationService;
 		this.importService = importService;
 		this.actionFactory = actionFactory;
+		this.viewDisplayer = viewDisplayer;
 
 		conflictComboBox = new JComboBox(ImportValidator.ValidationType.toArray());
 		
@@ -106,6 +113,8 @@ public class ImportValidationView extends InitializableView {
 		newPanel = builder.createPanel(1200,250);
 		matchPanel = builder.createPanel(1200,250);
 		
+		viewDisplayer.getFrame().setSize(new Dimension(1250, 800));
+		
 		conflictTable = new JTable(conflictModel);
 		newTable = new JTable(newModel);
 		matchTable = new JTable(matchModel);
@@ -114,6 +123,17 @@ public class ImportValidationView extends InitializableView {
 		newTable.getColumnModel().getColumn(13).setCellEditor(new DefaultCellEditor(conflictComboBox));
 		matchTable.getColumnModel().getColumn(13).setCellEditor(new DefaultCellEditor(conflictComboBox));
 		
+		conflictTable.setDefaultRenderer(Object.class, new CellRenderer());
+		conflictTable.setDefaultRenderer(Long.class, new CellRenderer());
+		conflictTable.setDefaultRenderer(Date.class, new CellRenderer());
+		
+		newTable.setDefaultRenderer(Object.class, new CellRenderer());
+		newTable.setDefaultRenderer(Long.class, new CellRenderer());
+		newTable.setDefaultRenderer(Date.class, new CellRenderer());
+		
+		matchTable.setDefaultRenderer(Object.class, new CellRenderer());
+		matchTable.setDefaultRenderer(Long.class, new CellRenderer());
+		matchTable.setDefaultRenderer(Date.class, new CellRenderer());
 		
 		conflictTable.setFillsViewportHeight(true);
 		newTable.setFillsViewportHeight(true);
@@ -315,6 +335,7 @@ public class ImportValidationView extends InitializableView {
 		
 		if(conflicts == 0){
 			if(imports.size() == 1){
+				viewDisplayer.getFrame().setSize(new Dimension(800, 800));
 				returnToMain();
 			} else if(imports.size() > 1) {
 				this.removeAll();
@@ -398,6 +419,8 @@ public class ImportValidationView extends InitializableView {
 					if(donationsFromPerson.size() == 0){
 						personService.delete(oldPerson);
 					}
+					donationService.delete(d);
+				} else {
 					donationService.delete(d);
 				}
 			} catch (ServiceException e) {
@@ -483,6 +506,7 @@ public class ImportValidationView extends InitializableView {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			viewDisplayer.getFrame().setSize(new Dimension(800, 800));
 			returnToMain();
 		}
 	}

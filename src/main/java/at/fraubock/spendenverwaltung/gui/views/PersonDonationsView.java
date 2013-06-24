@@ -1,5 +1,8 @@
 package at.fraubock.spendenverwaltung.gui.views;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -37,6 +40,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXDatePicker;
 
+import at.fraubock.spendenverwaltung.gui.CellRenderer;
 import at.fraubock.spendenverwaltung.gui.DonationTableModel;
 import at.fraubock.spendenverwaltung.gui.SimpleComboBoxModel;
 import at.fraubock.spendenverwaltung.gui.components.ComponentConstants;
@@ -93,8 +97,9 @@ public class PersonDonationsView extends InitializableView {
 	private DonationTableModel donationTableModel;
 	
 	private File confirmationTemplateFile;
-	JXDatePicker confirmationPicker;
+	private JXDatePicker confirmationPicker;
 	private JLabel dateLabel;
+	private JDialog donationConfirmationDialog;
 	
 	public PersonDonationsView (ViewActionFactory viewActionFactory, ComponentFactory componentFactory,
 			IDonationService donationService, IConfirmationService confirmationService, IAddressService addressService, Person selectedPerson, PersonTableModel personTableModel) {
@@ -133,6 +138,8 @@ public class PersonDonationsView extends InitializableView {
 		
 		donationTableModel = new DonationTableModel();
 		donationsTable = new JTable(donationTableModel);
+		donationsTable.setDefaultRenderer(Object.class, new CellRenderer());
+		donationsTable.setDefaultRenderer(Date.class, new CellRenderer());
 		donationsTable.setDefaultRenderer(Long.class, new LongCellRenderer());
 		donationsTable.setAutoCreateRowSorter(true);
 		donationsTable.setFillsViewportHeight(true);
@@ -726,11 +733,71 @@ public class PersonDonationsView extends InitializableView {
 		}	
 	}
 	
+	private final class ConfirmAllAction extends AbstractAction {
+		
+		private static final long serialVersionUID = 1L;
+
+		JPanel donationConfirmationPanel;
+		JLabel donationHeadLabel;
+		JLabel templateLabel;
+		JButton templateButton;
+		JButton saveButton;
+		JButton cancelButton;
+		Donation donation;
+		JLabel confirmationLabel;
+				
+		public ConfirmAllAction() {
+			super("Spendenbest\u00E4tigung für alle");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			feedbackLabel.setText("");
+			
+			List<Donation> donations = donationTableModel.getDonations();
+			
+			donationConfirmationDialog = new JDialog(SwingUtilities.getWindowAncestor(contentPanel), Dialog.ModalityType.APPLICATION_MODAL);
+			donationConfirmationDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+			donationConfirmationPanel = componentFactory.createPanel(350, 250);
+
+			//add headline
+			donationHeadLabel = componentFactory.createLabel(donations.size() + " Spendenbest\u00E4tigungen erstellen");
+			donationHeadLabel.setFont(new Font("Headline", Font.PLAIN, 14));
+			donationConfirmationPanel.add(donationHeadLabel, "wrap 20px, span 2");
+			
+			//add template
+			templateLabel = componentFactory.createLabel("Vorlage: ");
+			donationConfirmationPanel.add(templateLabel, "split2");
+			
+			templateButton = new JButton(new ChooseDonationConfirmationTemplate());
+			donationConfirmationPanel.add(templateButton, "gap 12, wrap, growx");
+			
+			//add date
+			confirmationLabel = componentFactory.createLabel("Datum: ");
+			donationConfirmationPanel.add(confirmationLabel, "split2");
+			
+			confirmationPicker = new JXDatePicker(new java.util.Date());
+			donationConfirmationPanel.add(confirmationPicker, "gap 20, wrap 20px, growx");
+			
+			//add save + cancel
+			saveButton = new JButton(new CreateConfirmationAction(donations));
+			donationConfirmationPanel.add(saveButton, "split 2");
+			
+			cancelButton = new JButton(new CancelDonationConfirmation(donationConfirmationDialog));
+			donationConfirmationPanel.add(cancelButton, "wrap");
+			
+			donationConfirmationDialog.add(donationConfirmationPanel);
+			donationConfirmationDialog.pack();
+			donationConfirmationDialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(contentPanel));
+			donationConfirmationDialog.setVisible(true);
+		}	
+	}
+	
 	private final class ConfirmAction extends AbstractAction {
 		
 		private static final long serialVersionUID = 1L;
 
-		JDialog donationConfirmationDialog;
 		JPanel donationConfirmationPanel;
 		JLabel donationHeadLabel;
 		JLabel templateLabel;
@@ -782,7 +849,9 @@ public class PersonDonationsView extends InitializableView {
 			donationConfirmationPanel.add(confirmationPicker, "gap 20, wrap 20px, growx");
 			
 			//add save + cancel
-			saveButton = new JButton(new CreateConfirmationAction(donation));
+			List<Donation> donationList = new ArrayList<Donation>();
+			donationList.add(donation);
+			saveButton = new JButton(new CreateConfirmationAction(donationList));
 			donationConfirmationPanel.add(saveButton, "split 2");
 			
 			cancelButton = new JButton(new CancelDonationConfirmation(donationConfirmationDialog));
@@ -861,54 +930,72 @@ public class PersonDonationsView extends InitializableView {
 	private final class CreateConfirmationAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
-		private Donation donation;
+		private List<Donation> donations;
 
-		public CreateConfirmationAction(Donation donation) {
+		public CreateConfirmationAction(List<Donation> donations) {
 			super("Speichern");
-			this.donation = donation;
+			this.donations = donations;
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			List<Donation> donationList = new ArrayList<Donation>();
-			donationList.add(donation);
-			Confirmation confirmation = new Confirmation();
-			
-			confirmation.setDonation(donation);
-			confirmation.setDate(confirmationPicker.getDate());
-			confirmation.setPerson(donation.getDonator());
-			
+			int counter = 1;
 			String fileName = showSaveDialog();
+			
+			ConfirmationTemplate confirmationTemplate = new ConfirmationTemplate();
+			confirmationTemplate.setFile(confirmationTemplateFile);
+			confirmationTemplate.setName(confirmationTemplateFile.getName());
+			
 			
 			if(fileName.equals(""))
 				return;
-
+			
 			try {
-				
-				if(confirmationTemplateFile != null) {
-					ConfirmationTemplate confirmationTemplate = new ConfirmationTemplate();
-					confirmationTemplate.setFile(confirmationTemplateFile);
-					confirmationTemplate.setName("abc");
-					
 					confirmationTemplate = confirmationService.insertOrUpdateConfirmationTemplate(confirmationTemplate);
-					
+			} catch (ServiceException e1) {
+				log.error(e1 + " occured in CreateConfirmationsView");
+			//	feedbackLabel.setText("Ein Fehler ist waehrend der Erstellung dieser Aussendung aufgetreten.");
+				JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
+			}
+			
+			for(Donation donation : donations){
+				Confirmation confirmation = new Confirmation();
+				
+				confirmation.setDonation(donation);
+				confirmation.setDate(confirmationPicker.getDate());
+				confirmation.setPerson(donation.getDonator());
+				
+				try {
 					confirmation.setTemplate(confirmationTemplate);
 
 					confirmationService.insertOrUpdate(confirmation);
 					//feedbackLabel.setText("Best\u00E4tigung wurde erstellt.");
-					JOptionPane.showMessageDialog(contentPanel, "Spendenbest\u00E4tigung erfolgreich erstellt.", "Information", JOptionPane.INFORMATION_MESSAGE);
 					
-					ConfirmationTemplateUtil.createMailingWithDocxTemplate(confirmationTemplateFile,donationList, fileName);
+					if(counter == donations.size())
+						JOptionPane.showMessageDialog(contentPanel, "Spendenbest\u00E4tigung erfolgreich erstellt.", "Information", JOptionPane.INFORMATION_MESSAGE);
+					
+					counter ++;
+				} catch (ServiceException e1) {
+					log.error(e1 + " occured in CreateConfirmationsView");
+				//	feedbackLabel.setText("Ein Fehler ist waehrend der Erstellung dieser Aussendung aufgetreten.");
+					JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
 				}
+				
+			}
+			
+			try {
+				ConfirmationTemplateUtil.createMailingWithDocxTemplate(confirmationTemplateFile,donations, fileName);
 			} catch (ServiceException e1) {
-				log.error(e1 + " occured in CreateMailingsView");
+				log.error(e1 + " occured in CreateConfirmationsView");
 			//	feedbackLabel.setText("Ein Fehler ist waehrend der Erstellung dieser Aussendung aufgetreten.");
 				JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
 			} catch (IOException e1) {
-				log.error(e1 + " occured in CreateMailingsView");
+				log.error(e1 + " occured in CreateConfirmationsView");
 				//feedbackLabel.setText("Ein Fehler ist waehrend der Erstellung des PDFs aufgetreten.");
 				JOptionPane.showMessageDialog(contentPanel, "Ein Fehler ist aufgetreten. Bitte kontaktieren Sie Ihren Administrator.", "Fehler", JOptionPane.ERROR_MESSAGE);
 			}
+			
+			donationConfirmationDialog.dispose();
 		}
 
 	}
@@ -952,20 +1039,6 @@ public class PersonDonationsView extends InitializableView {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			parent.dispose();
-		}	
-	}
-	
-	private final class ConfirmAllAction extends AbstractAction {
-		
-		private static final long serialVersionUID = 1L;
-		
-		public ConfirmAllAction() {
-			super("Spendenbest\u00E4tigung f\u00FCr alle");
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			//TODO alldonationconfirmation logic
 		}	
 	}
 	
@@ -1020,6 +1093,8 @@ public class PersonDonationsView extends InitializableView {
 	
 	private final class LongCellRenderer extends DefaultTableCellRenderer {
 
+	    Color color = new Color(240,240,240);
+
 		/**
 		 * 
 		 */
@@ -1029,6 +1104,20 @@ public class PersonDonationsView extends InitializableView {
 		protected void setValue(Object value) {
 			NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
 			super.setValue(nf.format((Double)value));
+		}
+	    
+		@Override
+		public Component getTableCellRendererComponent(JTable table, Object obj, boolean isSelected, boolean hasFocus, int row, int column) {
+		    JLabel label = (JLabel)super.getTableCellRendererComponent(table, obj, isSelected,hasFocus, row, column);
+		    
+		    if((row % 2) == 1 && !isSelected){
+		        label.setBackground(color);
+		    }
+		    else if((row % 2) == 0 && !isSelected){
+		        label.setBackground(Color.WHITE);
+		    }
+		    
+		    return label;
 		}
 		
 	}

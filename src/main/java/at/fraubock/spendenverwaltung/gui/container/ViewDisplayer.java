@@ -36,6 +36,10 @@ public class ViewDisplayer {
 		frame.setVisible(true);
 	}
 	
+	public JFrame getFrame(){
+		return frame;
+	}
+	
 	/**
 	 * changes the content of the frame's JScrollPane and displays it
 	 * @param newView

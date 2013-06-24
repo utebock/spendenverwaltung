@@ -25,8 +25,10 @@ import at.fraubock.spendenverwaltung.interfaces.dao.IDonationDAO;
 import at.fraubock.spendenverwaltung.interfaces.dao.IPersonDAO;
 import at.fraubock.spendenverwaltung.interfaces.domain.Confirmation;
 import at.fraubock.spendenverwaltung.interfaces.domain.ConfirmationTemplate;
+import at.fraubock.spendenverwaltung.interfaces.domain.filter.Filter;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.PersistenceException;
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ValidationException;
+import at.fraubock.spendenverwaltung.util.filter.FilterBuilder;
 
 public class ConfirmationDAOImplemented implements IConfirmationDAO {
 
@@ -54,6 +56,7 @@ public class ConfirmationDAOImplemented implements IConfirmationDAO {
 		this.donationDao = donationDao;
 	}
 
+	
 	public static void validate(Confirmation c) throws ValidationException{
 		if(c == null)
 			throw new ValidationException("Confirmation was null");
@@ -358,6 +361,53 @@ public class ConfirmationDAOImplemented implements IConfirmationDAO {
 		}
 	}
 	
+	@Override
+	public List<Confirmation> getByPersonNameLike(String searchString) throws PersistenceException {
+		log.debug("Entering getByPersonNameLike with param " + searchString);
+
+		try {
+			ConfirmationMapper mapper = new ConfirmationMapper();
+			List<Confirmation> confirmations = jdbcTemplate.query(
+					"SELECT c.*, s.donationid, m.from_date, m.to_date " +
+					"FROM donation_confirmations c " +
+						"left outer join single_donation_confirmation s on c.id = s.id " +
+						"left outer join multiple_donations_confirmation m on c.id = m.id " +
+						"join persons p on c.personid = p.id "+
+					"WHERE p.givenname like ? OR p.surname like ?",
+					new Object[] { "%"+searchString+"%","%"+searchString+"%" }, mapper);
+
+			for (Confirmation c : confirmations) {
+				Integer tmplId = mapper.getTemplateIds().get(c.getId());
+				if(tmplId != null){
+					c.setTemplate(confirmationTemplateDao.getByID(tmplId));
+				}
+				
+				Integer personId = mapper.getPersonIds().get(c.getId());
+				if(personId != null){
+					c.setPerson(personDao.getById(personId));
+				}
+				
+				if(c.getFromDate() == null && c.getToDate() == null){
+					Integer donationId = mapper.getDonationIds().get(c.getId());
+					if(donationId != null){
+						c.setDonation(donationDao.getByID(donationId));
+					}
+				}
+			}
+
+			log.debug("Returning from getByPersonNameLike with result " + confirmations);
+			return confirmations;
+		} catch (EmptyResultDataAccessException e) {
+			// return null if query returns 0 rows
+			return null;
+
+		} catch (DataAccessException e) {
+			log.warn(e.getLocalizedMessage());
+			throw new PersistenceException(e);
+		}
+
+	}
+
 	private class ConfirmationMapper implements RowMapper<Confirmation> {
 
 		private Map<Integer, Integer> templateIds = new HashMap<Integer, Integer>();

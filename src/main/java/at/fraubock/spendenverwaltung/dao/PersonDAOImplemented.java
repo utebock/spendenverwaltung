@@ -434,12 +434,16 @@ public class PersonDAOImplemented implements IPersonDAO {
 								p.getMainAddress().getCity() },
 						new PersonMapper());
 			} else {
-				String select = "select * from persons p, addresses a, livesat l WHERE (l.pid = p.id AND l.aid = a.id AND vp.id = p.id) AND ((p.surname LIKE ? AND p.givenname LIKE ?) AND (p.email LIKE ? OR p.telephone LIKE ?))";
-				selectedPersons = jdbcTemplate.query(
-						select,
-						new Object[] { p.getSurname(), p.getGivenName(),
-								p.getEmail(), p.getTelephone() },
-						new PersonMapper());
+				if((p.getSurname() != null && p.getGivenName() != null) && (p.getEmail() != null || p.getTelephone() != null)){
+					String select = "select * from persons p WHERE ((p.surname LIKE ? AND p.givenname LIKE ?) AND (p.email LIKE ? OR p.telephone LIKE ?))";
+					selectedPersons = jdbcTemplate.query(
+							select,
+							new Object[] { p.getSurname(), p.getGivenName(),
+									p.getEmail(), p.getTelephone() },
+							new PersonMapper());
+				} else{
+					selectedPersons = new ArrayList<Person>();
+				}
 			}
 
 			log.info("found " + selectedPersons.size()
