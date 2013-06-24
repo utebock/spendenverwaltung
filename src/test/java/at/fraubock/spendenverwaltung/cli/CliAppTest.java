@@ -25,35 +25,42 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import at.fraubock.spendenverwaltung.interfaces.exceptions.ServiceException;
 import at.fraubock.spendenverwaltung.interfaces.service.IActionService;
-import at.fraubock.spendenverwaltung.interfaces.service.IDonationService;
+import at.fraubock.spendenverwaltung.interfaces.service.IConfirmationService;
 import at.fraubock.spendenverwaltung.interfaces.service.IFilterService;
 import at.fraubock.spendenverwaltung.interfaces.service.IImportService;
+import at.fraubock.spendenverwaltung.interfaces.service.IMailChimpService;
 import at.fraubock.spendenverwaltung.interfaces.service.IMailingService;
-import at.fraubock.spendenverwaltung.interfaces.service.IPersonService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/testspring.xml")
 public class CliAppTest {
 
 	private IActionService actionService;
-	private IDonationService donationService;
+	private IConfirmationService confirmationService;
 	private IFilterService filterService;
 	private IImportService importService;
 	private IMailingService mailingService;
-	private IPersonService personService;
+	private IMailChimpService mailChimpService;
 	private ByteArrayOutputStream out;
 	private ByteArrayOutputStream err;
 	private BasicDataSource dataSource;
+	private Object[] allMocks;
+	private Object[] serviceMocks;
 
 	@Before
 	public void setUp() {
 		actionService = mock(IActionService.class);
-		donationService = mock(IDonationService.class);
+		confirmationService = mock(IConfirmationService.class);
 		mailingService = mock(IMailingService.class);
-		personService = mock(IPersonService.class);
+		mailChimpService = mock(IMailChimpService.class);
 		importService = mock(IImportService.class);
 		filterService = mock(IFilterService.class);
 		dataSource = mock(BasicDataSource.class);
+		serviceMocks = new Object[] { actionService, confirmationService,
+				mailChimpService, mailingService, importService, filterService };
+		allMocks = new Object[] { actionService, confirmationService,
+				mailChimpService, mailingService, importService, filterService,
+				dataSource };
 		out = new ByteArrayOutputStream();
 		err = new ByteArrayOutputStream();
 	}
@@ -65,11 +72,11 @@ public class CliAppTest {
 				"--url=unneededhost:500/unneededdb" }, new PrintStream(out),
 				new PrintStream(err));
 		exec.setActionService(actionService);
-		exec.setDonationService(donationService);
 		exec.setFilterService(filterService);
 		exec.setImportService(importService);
 		exec.setMailingService(mailingService);
-		exec.setPersonService(personService);
+		exec.setConfirmationService(confirmationService);
+		exec.setMailChimpService(mailChimpService);
 		exec.setDataSource(dataSource);
 		exec.setDefaultDatabaseUrl("defaultUrl");
 		int errCode = exec.execute(null);
@@ -90,8 +97,7 @@ public class CliAppTest {
 		verify(dataSource, times(1)).setPassword("unneededpass");
 		verify(dataSource, times(1)).setUrl(
 				"jdbc:mysql://unneededhost:500/unneededdb");
-		verifyNoMoreInteractions(actionService, donationService, filterService,
-				importService, mailingService, personService, dataSource);
+		verifyNoMoreInteractions(allMocks);
 	}
 
 	@Test
@@ -100,13 +106,11 @@ public class CliAppTest {
 				"--user=unneededuser", "--password=unneededpass", },
 				new PrintStream(out), new PrintStream(err));
 		exec.setActionService(actionService);
-		exec.setDonationService(donationService);
 		exec.setFilterService(filterService);
+		exec.setConfirmationService(confirmationService);
+		exec.setMailChimpService(mailChimpService);
 		exec.setImportService(importService);
 		exec.setMailingService(mailingService);
-		exec.setPersonService(personService);
-		exec.setDataSource(dataSource);
-		exec.setDefaultDatabaseUrl("unneededhost:500/unneededdb");
 		exec.setDataSource(dataSource);
 		exec.setDefaultDatabaseUrl("defaultUrl");
 		int errCode = exec.execute(null);
@@ -125,10 +129,8 @@ public class CliAppTest {
 
 		verify(dataSource, times(1)).setUsername("unneededuser");
 		verify(dataSource, times(1)).setPassword("unneededpass");
-		verify(dataSource, times(1)).setUrl(
-				"jdbc:mysql://defaultUrl");
-		verifyNoMoreInteractions(actionService, donationService, filterService,
-				importService, mailingService, personService, dataSource);
+		verify(dataSource, times(1)).setUrl("jdbc:mysql://defaultUrl");
+		verifyNoMoreInteractions(allMocks);
 	}
 
 	@Test
@@ -137,11 +139,11 @@ public class CliAppTest {
 				"--user=unneededuser", "--password=unneededpass", },
 				new PrintStream(out), new PrintStream(err));
 		exec.setActionService(actionService);
-		exec.setDonationService(donationService);
 		exec.setFilterService(filterService);
+		exec.setConfirmationService(confirmationService);
+		exec.setMailChimpService(mailChimpService);
 		exec.setImportService(importService);
 		exec.setMailingService(mailingService);
-		exec.setPersonService(personService);
 		exec.setDataSource(dataSource);
 		exec.setDefaultDatabaseUrl("defaultUrl");
 		int errCode = exec.execute(null);
@@ -159,8 +161,7 @@ public class CliAppTest {
 		assertTrue(out.toString().contains("manuelbichler@aim.com"));
 
 		verify(importService, never()).nativeImport(any(File.class));
-		verifyNoMoreInteractions(actionService, donationService, filterService,
-				importService, mailingService, personService);
+		verifyNoMoreInteractions(serviceMocks);
 	}
 
 	@Test
@@ -169,11 +170,11 @@ public class CliAppTest {
 				"--user=unneededuser", "--password=unneededpass", },
 				new PrintStream(out), new PrintStream(err));
 		exec.setActionService(actionService);
-		exec.setDonationService(donationService);
+		exec.setConfirmationService(confirmationService);
+		exec.setMailChimpService(mailChimpService);
 		exec.setFilterService(filterService);
 		exec.setImportService(importService);
 		exec.setMailingService(mailingService);
-		exec.setPersonService(personService);
 		exec.setDataSource(dataSource);
 		exec.setDefaultDatabaseUrl("defaultUrl");
 		int errCode = exec.execute(null);
@@ -185,8 +186,7 @@ public class CliAppTest {
 		assertTrue(err.toString().contains("Error"));
 
 		verify(importService, never()).nativeImport(any(File.class));
-		verifyNoMoreInteractions(actionService, donationService, filterService,
-				importService, mailingService, personService);
+		verifyNoMoreInteractions(allMocks);
 	}
 
 	@Test
@@ -195,11 +195,11 @@ public class CliAppTest {
 				"--user=unneededuser", "--password=unneededpass", },
 				new PrintStream(out), new PrintStream(err));
 		exec.setActionService(actionService);
-		exec.setDonationService(donationService);
 		exec.setFilterService(filterService);
 		exec.setImportService(importService);
 		exec.setMailingService(mailingService);
-		exec.setPersonService(personService);
+		exec.setConfirmationService(confirmationService);
+		exec.setMailChimpService(mailChimpService);
 		exec.setDataSource(dataSource);
 		exec.setDefaultDatabaseUrl("defaultUrl");
 		int errCode = exec.execute(null);
@@ -211,8 +211,7 @@ public class CliAppTest {
 		assertTrue(err.toString().contains("Error"));
 
 		verify(importService, never()).nativeImport(any(File.class));
-		verifyNoMoreInteractions(actionService, donationService, filterService,
-				importService, mailingService, personService);
+		verifyNoMoreInteractions(allMocks);
 	}
 
 	@Test
@@ -222,11 +221,11 @@ public class CliAppTest {
 				"--password=unneededpass", }, new PrintStream(out),
 				new PrintStream(err));
 		exec.setActionService(actionService);
-		exec.setDonationService(donationService);
+		exec.setConfirmationService(confirmationService);
+		exec.setMailChimpService(mailChimpService);
 		exec.setFilterService(filterService);
 		exec.setImportService(importService);
 		exec.setMailingService(mailingService);
-		exec.setPersonService(personService);
 		exec.setDataSource(dataSource);
 		exec.setDefaultDatabaseUrl("defaultUrl");
 		int errCode = exec.execute(null);
@@ -239,8 +238,7 @@ public class CliAppTest {
 
 		verify(importService, times(1)).nativeImport(eq(new File("test.csv")));
 		verify(importService, times(1)).nativeImport(any(File.class));
-		verifyNoMoreInteractions(actionService, donationService, filterService,
-				importService, mailingService, personService);
+		verifyNoMoreInteractions(serviceMocks);
 	}
 
 	@Test
@@ -250,11 +248,11 @@ public class CliAppTest {
 				"--password=unneededpass", }, new PrintStream(out),
 				new PrintStream(err));
 		exec.setActionService(actionService);
-		exec.setDonationService(donationService);
 		exec.setFilterService(filterService);
 		exec.setImportService(importService);
+		exec.setConfirmationService(confirmationService);
+		exec.setMailChimpService(mailChimpService);
 		exec.setMailingService(mailingService);
-		exec.setPersonService(personService);
 		exec.setDataSource(dataSource);
 		exec.setDefaultDatabaseUrl("defaultUrl");
 		int errCode = exec.execute(null);
@@ -267,8 +265,7 @@ public class CliAppTest {
 
 		verify(importService, times(1)).hypoImport(eq(new File("test.csv")));
 		verify(importService, times(1)).hypoImport(any(File.class));
-		verifyNoMoreInteractions(actionService, donationService, filterService,
-				importService, mailingService, personService);
+		verifyNoMoreInteractions(serviceMocks);
 	}
 
 	@Test
@@ -278,11 +275,11 @@ public class CliAppTest {
 				"--password=unneededpass", }, new PrintStream(out),
 				new PrintStream(err));
 		exec.setActionService(actionService);
-		exec.setDonationService(donationService);
 		exec.setFilterService(filterService);
 		exec.setImportService(importService);
 		exec.setMailingService(mailingService);
-		exec.setPersonService(personService);
+		exec.setConfirmationService(confirmationService);
+		exec.setMailChimpService(mailChimpService);
 		exec.setDataSource(dataSource);
 		exec.setDefaultDatabaseUrl("defaultUrl");
 		int errCode = exec.execute(null);
@@ -295,8 +292,7 @@ public class CliAppTest {
 
 		verify(importService, times(1)).smsImport(eq(new File("sms.csv")));
 		verify(importService, times(1)).smsImport(any(File.class));
-		verifyNoMoreInteractions(actionService, donationService, filterService,
-				importService, mailingService, personService);
+		verifyNoMoreInteractions(serviceMocks);
 	}
 
 	@Test
@@ -306,11 +302,11 @@ public class CliAppTest {
 				"--password=unneededpass", }, new PrintStream(out),
 				new PrintStream(err));
 		exec.setActionService(actionService);
-		exec.setDonationService(donationService);
 		exec.setFilterService(filterService);
 		exec.setImportService(importService);
 		exec.setMailingService(mailingService);
-		exec.setPersonService(personService);
+		exec.setConfirmationService(confirmationService);
+		exec.setMailChimpService(mailChimpService);
 		exec.setDataSource(dataSource);
 		exec.setDefaultDatabaseUrl("defaultUrl");
 		int errCode = exec.execute(null);
@@ -322,8 +318,7 @@ public class CliAppTest {
 		assertTrue(err.toString().contains("Error"));
 
 		verify(importService, times(0)).nativeImport(any(File.class));
-		verifyNoMoreInteractions(actionService, donationService, filterService,
-				importService, mailingService, personService);
+		verifyNoMoreInteractions(allMocks);
 	}
 
 	@Test
@@ -333,11 +328,11 @@ public class CliAppTest {
 						"--password=unneededpass", }, new PrintStream(out),
 				new PrintStream(err));
 		exec.setActionService(actionService);
-		exec.setDonationService(donationService);
 		exec.setFilterService(filterService);
 		exec.setImportService(importService);
+		exec.setConfirmationService(confirmationService);
+		exec.setMailChimpService(mailChimpService);
 		exec.setMailingService(mailingService);
-		exec.setPersonService(personService);
 		exec.setDataSource(dataSource);
 		exec.setDefaultDatabaseUrl("defaultUrl");
 		int errCode = exec.execute(null);
@@ -350,8 +345,7 @@ public class CliAppTest {
 
 		verify(importService, times(1)).nativeImport(eq(new File("test.csv")));
 		verify(importService, times(1)).nativeImport(any(File.class));
-		verifyNoMoreInteractions(actionService, donationService, filterService,
-				importService, mailingService, personService);
+		verifyNoMoreInteractions(serviceMocks);
 	}
 
 	@Test
@@ -364,11 +358,11 @@ public class CliAppTest {
 						"--password=unneededpass", }, new PrintStream(out),
 				new PrintStream(err));
 		exec.setActionService(actionService);
-		exec.setDonationService(donationService);
 		exec.setFilterService(filterService);
+		exec.setConfirmationService(confirmationService);
+		exec.setMailChimpService(mailChimpService);
 		exec.setImportService(importService);
 		exec.setMailingService(mailingService);
-		exec.setPersonService(personService);
 		exec.setDataSource(dataSource);
 		exec.setDefaultDatabaseUrl("defaultUrl");
 		int errCode = exec.execute(null);
@@ -381,8 +375,7 @@ public class CliAppTest {
 
 		verify(importService, times(1)).nativeImport(eq(new File("test.csv")));
 		verify(importService, times(1)).nativeImport(any(File.class));
-		verifyNoMoreInteractions(actionService, donationService, filterService,
-				importService, mailingService, personService);
+		verifyNoMoreInteractions(serviceMocks);
 	}
 
 	@Test
@@ -393,11 +386,11 @@ public class CliAppTest {
 				"--user=unneededuser", "--password=unneededpass", },
 				new PrintStream(out), new PrintStream(err));
 		exec.setActionService(actionService);
-		exec.setDonationService(donationService);
 		exec.setFilterService(filterService);
 		exec.setImportService(importService);
 		exec.setMailingService(mailingService);
-		exec.setPersonService(personService);
+		exec.setConfirmationService(confirmationService);
+		exec.setMailChimpService(mailChimpService);
 		exec.setDataSource(dataSource);
 		exec.setDefaultDatabaseUrl("defaultUrl");
 
@@ -410,7 +403,6 @@ public class CliAppTest {
 		assertEquals("", err.toString());
 
 		verify(filterService, times(1)).convertResultsToCSVById(13);
-		verifyNoMoreInteractions(actionService, donationService, filterService,
-				importService, mailingService, personService);
+		verifyNoMoreInteractions(serviceMocks);
 	}
 }

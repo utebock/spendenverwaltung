@@ -166,6 +166,8 @@
 	</bean>
 	<bean id="mailChimpService"
 		class="at.fraubock.spendenverwaltung.service.MailChimpServiceImplemented">
+		<property name="mailingService" ref="mailingService" />
+		<property name="personService" ref="personService" />
 	</bean>
 
 </beans>
