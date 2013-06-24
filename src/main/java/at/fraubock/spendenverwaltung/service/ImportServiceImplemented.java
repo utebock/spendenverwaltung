@@ -143,6 +143,7 @@ public class ImportServiceImplemented implements IImportService {
 				donation.setType(DonationType.getByName(row.getType()));
 
 				// Address
+				if(row.getStreet().length()>0&&row.getCity().length()>0&&row.getPostcode().length()>0){
 				address = new Address();
 				address.setStreet(row.getStreet());
 				address.setCity(row.getCity());
@@ -152,6 +153,8 @@ public class ImportServiceImplemented implements IImportService {
 				// Connect domains
 				person.setMainAddress(address);
 
+				}
+				
 				donation.setDonator(person);
 				donation.setSource(imp);
 
@@ -170,18 +173,18 @@ public class ImportServiceImplemented implements IImportService {
 
 				// Address
 				address = person.getMainAddress();
-				if (address.getId() == null) {
+				if (address != null){
+					if(address.getId() == null) {
 					address = addressService.create(address);
-				}
+					}
+				
 				addresses = person.getAddresses();
 				addresses.add(address);
 				person.setAddresses(addresses);
 				person.setMainAddress(address);
+				}
 
-				log.debug("Person: " + person.getGivenName() + " "
-						+ person.getSurname() + " " + person.getEmail()
-						+ " id:" + person.getId() + " mainaddressid:"
-						+ person.getMainAddress().getId());
+				
 				// Person
 				if (person.getId() == null) {
 					person = personService.create(person);
